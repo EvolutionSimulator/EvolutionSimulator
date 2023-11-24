@@ -49,10 +49,10 @@ if(WIN32)
         VERBATIM)
 endif()
 
-add_subdirectory("../Engine" "${CMAKE_BINARY_DIR}/Engine")
 target_include_directories(UI PRIVATE
-    "../Engine/include"
-    ${CMAKE_CURRENT_SOURCE_DIR})
+    ${ENGINE_INCLUDE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
 target_link_libraries(UI PRIVATE Engine)
 
 if(${QT_VERSION} VERSION_LESS 6.1.0)
