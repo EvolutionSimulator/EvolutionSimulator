@@ -14,6 +14,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 add_library(Engine STATIC
   include/engine.h src/engine.cpp
   include/simulation.h src/simulation.cpp
+  include/simulationdata.h
 )
 
 target_include_directories(Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
