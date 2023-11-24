@@ -13,8 +13,6 @@ public:
     void Run();
     void Stop();
 
-    void UpdateSimulation(Simulation*, double deltaTime);
-    void FixedUpdateSimulation(Simulation*, double deltaTime);
     Simulation* GetSimulation();
 
 private:

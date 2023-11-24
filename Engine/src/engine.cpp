@@ -31,10 +31,10 @@ void Engine::Run()
 
             int fixed_update_steps = std::floor(fixed_update_delta / fixedUpdateInterval);
             for (int i = 0; i < fixed_update_steps; i++) {
-                FixedUpdateSimulation(simulation_, fixedUpdateInterval);
+                simulation_->FixedUpdate(fixedUpdateInterval);
             }
 
-            UpdateSimulation(simulation_, update_delta);
+            simulation_->Update(update_delta);
 
             lastUpdateTime_ = current_time;
             lastFixedUpdateTime_ +=
@@ -48,14 +48,6 @@ void Engine::Run()
 void Engine::Stop()
 {
     running_ = false;
-}
-
-void Engine::UpdateSimulation(Simulation* simulation, double deltaTime) {
-    simulation->Update(deltaTime);
-}
-
-void Engine::FixedUpdateSimulation(Simulation* simulation, double deltaTime) {
-    simulation->FixedUpdate(deltaTime);
 }
 
 Simulation *Engine::GetSimulation()

@@ -16,8 +16,11 @@ public :
     Simulation* GetSimulation();
 
 private :
-    void OnInit();
-    void OnUpdate();
+    virtual void OnInit() override;
+    virtual void OnUpdate() override;
+
+    void RenderSimulation(SimulationData* data);
 
     Simulation* simulation_ = nullptr;
+    std::function<void(SimulationData*)> render_lambda_;
 };

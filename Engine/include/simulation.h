@@ -1,20 +1,22 @@
 #pragma once
 
-#include "engine.h"
+#include "simulationdata.h"
+#include <functional>
+#include <mutex>
 
 class Simulation
 {
-    friend void Engine::UpdateSimulation(Simulation*, double deltaTime);
-    friend void Engine::FixedUpdateSimulation(Simulation*, double deltaTime);
-
 public:
     Simulation();
+    ~Simulation();
 
-    double x = 0;
-    double y = 0;
-
-protected:
+    void Start();
     void Update(double deltaTime);
     void FixedUpdate(double deltaTime);
 
+    void ProcessData(std::function<void(SimulationData*)> processFunc);
+
+private:
+    SimulationData* data_;
+    std::mutex data_mutex_;
 };
