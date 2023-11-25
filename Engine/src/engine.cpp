@@ -21,6 +21,8 @@ void Engine::Run()
         lastUpdateTime_ = engineStartTime_;
         lastFixedUpdateTime_ = engineStartTime_;
 
+        simulation_->Start();
+
         while (running_) {
             timer::time_point current_time = timer::now();
             double fixed_update_delta =
