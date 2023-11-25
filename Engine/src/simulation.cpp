@@ -10,6 +10,10 @@ Simulation::~Simulation()
     delete data_;
 }
 
+void Simulation::Start() {
+
+}
+
 void Simulation::Update(double deltaTime)
 {
     std::lock_guard<std::mutex> lock(data_mutex_);
