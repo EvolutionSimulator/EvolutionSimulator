@@ -20,11 +20,11 @@ endif()
 
 qt_add_executable(UI
     MANUAL_FINALIZATION
-    main.cpp
-    mainwindow.cpp mainwindow.h
-    mainwindow.ui
-    qsfmlcanvas.h qsfmlcanvas.cpp
-    simulationcanvas.h simulationcanvas.cpp
+    src/main.cpp
+    src/mainwindow.cpp include/mainwindow.h
+    src/mainwindow.ui
+    include/qsfmlcanvas.h src/qsfmlcanvas.cpp
+    include/simulationcanvas.h src/simulationcanvas.cpp
 
 )
 
@@ -49,6 +49,7 @@ if(WIN32)
         VERBATIM)
 endif()
 
+target_include_directories(Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(UI PRIVATE
     ${ENGINE_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
@@ -56,7 +57,7 @@ target_include_directories(UI PRIVATE
 target_link_libraries(UI PRIVATE Engine)
 
 if(${QT_VERSION} VERSION_LESS 6.1.0)
-  set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.UI)
+  set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.evolution.UI)
 endif()
 set_target_properties(UI PROPERTIES
     ${BUNDLE_ID_OPTION}
