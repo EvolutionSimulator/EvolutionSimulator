@@ -31,3 +31,7 @@ void MainWindow::RunSimulation()
         engine_thread_ = std::thread(&Engine::Run, engine_);
     }
 }
+
+void Nothing_but_git_testing() {
+    double i = 1;
+}
