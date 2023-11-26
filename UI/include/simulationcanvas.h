@@ -22,5 +22,5 @@ private :
     void RenderSimulation(SimulationData* data);
 
     Simulation* simulation_ = nullptr;
-    std::function<void(SimulationData*)> render_lambda_;
+    std::function<void(SimulationData*)> render_lambda_; // we will pass this to the ProcessData method of Simulation
 };

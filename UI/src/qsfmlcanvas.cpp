@@ -11,7 +11,7 @@ QSFMLCanvas::QSFMLCanvas(QWidget* Parent) :
     // Set strong focus to enable keyboard events to be received
     setFocusPolicy(Qt::StrongFocus);
 
-    // Setup the timer
+    // Setup the timer with a specified refresh interval (0 means it updates as fast as possible)
     timer_.setInterval(0);
 }
 
@@ -46,11 +46,13 @@ void QSFMLCanvas::showEvent(QShowEvent*)
     }
 }
 
+// I have no clue what this does exactly but if its not present then the widget flickers like crazy
 QPaintEngine* QSFMLCanvas::paintEngine() const
 {
     return nullptr;
 }
 
+// called when the widget is repainted
 void QSFMLCanvas::paintEvent(QPaintEvent*)
 {
     OnUpdate();
