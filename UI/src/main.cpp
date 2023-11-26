@@ -9,15 +9,15 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    QApplication app(argc, argv);
 
     Engine mainEngine;
 
-    MainWindow w;
-    w.SetEngine(&mainEngine);
-    w.show();
+    MainWindow window;
+    window.SetEngine(&mainEngine);
+    window.show();
 
-    int result = a.exec();
+    int result = app.exec();
 
     return result;
 }
