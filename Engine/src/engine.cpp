@@ -12,6 +12,7 @@ Engine::~Engine()
     delete simulation_;
 }
 
+// Main engine loop
 void Engine::Run()
 {
     if(!running_) {
@@ -25,12 +26,16 @@ void Engine::Run()
 
         while (running_) {
             timer::time_point current_time = timer::now();
+
+            // time since last FixedUpdate call
             double fixed_update_delta =
                 std::chrono::duration<double>(current_time - lastFixedUpdateTime_).count();
 
+            // time since last Update call
             double update_delta =
                 std::chrono::duration<double>(current_time - lastUpdateTime_).count();
 
+            // we calculate how many times we should call FixedUpdate using the time since last execution
             int fixed_update_steps = std::floor(fixed_update_delta / fixedUpdateInterval);
             for (int i = 0; i < fixed_update_steps; i++) {
                 simulation_->FixedUpdate(fixedUpdateInterval);
@@ -39,6 +44,7 @@ void Engine::Run()
             simulation_->Update(update_delta);
 
             lastUpdateTime_ = current_time;
+            // we increment lastFixedUpdateTime_ by the (update interval) * (number of times we called it during this cycle)
             lastFixedUpdateTime_ +=
                 std::chrono::duration_cast<timer::time_point::duration>(
                     std::chrono::duration<double>(fixed_update_steps * fixedUpdateInterval)

@@ -16,7 +16,7 @@ public:
     Simulation* GetSimulation();
 
 private:
-    const double fixedUpdateInterval = 0.05;
+    const double fixedUpdateInterval = 0.05; // how often FixedUpdate is called
     Simulation* simulation_;
     bool running_ = false;
 

@@ -19,14 +19,17 @@ Simulation *SimulationCanvas::GetSimulation()
     return simulation_;
 }
 
+// called when the widget is first rendered
 void SimulationCanvas::OnInit() {
     clear(sf::Color(0, 255, 0));
 }
 
+// called on each repaint
 void SimulationCanvas::OnUpdate() {
     simulation_->ProcessData(render_lambda_);
 }
 
+// use this to process the simulation data and render it on the screen
 void SimulationCanvas::RenderSimulation(SimulationData* data)
 {
     clear(sf::Color(0, 255, 0));
