@@ -12,21 +12,21 @@ Simulation::~Simulation()
 
 // Called once at the start of the simulation
 void Simulation::Start() {
-
+    data_->addEntity(Entity());
 }
 
 // Called every update cycle
 void Simulation::Update(double deltaTime)
 {
     std::lock_guard<std::mutex> lock(data_mutex_);
-    data_->x += 100 * deltaTime;
+    data_->modifyAllEntities(100 * deltaTime, 100 * deltaTime);
 }
 
 // Called at constant intervals
 void Simulation::FixedUpdate(double deltaTime)
 {
     std::lock_guard<std::mutex> lock(data_mutex_);
-    data_->y += 100 * deltaTime;
+    data_->modifyAllEntities(100 * deltaTime, 100 * deltaTime);
 }
 
 // Facilitates data processing with external functions in a thread-safe manner
