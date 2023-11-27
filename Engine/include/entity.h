@@ -9,6 +9,7 @@ public:
     Entity();
     Entity(const double x_coord, const double y_coord, const double size);
     virtual ~Entity();
+    void RandomInitialization(const double world_width, const double world_height);
 
     double GetSize() const;
     void SetSize(double size);
@@ -16,7 +17,7 @@ public:
     std::pair<double, double> GetCoordinates() const;
     void SetCoordinates(const double x_coord, const double y_coord);
 
-    void RandomInitialization(const double world_size);
+    double GetDistance(const Entity& otherEntity) const;
 
 private:
     double x_coord_, y_coord_, size_;

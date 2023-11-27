@@ -1,13 +1,17 @@
 #pragma once
 #include "entity.h"
+#include "environment.h"
 #include <vector>
 
 struct SimulationData {
 public:
 
-    SimulationData(double world_size) : entities_() {
-        world_size_ = world_size;
+    SimulationData() : entities_(), environment_(){
+        environment_.InitializeEnvironment();
+        InitializeEntities();
     };
+
+    void InitializeEntities();
 
     void addEntity(const Entity& entity);
     void removeEntity(const Entity& entity);
@@ -16,8 +20,6 @@ public:
     void ModifyAllEntities(double delta_x, double delta_y);
 
     std::vector<Entity> entities_;
-
-private:
-    double world_size_;
+    Environment environment_;
 
 };

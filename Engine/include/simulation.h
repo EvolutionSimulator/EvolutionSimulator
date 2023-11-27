@@ -19,6 +19,4 @@ public:
 private:
     SimulationData* data_;
     std::mutex data_mutex_;
-    // NEEDS TO BE CHANGED - NOT HARD-CODED
-    const double kWorldSize = 300;
 };
