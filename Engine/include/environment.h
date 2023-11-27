@@ -18,9 +18,6 @@ public:
 
     // Constructor
     Environment();
-    void InitializeEnvironment();
-
-    std::vector<Food> food_entities_;
 };
 
 #endif // ENVIRONMENT_H
