@@ -19,14 +19,16 @@ void Simulation::Start() {
 void Simulation::Update(double deltaTime)
 {
     std::lock_guard<std::mutex> lock(data_mutex_);
-    data_->modifyAllEntities(100 * deltaTime, 100 * deltaTime);
+    // Test function (DO NOT USE)
+    data_->ModifyAllEntities(100 * deltaTime, 100 * deltaTime);
 }
 
 // Called at constant intervals
 void Simulation::FixedUpdate(double deltaTime)
 {
     std::lock_guard<std::mutex> lock(data_mutex_);
-    data_->modifyAllEntities(100 * deltaTime, 100 * deltaTime);
+    // Test function (DO NOT USE)
+    data_->ModifyAllEntities(100 * deltaTime, 100 * deltaTime);
 }
 
 // Facilitates data processing with external functions in a thread-safe manner

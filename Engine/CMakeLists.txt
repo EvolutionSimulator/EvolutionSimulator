@@ -18,6 +18,8 @@ add_library(Engine STATIC
   include/entity.h
   src/entity.cpp
   src/simulationdata.cpp
+  include/food.h
+  src/food.cpp
 )
 
 target_include_directories(Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

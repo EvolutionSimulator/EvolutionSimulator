@@ -9,31 +9,14 @@ public:
     Entity();
     virtual ~Entity();
 
-    double getSize() const;
-    void setSize(double size);
+    double GetSize() const;
+    void SetSize(double size);
 
-    std::pair<double, double> getCoordinates() const;
-    void setCoordinates(const std::pair<double, double>& coordinates);
-    void setCoordinates(const double x, const double y);
+    std::pair<double, double> GetCoordinates() const;
+    void SetCoordinates(const double x_coord, const double y_coord);
 
 private:
     double x_coord_, y_coord_, size_;
 };
-
-
-class Food: public Entity
-{
-public:
-
-    Food();
-
-    void eat();
-    void setNutritionalValue(double value);
-    double getNutritionalValue() const;
-
-private:
-    double nutritional_value_;
-};
-
 
 #endif // ENTITY_H
