@@ -17,14 +17,14 @@ void SimulationData::removeEntity(const Entity& entity)
 }
 
 
-void SimulationData::modifyAllEntities(double delta_x, double delta_y)
+void SimulationData::ModifyAllEntities(double delta_x, double delta_y)
 {
     // Iterate through the vector and modify each entity
     std::pair<double, double> coordinates;
     for (Entity& entity : entities_) {
-        coordinates = entity.getCoordinates();
+        coordinates = entity.GetCoordinates();
         coordinates.first = coordinates.first + delta_x;
         coordinates.second = coordinates.second + delta_y;
-        entity.setCoordinates(coordinates);
+        entity.SetCoordinates(coordinates.first, coordinates.second);
     }
 }
