@@ -15,6 +15,9 @@ add_library(Engine STATIC
   include/engine.h src/engine.cpp
   include/simulation.h src/simulation.cpp
   include/simulationdata.h
+  include/entity.h
+  src/entity.cpp
+  src/simulationdata.cpp
 )
 
 target_include_directories(Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

@@ -33,10 +33,17 @@ void SimulationCanvas::OnUpdate() {
 void SimulationCanvas::RenderSimulation(SimulationData* data)
 {
     clear(sf::Color(0, 255, 0));
-    auto shape1 = sf::CircleShape(20, 100);
-    shape1.setPosition(data->x, 0);
-    auto shape2 = sf::CircleShape(20, 100);
-    shape2.setPosition(data->y, 45);
-    draw(shape1);
-    draw(shape2);
+
+    // Iterate through entities and create a circle shape for each
+    for (const auto& entity : data->entities_) {
+        sf::CircleShape shape(20); // Adjust the radius as needed
+
+        std::pair<double, double> coordinates = entity.getCoordinates();
+        // Set the position of the circle shape based on the entity's coordinates
+        shape.setPosition(coordinates.first, coordinates.second);
+
+        // Set other properties of the circle shape as needed
+
+        draw(shape);
+    }
 }
