@@ -6,6 +6,12 @@ Food::Food()
     // Constructor implementation
 }
 
+Food::Food(const double x_coord, const double y_coord)
+    : Entity(x_coord, y_coord, 0.0), nutritional_value_(0.0)
+{
+    // Constructor implementation
+}
+
 void Food::Eat()
 {
     // Call the destructor of the base class Entity

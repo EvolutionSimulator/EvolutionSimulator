@@ -8,6 +8,7 @@ class Food : public Entity
 public:
 
     Food();
+    Food(const double x_coord, const double y_coord);
 
     void Eat();
     void SetNutritionalValue(double value);

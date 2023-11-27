@@ -1,5 +1,6 @@
 #include "entity.h"
 #include <random>
+#include <cmath>
 
 // Entity constructor
 Entity::Entity()
@@ -53,9 +54,15 @@ double GetRandomFloat(double world_size) {
     return dis(gen);
 }
 
-void Entity::RandomInitialization(const double world_size)
+void Entity::RandomInitialization(const double world_width, const double world_height)
 {
-    x_coord_ = GetRandomFloat(world_size);
-    y_coord_ = GetRandomFloat(world_size);
+    x_coord_ = GetRandomFloat(world_width);
+    y_coord_ = GetRandomFloat(world_height);
 }
 
+double Entity::GetDistance(const Entity& other_entity) const {
+    std::pair<double, double> other_coordinates = other_entity.GetCoordinates();
+
+    // Use std::hypot for optimized distance calculation
+    return std::hypot(x_coord_ - other_coordinates.first, y_coord_- other_coordinates.second);
+}

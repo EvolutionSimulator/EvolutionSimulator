@@ -36,7 +36,7 @@ void SimulationCanvas::RenderSimulation(SimulationData* data)
 
     // Iterate through entities and create a circle shape for each
     for (const auto& entity : data->entities_) {
-        sf::CircleShape shape(20);
+        sf::CircleShape shape(10);
 
         std::pair<double, double> coordinates = entity.GetCoordinates();
         shape.setPosition(coordinates.first, coordinates.second);
