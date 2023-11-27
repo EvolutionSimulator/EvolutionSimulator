@@ -2,7 +2,7 @@
 
 Simulation::Simulation()
 {
-    data_ = new SimulationData();
+    data_ = new SimulationData(kWorldSize);
 }
 
 Simulation::~Simulation()
@@ -12,7 +12,9 @@ Simulation::~Simulation()
 
 // Called once at the start of the simulation
 void Simulation::Start() {
-    data_->addEntity(Entity());
+    Entity entity = Entity();
+    entity.RandomInitialization(kWorldSize);
+    data_->addEntity(entity);
 }
 
 // Called every update cycle

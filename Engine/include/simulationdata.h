@@ -5,7 +5,8 @@
 struct SimulationData {
 public:
 
-    SimulationData() : entities_() {
+    SimulationData(double world_size) : entities_() {
+        world_size_ = world_size;
     };
 
     void addEntity(const Entity& entity);
@@ -15,5 +16,8 @@ public:
     void ModifyAllEntities(double delta_x, double delta_y);
 
     std::vector<Entity> entities_;
+
+private:
+    double world_size_;
 
 };
