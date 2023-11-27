@@ -9,6 +9,7 @@ public:
     Entity();
     Entity(const double x_coord, const double y_coord, const double size);
     virtual ~Entity();
+
     void RandomInitialization(const double world_width, const double world_height);
 
     double GetSize() const;

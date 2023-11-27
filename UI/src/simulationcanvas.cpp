@@ -35,10 +35,10 @@ void SimulationCanvas::RenderSimulation(SimulationData* data)
     clear(sf::Color(0, 255, 0));
 
     // Iterate through entities and create a circle shape for each
-    for (const auto& entity : data->entities_) {
+    for (const auto& creature : data->creatures_) {
         sf::CircleShape shape(10);
 
-        std::pair<double, double> coordinates = entity.GetCoordinates();
+        std::pair<double, double> coordinates = creature.GetCoordinates();
         shape.setPosition(coordinates.first, coordinates.second);
 
         draw(shape);

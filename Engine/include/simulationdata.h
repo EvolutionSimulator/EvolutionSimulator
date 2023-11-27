@@ -1,25 +1,27 @@
 #pragma once
-#include "entity.h"
+#include "creature.h"
 #include "environment.h"
 #include <vector>
 
 struct SimulationData {
 public:
 
-    SimulationData() : entities_(), environment_(){
-        environment_.InitializeEnvironment();
-        InitializeEntities();
+    SimulationData() : creatures_(), environment_(){
+        InitializeFood();
+        InitializeCreatures();
     };
 
-    void InitializeEntities();
+    void InitializeCreatures();
+    void InitializeFood();
 
-    void addEntity(const Entity& entity);
-    void removeEntity(const Entity& entity);
+    void AddCreature(const Creature& entity);
+    void RemoveCreature(const Creature& entity);
 
     // Test function (DO NOT USE)
-    void ModifyAllEntities(double delta_x, double delta_y);
+    void ModifyAllCreatures(double delta_x, double delta_y);
 
-    std::vector<Entity> entities_;
+    std::vector<Creature> creatures_;
+    std::vector<Food> food_entities_;
     Environment environment_;
 
 };
