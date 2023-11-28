@@ -52,3 +52,9 @@ compile_commands.json
 *creator.user*
 
 *_qmlcache.qrc
+
+# VSCode 
+.vscode
+build
+.DS_Store
+.clang-format
