@@ -22,6 +22,8 @@ class Genome {
 
   void DisableNeuron(int id);
   void DisableLink(int id);
+  void EnableNeuron(int id);
+  void EnableLink(int id);
 
   void MutateAddNeuron();
   void MutateAddLink();

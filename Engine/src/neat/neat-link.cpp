@@ -17,8 +17,8 @@ bool Link::IsActive() const { return active_; }
 
 void Link::SetWeight(double weight) { weight_ = weight; }
 
-void Link::SetActive(){active_= false;}
+void Link::SetActive(){active_= true;}
 
-void Link::SetInactive(){active_ = true;}
+void Link::SetInactive(){active_ = false;}
 
 }  // namespace neat

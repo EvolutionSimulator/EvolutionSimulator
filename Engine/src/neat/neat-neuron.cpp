@@ -15,8 +15,8 @@ bool Neuron::IsActive() const { return active_; }
 
 void Neuron::SetBias(double bias) { bias_ = bias; }
 
-void Neuron::SetActive(){active_= false;}
+void Neuron::SetActive(){active_= true;}
 
-void Neuron::SetInactive(){active_ = true;}
+void Neuron::SetInactive(){active_ = false;}
 
 }  // namespace neat
