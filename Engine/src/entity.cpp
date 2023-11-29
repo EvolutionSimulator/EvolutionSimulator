@@ -66,3 +66,13 @@ double Entity::GetDistance(const Entity& other_entity) const {
     // Use std::hypot for optimized distance calculation
     return std::hypot(x_coord_ - other_coordinates.first, y_coord_- other_coordinates.second);
 }
+
+double Entity::GetOrientation() const
+{
+    return orientation_;
+}
+
+void Entity::SetOrientation(double orientation)
+{
+    orientation_ = orientation;
+}
