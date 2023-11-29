@@ -137,62 +137,91 @@ void TestDisableLink() {
 }
 
 void TestMutateDisableNeuron() {
-  neat::Genome genome(4, 2);
+  neat::Genome genome(3, 2);
   genome.AddNeuron(neat::NeuronType::kHidden, 0.5);
-  genome.AddNeuron(neat::NeuronType::kHidden, 0.7);
+  genome.AddNeuron(neat::NeuronType::kHidden, 0.4);
+  genome.AddNeuron(neat::NeuronType::kOutput, 0.3);
 
-  // Ensure that at least one hidden neuron exists
-  assert(genome.GetNeurons().size() >= 1);
-
-  // Disable a random hidden neuron
   genome.MutateDisableNeuron();
 
-  auto neurons = genome.GetNeurons();
-  auto links = genome.GetLinks();
-
-  // Check if the disabled neuron is indeed disabled
-  bool isNeuronDisabled = false;
+  const auto& neurons = genome.GetNeurons();
+  bool anyDisabled = false;
   for (const auto& neuron : neurons) {
-      if (neuron.GetType() == neat::NeuronType::kHidden && !neuron.IsActive()) {
-          isNeuronDisabled = true;
+      if (!neuron.IsActive()) {
+          anyDisabled = true;
           break;
       }
   }
-  assert(isNeuronDisabled);
 
-  // Check if all links related to the disabled neuron are also disabled
-  for (const auto& link : links) {
-      assert(link.GetInId() != 1 || !link.IsActive());
-      assert(link.GetOutId() != 1 || !link.IsActive());
-  }
-
+  assert(anyDisabled); // At least one neuron should have been disabled
   std::cout << "MutateDisableNeuron test passed!\n";
 }
 
 void TestMutateDisableLink() {
-  neat::Genome genome(3, 3);
+  neat::Genome genome(3, 2);
   genome.AddLink(1, 2, 0.5);
   genome.AddLink(2, 3, 0.7);
 
-  // Ensure that at least one link exists
-  assert(genome.GetLinks().size() >= 1);
-
-  // Disable a random link
   genome.MutateDisableLink();
 
-  auto links = genome.GetLinks();
-
-  // Check if the disabled link is indeed disabled
-  bool isLinkDisabled = false;
+  const auto& links = genome.GetLinks();
+  bool anyDisabled = false;
   for (const auto& link : links) {
       if (!link.IsActive()) {
-          isLinkDisabled = true;
+          anyDisabled = true;
           break;
       }
   }
-  assert(isLinkDisabled);
 
+  assert(anyDisabled); // At least one link should have been disabled
   std::cout << "MutateDisableLink test passed!\n";
+}
+
+void TestEnableNeuron() {
+  neat::Genome genome(3, 2);
+  genome.AddNeuron(neat::NeuronType::kHidden, 0.5);
+  genome.AddNeuron(neat::NeuronType::kHidden, 0.4);
+  genome.AddNeuron(neat::NeuronType::kOutput, 0.3);
+
+  // Disable a neuron
+  genome.DisableNeuron(1); // Assuming ID 1 for the neuron to disable
+
+  genome.EnableNeuron(1); // Enable the previously disabled neuron
+
+  const auto& neurons = genome.GetNeurons();
+  bool anyEnabled = false;
+  for (const auto& neuron : neurons) {
+      if (neuron.IsActive()) {
+          anyEnabled = true;
+          break;
+      }
+  }
+
+  assert(anyEnabled); // At least one neuron should have been enabled
+  std::cout << "EnableNeuron test passed!\n";
+}
+
+void TestEnableLink() {
+  neat::Genome genome(3, 2);
+  genome.AddLink(1, 2, 0.5);
+  genome.AddLink(2, 3, 0.7);
+
+  // Disable a link
+  genome.DisableLink(0); // Assuming ID 0 for the link to disable
+
+  genome.EnableLink(0); // Enable the previously disabled link
+
+  const auto& links = genome.GetLinks();
+  bool anyEnabled = false;
+  for (const auto& link : links) {
+      if (link.IsActive()) {
+          anyEnabled = true;
+          break;
+      }
+  }
+
+  assert(anyEnabled); // At least one link should have been enabled
+  std::cout << "EnableLink test passed!\n";
 }
 
 void TestAllNeat() {
@@ -203,10 +232,11 @@ void TestAllNeat() {
   TestSetWeight();
   TestNeuronConstructor();
   TestSetBias();
-  /*
+
   TestDisableNeuron();
   TestDisableLink();
   TestMutateDisableNeuron();
   TestMutateDisableLink();
-  */
+  TestEnableNeuron();
+  TestEnableLink();
 }

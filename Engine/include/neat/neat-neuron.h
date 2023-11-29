@@ -1,8 +1,6 @@
 #ifndef NEATNEURON_H
 #define NEATNEURON_H
 
-#include "neat-link.h"
-
 #include <vector>
 
 namespace neat {

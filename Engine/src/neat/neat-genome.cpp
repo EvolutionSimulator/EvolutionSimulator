@@ -42,7 +42,7 @@ void Genome::DisableNeuron(int id) {
     if (neuron.GetId()==id){
         neuron.SetInactive();
         // should we include this
-        for (const Link& link: GetLinks()){
+        for (const Link& link: links_){
             if (neuron.GetId()==link.GetInId() || neuron.GetId()==link.GetOutId()){
                 DisableLink(link.GetId());
             }
@@ -54,14 +54,14 @@ void Genome::DisableNeuron(int id) {
 
 void Genome::DisableLink(int id) {
   for (Link& link: links_){
-    if (link.GetInId()==id){
+    if (link.GetId()==id){
         link.SetInactive();
     }
   }
 }
 
-/*
-void Genome::ActivateNeuron(int id) {
+
+void Genome::EnableNeuron(int id) {
   for (Neuron& neuron: neurons_) {
     if (neuron.GetId()==id){
         neuron.SetActive();
@@ -72,19 +72,20 @@ void Genome::ActivateNeuron(int id) {
                 ActivateLink(link.GetId());
             }
         }
+        */
         break;
     }
   }
 }
 
-void Genome::ActivateLink(int id) {
+void Genome::EnableLink(int id) {
   for (Link& link: links_){
-    if (link.GetInId()==id){
+    if (link.GetId()==id){
         link.SetActive();
     }
   }
 }
-*/
+
 
 void Genome::MutateDisableNeuron() {
   std::vector<int> hiddenIDs = {};
@@ -111,10 +112,7 @@ void Genome::MutateDisableLink() {
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(0, links_.size() - 1);
 
-    int index = dis(gen);
-    int idToDisable = links_[index].GetId();
-
-    DisableLink(idToDisable);
+    DisableLink(links_[dis(gen)].GetId());
   }
 
 }
