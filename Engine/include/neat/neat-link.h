@@ -11,11 +11,15 @@ class Link {
   int GetInId() const;
   int GetOutId() const;
   double GetWeight() const;
+  bool IsActive() const;
 
   void SetWeight(double weight);
+  void SetActive();
+  void SetInactive();
 
  private:
   int id_;
+  bool active_;
   double weight_;
   int in_id_;
   int out_id_;

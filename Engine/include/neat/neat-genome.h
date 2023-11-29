@@ -2,6 +2,7 @@
 #define NEATGENOME_H
 
 #include <vector>
+#include <random>
 
 #include "neat-link.h"
 #include "neat-neuron.h"
@@ -19,13 +20,13 @@ class Genome {
   void AddNeuron(NeuronType type, double bias);
   void AddLink(int in_id, int out_id, double weight);
 
-  void RemoveNeuron(int id);
-  void RemoveLink(int id);
+  void DisableNeuron(int id);
+  void DisableLink(int id);
 
   void MutateAddNeuron();
   void MutateAddLink();
-  void MutateRemoveNeuron();
-  void MutateRemoveLink();
+  void MutateDisableNeuron();
+  void MutateDisableLink();
   void MutateChangeWeight();
 
  private:
