@@ -11,6 +11,7 @@ class Link {
   int GetInId() const;
   int GetOutId() const;
   double GetWeight() const;
+  bool IsActive() const;
 
   void SetWeight(double weight);
 
@@ -19,6 +20,7 @@ class Link {
   double weight_;
   int in_id_;
   int out_id_;
+  bool active_;
 };
 
 }  // namespace neat

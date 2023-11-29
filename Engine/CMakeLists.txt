@@ -22,6 +22,9 @@ add_library(Engine STATIC
   src/main.cpp
   src/neat/neat-test.cpp
   include/neat/neat-test.h
+  include/neat/neat-neural-network.h
+  src/neat/neat-neural-network.cpp
+
 )
 
 target_include_directories(Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
