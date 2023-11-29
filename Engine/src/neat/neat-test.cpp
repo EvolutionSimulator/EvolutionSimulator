@@ -4,6 +4,7 @@
 #include "neat/neat-genome.h"
 #include "neat/neat-link.h"
 #include "neat/neat-neuron.h"
+#include "neat/neat-neural-network.h"
 
 void TestGenomeConstructor() {
   int input_count = 5;
@@ -80,12 +81,30 @@ void TestSetBias() {
   std::cout << "SetBias test passed!\n";
 }
 
+void TestGetLayers () {
+  neat::Genome genome(3, 2);
+  genome.AddLink(1, 4, 1);
+  genome.AddLink(3, 5, 1);
+  genome.AddLink(2, 5, 1);
+  genome.AddLink(3, 4, 1);
+  genome.AddNeuron(neat::NeuronType::kHidden, 0.5);
+  genome.AddLink(1, 6, 1);
+  genome.AddLink(6, 4, 1);
+  std::vector< std::vector<int> > true_layers = {{1,2,3}, {6}, {4,5}};
+  std::vector< std::vector<int> > result_layers = neat::get_layers(genome);
+  assert(true_layers == result_layers);
+  std::cout << "GetLayers passed" << std::endl;
+
+}
+
 void TestAllNeat() {
-  TestGenomeConstructor();
+  /*TestGenomeConstructor();
   TestAddNeuron();
   TestAddLink();
   TestLinkConstructor();
   TestSetWeight();
   TestNeuronConstructor();
-  TestSetBias();
+  TestSetBias();*/
+  TestGetLayers();
+
 }

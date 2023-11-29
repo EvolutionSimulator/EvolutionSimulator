@@ -13,6 +13,8 @@ int Link::GetOutId() const { return out_id_; }
 
 double Link::GetWeight() const { return weight_; }
 
+bool Link::IsActive() const {return active_;}
+
 void Link::SetWeight(double weight) { weight_ = weight; }
 
 }  // namespace neat
