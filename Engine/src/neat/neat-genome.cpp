@@ -37,4 +37,86 @@ void Genome::AddLink(int in_id, int out_id, double weight) {
   ++next_link_id_;
 }
 
+void Genome::DisableNeuron(int id) {
+  for (Neuron& neuron: neurons_) {
+    if (neuron.GetId()==id){
+        neuron.SetInactive();
+        // should we include this
+        for (const Link& link: GetLinks()){
+            if (neuron.GetId()==link.GetInId() || neuron.GetId()==link.GetOutId()){
+                DisableLink(link.GetId());
+            }
+        }
+        break;
+    }
+  }
+}
+
+void Genome::DisableLink(int id) {
+  for (Link& link: links_){
+    if (link.GetInId()==id){
+        link.SetInactive();
+    }
+  }
+}
+
+/*
+void Genome::ActivateNeuron(int id) {
+  for (Neuron& neuron: neurons_) {
+    if (neuron.GetId()==id){
+        neuron.SetActive();
+        //kind of necessary if we disable all links when a neuron is disabled (but which ones should be reactivated)
+        /*
+        for (const Link& link: GetLinks()){
+            if (neuron.GetId()==link.GetInId() || neuron.GetId()==link.GetOutId()){
+                ActivateLink(link.GetId());
+            }
+        }
+        break;
+    }
+  }
+}
+
+void Genome::ActivateLink(int id) {
+  for (Link& link: links_){
+    if (link.GetInId()==id){
+        link.SetActive();
+    }
+  }
+}
+*/
+
+void Genome::MutateDisableNeuron() {
+  std::vector<int> hiddenIDs = {};
+  for (const Neuron& neuron: GetNeurons()){
+    if (neuron.GetType() == NeuronType::kHidden){
+        hiddenIDs.push_back(neuron.GetId());
+    }
+  }
+  if (!hiddenIDs.empty()) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, hiddenIDs.size() - 1);
+
+    DisableNeuron(hiddenIDs[dis(gen)]);
+
+    // do we want to implement so that some neurons can also be activated
+
+  }
+}
+
+void Genome::MutateDisableLink() {
+  if (!links_.empty()) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, links_.size() - 1);
+
+    int index = dis(gen);
+    int idToDisable = links_[index].GetId();
+
+    DisableLink(idToDisable);
+  }
+
+}
+
 }  // namespace neat
