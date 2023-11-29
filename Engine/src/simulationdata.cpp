@@ -29,6 +29,14 @@ void SimulationData::ModifyAllCreatures(double delta_x, double delta_y)
     }
 }
 
+void SimulationData::MoveAllCreatures(double deltaTime)
+{
+    for (Creature& creature: creatures_) {
+        creature.Rotate(deltaTime);
+        creature.Move(deltaTime);
+    }
+}
+
 void SimulationData::InitializeCreatures() {
     // Retrieve information from the environment
     double world_width = environment_.kMapWidth;

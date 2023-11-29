@@ -15,6 +15,9 @@ public:
     void SetVelocityForward(double velocity);
     void SetRotationalVelocity(double rotational_velocity);
 
+    void Move(double deltaTime);
+    void Rotate(double deltaTime);
+
 private:
     double energy_;
     double velocity_forward_;

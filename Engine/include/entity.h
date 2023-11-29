@@ -18,10 +18,13 @@ public:
     std::pair<double, double> GetCoordinates() const;
     void SetCoordinates(const double x_coord, const double y_coord);
 
+    double GetOrientation() const;
+    void SetOrientation(double orientation);
+
     double GetDistance(const Entity& otherEntity) const;
 
 private:
-    double x_coord_, y_coord_, size_;
+    double x_coord_, y_coord_, orientation_, size_;
 };
 
 #endif // ENTITY_H

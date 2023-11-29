@@ -19,6 +19,7 @@ public:
 
     // Test function (DO NOT USE)
     void ModifyAllCreatures(double delta_x, double delta_y);
+    void MoveAllCreatures(double deltaTime);
 
     std::vector<Creature> creatures_;
     std::vector<Food> food_entities_;
