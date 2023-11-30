@@ -44,3 +44,20 @@ void Creature::Move(double deltaTime)
     coordinates.second = coordinates.second + deltaTime * y_velocity;
     this->SetCoordinates(coordinates.first, coordinates.second);
 }
+
+
+void Creature::UpdateEnergy(){
+    SetEnergy( GetEnergy() - (GetVelocityForward() + GetRotationalVelocity()) * GetSize() );
+
+    if (GetEnergy() <= 0) {
+        Dies();
+    }
+}
+
+void Creature::Dies(){
+    SetState(Dead);
+}
+
+void Creature::Eats(double nutritional_value){
+    SetEnergy(GetEnergy() + nutritional_value);
+}

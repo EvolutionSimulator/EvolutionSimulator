@@ -6,8 +6,8 @@ Food::Food()
     // Constructor implementation
 }
 
-Food::Food(const double x_coord, const double y_coord)
-    : Entity(x_coord, y_coord, 0.0), nutritional_value_(0.0)
+Food::Food(const double x_coord, const double y_coord,  const double size)
+    : Entity(x_coord, y_coord, size), nutritional_value_(0.0)
 {
     // Constructor implementation
 }
