@@ -24,11 +24,13 @@ class Genome {
   void DisableLink(int id);
   void EnableNeuron(int id);
   void EnableLink(int id);
+  void RemoveNeuron(int id);
+  void RemoveLink(int id);
 
   void MutateAddNeuron();
   void MutateAddLink();
-  void MutateDisableNeuron();
-  void MutateDisableLink();
+  void MutateRemoveNeuron();
+  void MutateRemoveLink();
   void MutateChangeWeight();
 
  private:
