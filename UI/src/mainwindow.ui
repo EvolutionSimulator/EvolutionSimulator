@@ -50,6 +50,19 @@
      <string>PAUSE</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="restartButton">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>360</y>
+      <width>80</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>RESTART</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

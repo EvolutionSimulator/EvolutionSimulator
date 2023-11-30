@@ -22,6 +22,7 @@ private:
     void RunSimulation();
     void PauseSimulation();
     void StopSimulation();
+    void RestartSimulation();
 
     Ui::MainWindow* ui_; // pointer to all UI widgets (buttons, labels, texboxes, the simulation canvas, etc)
 
