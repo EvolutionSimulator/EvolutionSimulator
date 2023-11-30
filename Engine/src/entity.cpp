@@ -6,13 +6,13 @@
 Entity::Entity()
     : x_coord_(0.0), y_coord_(0.0), size_(0.0)
 {
-
+    state_ = Alive;
 }
 
 Entity::Entity(const double x_coord, const double y_coord, const double size)
     : x_coord_(x_coord), y_coord_(y_coord), size_(size)
 {
-
+    state_ = Alive;
 }
 
 // Entity destructor
@@ -75,4 +75,12 @@ double Entity::GetOrientation() const
 void Entity::SetOrientation(double orientation)
 {
     orientation_ = orientation;
+}
+
+Entity::states Entity::GetState() const{
+    return state_;
+}
+
+void Entity::SetState(states state){
+    state_ = state;
 }

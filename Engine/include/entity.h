@@ -6,6 +6,11 @@
 class Entity
 {
 public:
+    enum states {
+        Dead = 0,
+        Alive = 1
+    };
+
     Entity();
     Entity(const double x_coord, const double y_coord, const double size);
     virtual ~Entity();
@@ -23,8 +28,11 @@ public:
 
     double GetDistance(const Entity& otherEntity) const;
 
+    states GetState() const;
+    void SetState (states state);
 private:
     double x_coord_, y_coord_, orientation_, size_;
+    states state_;
 };
 
 #endif // ENTITY_H

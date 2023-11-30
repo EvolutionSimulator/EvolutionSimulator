@@ -18,6 +18,12 @@ public:
     void Move(double deltaTime);
     void Rotate(double deltaTime);
 
+    void Dies();
+
+    void Eats(double nutritional_value);
+
+    void UpdateEnergy();
+
 private:
     double energy_;
     double velocity_forward_;
