@@ -1,27 +1,17 @@
 #ifndef CREATURE_HPP
 #define CREATURE_HPP
 
-#include "entity.h"
+#include "movable_entity.h"
 
-class Creature : public Entity {
+class Creature : public MovableEntity {
 public:
     Creature();
 
     double GetEnergy() const;
-    double GetVelocityForward() const;
-    double GetRotationalVelocity() const;
-
     void SetEnergy(double energy);
-    void SetVelocityForward(double velocity);
-    void SetRotationalVelocity(double rotational_velocity);
-
-    void Move(double deltaTime);
-    void Rotate(double deltaTime);
 
 private:
     double energy_;
-    double velocity_forward_;
-    double rotational_velocity_;
 };
 
 #endif // CREATURE_HPP
