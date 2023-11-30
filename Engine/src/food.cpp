@@ -1,5 +1,5 @@
 #include "food.h"
-#include <stdlib.h>
+#include "cstdlib"
 #include "environment.h"
 Food::Food()
     : Entity()
@@ -8,7 +8,7 @@ Food::Food()
 }
 
 Food::Food(const double x_coord, const double y_coord)
-    : Entity(x_coord, y_coord, rand()%Environment::kMaxFoodSize)
+    : Entity(x_coord, y_coord, std::rand()%Environment::kMaxFoodSize)
 {
     //Constructor implementation
 }
