@@ -2,7 +2,7 @@
 #include <vector>
 #include <algorithm>
 #include <stdexcept>
-
+#include "food.h"
 void SimulationData::AddCreature(const Creature& creature)
 {
     creatures_.push_back(creature);
@@ -34,6 +34,18 @@ void SimulationData::MoveAllCreatures(double deltaTime)
     for (Creature& creature: creatures_) {
         creature.Rotate(deltaTime);
         creature.Move(deltaTime);
+    }
+}
+
+void SimulationData::GenerateMoreFood(){
+    //Calculate current density
+    double size = food_entities_.size();
+    double max_number = environment_.kFoodDensity * environment_.kMapHeight * environment_.kMapWidth;
+    while (size < max_number){
+        Food new_food = Food();
+        new_food.RandomInitialization(environment_.kMapHeight, environment_.kMapWidth);
+        food_entities_.emplace_back(new_food);
+        size++;
     }
 }
 
