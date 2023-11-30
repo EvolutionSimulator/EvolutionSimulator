@@ -17,6 +17,7 @@ public:
     void AddCreature(const Creature& entity);
     void RemoveCreature(const Creature& entity);
 
+    void GenerateMoreFood();
     // Test function (DO NOT USE)
     void ModifyAllCreatures(double delta_x, double delta_y);
     void MoveAllCreatures(double deltaTime);

@@ -15,6 +15,11 @@ Entity::Entity(const double x_coord, const double y_coord, const double size)
 
 }
 
+Entity::Entity(const double size)
+    : x_coord_(0.0), y_coord_(0.0), size_(size)
+{
+
+}
 // Entity destructor
 Entity::~Entity()
 {
