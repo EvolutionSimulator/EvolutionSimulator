@@ -18,12 +18,14 @@ public:
 
     void SetEngine(Engine* engine);
 
-private:
+private slots: // Slots should be placed under this section
     void RunSimulation();
-    void StopSimulation();
+    void ChangeDensity(int value); // Make sure this is under 'private slots:'
 
-    Ui::MainWindow* ui_; // pointer to all UI widgets (buttons, labels, texboxes, the simulation canvas, etc)
+private:
+    Ui::MainWindow* ui_; // Pointer to all UI widgets
 
-    Engine* engine_;
-    std::thread engine_thread_;
+    Engine* engine_; // Pointer to the simulation engine
+    std::thread engine_thread_; // Thread for running the simulation engine
 };
+

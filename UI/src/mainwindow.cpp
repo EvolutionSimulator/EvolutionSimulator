@@ -1,3 +1,4 @@
+#include <iostream>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -6,7 +7,10 @@ MainWindow::MainWindow(QWidget *parent)
     , ui_(new Ui::MainWindow)
 {
     ui_->setupUi(this);
+    ui_->densityFood->setMinimum(1);
+    ui_->densityFood->setMaximum(1000);
     connect(ui_->runButton, &QPushButton::clicked, this, &MainWindow::RunSimulation);
+    connect(ui_->densityFood, SIGNAL(valueChanged(int)), this, SLOT(ChangeDensity(int)));
 }
 
 MainWindow::~MainWindow()
@@ -23,6 +27,14 @@ void MainWindow::SetEngine(Engine *engine)
 {
     engine_ = engine;
     ui_->canvas->SetSimulation(engine_->GetSimulation());
+}
+
+void MainWindow::ChangeDensity(int value)
+{
+    double density = static_cast<double>(value) / 100.0; // Convert to density
+    engine_->GetEnvironment().SetFoodDensity(density); // Update the density
+    engine_->UpdateEnvironment(); // Apply the updated density
+    std::cout << "Density changed to " << density << std::endl;
 }
 
 void MainWindow::RunSimulation()

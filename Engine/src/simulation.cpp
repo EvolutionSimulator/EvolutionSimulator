@@ -37,3 +37,7 @@ void Simulation::ProcessData(std::function<void (SimulationData*)> processFunc)
     std::lock_guard<std::mutex> lock(data_mutex_);
     processFunc(data_);
 }
+
+SimulationData* Simulation::GetSimulationData() {
+    return data_;
+}
