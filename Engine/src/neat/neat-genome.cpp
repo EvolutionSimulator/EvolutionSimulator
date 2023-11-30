@@ -86,8 +86,46 @@ void Genome::EnableLink(int id) {
   }
 }
 
+void Genome::RemoveNeuron(int id) {
+  int index_to_delete = -1;
+  for (int i = 0; i < neurons_.size(); ++i) {
+    if (neurons_[i].GetId() == id) {
+        index_to_delete = i;
+        break;
+    }
+  }
 
-void Genome::MutateDisableNeuron() {
+  if (index_to_delete != -1) {
+    std::vector<int> links_to_remove;
+
+    for (const Link& link : links_) {
+        if (neurons_[index_to_delete].GetId() == link.GetInId() || neurons_[index_to_delete].GetId() == link.GetOutId()) {
+            links_to_remove.push_back(link.GetId());
+        }
+    }
+
+    for (int link_id : links_to_remove) {
+        RemoveLink(link_id);
+    }
+
+    neurons_.erase(neurons_.begin() + index_to_delete);
+  }
+}
+
+void Genome::RemoveLink(int id) {
+  int index_to_delete = -1;
+  for (int i = 0; i<links_.size(); i++){
+    if (links_[i].GetId()==id){
+        index_to_delete = i;
+        break;
+    }
+  }
+  if (index_to_delete!=-1){
+    links_.erase(links_.begin()+index_to_delete);
+  }
+}
+
+void Genome::MutateRemoveNeuron() {
   std::vector<int> hiddenIDs = {};
   for (const Neuron& neuron: GetNeurons()){
     if (neuron.GetType() == NeuronType::kHidden){
@@ -99,22 +137,21 @@ void Genome::MutateDisableNeuron() {
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(0, hiddenIDs.size() - 1);
 
-    DisableNeuron(hiddenIDs[dis(gen)]);
-
-    // do we want to implement so that some neurons can also be activated
-
+    RemoveNeuron(hiddenIDs[dis(gen)]);
   }
 }
 
-void Genome::MutateDisableLink() {
+void Genome::MutateRemoveLink() {
   if (!links_.empty()) {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(0, links_.size() - 1);
 
-    DisableLink(links_[dis(gen)].GetId());
-  }
+    int index = dis(gen);
+    int idToRemove = links_[index].GetId();
 
+    RemoveLink(idToRemove);
+  }
 }
 
 }  // namespace neat
