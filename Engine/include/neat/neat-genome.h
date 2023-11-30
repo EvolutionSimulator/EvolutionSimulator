@@ -33,6 +33,8 @@ class Genome {
   void MutateRemoveLink();
   void MutateChangeWeight();
 
+  bool HasLink(const int& in_id, const int& ou_id);
+
  private:
   int input_count_;
   int output_count_;

@@ -1,4 +1,5 @@
 #include "neat/neat-genome.h"
+#include <random>
 
 namespace neat {
 
@@ -152,6 +153,46 @@ void Genome::MutateRemoveLink() {
 
     RemoveLink(idToRemove);
   }
+}
+
+bool Genome::HasLink(const int& inID, const int& outID) {
+  for (const auto& link : links_) {
+    if (link.GetInId() == inID && link.GetOutId() == outID || link.GetInId() == outID && link.GetOutId() == inID) {
+        return true;
+    }
+  }
+  return false;
+}
+
+void Genome::MutateAddLink(){
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<size_t> dist(0,neurons_.size()-1);
+  size_t indexRandomNeuron1 = dist(gen);
+  size_t indexRandomNeuron2 = dist(gen);
+  while(neurons_[indexRandomNeuron1].GetType() == NeuronType::kOutput){
+      indexRandomNeuron1 = dist(gen);
+  }
+  while(neurons_[indexRandomNeuron2].GetType() == NeuronType::kInput){
+      indexRandomNeuron2 = dist(gen);
+  }
+
+  int n1 = neurons_[indexRandomNeuron1].GetId(); //id of in neuron
+  int n2 = neurons_[indexRandomNeuron2].GetId(); //id of out neuron
+
+  if (HasLink(n1,n2)){
+      return ; // IF WE END UP USING ENABLED/DISABLE LINKS, THEN ENABLE LINK
+  }
+
+  //We loop through all hidden neurons and check if a triangle is formed:
+  for (size_t i = 0; i < neurons_.size(); ++i) {
+    int tempID = neurons_[i].GetId();
+    if (HasLink(n1,tempID) && HasLink(n2,tempID)){
+        return;
+    }
+    }
+
+  AddLink(n1, n2, 1);
 }
 
 }  // namespace neat
