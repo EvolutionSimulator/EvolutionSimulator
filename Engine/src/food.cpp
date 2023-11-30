@@ -1,15 +1,16 @@
 #include "food.h"
-
+#include <stdlib.h>
+#include "environment.h"
 Food::Food()
-    : Entity(), nutritional_value_(0.0)
+    : Entity()
 {
     // Constructor implementation
 }
 
 Food::Food(const double x_coord, const double y_coord)
-    : Entity(x_coord, y_coord, 0.0), nutritional_value_(0.0)
+    : Entity(x_coord, y_coord, rand()%Environment::kMaxFoodSize)
 {
-    // Constructor implementation
+    //Constructor implementation
 }
 
 void Food::Eat()
@@ -18,12 +19,4 @@ void Food::Eat()
     this->Entity::~Entity();
 }
 
-void Food::SetNutritionalValue(double value)
-{
-    nutritional_value_ = value;
-}
 
-double Food::GetNutritionalValue() const
-{
-    return nutritional_value_;
-}

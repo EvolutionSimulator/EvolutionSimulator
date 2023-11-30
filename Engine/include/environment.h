@@ -14,6 +14,7 @@ public:
 
     // Constant for food density
     static constexpr double kFoodDensity = 0.001;
+    static constexpr double kMaxFoodSize = 10;
     static constexpr double kCreatureDensity = 0.001;
 
     // Constructor
