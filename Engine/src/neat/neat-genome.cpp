@@ -185,8 +185,9 @@ void Genome::MutateAddLink(){
   }
 
   //We loop through all hidden neurons and check if a triangle is formed:
+  int tempID;
   for (size_t i = 0; i < neurons_.size(); ++i) {
-    int tempID = neurons_[i].GetId();
+    tempID= neurons_[i].GetId();
     if (HasLink(n1,tempID) && HasLink(n2,tempID)){
         return;
     }
@@ -195,4 +196,17 @@ void Genome::MutateAddLink(){
   AddLink(n1, n2, 1);
 }
 
+void Genome::MutateAddNeuron(){
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<size_t> dist(0,links_.size()-1);
+    size_t randIndex=dist(gen);
+    Link RandomLink = links_[randIndex];
+    links_.erase (links_.begin() + randIndex);
+
+    AddNeuron(NeuronType::kInput, 0.0);
+    int newNeuronId = neurons_[-1].GetId();
+    AddLink(RandomLink.GetInId(), newNeuronId, 1);
+    AddLink(newNeuronId, RandomLink.GetOutId(), RandomLink.GetWeight());
+}
 }  // namespace neat
