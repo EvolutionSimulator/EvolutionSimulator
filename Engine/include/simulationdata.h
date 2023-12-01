@@ -1,6 +1,7 @@
 #pragma once
 #include "creature.h"
 #include "environment.h"
+#include "food.h"
 #include <vector>
 
 struct SimulationData {

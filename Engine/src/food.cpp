@@ -16,7 +16,7 @@ Food::Food(const double x_coord, const double y_coord)
 Food::Food(const double size)
     : Entity(size)
 {
-
+    //Constructor implementation
 }
 
 void Food::Eat()

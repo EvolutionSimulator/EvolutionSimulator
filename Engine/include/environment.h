@@ -2,8 +2,6 @@
 
 #ifndef ENVIRONMENT_H
 #define ENVIRONMENT_H
-
-#include "food.h"
 #include <vector>
 
 class Environment {
