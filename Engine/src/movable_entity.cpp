@@ -1,4 +1,4 @@
-#include "movable_entity.h".h"
+#include "movable_entity.h"
 #include "math.h"
 
 MovableEntity::MovableEntity()
@@ -23,7 +23,7 @@ void MovableEntity::SetRotationalVelocity(double rotational_velocity) {
 
 void MovableEntity::Rotate(double deltaTime)
 {
-    double rotational_velocity = fmod(this->GetOrientation() + deltaTime * this->GetRotationalVelocity(), PI);
+    double rotational_velocity = fmod(this->GetOrientation() + deltaTime * this->GetRotationalVelocity(), M_PI);
     this->SetOrientation(rotational_velocity);
 }
 
