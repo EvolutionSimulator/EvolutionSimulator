@@ -1,5 +1,6 @@
 #include "neat/neat-genome.h"
 #include <random>
+#include <algorithm>
 
 namespace neat {
 
@@ -126,34 +127,34 @@ void Genome::RemoveLink(int id) {
   }
 }
 
-void Genome::MutateRemoveNeuron() {
-  std::vector<int> hiddenIDs = {};
-  for (const Neuron& neuron: GetNeurons()){
-    if (neuron.GetType() == NeuronType::kHidden){
-        hiddenIDs.push_back(neuron.GetId());
-    }
-  }
-  if (!hiddenIDs.empty()) {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(0, hiddenIDs.size() - 1);
+//void Genome::MutateRemoveNeuron() {
+//  std::vector<int> hiddenIDs = {};
+//  for (const Neuron& neuron: GetNeurons()){
+//    if (neuron.GetType() == NeuronType::kHidden){
+//        hiddenIDs.push_back(neuron.GetId());
+//    }
+//  }
+//  if (!hiddenIDs.empty()) {
+//    std::random_device rd;
+//    std::mt19937 gen(rd());
+//    std::uniform_int_distribution<> dis(0, hiddenIDs.size() - 1);
 
-    RemoveNeuron(hiddenIDs[dis(gen)]);
-  }
-}
+//    RemoveNeuron(hiddenIDs[dis(gen)]);
+//  }
+//}
 
-void Genome::MutateRemoveLink() {
-  if (!links_.empty()) {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(0, links_.size() - 1);
+// void Genome::MutateRemoveLink() {
+//   if (!links_.empty()) {
+//     std::random_device rd;
+//     std::mt19937 gen(rd());
+//     std::uniform_int_distribution<> dis(0, links_.size() - 1);
 
-    int index = dis(gen);
-    int idToRemove = links_[index].GetId();
+//     int index = dis(gen);
+//     int idToRemove = links_[index].GetId();
 
-    RemoveLink(idToRemove);
-  }
-}
+//     RemoveLink(idToRemove);
+//   }
+// }
 
 bool Genome::HasLink(const int& inID, const int& outID) {
   for (const auto& link : links_) {
@@ -196,7 +197,19 @@ void Genome::MutateAddLink(){
   AddLink(n1, n2, 1);
 }
 
+void Genome::MutateRemoveLink(){
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<size_t> dist(0,links_.size()-1);
+    size_t randIndex=dist(gen);
+    links_.erase (links_.begin() + randIndex);
+}
+
 void Genome::MutateAddNeuron(){
+    if(links_.size()==0){
+        return;
+    }
+
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<size_t> dist(0,links_.size()-1);
@@ -204,9 +217,29 @@ void Genome::MutateAddNeuron(){
     Link RandomLink = links_[randIndex];
     links_.erase (links_.begin() + randIndex);
 
-    AddNeuron(NeuronType::kInput, 0.0);
+    AddNeuron(NeuronType::kHidden, 0.0);
     int newNeuronId = neurons_[-1].GetId();
     AddLink(RandomLink.GetInId(), newNeuronId, 1);
     AddLink(newNeuronId, RandomLink.GetOutId(), RandomLink.GetWeight());
 }
+
+void Genome::MutateRemoveNeuron(){
+    if (neurons_.size() - input_count_ - output_count_ == 0){
+        return;
+    }
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<size_t> dist(0,neurons_.size()-1);
+    size_t indexRandomNeuron = dist(gen);
+    while(neurons_[indexRandomNeuron].GetType() != NeuronType::kHidden){
+        indexRandomNeuron = dist(gen);
+    }
+    links_.erase(std::remove_if(links_.begin(), links_.end(), [&indexRandomNeuron, this](Link l) {
+            return (l.GetInId()==neurons_[indexRandomNeuron].GetId() || l.GetOutId()==neurons_[indexRandomNeuron].GetId());
+        }), links_.end());
+
+    neurons_.erase (neurons_.begin() + indexRandomNeuron);
+
+}
+
 }  // namespace neat
