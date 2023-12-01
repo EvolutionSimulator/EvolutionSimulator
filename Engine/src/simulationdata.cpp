@@ -16,10 +16,11 @@ void SimulationData::RemoveCreature(const Creature& creature)
                      creatures_.end());
 }
 
-
+/*!
+ * Iterate through the vector and modify each entity
+ */
 void SimulationData::ModifyAllCreatures(double delta_x, double delta_y)
 {
-    // Iterate through the vector and modify each entity
     std::pair<double, double> coordinates;
     for (Creature& creature : creatures_) {
         coordinates = creature.GetCoordinates();
@@ -28,7 +29,9 @@ void SimulationData::ModifyAllCreatures(double delta_x, double delta_y)
         creature.SetCoordinates(coordinates.first, coordinates.second);
     }
 }
-
+/*!
+ * Update all creatures position and orientation by a deltaTime interval
+ */
 void SimulationData::MoveAllCreatures(double deltaTime)
 {
     for (Creature& creature: creatures_) {
@@ -37,8 +40,10 @@ void SimulationData::MoveAllCreatures(double deltaTime)
     }
 }
 
+/*!
+ * If the food density is less than the established in the environment it creates new food entities until that threshold is reached
+ */
 void SimulationData::GenerateMoreFood(){
-    //Calculate current density
     double size = food_entities_.size();
     double max_number = environment_.kFoodDensity * environment_.kMapHeight * environment_.kMapWidth;
     while (size < max_number){
