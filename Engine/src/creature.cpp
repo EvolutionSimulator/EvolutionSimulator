@@ -1,5 +1,11 @@
 #include "creature.h"
 
+Creature::Creature()
+    : MovableEntity()
+{
+
+}
+
 double Creature::GetEnergy() const {
     return energy_;
 }
