@@ -1,0 +1,1 @@
+I added pause and restart functionalities to the simulation. I also started experimenting with randomized creature movement although I am still in the early stages and have yet to commit my code as although it compiles it does not work yet.
