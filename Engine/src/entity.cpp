@@ -20,6 +20,7 @@ Entity::Entity(const double size)
 {
 
 }
+
 // Entity destructor
 Entity::~Entity()
 {

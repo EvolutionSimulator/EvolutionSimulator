@@ -2,6 +2,7 @@
 #define CREATURE_HPP
 
 #include "movable_entity.h"
+#include "food.h"
 
 class Creature : public MovableEntity {
 public:
