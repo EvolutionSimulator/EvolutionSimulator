@@ -27,6 +27,10 @@ add_library(Engine STATIC
 
 )
 
+add_executable(EngineExecutable src/main.cpp)
+
 target_include_directories(Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(EngineExecutable PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(Engine PRIVATE Qt${QT_VERSION_MAJOR}::Core)
+target_link_libraries(EngineExecutable PRIVATE Engine)
 target_compile_definitions(Engine PRIVATE Engine_LIBRARY)

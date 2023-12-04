@@ -1,4 +1,7 @@
 #include "neat/neat-neural-network.h"
+#include <unordered_map>
+#include <cmath>
+#include <cassert>
 
 namespace neat {
 
@@ -7,29 +10,72 @@ NeuronInput::NeuronInput(int input_id, double weight){
     this->weight = weight;
 }
 
-FeedForwardNeuron::FeedForwardNeuron(double value, double bias, std::vector<NeuronInput> inputs) {
-    this->value = value;
+FeedForwardNeuron::FeedForwardNeuron(int id, double bias, std::vector<NeuronInput> inputs) {
+    this->id = id;
     this->bias = bias;
     this->inputs = inputs;
 }
 
 NeuralNetwork::NeuralNetwork(Genome &genom) {
-    /*
-    std::vector< std::vector<int> > layers = get_layers(genom);
-    std::vector<Neuron> neurons = genom.GetNeurons();
+    std::vector< std::vector<Neuron> > layers = get_layers(genom);
+    //std::vector<Neuron> neurons = genom.GetNeurons();
     std::vector<FeedForwardNeuron> ffneurons;
-    for (int i=0; i < genom.GetInputCount(); i++) {
-        input_ids_.push_back(neurons[i].GetId());
+    std::vector<int> input_ids;
+    for (const Neuron &neuron:layers.front()){
+        input_ids.push_back(neuron.GetId());
     }
-    for (int i=genom.GetInputCount(); i < genom.GetInputCount() + genom.GetOutputCount(); i++) {
-        output_ids_.push_back(neurons[i].GetId());
+    input_ids_ = input_ids;
+    std::vector<int> output_ids;
+    for (const Neuron &neuron:layers.back()){
+        output_ids.push_back(neuron.GetId());
     }
-    */
+    output_ids_ = output_ids;
+    for (const std::vector<Neuron> &layer: layers) {
+        for (const Neuron &neuron : layer) {
+            std::vector<NeuronInput> inputs;
+            for (const Link &link : genom.GetLinks()) {
+                if (link.GetOutId() == neuron.GetId()) {
+                    inputs.push_back(NeuronInput(link.GetInId(), link.GetWeight()));
+                }
+            }
+            ffneurons.push_back(FeedForwardNeuron(neuron.GetId(), neuron.GetBias(), inputs));
+        }
+    }
+    ffneurons_ = ffneurons;
 }
 
-std::vector<std::vector<int> > get_layers(Genome &genom) {
-    std::vector<std::vector<int> > layers;
-    std::vector<int> input_layer;
+std::vector<double> NeuralNetwork::Activate(std::vector<double> input_values) const {
+    assert(input_values.size() == input_ids_.size());
+    std::unordered_map<int, double> values;
+    for (int i = 0; i < input_values.size(); i++) {
+        values[input_ids_[i]] = input_values[i];
+    }
+    /*for (int i = 0; i < output_ids_.size(); i++) {
+        values[output_ids_[i]] = 0;
+    }*/
+    for (const FeedForwardNeuron &ffneuron:ffneurons_) {
+        if (values.find(ffneuron.id) == values.end()) {//if ffneuron is not already activated
+            double value = 0;
+            for (const NeuronInput &input:ffneuron.inputs) {
+                assert(values.find(input.input_id) != values.end()); //previous neurons have to be activated
+                value += values[input.input_id] * input.weight;
+            }
+            value+= ffneuron.bias;
+            value = activation_funtion(value);
+            values[ffneuron.id] = value;
+        }
+    }
+    std::vector<double> result;
+    for (int i  = 0; i < output_ids_.size(); i++) {
+        result.push_back(values[output_ids_[i]]);
+    }
+    return result;
+
+}
+
+std::vector<std::vector<Neuron> > get_layers(Genome &genom) {
+    std::vector<std::vector<Neuron> > layers;
+    std::vector<Neuron> input_layer;
     std::vector<int> active; // a neuron is active if all of its incoming neurons belong to an active layer. A layer is active if all of its neurons are active.
                              //input neurons are also active and they form an active layer
     std::vector<Neuron> neurons = genom.GetNeurons();
@@ -37,45 +83,43 @@ std::vector<std::vector<int> > get_layers(Genome &genom) {
 
     for (int i = 0; i < genom.GetInputCount(); i++) {
         int inputid = neurons[i].GetId();
-        input_layer.push_back(inputid);
+        input_layer.push_back(neurons[i]);
         active.push_back(inputid);
     }
     layers.push_back(input_layer);
-    /*std::vector<int> ouput_layer;
+    std::vector<Neuron> output_layer;
     for (int i = genom.GetInputCount(); i < genom.GetInputCount() + genom.GetOutputCount(); i++) {
-        int outputid = genom.GetNeurons()[i].GetId();
-        output_layer.push_back(outputid);
-    }*/
-    int N_neurons = genom.GetNeurons().size(); //total number of neurons in the network
-    while (active.size() < N_neurons) {
-        std::vector<int> layer;
-        for (int i = genom.GetInputCount(); i < N_neurons;  i++){ //we dont check for the input neurons, they are already added
+        output_layer.push_back(neurons[i]);
+    }
+    int N_neurons = neurons.size(); //total number of neurons in the network
+    while (active.size() < N_neurons - genom.GetOutputCount()) {
+        std::vector<Neuron> layer;
+        for (int i = genom.GetInputCount() + genom.GetOutputCount(); i < N_neurons;  i++){ //we dont check for the input neurons, they are already added
             Neuron neuron = neurons[i];
-            bool is_active = true;
-            for (const Link& link: links) {
-                if (link.IsActive() && link.GetInId() == neuron.GetId() && contains(active, link.GetOutId())) {
-                    is_active = false;
-                    break;
+            if (!contains(active, neuron.GetId())) {
+                bool is_active = true;
+                for (const Link& link: links) {
+                    if (link.IsActive() && link.GetOutId() == neuron.GetId() && !contains(active, link.GetInId())) {
+                        is_active = false;
+                        break;
+                    }
                 }
-            }
-            if (is_active) {
-                layer.push_back(neuron.GetId());
+                if (is_active) {
+                    layer.push_back(neuron);
+                }
             }
         }
         layers.push_back(layer);
-        active.reserve(active.size() + distance(layer.begin(), layer.end()));
-        active.insert(active.end(), layer.begin(), layer.end());
+        for (std::vector<Neuron>::iterator i = layer.begin(); i != layer.end(); i++) {
+            active.push_back((*i).GetId());
+        }
+
     }
+    layers.push_back(output_layer);
     return layers;
 }
 
-bool contains(std::vector<int> v, int el) {
-    for(std::vector<int>::iterator i = v.begin(); i != v.end(); i ++) {
-        if ((*i) == el) {
-            return true;
-        }
-    }
-    return false;
+double activation_funtion(double x){
+    return 1 / (1 + exp(-x));
 }
-
 } // end of namespace neat

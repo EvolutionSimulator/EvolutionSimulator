@@ -80,31 +80,52 @@ void TestSetBias() {
   assert(neuron.GetBias() == new_bias);
   std::cout << "SetBias test passed!\n";
 }
-
+/*
 void TestGetLayers () {
   neat::Genome genome(3, 2);
+  genome.AddLink(0, 3, 1);
+  genome.AddLink(2, 4, 1);
   genome.AddLink(1, 4, 1);
-  genome.AddLink(3, 5, 1);
-  genome.AddLink(2, 5, 1);
-  genome.AddLink(3, 4, 1);
+  genome.AddLink(2, 3, 1);
   genome.AddNeuron(neat::NeuronType::kHidden, 0.5);
-  genome.AddLink(1, 6, 1);
-  genome.AddLink(6, 4, 1);
-  std::vector< std::vector<int> > true_layers = {{1,2,3}, {6}, {4,5}};
+  genome.AddLink(0, 5, 1);
+  genome.AddLink(5, 3, 1);
+ // genome.AddLink();
+
+  std::vector< std::vector<int> > true_layers = {{0,1,2}, {5}, {3,4}};
   std::vector< std::vector<int> > result_layers = neat::get_layers(genome);
   assert(true_layers == result_layers);
-  std::cout << "GetLayers passed" << std::endl;
+  for (std::vector< std::vector<int> >::iterator i = result_layers.begin(); i != result_layers.end(); i++) {
+      for (std::vector<int>::iterator j = (*i).begin(); j!= (*i).end(); j++) {
+          std::cout << *j << " ";
+      }
+      std::cout << std::endl;
+  }
+  std::cout << "Passed get_layers" << std::endl;
 
 }
-
+*/
 void TestAllNeat() {
-  /*TestGenomeConstructor();
+ /* TestGenomeConstructor();
   TestAddNeuron();
   TestAddLink();
   TestLinkConstructor();
   TestSetWeight();
   TestNeuronConstructor();
   TestSetBias();*/
-  TestGetLayers();
-
+ // TestGetLayers();
+  neat::Genome genome(3, 2);
+  genome.AddLink(0, 3, 1);
+  genome.AddLink(2, 4, 1);
+  genome.AddLink(1, 4, 1);
+  genome.AddLink(2, 3, 1);
+  genome.AddNeuron(neat::NeuronType::kHidden, 0.5);
+  genome.AddLink(0, 5, 1);
+  genome.AddLink(5, 3, 1);
+  neat::NeuralNetwork neural_network(genome);
+  std::vector<double> input_values = {1,1,1};
+  std::vector<double> output_values = neural_network.Activate(input_values);
+  for (const double &val:output_values) {
+      std::cout << val << std::endl;
+  }
 }
