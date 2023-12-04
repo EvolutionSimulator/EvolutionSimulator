@@ -3,7 +3,7 @@
 
 #include <vector>
 
-bool CollisionCircleCircle(const double& tolerance, const std::pair<double, double>& center1, const double& radius1, const std::pair<double, double>& center2, const double radius2);
+bool CollisionCircleCircle(const double& tolerance, const std::pair<double, double>& center1, const double& radius1, const std::pair<double, double>& center2, const double& radius2);
 bool CollisionCircleLine(const double& tolerance, const std::pair<double, double>& center, const double& radius,
                          const std::pair<double, double>& endpoint1, const std::pair<double, double>& endpoint2);
 bool CollisionLineLine(const double tolerance, const std::pair<double, double> line1_endpoint1, const std::pair<double, double> line1_endpoint2,

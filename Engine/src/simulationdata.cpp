@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include "food.h"
 #include <cmath>
+#include "collisions.h"
 
 void SimulationData::AddCreature(const Creature& creature)
 {
@@ -128,15 +129,6 @@ void SimulationData::UpdateGrid() {
     UpdateGridTemplate(food_entities_, food_grid_, environment_.kGridCellSize);
 }
 
-
-
-// Test Function - Needs to be imported from collisions.h
-bool CollisionCircleCircle(const double tolerance, const std::pair<double, double>& center1, const double radius1,
-                           const std::pair<double, double>& center2, const double radius2) {
-
-    double distance = std::hypot(center2.first - center1.first, center2.second - center1.second);
-    return distance <= (radius1 + radius2 - tolerance);
-}
 
 template<typename EntityType1, typename EntityType2>
 void CheckCollisionsTemplate(
