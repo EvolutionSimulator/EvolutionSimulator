@@ -103,6 +103,7 @@ void TestMutateChangeWeight() {
     assert(original_weights[i] != link.GetWeight());
     i++;
   }
+  std::cout << "MutateChangeWeight test passed!\n";
 }
 
 void TestAllNeat() {

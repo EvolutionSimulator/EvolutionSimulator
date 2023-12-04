@@ -9,7 +9,7 @@
 
 namespace neat {
 
-static double mutation_rate;
+static double mutation_rate; // TODO: give a value to this
 
 class Genome {
  public:
