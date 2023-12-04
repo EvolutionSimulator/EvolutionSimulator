@@ -2,6 +2,7 @@
 #include <vector>
 #include <algorithm>
 #include <stdexcept>
+#include <iostream>
 
 void SimulationData::AddCreature(const Creature& creature)
 {
@@ -57,13 +58,20 @@ void SimulationData::InitializeCreatures() {
         }
     }
 }
+
 // Function to initialize the environment
 void SimulationData::InitializeFood() {
-    // Populate the vector with food entities based on food density
+    double kFoodDensity = environment_.GetFoodDensity(); // Use the getter here
+
+    std::cout<<"Density in Simulation data:"<<kFoodDensity<<std::endl;
+
+    // Clear existing food entities before repopulating
+    food_entities_.clear();
+
+    // Populate the vector with food entities based on the current food density
     for (double x = 0; x < environment_.kMapWidth; x += 10.0) {
         for (double y = 0; y < environment_.kMapHeight; y += 10.0) {
-            if (std::rand() / (RAND_MAX + 1.0) < environment_.kFoodDensity) {
-
+            if (std::rand() / (RAND_MAX + 1.0) < kFoodDensity) {
                 food_entities_.emplace_back(Food(x,y));
             }
         }

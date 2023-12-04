@@ -39,7 +39,13 @@ void Simulation::ProcessData(std::function<void (SimulationData*)> processFunc)
     processFunc(data_);
 }
 
+SimulationData* Simulation::GetSimulationData() {
+    return data_;
+}
+
+
 // Function to stop the simulation
+
 void Simulation::Stop()
 {
     is_running_ = false;

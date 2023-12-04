@@ -9,6 +9,7 @@ class Simulation
 public:
     Simulation();
     ~Simulation();
+    SimulationData* GetSimulationData();
 
     void Start();
     void Update(double deltaTime);
