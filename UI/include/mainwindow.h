@@ -21,6 +21,8 @@ public:
 private slots: // Slots should be placed under this section
     void RunSimulation();
     void ChangeDensity(int value); // Make sure this is under 'private slots:'
+    void PauseSimulation();
+    void RestartSimulation();
 
 private:
     Ui::MainWindow* ui_; // Pointer to all UI widgets
