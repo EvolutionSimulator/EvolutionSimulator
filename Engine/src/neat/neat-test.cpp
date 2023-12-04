@@ -80,6 +80,31 @@ void TestSetBias() {
   std::cout << "SetBias test passed!\n";
 }
 
+void TestMutateChangeWeight() {
+  neat::Genome genome(5, 3);
+
+  // Add some links
+  genome.AddLink(0, 1, 0.5);
+  genome.AddLink(1, 2, 0.3);
+  genome.AddLink(2, 3, 0.7);
+
+  // Store the original weights
+  std::vector<double> original_weights;
+  for (const auto& link : genome.GetLinks()) {
+    original_weights.push_back(link.GetWeight());
+  }
+
+  // Mutate the weights
+  genome.MutateChangeWeight();
+
+  // Check if the weights have changed
+  int i = 0;
+  for (const auto& link : genome.GetLinks()) {
+    assert(original_weights[i] != link.GetWeight());
+    i++;
+  }
+}
+
 void TestAllNeat() {
   TestGenomeConstructor();
   TestAddNeuron();
@@ -88,4 +113,5 @@ void TestAllNeat() {
   TestSetWeight();
   TestNeuronConstructor();
   TestSetBias();
+  TestMutateChangeWeight();
 }

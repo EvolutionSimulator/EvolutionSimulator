@@ -37,4 +37,17 @@ void Genome::AddLink(int in_id, int out_id, double weight) {
   ++next_link_id_;
 }
 
+void Genome::MutateChangeWeight() {
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_real_distribution<> dis(0.0, mutation_rate);
+
+  for (Link &link : links_) {
+    if (dis(gen) < mutation_rate) {
+      double delta = (dis(gen) - 0.5) * 0.2;
+      link.SetWeight(delta);
+    }
+  }
+}
+
 }  // namespace neat

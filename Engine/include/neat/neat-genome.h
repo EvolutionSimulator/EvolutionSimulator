@@ -2,11 +2,14 @@
 #define NEATGENOME_H
 
 #include <vector>
+#include <random>
 
 #include "neat-link.h"
 #include "neat-neuron.h"
 
 namespace neat {
+
+static double mutation_rate;
 
 class Genome {
  public:
