@@ -1,5 +1,4 @@
 #include <cmath>
-#include <iostream>
 #include "collisions.h"
 
 double EuclideanDistance(const std::pair<double, double>& point1, const std::pair<double, double>& point2){
