@@ -1,27 +1,29 @@
 #ifndef CREATURE_HPP
 #define CREATURE_HPP
 
-#include "entity.h"
+#include "movable_entity.h"
+#include "food.h"
 
-class Creature : public Entity {
+class Creature : public MovableEntity {
 public:
+    enum states {
+        Dead = 0,
+        Alive = 1
+    };
     Creature();
 
+    void Dies();
+    void Eats(double nutritional_value);
+    void UpdateEnergy();
     double GetEnergy() const;
-    double GetVelocityForward() const;
-    double GetRotationalVelocity() const;
-
     void SetEnergy(double energy);
-    void SetVelocityForward(double velocity);
-    void SetRotationalVelocity(double rotational_velocity);
 
-    void Move(double deltaTime);
-    void Rotate(double deltaTime);
+    states GetState() const;
+    void SetState (states state);
 
 private:
     double energy_;
-    double velocity_forward_;
-    double rotational_velocity_;
+    states state_;
 };
 
 #endif // CREATURE_HPP
