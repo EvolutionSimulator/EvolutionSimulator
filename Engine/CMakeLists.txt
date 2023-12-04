@@ -24,6 +24,10 @@ add_library(Engine STATIC
   src/environment.cpp
   include/creature.h
   src/creature.cpp
+  src/movable_entity.cpp
+  include/movable_entity.h
+  include/collisions.h
+  src/collisions.cpp
 )
 
 target_include_directories(Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
