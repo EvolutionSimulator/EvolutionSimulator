@@ -14,13 +14,15 @@ class Link {
   bool IsActive() const;
 
   void SetWeight(double weight);
+  void SetActive();
+  void SetInactive();
 
  private:
   int id_;
+  bool active_;
   double weight_;
   int in_id_;
   int out_id_;
-  bool active_;
 };
 
 }  // namespace neat
