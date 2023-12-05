@@ -2,19 +2,10 @@
 #include <unordered_map>
 #include <cmath>
 #include <cassert>
+#include <algorithm>
+#include <iostream>
 
 namespace neat {
-
-NeuronInput::NeuronInput(int input_id, double weight){
-    this->input_id = input_id;
-    this->weight = weight;
-}
-
-FeedForwardNeuron::FeedForwardNeuron(int id, double bias, std::vector<NeuronInput> inputs) {
-    this->id = id;
-    this->bias = bias;
-    this->inputs = inputs;
-}
 
 NeuralNetwork::NeuralNetwork(Genome &genom) {
     std::vector< std::vector<Neuron> > layers = get_layers(genom);
@@ -35,10 +26,12 @@ NeuralNetwork::NeuralNetwork(Genome &genom) {
             std::vector<NeuronInput> inputs;
             for (const Link &link : genom.GetLinks()) {
                 if (link.GetOutId() == neuron.GetId()) {
-                    inputs.push_back(NeuronInput(link.GetInId(), link.GetWeight()));
+                    NeuronInput input = {link.GetInId(), link.GetWeight()};
+                    inputs.push_back(input);
                 }
             }
-            ffneurons.push_back(FeedForwardNeuron(neuron.GetId(), neuron.GetBias(), inputs));
+            FeedForwardNeuron ffneuron = {neuron.GetId(), neuron.GetBias(), inputs};
+            ffneurons.push_back(ffneuron);
         }
     }
     ffneurons_ = ffneurons;
@@ -50,14 +43,12 @@ std::vector<double> NeuralNetwork::Activate(std::vector<double> input_values) co
     for (int i = 0; i < input_values.size(); i++) {
         values[input_ids_[i]] = input_values[i];
     }
-    /*for (int i = 0; i < output_ids_.size(); i++) {
-        values[output_ids_[i]] = 0;
-    }*/
+
     for (const FeedForwardNeuron &ffneuron:ffneurons_) {
         if (values.find(ffneuron.id) == values.end()) {//if ffneuron is not already activated
             double value = 0;
             for (const NeuronInput &input:ffneuron.inputs) {
-                assert(values.find(input.input_id) != values.end()); //previous neurons have to be activated
+                assert(values.find(input.input_id) != values.end());//previous neurons have to be activated
                 value += values[input.input_id] * input.weight;
             }
             value+= ffneuron.bias;
@@ -100,10 +91,10 @@ std::vector<std::vector<Neuron> > get_layers(Genome &genom) {
     while (active.size() < N_neurons - genom.GetOutputCount()) {
         std::vector<Neuron> layer;
         for (const Neuron &neuron:neurons){
-            if (neuron.GetType() == NeuronType::kHidden && !contains(active, neuron.GetId())) {
+            if (neuron.GetType() == NeuronType::kHidden && std::find(active.begin(), active.end(), neuron.GetId()) == active.end()) {
                 bool is_active = true;
                 for (const Link& link: links) {
-                    if (link.IsActive() && link.GetOutId() == neuron.GetId() && !contains(active, link.GetInId())) {
+                    if (link.IsActive() && link.GetOutId() == neuron.GetId() && std::find(active.begin(), active.end(), link.GetInId()) == active.end()) {
                         is_active = false;
                         break;
                     }
