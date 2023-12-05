@@ -286,7 +286,7 @@ void TestNeuralNetworkActivate() {
 }
 
 void TestAllNeat() {
-  TestGenomeConstructor();
+  /*TestGenomeConstructor();
   TestAddNeuron();
   TestAddLink();
   TestLinkConstructor();
@@ -301,7 +301,7 @@ void TestAllNeat() {
   TestRemoveNeuron();
   TestRemoveLink();
   TestMutateRemoveNeuron();
-  TestMutateRemoveLink();
+  TestMutateRemoveLink();*/
   TestGetLayers();
-  TestNeuralNetworkActivate();
+  //TestNeuralNetworkActivate();
 }

@@ -76,27 +76,31 @@ std::vector<double> NeuralNetwork::Activate(std::vector<double> input_values) co
 std::vector<std::vector<Neuron> > get_layers(Genome &genom) {
     std::vector<std::vector<Neuron> > layers;
     std::vector<Neuron> input_layer;
+    std::vector<Neuron> output_layer;
     std::vector<int> active; // a neuron is active if all of its incoming neurons belong to an active layer. A layer is active if all of its neurons are active.
                              //input neurons are also active and they form an active layer
     std::vector<Neuron> neurons = genom.GetNeurons();
     std::vector<Link> links = genom.GetLinks();
 
-    for (int i = 0; i < genom.GetInputCount(); i++) {
-        int inputid = neurons[i].GetId();
-        input_layer.push_back(neurons[i]);
-        active.push_back(inputid);
+    for (const Neuron &neuron: neurons) {
+        if (neuron.GetType() == NeuronType::kInput) {
+            int inputid = neuron.GetId();
+            input_layer.push_back(neuron);
+            active.push_back(inputid);
+        }
     }
     layers.push_back(input_layer);
-    std::vector<Neuron> output_layer;
-    for (int i = genom.GetInputCount(); i < genom.GetInputCount() + genom.GetOutputCount(); i++) {
-        output_layer.push_back(neurons[i]);
+
+    for (const Neuron &neuron: neurons) {
+        if (neuron.GetType() == NeuronType::kOutput) {
+            output_layer.push_back(neuron);
+        }
     }
     int N_neurons = neurons.size(); //total number of neurons in the network
     while (active.size() < N_neurons - genom.GetOutputCount()) {
         std::vector<Neuron> layer;
-        for (int i = genom.GetInputCount() + genom.GetOutputCount(); i < N_neurons;  i++){ //we dont check for the input neurons, they are already added
-            Neuron neuron = neurons[i];
-            if (!contains(active, neuron.GetId())) {
+        for (const Neuron &neuron:neurons){
+            if (neuron.GetType() == NeuronType::kHidden && !contains(active, neuron.GetId())) {
                 bool is_active = true;
                 for (const Link& link: links) {
                     if (link.IsActive() && link.GetOutId() == neuron.GetId() && !contains(active, link.GetInId())) {

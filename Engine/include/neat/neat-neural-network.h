@@ -7,15 +7,13 @@
 
 namespace neat {
 
-class NeuronInput {
-public:
+struct NeuronInput {
     NeuronInput(int input_id, double weight);
     int input_id;
     double weight;
 };
 
-class FeedForwardNeuron { // Functional units of the NeuralNetowork, obtained from Neurons and Links
-public:
+struct FeedForwardNeuron { // Functional units of the NeuralNetowork, obtained from Neurons and Links
     FeedForwardNeuron(int id, double bias_, std::vector<NeuronInput> inputs_);
     int id;
     double bias;
