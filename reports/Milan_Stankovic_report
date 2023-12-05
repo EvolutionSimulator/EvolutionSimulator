@@ -1,0 +1,6 @@
+Week 1
+
+I implemented a NeuralNetwork class. Calculating outputs of a creature's brain directly from its genome is very inefficient and it needs to be done many times per
+second. That's why, at the beginning of a creature's life, a NeuralNetwork object is created using information from the creature's genome, and it acts as a brain.
+Constructor of the NeuralNetwork takes a Genome object as input and stores the neurons in a way that enables the efficient computation of outputs, given input neurons
+' values. To compute the outputs, NeuralNetwork has a member function Activate.
