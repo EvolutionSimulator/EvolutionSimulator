@@ -165,6 +165,72 @@ bool Genome::HasLink(const int& inID, const int& outID) {
   return false;
 }
 
+void Genome::RemoveLink(int id) {
+  int index_to_delete = -1;
+  for (int i = 0; i<links_.size(); i++){
+    if (links_[i].GetId()==id){
+        index_to_delete = i;
+        break;
+    }
+  }
+  if (index_to_delete!=-1){
+    links_.erase(links_.begin()+index_to_delete);
+  }
+}
+
+
+//Neuron Genome::FindNeuronIndexById(int targetId) const {
+//    for (size_t i = 0; i < neurons_.size(); ++i) {
+//        if (neurons_[i].GetId() == targetId) {
+//            // Neuron with the specified ID found, return its index
+//            return neurons_[i];
+//        }
+//    }
+
+//    // Neuron with the specified ID not found, return -1
+//    return -1;
+//}
+
+bool Genome::DFS(const Neuron& currentNeuron, std::unordered_set<int>& visited, std::unordered_set<int>& visiting) const {
+    int currentId = currentNeuron.GetId();
+
+    if (visiting.find(currentId) != visiting.end()) {
+        return true; //loop
+    }
+
+    if (visited.find(currentId) != visited.end()) {
+        return false; //already visited
+    }
+
+    visiting.insert(currentId);
+
+    for (const auto& link : links_) {
+            if (link.GetInId() == currentId) {
+                int neighborId = link.GetOutId();
+                auto neighborIt = std::find_if(neurons_.begin(), neurons_.end(),
+                                                [neighborId](const Neuron& n) { //find the neuron w right id
+                                                    return n.GetId() == neighborId;
+                                                });
+
+                if (neighborIt != neurons_.end() && DFS(*neighborIt, visited, visiting)) {
+                    return true; // found loop
+                }
+            }
+        }
+
+        visiting.erase(currentId);
+        visited.insert(currentId);
+
+    return false;
+}
+
+bool Genome::DetectLoops(const Neuron& startNeuron){
+    std::unordered_set<int> visited;
+    std::unordered_set<int> visiting;
+
+    return DFS(startNeuron, visited, visiting);
+}
+
 void Genome::MutateAddLink(){
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -185,16 +251,13 @@ void Genome::MutateAddLink(){
       return ; // IF WE END UP USING ENABLED/DISABLE LINKS, THEN ENABLE LINK
   }
 
-  //We loop through all hidden neurons and check if a triangle is formed:
-  int tempID;
-  for (size_t i = 0; i < neurons_.size(); ++i) {
-    tempID= neurons_[i].GetId();
-    if (HasLink(n1,tempID) && HasLink(n2,tempID)){
-        return;
-    }
-    }
-
+  //Check if cycle exists:
   AddLink(n1, n2, 1);
+  Link newl = links_[-1];
+  if (DetectLoops(neurons_[indexRandomNeuron1])){
+      RemoveLink(newl.GetId());
+      return;
+  }
 }
 
 void Genome::MutateAddNeuron(){
@@ -210,6 +273,7 @@ void Genome::MutateAddNeuron(){
     links_.erase (links_.begin() + randIndex);
 
     AddNeuron(NeuronType::kHidden, 0.0);
+    //disable the initial link between the inId and outId
     int newNeuronId = neurons_[-1].GetId();
     AddLink(RandomLink.GetInId(), newNeuronId, 1);
     AddLink(newNeuronId, RandomLink.GetOutId(), RandomLink.GetWeight());
