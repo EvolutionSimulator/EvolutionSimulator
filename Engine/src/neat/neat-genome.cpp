@@ -270,7 +270,7 @@ void Genome::MutateAddNeuron(){
     std::uniform_int_distribution<size_t> dist(0,links_.size()-1);
     size_t randIndex=dist(gen);
     Link RandomLink = links_[randIndex];
-    links_.erase (links_.begin() + randIndex);
+    DisableLink(RandomLink.GetId());
 
     AddNeuron(NeuronType::kHidden, 0.0);
     //disable the initial link between the inId and outId
