@@ -23,7 +23,10 @@ public:
 
     void GenerateMoreFood();
     void UpdateGrid();
-    void CheckCollisions();
+
+    void CheckFoodCollisions();
+    void CheckCreatureCollisions();
+
     void ModifyAllCreatures(double delta_x, double delta_y);
     void MoveAllCreatures(double deltaTime);
 

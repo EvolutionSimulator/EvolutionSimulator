@@ -16,6 +16,8 @@ public:
     void Move(double deltaTime);
     void Rotate(double deltaTime);
 
+    virtual void OnCollision(Entity& other_entity);
+
 private:
     double velocity_forward_;
     double rotational_velocity_;
