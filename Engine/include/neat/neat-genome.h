@@ -22,6 +22,10 @@ class Genome {
   void AddNeuron(NeuronType type, double bias);
   void AddLink(int in_id, int out_id, double weight);
 
+  void DisableNeuron(int id);
+  void DisableLink(int id);
+  void EnableNeuron(int id);
+  void EnableLink(int id);
   void RemoveNeuron(int id);
   void RemoveLink(int id);
 

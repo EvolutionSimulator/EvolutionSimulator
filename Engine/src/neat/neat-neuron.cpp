@@ -11,6 +11,12 @@ NeuronType Neuron::GetType() const { return type_; }
 
 double Neuron::GetBias() const { return bias_; }
 
+bool Neuron::IsActive() const { return active_; }
+
 void Neuron::SetBias(double bias) { bias_ = bias; }
+
+void Neuron::SetActive(){active_= true;}
+
+void Neuron::SetInactive(){active_ = false;}
 
 }  // namespace neat
