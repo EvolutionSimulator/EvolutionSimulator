@@ -10,8 +10,7 @@
 namespace neat {
 
 constexpr double kWeightMutationRate = 0.2; // temporary value
-static double maxWeightChange = 0.2;
-static double randomNoiseCenter = 0.5;
+static double standardDeviationWeight = 0.1;
 static double maxWeight = 1.0;
 static double minWeight = 0.0;
 
