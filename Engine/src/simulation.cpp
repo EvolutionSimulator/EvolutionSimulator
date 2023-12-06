@@ -3,6 +3,7 @@
 Simulation::Simulation()
 {
     data_ = new SimulationData();
+    is_running_ = true; // Initialize the flag to true
 }
 
 Simulation::~Simulation()
@@ -38,4 +39,16 @@ void Simulation::ProcessData(std::function<void (SimulationData*)> processFunc)
 {
     std::lock_guard<std::mutex> lock(data_mutex_);
     processFunc(data_);
+}
+
+SimulationData* Simulation::GetSimulationData() {
+    return data_;
+}
+
+
+// Function to stop the simulation
+
+void Simulation::Stop()
+{
+    is_running_ = false;
 }

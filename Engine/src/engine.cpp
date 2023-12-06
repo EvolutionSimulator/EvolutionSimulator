@@ -12,6 +12,12 @@ Engine::~Engine()
     delete simulation_;
 }
 
+Environment& Engine::GetEnvironment() {
+    return environment_;
+}
+
+
+
 // Main engine loop
 void Engine::Run()
 {
@@ -51,6 +57,10 @@ void Engine::Run()
                 );
         }
     }
+}
+
+void Engine::UpdateEnvironment() {
+    simulation_->GetSimulationData()->InitializeFood();
 }
 
 void Engine::Stop()
