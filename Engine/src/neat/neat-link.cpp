@@ -1,4 +1,6 @@
 #include "neat/neat-link.h"
+#include "assert.h"
+#include "random"
 
 namespace neat {
 
@@ -21,4 +23,19 @@ void Link::SetActive(){active_= true;}
 
 void Link::SetInactive(){active_ = false;}
 
+Link CrossoverLink(const Link &a, const Link &b){
+    assert(a.GetId() == b.GetId());
+
+    int id = a.GetId();
+    int id_in = a.GetInId();
+    int id_out = a.GetOutId();
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<double> distribution(0.0, 1.0);
+
+    double weight = distribution(gen) < 0.5 ? a.GetWeight() : b.GetWeight();
+
+    return {id, id_in, id_out, weight};
+}
 }  // namespace neat
