@@ -121,11 +121,13 @@ void UpdateGridTemplate(const std::vector<EntityType>& entities, std::unordered_
     int gridX, gridY;
 
     for (const auto& entity : entities) {
-        coordinates = entity.GetCoordinates();
-        gridX = static_cast<int>(coordinates.first / cellSize);
-        gridY = static_cast<int>(coordinates.second / cellSize);
-
-        entityGrid[gridX][gridY].push_back(entity);
+        if (entity.GetState() == Entity::Alive)
+        {
+            coordinates = entity.GetCoordinates();
+            gridX = static_cast<int>(coordinates.first / cellSize);
+            gridY = static_cast<int>(coordinates.second / cellSize);
+            entityGrid[gridX][gridY].push_back(entity);
+        }
     }
 }
 
@@ -137,30 +139,30 @@ void SimulationData::UpdateGrid() {
 
 template<typename EntityType1, typename EntityType2>
 void CheckCollisionsTemplate(
-    const std::unordered_map<int, std::unordered_map<int, std::vector<EntityType1>>>& entityGrid1,
-    const std::unordered_map<int, std::unordered_map<int, std::vector<EntityType2>>>& entityGrid2,
+    std::unordered_map<int, std::unordered_map<int, std::vector<EntityType1>>>& entityGrid1,
+    std::unordered_map<int, std::unordered_map<int, std::vector<EntityType2>>>& entityGrid2,
     const Environment& environment
     ) {
     double tolerance = environment.kTolerance;
 
-    for (const auto& row : entityGrid1) {
-        for (const auto& cell : row.second) {
-            const std::vector<EntityType1>& entities1 = cell.second;
+    for (auto& row : entityGrid1) {
+        for (auto& cell : row.second) {
+            std::vector<EntityType1>& entities1 = cell.second;
 
             // Check if there are entities in the corresponding cell in entityGrid2
             auto it2 = entityGrid2.find(row.first);
             if (it2 != entityGrid2.end()) {
-                const auto& row2 = *it2;
+                auto& row2 = *it2;
                 auto itCell2 = row2.second.find(cell.first);
                 if (itCell2 != row2.second.end()) {
-                    const std::vector<EntityType2>& entities2 = itCell2->second;
+                    std::vector<EntityType2>& entities2 = itCell2->second;
 
                     // Now, check for collisions only between entities1 and entities2
-                    for (const auto& entity1 : entities1) {
-                        for (const auto& entity2 : entities2) {
+                    for (auto& entity1 : entities1) {
+                        for (auto& entity2 : entities2) {
                             if (CollisionCircleCircle(tolerance, entity1.GetCoordinates(), entity1.GetSize(), entity2.GetCoordinates(), entity2.GetSize())) {
                                 // Handle the collision as needed
-
+                                entity1.OnCollision(entity2);
                             }
                         }
                     }
@@ -170,6 +172,6 @@ void CheckCollisionsTemplate(
     }
 }
 
-void SimulationData::CheckCollisions() {
+void SimulationData::CheckFoodCollisions() {
     CheckCollisionsTemplate<Creature,Food>(creature_grid_, food_grid_, environment_);
 }
