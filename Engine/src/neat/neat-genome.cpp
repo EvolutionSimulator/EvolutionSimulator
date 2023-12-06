@@ -1,4 +1,6 @@
 #include "neat/neat-genome.h"
+#include <random>
+#include <algorithm>
 
 namespace neat {
 
@@ -112,18 +114,18 @@ void Genome::RemoveNeuron(int id) {
   }
 }
 
-void Genome::RemoveLink(int id) {
-  int index_to_delete = -1;
-  for (int i = 0; i<links_.size(); i++){
-    if (links_[i].GetId()==id){
-        index_to_delete = i;
-        break;
-    }
-  }
-  if (index_to_delete!=-1){
-    links_.erase(links_.begin()+index_to_delete);
-  }
-}
+//void Genome::RemoveLink(int id) {
+//  int index_to_delete = -1;
+//  for (int i = 0; i<links_.size(); i++){
+//    if (links_[i].GetId()==id){
+//        index_to_delete = i;
+//        break;
+//    }
+//  }
+//  if (index_to_delete!=-1){
+//    links_.erase(links_.begin()+index_to_delete);
+//  }
+//}
 
 void Genome::MutateRemoveNeuron() {
   std::vector<int> hiddenIDs = {};
@@ -141,17 +143,142 @@ void Genome::MutateRemoveNeuron() {
   }
 }
 
-void Genome::MutateRemoveLink() {
-  if (!links_.empty()) {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(0, links_.size() - 1);
+ void Genome::MutateRemoveLink() {
+   if (!links_.empty()) {
+     std::random_device rd;
+     std::mt19937 gen(rd());
+     std::uniform_int_distribution<> dis(0, links_.size() - 1);
 
-    int index = dis(gen);
-    int idToRemove = links_[index].GetId();
+     int index = dis(gen);
+     int idToRemove = links_[index].GetId();
 
-    RemoveLink(idToRemove);
+     RemoveLink(idToRemove);
+   }
+ }
+
+bool Genome::HasLink(const int& inID, const int& outID) {
+  for (const auto& link : links_) {
+    if (link.GetInId() == inID && link.GetOutId() == outID || link.GetInId() == outID && link.GetOutId() == inID) {
+        return true;
+    }
+  }
+  return false;
+}
+
+void Genome::RemoveLink(int id) {
+  int index_to_delete = -1;
+  for (int i = 0; i<links_.size(); i++){
+    if (links_[i].GetId()==id){
+        index_to_delete = i;
+        break;
+    }
+  }
+  if (index_to_delete!=-1){
+    links_.erase(links_.begin()+index_to_delete);
   }
 }
+
+
+//Neuron Genome::FindNeuronIndexById(int targetId) const {
+//    for (size_t i = 0; i < neurons_.size(); ++i) {
+//        if (neurons_[i].GetId() == targetId) {
+//            // Neuron with the specified ID found, return its index
+//            return neurons_[i];
+//        }
+//    }
+
+//    // Neuron with the specified ID not found, return -1
+//    return -1;
+//}
+
+bool Genome::DFS(const Neuron& currentNeuron, std::unordered_set<int>& visited, std::unordered_set<int>& visiting) const {
+    int currentId = currentNeuron.GetId();
+
+    if (visiting.find(currentId) != visiting.end()) {
+        return true; //loop
+    }
+
+    if (visited.find(currentId) != visited.end()) {
+        return false; //already visited
+    }
+
+    visiting.insert(currentId);
+
+    for (const auto& link : links_) {
+            if (link.GetInId() == currentId) {
+                int neighborId = link.GetOutId();
+                auto neighborIt = std::find_if(neurons_.begin(), neurons_.end(),
+                                                [neighborId](const Neuron& n) { //find the neuron w right id
+                                                    return n.GetId() == neighborId;
+                                                });
+
+                if (neighborIt != neurons_.end() && DFS(*neighborIt, visited, visiting)) {
+                    return true; // found loop
+                }
+            }
+        }
+
+        visiting.erase(currentId);
+        visited.insert(currentId);
+
+    return false;
+}
+
+bool Genome::DetectLoops(const Neuron& startNeuron){
+    std::unordered_set<int> visited;
+    std::unordered_set<int> visiting;
+
+    return DFS(startNeuron, visited, visiting);
+}
+
+void Genome::MutateAddLink(){
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<size_t> dist(0,neurons_.size()-1);
+  size_t indexRandomNeuron1 = dist(gen);
+  size_t indexRandomNeuron2 = dist(gen);
+  while(neurons_[indexRandomNeuron1].GetType() == NeuronType::kOutput){
+      indexRandomNeuron1 = dist(gen);
+  }
+  while(neurons_[indexRandomNeuron2].GetType() == NeuronType::kInput){
+      indexRandomNeuron2 = dist(gen);
+  }
+
+  int n1 = neurons_[indexRandomNeuron1].GetId(); //id of in neuron
+  int n2 = neurons_[indexRandomNeuron2].GetId(); //id of out neuron
+
+  if (HasLink(n1,n2)){
+      return ; // IF WE END UP USING ENABLED/DISABLE LINKS, THEN ENABLE LINK
+  }
+
+  //Check if cycle exists:
+  AddLink(n1, n2, 1);
+  Link newl = links_[-1];
+  if (DetectLoops(neurons_[indexRandomNeuron1])){
+      RemoveLink(newl.GetId());
+      return;
+  }
+}
+
+void Genome::MutateAddNeuron(){
+    if(links_.size()==0){
+        return;
+    }
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<size_t> dist(0,links_.size()-1);
+    size_t randIndex=dist(gen);
+    Link RandomLink = links_[randIndex];
+    DisableLink(RandomLink.GetId()); //test
+
+    AddNeuron(NeuronType::kHidden, 0.0);
+    //disable the initial link between the inId and outId
+    int newNeuronId = neurons_[-1].GetId();
+    AddLink(RandomLink.GetInId(), newNeuronId, 1);
+    AddLink(newNeuronId, RandomLink.GetOutId(), RandomLink.GetWeight());
+}
+
+
 
 }  // namespace neat
