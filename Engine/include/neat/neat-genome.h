@@ -41,7 +41,7 @@ class Genome {
   std::vector<Neuron> neurons_;
   std::vector<Link> links_;
 };
-
+Genome Crossover(const Genome &dominant, const Genome &recessive);
 }  // namespace neat
 
 #endif  // NEATGENOME_H
