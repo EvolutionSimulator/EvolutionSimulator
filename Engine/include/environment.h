@@ -12,9 +12,8 @@ public:
 
     static constexpr double kCreatureDensity = 0.001; // Constant for creature density
     // Food and creature density for random initialization
-    static constexpr double kFoodDensity = 0.001;
+    double kFoodDensity = 0.001;
     static constexpr int kMaxFoodSize = 10;
-    static constexpr double kCreatureDensity = 0.001;
 
     // Length of side of grid cell
     static constexpr double kGridCellSize = 10.0;
@@ -26,10 +25,9 @@ public:
     Environment();
 
     // Getter and setter for food density
-    void SetFoodDensity(double density) { foodDensity = density; printf("setting density to %f\n", density);}
+    void SetFoodDensity(double density) { kFoodDensity = density;}
     double GetFoodDensity() const {
-        printf("Getting density: %f\n", foodDensity);
-        return foodDensity;
+        return kFoodDensity;
     }};
 
 #endif // ENVIRONMENT_H
