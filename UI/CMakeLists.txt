@@ -20,7 +20,7 @@ endif()
 
 qt_add_executable(UI
     MANUAL_FINALIZATION
-    src/main-ui.cpp
+    src/main.cpp
     src/mainwindow.cpp include/mainwindow.h
     src/mainwindow.ui
     include/qsfmlcanvas.h src/qsfmlcanvas.cpp

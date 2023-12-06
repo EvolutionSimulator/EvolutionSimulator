@@ -19,10 +19,15 @@ add_library(Engine STATIC
   include/neat/neat-link.h src/neat/neat-link.cpp
   include/neat/neat-genome.h src/neat/neat-genome.cpp
 
-  src/main.cpp
+
   src/neat/neat-test.cpp
   include/neat/neat-test.h
+  include/neat/neat-neural-network.h
+  src/neat/neat-neural-network.cpp
+
 )
+
+add_subdirectory(tests)
 
 target_include_directories(Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(Engine PRIVATE Qt${QT_VERSION_MAJOR}::Core)
