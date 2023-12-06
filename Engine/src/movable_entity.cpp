@@ -37,3 +37,8 @@ void MovableEntity::Move(double deltaTime)
     coordinates.second = coordinates.second + deltaTime * y_velocity;
     this->SetCoordinates(coordinates.first, coordinates.second);
 }
+
+void MovableEntity::OnCollision(Entity& other_entity)
+{
+
+}

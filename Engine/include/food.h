@@ -6,7 +6,6 @@
 class Food : public Entity
 {
 public:
-
     Food();
     Food(const double x_coord, const double y_coord);
     Food(const double size);
@@ -17,7 +16,6 @@ public:
 
 private:
     double nutritional_value_;
-
 };
 
 

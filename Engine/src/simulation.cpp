@@ -31,7 +31,7 @@ void Simulation::FixedUpdate(double deltaTime)
     // Test function (DO NOT USE)
     data_->ModifyAllCreatures(100 * deltaTime, 100 * deltaTime);
     data_->UpdateGrid();
-    data_->CheckCollisions();
+    data_->CheckFoodCollisions();
 }
 
 // Facilitates data processing with external functions in a thread-safe manner
