@@ -9,7 +9,7 @@
 
 namespace neat {
 
-static double mutation_rate = 0.2; // TODO: give a value to this
+static const double kWeightMutationRate = 0.2; // temporary value
 
 class Genome {
  public:
