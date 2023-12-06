@@ -114,47 +114,47 @@ void Genome::RemoveNeuron(int id) {
   }
 }
 
-void Genome::RemoveLink(int id) {
-  int index_to_delete = -1;
-  for (int i = 0; i<links_.size(); i++){
-    if (links_[i].GetId()==id){
-        index_to_delete = i;
-        break;
-    }
-  }
-  if (index_to_delete!=-1){
-    links_.erase(links_.begin()+index_to_delete);
-  }
-}
-
-//void Genome::MutateRemoveNeuron() {
-//  std::vector<int> hiddenIDs = {};
-//  for (const Neuron& neuron: GetNeurons()){
-//    if (neuron.GetType() == NeuronType::kHidden){
-//        hiddenIDs.push_back(neuron.GetId());
+//void Genome::RemoveLink(int id) {
+//  int index_to_delete = -1;
+//  for (int i = 0; i<links_.size(); i++){
+//    if (links_[i].GetId()==id){
+//        index_to_delete = i;
+//        break;
 //    }
 //  }
-//  if (!hiddenIDs.empty()) {
-//    std::random_device rd;
-//    std::mt19937 gen(rd());
-//    std::uniform_int_distribution<> dis(0, hiddenIDs.size() - 1);
-
-//    RemoveNeuron(hiddenIDs[dis(gen)]);
+//  if (index_to_delete!=-1){
+//    links_.erase(links_.begin()+index_to_delete);
 //  }
 //}
 
-// void Genome::MutateRemoveLink() {
-//   if (!links_.empty()) {
-//     std::random_device rd;
-//     std::mt19937 gen(rd());
-//     std::uniform_int_distribution<> dis(0, links_.size() - 1);
+void Genome::MutateRemoveNeuron() {
+  std::vector<int> hiddenIDs = {};
+  for (const Neuron& neuron: GetNeurons()){
+    if (neuron.GetType() == NeuronType::kHidden){
+        hiddenIDs.push_back(neuron.GetId());
+    }
+  }
+  if (!hiddenIDs.empty()) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, hiddenIDs.size() - 1);
 
-//     int index = dis(gen);
-//     int idToRemove = links_[index].GetId();
+    RemoveNeuron(hiddenIDs[dis(gen)]);
+  }
+}
 
-//     RemoveLink(idToRemove);
-//   }
-// }
+ void Genome::MutateRemoveLink() {
+   if (!links_.empty()) {
+     std::random_device rd;
+     std::mt19937 gen(rd());
+     std::uniform_int_distribution<> dis(0, links_.size() - 1);
+
+     int index = dis(gen);
+     int idToRemove = links_[index].GetId();
+
+     RemoveLink(idToRemove);
+   }
+ }
 
 bool Genome::HasLink(const int& inID, const int& outID) {
   for (const auto& link : links_) {
