@@ -161,8 +161,13 @@ void Genome::MutateChangeWeight() {
 
   for (Link &link : links_) {
     if (dis(gen) < kWeightMutationRate) {
-      double delta = (dis(gen) - 0.5) * 0.2;
-      link.SetWeight(delta);
+      double delta = (dis(gen) - randomNoiseCenter) * maxWeightChange;
+      link.SetWeight(link.GetWeight() + delta);
+      if (link.GetWeight() > maxWeight) {
+        link.SetWeight(maxWeight);
+      } else if (link.GetWeight() < minWeight) {
+        link.SetWeight(minWeight);
+      }
     }
   }
 }

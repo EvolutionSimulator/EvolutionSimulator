@@ -266,7 +266,25 @@ void TestMutateChangeWeight() {
     assert(original_weights[i] != link.GetWeight());
     i++;
   }
+
+  // Store the second set of weights
+  std::vector<double> new_weights;
+  for (const auto& link : genome.GetLinks()) {
+    new_weights.push_back(link.GetWeight());
+  }
+
+  // Mutate the weights again
+  genome.MutateChangeWeight();
+
+  // Check if the weights have changed
+  i = 0;
+  for (const auto& link : genome.GetLinks()) {
+    assert(new_weights[i] != link.GetWeight());
+    i++;
+  }
+
   std::cout << "MutateChangeWeight test passed!\n";
+}
 
 void TestAllNeat() {
   TestGenomeConstructor();
