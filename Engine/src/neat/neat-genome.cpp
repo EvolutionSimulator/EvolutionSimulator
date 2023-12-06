@@ -157,10 +157,10 @@ void Genome::MutateRemoveLink() {
 void Genome::MutateChangeWeight() {
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_real_distribution<> dis(0.0, mutation_rate);
+  std::normal_distribution<> dis(0.0, 0.1);
 
   for (Link &link : links_) {
-    if (dis(gen) < mutation_rate) {
+    if (dis(gen) < kWeightMutationRate) {
       double delta = (dis(gen) - 0.5) * 0.2;
       link.SetWeight(delta);
     }
