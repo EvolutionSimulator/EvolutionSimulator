@@ -70,3 +70,48 @@ TEST(NeatTests, SetBias) {
 
     EXPECT_EQ(neuron.GetBias(), new_bias);
 }
+TEST(NeatTests, CrossoverNeuron) {
+    neat::Neuron neuronA{1, neat::NeuronType(), 0.3};
+    neat::Neuron neuronB{1, neat::NeuronType(), 0.7};
+    neat::Neuron crossoverResult = CrossoverNeuron(neuronA, neuronB);
+    EXPECT_EQ(crossoverResult.GetId(), 1);
+    EXPECT_EQ(crossoverResult.GetType(), neat::NeuronType());
+    EXPECT_GE(crossoverResult.GetBias(), 0.0);
+    EXPECT_LE(crossoverResult.GetBias(), 1.0);
+    std::cout << "CrossoverNeuron test passed." << std::endl;
+}
+TEST(NeatTests, CrossoverLink) {
+    neat::Link linkA{1, 10, 20, 0.3};
+    neat::Link linkB{1, 10, 20, 0.7};
+    neat::Link crossoverResult = CrossoverLink(linkA, linkB);
+
+    EXPECT_EQ(crossoverResult.GetId(), 1);
+    EXPECT_EQ(crossoverResult.GetInId(), 10);
+    EXPECT_EQ(crossoverResult.GetOutId(), 20);
+    EXPECT_GE(crossoverResult.GetWeight(), 0.0);
+    EXPECT_LE(crossoverResult.GetWeight(), 1.0);
+
+    std::cout << "CrossoverLink test passed." << std::endl;
+}
+TEST(NeatTests, CrossoverGenome) {
+    neat::Genome dominantGenome{2, 1};
+    neat::Genome recessiveGenome{2, 1};
+    dominantGenome.AddNeuron(neat::NeuronType(), 0.3);
+    recessiveGenome.AddNeuron( neat::NeuronType(), -0.5);
+    dominantGenome.AddLink(1, 2, 0.5);
+    recessiveGenome.AddLink(1, 2, 0.7);
+    neat::Genome offspringGenome = Crossover(dominantGenome, recessiveGenome);
+    EXPECT_EQ(offspringGenome.GetInputCount(), 2);
+    EXPECT_EQ(offspringGenome.GetOutputCount(), 1);
+    const auto& offspringNeurons = offspringGenome.GetNeurons();
+    EXPECT_EQ(offspringNeurons[0].GetType(), neat::NeuronType());
+    EXPECT_GE(offspringNeurons[0].GetBias(), -1.0);
+    EXPECT_LE(offspringNeurons[0].GetBias(), 1.0);
+    const auto& offspringLinks = offspringGenome.GetLinks();
+    EXPECT_EQ(offspringLinks.size(), 1);
+    EXPECT_EQ(offspringLinks[0].GetInId(), 1);
+    EXPECT_EQ(offspringLinks[0].GetOutId(), 2);
+    EXPECT_GE(offspringLinks[0].GetWeight(), 0.0);
+    EXPECT_LE(offspringLinks[0].GetWeight(), 1.0);
+    std::cout << "Crossover test passed." << std::endl;
+}
