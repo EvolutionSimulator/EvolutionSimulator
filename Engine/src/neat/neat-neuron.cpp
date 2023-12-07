@@ -37,10 +37,10 @@ Neuron CrossoverNeuron(const Neuron &a, const Neuron &b){
     std::mt19937 gen(rd());
     std::uniform_real_distribution<double> distribution(0.0, 1.0);
 
-    Neuron crossoverNeuron = a;
+    Neuron crossover_neuron = a;
 
-    crossoverNeuron.SetBias(distribution(gen) < 0.5 ? a.GetBias() : b.GetBias());
+    crossover_neuron.SetBias(distribution(gen) < 0.5 ? a.GetBias() : b.GetBias());
 
-    return crossoverNeuron;
+    return crossover_neuron;
 }
 }  // namespace neat
