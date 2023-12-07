@@ -1,8 +1,8 @@
 #include "simulation.h"
 
-Simulation::Simulation()
+Simulation::Simulation(Environment& environment)
 {
-    data_ = new SimulationData();
+    data_ = new SimulationData(environment);
     is_running_ = true; // Initialize the flag to true
 }
 

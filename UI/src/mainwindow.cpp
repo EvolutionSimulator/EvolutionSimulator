@@ -33,10 +33,9 @@ void MainWindow::SetEngine(Engine *engine)
 
 void MainWindow::ChangeDensity(int value)
 {
-    double density = static_cast<double>(value) / 100.0; // Convert to density
+    double density = static_cast<double>(value) / 1000.0;
     engine_->GetEnvironment().SetFoodDensity(density); // Update the density
-    engine_->UpdateEnvironment(); // Apply the updated density
-    std::cout << "Density changed to " << density << std::endl;
+    engine_->UpdateEnvironment();
 }
 
 void MainWindow::RunSimulation()
