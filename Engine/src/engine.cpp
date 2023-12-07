@@ -3,8 +3,8 @@
 #include <cmath>
 
 Engine::Engine()
-{
-    simulation_ = new Simulation();
+    : environment_(), simulation_(new Simulation(environment_)) {
+    simulation_ = new Simulation(environment_);
 }
 
 Engine::~Engine()

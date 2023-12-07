@@ -5,7 +5,7 @@
 
 // Constructor implementation
 Environment::Environment()
-    : kFoodDensity(0.01) // Initialize food density here
+    : kFoodDensity(0.005) // Initialize food density here
 {
 
 }

@@ -2,7 +2,6 @@
 #include <vector>
 #include <algorithm>
 #include <stdexcept>
-#include <iostream>
 #include "food.h"
 #include <cmath>
 #include "collisions.h"
@@ -83,8 +82,6 @@ void SimulationData::InitializeCreatures() {
 // Function to initialize the environment
 void SimulationData::InitializeFood() {
     double kFoodDensity = environment_.GetFoodDensity(); // Use the getter here
-
-    std::cout<<"Density in Simulation data:"<<kFoodDensity<<std::endl;
 
     // Clear existing food entities before repopulating
     food_entities_.clear();
