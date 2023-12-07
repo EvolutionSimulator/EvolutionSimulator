@@ -244,6 +244,7 @@ void TestMutateRemoveLink() {
   std::cout << "MutateRemoveLink test passed!\n";
 }
 
+
 void TestGetLayers () {
   neat::Genome genome(3, 2);
   genome.AddLink(0, 3, 1);
@@ -285,6 +286,7 @@ void TestNeuralNetworkActivate() {
   }
 }
 
+
 void TestAllNeat() {
   TestGenomeConstructor();
   TestAddNeuron();
@@ -304,4 +306,5 @@ void TestAllNeat() {
   TestMutateRemoveLink();
   TestGetLayers();
   TestNeuralNetworkActivate();
+
 }
