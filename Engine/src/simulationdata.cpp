@@ -6,6 +6,7 @@
 #include "food.h"
 #include <cmath>
 #include "collisions.h"
+#include "neat/neat-genome.h"
 
 void SimulationData::AddCreature(const Creature& creature)
 {
@@ -41,17 +42,29 @@ void SimulationData::UpdateAllCreatures(double deltaTime)
     for (Creature& creature: creatures_) {
         creature.Update(deltaTime);
         if (creature.Fit()){
-            fit_reproduce_.push_back(creature);
+            fit_reproduce_.push(creature);
         }
     }
 }
 
 /*!
- * Takes two creatures from fit_reproduce and makes a children out of them
+ * Takes two creatures from fit_reproduce and makes a children out of them, takes the creature with the most energy as the dominant genome
  */
-void SimulationData::ReproduceCreature(){
-    if (fit_reproduce_.size() > 2){
-
+void SimulationData::ReproduceCreatures(){
+    while (fit_reproduce_.size() > 2){
+        Creature creature1 = fit_reproduce_.front();
+        fit_reproduce_.pop();
+        Creature creature2 = fit_reproduce_.front();
+        fit_reproduce_.pop();
+        double energy1 = creature1.GetEnergy();
+        double energy2 = creature2.GetEnergy();
+        if (energy1 > energy2){
+            neat::Genome new_genome = neat::Crossover(creature1.GetGenome(), creature2.GetGenome());
+            AddCreature(Creature(new_genome));
+        } else {
+            neat::Genome new_genome = neat::Crossover(creature2.GetGenome(), creature1.GetGenome());
+            AddCreature(Creature(new_genome));
+        }
     }
 }
 /*!

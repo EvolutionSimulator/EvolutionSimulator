@@ -30,6 +30,7 @@ protected:
     double energy_;
     states state_;
     neat::NeuralNetwork brain_;
+    neat::Genome genome_;
 };
 
 #endif // CREATURE_HPP

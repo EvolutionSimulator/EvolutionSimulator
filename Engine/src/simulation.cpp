@@ -28,7 +28,8 @@ void Simulation::FixedUpdate(double deltaTime)
 {
     std::lock_guard<std::mutex> lock(data_mutex_);
     data_->UpdateAllCreatures(deltaTime);
-    data_->GenerateMoreFood();
+    data_->ReproduceCreatures();
+
     data_->UpdateGrid();
     data_->CheckCollisions();
 }
