@@ -2,6 +2,8 @@
 #include "neat/neat-genome.h"
 #include "neat/neat-link.h"
 #include "neat/neat-neuron.h"
+#include "neat/neat-neural-network.h"
+
 
 TEST(NeatTests, GenomeConstructor) {
     int input_count = 5;
@@ -69,4 +71,172 @@ TEST(NeatTests, SetBias) {
     neuron.SetBias(new_bias);
 
     EXPECT_EQ(neuron.GetBias(), new_bias);
+}
+
+TEST(NeatTests, DisableNeuron) {
+    neat::Genome genome(5, 3);
+    genome.AddNeuron(neat::NeuronType::kHidden, 0.5);
+    genome.AddNeuron(neat::NeuronType::kHidden, 0.7);
+    genome.AddLink(1, 2, 0.5);
+    genome.DisableNeuron(1);
+
+    auto neurons = genome.GetNeurons();
+    auto links = genome.GetLinks();
+
+    bool isNeuronDisabled = false;
+    for (const auto& neuron : neurons) {
+        if (neuron.GetId() == 1 && !neuron.IsActive()) {
+            isNeuronDisabled = true;
+            break;
+        }
+    }
+    ASSERT_TRUE(isNeuronDisabled);
+
+    for (const auto& link : links) {
+        EXPECT_TRUE(link.GetInId() != 1 || !link.IsActive());
+        EXPECT_TRUE(link.GetOutId() != 1 || !link.IsActive());
+    }
+}
+
+TEST(NeatTests, DisableLink) {
+    neat::Genome genome(3, 2);
+    genome.AddLink(1, 2, 0.5);
+    genome.AddLink(2, 3, 0.7);
+    genome.DisableLink(1);
+
+    auto links = genome.GetLinks();
+
+    bool isLinkDisabled = false;
+    for (const auto& link : links) {
+        if (link.GetId() == 1 && !link.IsActive()) {
+            isLinkDisabled = true;
+            break;
+        }
+    }
+    ASSERT_TRUE(isLinkDisabled);
+}
+
+TEST(NeatTests, EnableNeuron) {
+    neat::Genome genome(3, 2);
+    genome.AddNeuron(neat::NeuronType::kHidden, 0.5);
+    genome.AddNeuron(neat::NeuronType::kHidden, 0.4);
+    genome.AddNeuron(neat::NeuronType::kOutput, 0.3);
+    genome.DisableNeuron(1);
+    genome.EnableNeuron(1);
+
+    const auto& neurons = genome.GetNeurons();
+    bool anyEnabled = false;
+    for (const auto& neuron : neurons) {
+        if (neuron.IsActive()) {
+            anyEnabled = true;
+            break;
+        }
+    }
+
+    ASSERT_TRUE(anyEnabled);
+}
+
+TEST(NeatTests, EnableLink) {
+    neat::Genome genome(3, 2);
+    genome.AddLink(1, 2, 0.5);
+    genome.AddLink(2, 3, 0.7);
+    genome.DisableLink(0);
+    genome.EnableLink(0);
+
+    const auto& links = genome.GetLinks();
+    bool anyEnabled = false;
+    for (const auto& link : links) {
+        if (link.IsActive()) {
+            anyEnabled = true;
+            break;
+        }
+    }
+
+    ASSERT_TRUE(anyEnabled);
+}
+
+TEST(NeatTests, RemoveNeuron) {
+    neat::Genome genome(3, 2);
+    genome.AddNeuron(neat::NeuronType::kHidden, 0.5);
+    genome.AddNeuron(neat::NeuronType::kOutput, 0.3);
+    genome.AddNeuron(neat::NeuronType::kInput, 0.2);
+    genome.AddLink(0, 1, 0.7);
+    genome.AddLink(1, 2, 0.4);
+    genome.RemoveNeuron(0);
+
+    const auto& neurons = genome.GetNeurons();
+    const auto& links = genome.GetLinks();
+
+    ASSERT_EQ(neurons.size(), 7);
+    EXPECT_EQ(neurons[0].GetId(), 1);
+    EXPECT_EQ(neurons[1].GetId(), 2);
+
+    ASSERT_EQ(links.size(), 1);
+    EXPECT_TRUE(links[0].GetInId() != 0 && links[0].GetOutId() != 0);
+}
+
+TEST(NeatTests, RemoveLink) {
+    neat::Genome genome(3, 2);
+    genome.AddLink(1, 2, 0.5);
+    genome.AddLink(2, 3, 0.7);
+    genome.RemoveLink(0);
+
+    ASSERT_EQ(genome.GetLinks().size(), 1);
+}
+
+TEST(NeatTests, MutateRemoveNeuron) {
+    neat::Genome genome(3, 2);
+    genome.AddNeuron(neat::NeuronType::kHidden, 0.5);
+    genome.AddNeuron(neat::NeuronType::kHidden, 0.4);
+    genome.AddNeuron(neat::NeuronType::kOutput, 0.3);
+    genome.MutateRemoveNeuron();
+
+    ASSERT_EQ(genome.GetNeurons().size(), 7);
+}
+
+TEST(NeatTests, MutateRemoveLink) {
+    neat::Genome genome(3, 2);
+    genome.AddLink(1, 2, 0.5);
+    genome.AddLink(2, 3, 0.7);
+    genome.MutateRemoveLink();
+
+    ASSERT_EQ(genome.GetLinks().size(), 1);
+}
+
+TEST(NeatTests, GetLayers) {
+    neat::Genome genome(3, 2);
+    genome.AddLink(0, 3, 1);
+    genome.AddLink(2, 4, 1);
+    genome.AddLink(1, 4, 1);
+    genome.AddLink(2, 3, 1);
+    genome.AddNeuron(neat::NeuronType::kHidden, 0.5);
+    genome.AddLink(0, 5, 1);
+    genome.AddLink(5, 3, 1);
+
+    std::vector<std::vector<int>> true_layers = {{0, 1, 2}, {5}, {3, 4}};
+    std::vector<std::vector<neat::Neuron>> result_layers = neat::get_layers(genome);
+
+    ASSERT_EQ(result_layers.size(), true_layers.size());
+    for (size_t i = 0; i < result_layers.size(); i++) {
+        ASSERT_EQ(result_layers[i].size(), true_layers[i].size());
+        for (size_t j = 0; j < result_layers[i].size(); j++) {
+            EXPECT_EQ(true_layers[i][j], result_layers[i][j].GetId());
+        }
+    }
+}
+
+TEST(NeatTests, NeuralNetworkActivate) {
+    neat::Genome genome(3, 2);
+    genome.AddLink(0, 3, 1);
+    genome.AddLink(2, 4, 1);
+    genome.AddLink(1, 4, 1);
+    genome.AddLink(2, 3, 1);
+    genome.AddNeuron(neat::NeuronType::kHidden, 0.5);
+    genome.AddLink(0, 5, 1);
+    genome.AddLink(5, 3, 1);
+    neat::NeuralNetwork neural_network(genome);
+    std::vector<double> input_values = {1, 1, 1};
+    std::vector<double> output_values = neural_network.Activate(input_values);
+
+    ASSERT_FALSE(output_values.empty()); // Replace with more specific checks as needed
 }

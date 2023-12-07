@@ -6,6 +6,7 @@
 
 #include "neat-link.h"
 #include "neat-neuron.h"
+#include <unordered_set>
 
 namespace neat {
 
@@ -25,9 +26,11 @@ class Genome {
   void AddNeuron(NeuronType type, double bias);
   void AddLink(int in_id, int out_id, double weight);
 
+
   void DisableNeuron(int id); //don't use this for now
   void DisableLink(int id);
   void EnableNeuron(int id); //don't use this for now
+
   void EnableLink(int id);
   void RemoveNeuron(int id);
   void RemoveLink(int id);
@@ -38,6 +41,10 @@ class Genome {
   void MutateRemoveLink();
   void MutateChangeWeight();
 
+  bool DetectLoops(const Neuron& n);
+
+  bool HasLink(const int& in_id, const int& ou_id);
+
  private:
   int input_count_;
   int output_count_;
@@ -45,6 +52,8 @@ class Genome {
   int next_link_id_;
   std::vector<Neuron> neurons_;
   std::vector<Link> links_;
+
+  bool DFS(const Neuron& currentNeuron, std::unordered_set<int>& visited, std::unordered_set<int>& visiting) const;
 };
 
 }  // namespace neat
