@@ -9,7 +9,7 @@ enum class NeuronType { kInput, kOutput, kHidden };
 
 class Neuron {
  public:
-  Neuron(int id, NeuronType type, double bias);
+  explicit Neuron(NeuronType type, double bias);
 
   int GetId() const;
   NeuronType GetType() const;
@@ -20,13 +20,17 @@ class Neuron {
   void SetActive();
   void SetInactive();
  private:
+  static int next_id_;
+
   int id_;
-  bool active_ = true;
+  bool active_;
   NeuronType type_;
   double bias_;
 };
 
 Neuron CrossoverNeuron(const Neuron &a, const Neuron &b);
+
+Neuron NewNeuron(NeuronType type, double bias);
 
 }  // namespace neat
 

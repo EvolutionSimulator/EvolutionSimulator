@@ -1,11 +1,12 @@
 #include "neat/neat-link.h"
-#include "assert.h"
 #include "random"
 
 namespace neat {
 
-Link::Link(int id, int in_id, int out_id, double weight)
-    : id_(id), in_id_(in_id), out_id_(out_id), weight_(weight), active_(true) {}
+int Link::next_id_ = 1;
+
+Link::Link(int in_id, int out_id, double weight)
+    : id_(next_id_++), in_id_(in_id), out_id_(out_id), weight_(weight), active_(true) {}
 
 int Link::GetId() const { return id_; }
 
@@ -23,19 +24,22 @@ void Link::SetActive(){active_= true;}
 
 void Link::SetInactive(){active_ = false;}
 
-Link CrossoverLink(const Link &a, const Link &b){
-    assert(a.GetId() == b.GetId());
+Link NewLink(int in_id, int out_id, double weight);
 
-    int id = a.GetId();
-    int id_in = a.GetInId();
-    int id_out = a.GetOutId();
+Link CrossoverLink(const Link &a, const Link &b){
+    if (a.GetId() != b.GetId()) {
+        throw std::invalid_argument("Links must have the same id");
+    }
 
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<double> distribution(0.0, 1.0);
 
-    double weight = distribution(gen) < 0.5 ? a.GetWeight() : b.GetWeight();
+    Link crossoverLink = a;
 
-    return {id, id_in, id_out, weight};
+    crossoverLink.SetWeight(distribution(gen) < 0.5 ? a.GetWeight() : b.GetWeight());
+
+    return crossoverLink;
 }
+
 }  // namespace neat

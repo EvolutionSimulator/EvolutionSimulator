@@ -1,10 +1,11 @@
 #include "neat/neat-neuron.h"
-#include "assert.h"
 #include "random"
 namespace neat {
 
-Neuron::Neuron(int id, NeuronType type, double bias)
-    : id_(id), type_(type), bias_(bias) {}
+int Neuron::next_id_ = 1;
+
+Neuron::Neuron(NeuronType type, double bias)
+    : id_(next_id_++), type_(type), bias_(bias), active_(true) {}
 
 int Neuron::GetId() const { return id_; }
 
@@ -21,8 +22,14 @@ void Neuron::SetActive(){active_= true;}
 void Neuron::SetInactive(){active_ = false;}
 
 Neuron CrossoverNeuron(const Neuron &a, const Neuron &b){
-    assert(a.GetId() == b.GetId());
-    assert(a.GetType() == b.GetType());
+    if (a.GetId() != b.GetId()) {
+        throw std::invalid_argument("Neurons must have the same id");
+    }
+
+    if (a.GetType() != b.GetType()) {
+        throw std::invalid_argument("Neurons must have the same type");
+    }
+
     int id = a.GetId();
     NeuronType type = a.GetType();
 
@@ -30,8 +37,10 @@ Neuron CrossoverNeuron(const Neuron &a, const Neuron &b){
     std::mt19937 gen(rd());
     std::uniform_real_distribution<double> distribution(0.0, 1.0);
 
-    double bias = distribution(gen) < 0.5 ? a.GetBias() : b.GetBias();
+    Neuron crossoverNeuron = a;
 
-    return {id, type, bias};
+    crossoverNeuron.SetBias(distribution(gen) < 0.5 ? a.GetBias() : b.GetBias());
+
+    return crossoverNeuron;
 }
 }  // namespace neat
