@@ -10,6 +10,11 @@
 
 namespace neat {
 
+constexpr double kWeightMutationRate = 0.2; // temporary value
+static double standardDeviationWeight = 0.1;
+static double maxWeight = 1.0;
+static double minWeight = 0.0;
+
 class Genome {
  public:
   Genome(int input_count, int output_count);
