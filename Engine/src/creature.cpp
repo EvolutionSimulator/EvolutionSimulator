@@ -1,6 +1,5 @@
 #include "creature.h"
 
-
 Creature::Creature(neat::Genome genome)
     : MovableEntity(), energy_(0.0), brain_(neat::NeuralNetwork(genome)) {
 
