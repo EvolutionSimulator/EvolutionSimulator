@@ -22,7 +22,19 @@ add_library(Engine STATIC
 
   include/neat/neat-neural-network.h
   src/neat/neat-neural-network.cpp
-
+  include/entity.h
+  src/entity.cpp
+  src/simulationdata.cpp
+  include/food.h
+  src/food.cpp
+  include/environment.h
+  src/environment.cpp
+  include/creature.h
+  src/creature.cpp
+  src/movable_entity.cpp
+  include/movable_entity.h
+  include/collisions.h
+  src/collisions.cpp
 )
 
 add_subdirectory(tests)
