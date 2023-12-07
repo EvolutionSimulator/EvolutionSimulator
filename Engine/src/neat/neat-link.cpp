@@ -35,11 +35,11 @@ Link CrossoverLink(const Link &a, const Link &b){
     std::mt19937 gen(rd());
     std::uniform_real_distribution<double> distribution(0.0, 1.0);
 
-    Link crossoverLink = a;
+    Link crossover_link = a;
 
-    crossoverLink.SetWeight(distribution(gen) < 0.5 ? a.GetWeight() : b.GetWeight());
+    crossover_link.SetWeight(distribution(gen) < 0.5 ? a.GetWeight() : b.GetWeight());
 
-    return crossoverLink;
+    return crossover_link;
 }
 
 }  // namespace neat

@@ -21,17 +21,15 @@ struct FeedForwardNeuron { // Functional units of the NeuralNetowork, obtained f
 
 class NeuralNetwork {
 public:
-    NeuralNetwork(Genome &genom);
-    std::vector<double> Activate(std::vector<double> input_values) const;
+    NeuralNetwork(const Genome &genom);
+    std::vector<double> Activate(const std::vector<double> &input_values) const;
 private:
     std::vector<int> input_ids_;
     std::vector<int> output_ids_;
     std::vector<FeedForwardNeuron> ffneurons_;
-
-
 };
 
-std::vector<std::vector<Neuron> > get_layers(Genome &genom); //organize neurons from a Genome into layers (by neurons ids)
+std::vector<std::vector<Neuron> > get_layers(const Genome &genom); //organize neurons from a Genome into layers (by neurons ids)
 
 
 double activation_funtion(double x);
