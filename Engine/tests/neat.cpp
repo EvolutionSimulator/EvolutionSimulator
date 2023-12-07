@@ -239,6 +239,7 @@ TEST(NeatTests, NeuralNetworkActivate) {
 
     ASSERT_FALSE(output_values.empty()); // Replace with more specific checks as needed
 }
+
 TEST(NeatTests, CrossoverNeuron) {
     neat::Neuron neuronA{1, neat::NeuronType(), 0.3};
     neat::Neuron neuronB{1, neat::NeuronType(), 0.7};
@@ -284,3 +285,4 @@ TEST(NeatTests, CrossoverGenome) {
     EXPECT_LE(offspringLinks[0].GetWeight(), 1.0);
     std::cout << "Crossover test passed." << std::endl;
 }
+

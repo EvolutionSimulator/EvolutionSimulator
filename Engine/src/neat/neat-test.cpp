@@ -347,4 +347,7 @@ void TestAllNeat() {
   TestMutateChangeWeight();
   TestGetLayers();
   TestNeuralNetworkActivate();
+  TestGetLayers();
+  TestNeuralNetworkActivate();
+
 }

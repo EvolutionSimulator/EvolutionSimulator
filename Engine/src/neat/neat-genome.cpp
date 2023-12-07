@@ -290,7 +290,6 @@ void Genome::MutateAddNeuron(){
     size_t randIndex=dist(gen);
     Link RandomLink = links_[randIndex];
     DisableLink(RandomLink.GetId()); //test
-
     AddNeuron(NeuronType::kHidden, 0.0);
     //disable the initial link between the inId and outId
     int newNeuronId = neurons_[-1].GetId();

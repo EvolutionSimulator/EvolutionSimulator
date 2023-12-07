@@ -26,9 +26,11 @@ class Genome {
   void AddNeuron(NeuronType type, double bias);
   void AddLink(int in_id, int out_id, double weight);
 
+
   void DisableNeuron(int id); //don't use this for now
   void DisableLink(int id);
   void EnableNeuron(int id); //don't use this for now
+
   void EnableLink(int id);
   void RemoveNeuron(int id);
   void RemoveLink(int id);
@@ -50,6 +52,9 @@ class Genome {
   int next_link_id_;
   std::vector<Neuron> neurons_;
   std::vector<Link> links_;
+  bool DFS(const Neuron& currentNeuron, std::unordered_set<int>& visited, std::unordered_set<int>& visiting) const;
+};
+
 
   bool DFS(const Neuron& currentNeuron, std::unordered_set<int>& visited, std::unordered_set<int>& visiting) const;
 };
