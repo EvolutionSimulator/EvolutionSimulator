@@ -31,8 +31,11 @@ void Creature::Eats(double nutritional_value){
 
 void Creature::OnCollision(Food& food)
 {
-    Eats(food.GetNutritionalValue());
-    food.Eat();
+    if (food.GetState() == Entity::Alive)
+    {
+        Eats(food.GetNutritionalValue());
+        food.Eat();
+    }
 }
 
 

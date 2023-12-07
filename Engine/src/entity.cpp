@@ -60,10 +60,11 @@ double GetRandomFloat(double world_size) {
     return dis(gen);
 }
 
-void Entity::RandomInitialization(const double world_width, const double world_height)
+void Entity::RandomInitialization(const double world_width, const double world_height, const double max_creature_size)
 {
     x_coord_ = GetRandomFloat(world_width);
     y_coord_ = GetRandomFloat(world_height);
+    size_ = GetRandomFloat(max_creature_size);
 }
 
 double Entity::GetDistance(const Entity& other_entity) const {

@@ -22,6 +22,7 @@ void Simulation::Update(double deltaTime)
     std::lock_guard<std::mutex> lock(data_mutex_);
     // Test function (DO NOT USE)
     data_->ModifyAllCreatures(100 * deltaTime, 100 * deltaTime);
+
 }
 
 // Called at constant intervals
@@ -30,8 +31,8 @@ void Simulation::FixedUpdate(double deltaTime)
     std::lock_guard<std::mutex> lock(data_mutex_);
     // Test function (DO NOT USE)
     data_->ModifyAllCreatures(100 * deltaTime, 100 * deltaTime);
-    data_->UpdateGrid();
     data_->CheckFoodCollisions();
+    data_->UpdateGrid();
 }
 
 // Facilitates data processing with external functions in a thread-safe manner

@@ -22,7 +22,7 @@ Food::Food(const double size)
 
 void Food::Eat()
 {
-    SetState(Dead);
+    SetState(Entity::Dead);
 }
 
 void Food::SetNutritionalValue(double value)
