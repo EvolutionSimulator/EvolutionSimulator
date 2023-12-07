@@ -1,6 +1,7 @@
 #include "neat/neat-genome.h"
 #include <random>
 #include <algorithm>
+#include <optional>
 
 namespace neat {
 
