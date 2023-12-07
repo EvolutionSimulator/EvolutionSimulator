@@ -10,10 +10,16 @@
 
 namespace neat {
 
-constexpr double kWeightMutationRate = 0.2; // temporary value
+static double weightMutationRate = 0.2;
 static double standardDeviationWeight = 0.1;
 static double maxWeight = 1.0;
 static double minWeight = 0.0;
+
+static double addNeuronMutationRate = 0.05;
+static double addLinkMutationRate = 0.25;
+static double removeNeuronMutationRate = 0.02;
+static double removeLinkMutationRate = 0.15;
+static double changeWeightMutationRate = 0.6;
 
 class Genome {
  public:
@@ -35,6 +41,8 @@ class Genome {
   void RemoveNeuron(int id);
   void RemoveLink(int id);
 
+  void Mutate();
+
   void MutateAddNeuron();
   void MutateAddLink();
   void MutateRemoveNeuron();
@@ -46,8 +54,6 @@ class Genome {
   bool HasLink(const int& in_id, const int& ou_id);
 
  private:
-  int input_count_;
-  int output_count_;
   std::vector<Neuron> neurons_;
   std::vector<Link> links_;
   bool DFS(const Neuron& currentNeuron, std::unordered_set<int>& visited, std::unordered_set<int>& visiting) const;

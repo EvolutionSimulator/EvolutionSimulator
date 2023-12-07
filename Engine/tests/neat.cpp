@@ -200,6 +200,60 @@ TEST(NeatTests, RemoveLink) {
     ASSERT_EQ(genome.GetLinks().size(), 1);
 }
 
+TEST(NeatTests, Mutate) {
+  auto HasAnyWeightChanged = [](const Genome& original, const Genome& mutated) {
+    const std::vector<Link>& originalLinks = original.GetLinks();
+    const std::vector<Link>& mutatedLinks = mutated.GetLinks();
+
+    for (const Link& originalLink : originalLinks) {
+      for (const Link& mutatedLink : mutatedLinks) {
+        if (originalLink.GetId() == mutatedLink.GetId() &&
+            originalLink.GetWeight() != mutatedLink.GetWeight()) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  };
+
+  Genome genome(3, 3);
+
+  int countAddNeuron = 0;
+  int countAddLink = 0;
+  int countRemoveNeuron = 0;
+  int countRemoveLink = 0;
+  int countChangeWeight = 0;
+
+  for (int i = 0; i < 1000; i++) {
+    Genome originalGenome = genome;
+    genome.Mutate();
+
+    if (genome.GetNeurons().size() > originalGenome.GetNeurons().size()) {
+      countAddNeuron++;
+    }
+    if (genome.GetLinks().size() > originalGenome.GetLinks().size()) {
+      countAddLink++;
+    }
+    if (genome.GetNeurons().size() < originalGenome.GetNeurons().size()) {
+      countRemoveNeuron++;
+    }
+    if (genome.GetLinks().size() < originalGenome.GetLinks().size()) {
+      countRemoveLink++;
+    }
+    if (HasAnyWeightChanged(genome, originalGenome)) {
+      countChangeWeight++;
+    }
+  }
+
+  // Check that each mutation happened at least once
+  EXPECT_GT(countAddNeuron, 0);
+  EXPECT_GT(countAddLink, 0);
+  EXPECT_GT(countRemoveNeuron, 0);
+  EXPECT_GT(countRemoveLink, 0);
+  EXPECT_GT(countChangeWeight, 0);
+}
+
 TEST(NeatTests, MutateRemoveNeuron) {
     Genome genome(3, 2);
     genome.AddNeuron(Neuron(NeuronType::kHidden, 0.5));
@@ -374,6 +428,7 @@ TEST(NeatTests, CrossoverLink) {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 // To be rewritten with mutations
 // TEST(NeatTests, CrossoverGenome) {
@@ -399,3 +454,123 @@ TEST(NeatTests, CrossoverLink) {
 //     std::cout << "Crossover test passed." << std::endl;
 // }
 >>>>>>> 8b35ce8 (Restructure NEAT classes)
+=======
+TEST(NeatTests, Crossover) {
+  Genome genomeA(3, 3);
+
+  // Mutate genomeA several times
+  for (int i = 0; i < 100; i++) {
+    genomeA.Mutate();
+  }
+
+  // Clone genomeA to create genomeB
+  Genome genomeB = genomeA;
+
+  // Mutate both genomes several times
+  for (int i = 0; i < 100; i++) {
+    genomeA.Mutate();
+    genomeB.Mutate();
+  }
+
+  // Perform crossover
+  Genome crossoverResult = Crossover(genomeA, genomeB);
+
+  // Check that every neuron ID in crossoverResult also exists in genomeA and vice versa
+  for (const auto& neuron : crossoverResult.GetNeurons()) {
+    EXPECT_NE(std::find_if(genomeA.GetNeurons().begin(), genomeA.GetNeurons().end(),
+                           [&neuron](const Neuron& n) { return n.GetId() == neuron.GetId(); }),
+              genomeA.GetNeurons().end());
+  }
+
+  for (const auto& neuron : genomeA.GetNeurons()) {
+    EXPECT_NE(std::find_if(crossoverResult.GetNeurons().begin(), crossoverResult.GetNeurons().end(),
+                           [&neuron](const Neuron& n) { return n.GetId() == neuron.GetId(); }),
+              crossoverResult.GetNeurons().end());
+  }
+
+  // Check that every link ID in crossoverResult also exists in genomeA and vice versa
+  for (const auto& link : crossoverResult.GetLinks()) {
+    EXPECT_NE(std::find_if(genomeA.GetLinks().begin(), genomeA.GetLinks().end(),
+                           [&link](const Link& l) { return l.GetId() == link.GetId(); }),
+              genomeA.GetLinks().end());
+  }
+
+  for (const auto& link : genomeA.GetLinks()) {
+    EXPECT_NE(std::find_if(crossoverResult.GetLinks().begin(), crossoverResult.GetLinks().end(),
+                           [&link](const Link& l) { return l.GetId() == link.GetId(); }),
+              crossoverResult.GetLinks().end());
+  }
+
+  // Check that the bias of every neuron in crossoverResult corresponds to the bias of the same neuron in genomeA or genomeB
+  for (const auto& neuron : crossoverResult.GetNeurons()) {
+    auto itA = std::find_if(
+        genomeA.GetNeurons().begin(), genomeA.GetNeurons().end(),
+        [&neuron](const Neuron& n) { return n.GetId() == neuron.GetId(); });
+    auto itB = std::find_if(
+        genomeB.GetNeurons().begin(), genomeB.GetNeurons().end(),
+        [&neuron](const Neuron& n) { return n.GetId() == neuron.GetId(); });
+
+    if (itA != genomeA.GetNeurons().end() &&
+        neuron.GetBias() == itA->GetBias()) {
+      // Neuron bias matches with genomeA
+    } else if (itB != genomeB.GetNeurons().end() &&
+               neuron.GetBias() == itB->GetBias()) {
+      // Neuron bias matches with genomeB
+    } else {
+      FAIL() << "Neuron with ID " << neuron.GetId()
+             << " not found in either parent genome or biases do not match.";
+    }
+  }
+
+  // Check that the weight of every link in crossoverResult corresponds to the weight of the same link in genomeA or genomeB
+  for (const auto& link : crossoverResult.GetLinks()) {
+    auto itA = std::find_if(
+        genomeA.GetLinks().begin(), genomeA.GetLinks().end(),
+        [&link](const Link& l) { return l.GetId() == link.GetId(); });
+    auto itB = std::find_if(
+        genomeB.GetLinks().begin(), genomeB.GetLinks().end(),
+        [&link](const Link& l) { return l.GetId() == link.GetId(); });
+
+    if (itA != genomeA.GetLinks().end() &&
+        link.GetWeight() == itA->GetWeight()) {
+      // Link weight matches with genomeA
+    } else if (itB != genomeB.GetLinks().end() &&
+               link.GetWeight() == itB->GetWeight()) {
+      // Link weight matches with genomeB
+    } else {
+      FAIL() << "Link with ID " << link.GetId()
+             << " not found in either parent genome or weights do not match.";
+    }
+  }
+}
+
+TEST(NeatTests, ActivationAfterMutateCrossover) {
+  Genome genomeA(3, 1);
+
+  // Mutate genomeA several times
+  for (int i = 0; i < 1000; i++) {
+    genomeA.Mutate();
+    // for (auto &link : genomeA.GetLinks()) {
+    //     std::cerr << link.GetInId() << ' ' << link.GetOutId() << std::endl; 
+    // }
+    // std::cerr << std::endl;
+  }
+
+  // Clone genomeA to create genomeB
+  Genome genomeB = genomeA;
+
+  // Mutate both genomes several times
+  for (int i = 0; i < 1000; i++) {
+    genomeA.Mutate();
+    genomeB.Mutate();
+  }
+
+  // Perform crossover
+  Genome crossoverResult = Crossover(genomeA, genomeB);
+
+  NeuralNetwork nn = NeuralNetwork(crossoverResult);
+  std::cerr << nn.Activate({1, 1, 1})[0] << std::endl;
+  std::cerr << nn.Activate({1, 0, 1})[0] << std::endl;
+  std::cerr << nn.Activate({0, 1, 1})[0] << std::endl;
+}
+>>>>>>> 6a18cbd (Implement Mutate)

@@ -7,7 +7,7 @@
 
 namespace neat {
 
-NeuralNetwork::NeuralNetwork(Genome &genom) {
+NeuralNetwork::NeuralNetwork(const Genome &genom) {
     std::vector< std::vector<Neuron> > layers = get_layers(genom);
     //std::vector<Neuron> neurons = genom.GetNeurons();
     std::vector<FeedForwardNeuron> ffneurons;
@@ -37,7 +37,7 @@ NeuralNetwork::NeuralNetwork(Genome &genom) {
     ffneurons_ = ffneurons;
 }
 
-std::vector<double> NeuralNetwork::Activate(std::vector<double> input_values) const {
+std::vector<double> NeuralNetwork::Activate(const std::vector<double> &input_values) const {
     assert(input_values.size() == input_ids_.size());
     std::unordered_map<int, double> values;
     for (int i = 0; i < input_values.size(); i++) {
@@ -48,8 +48,10 @@ std::vector<double> NeuralNetwork::Activate(std::vector<double> input_values) co
         if (values.find(ffneuron.id) == values.end()) {//if ffneuron is not already activated
             double value = 0;
             for (const NeuronInput &input:ffneuron.inputs) {
-                assert(values.find(input.input_id) != values.end());//previous neurons have to be activated
-                value += values[input.input_id] * input.weight;
+                // assert(values.find(input.input_id) != values.end()); //previous neurons have to be activated
+                if (values.find(input.input_id) != values.end()) {
+                    value += values[input.input_id] * input.weight;
+                }
             }
             value+= ffneuron.bias;
             value = activation_funtion(value);
@@ -64,7 +66,7 @@ std::vector<double> NeuralNetwork::Activate(std::vector<double> input_values) co
 
 }
 
-std::vector<std::vector<Neuron> > get_layers(Genome &genom) {
+std::vector<std::vector<Neuron> > get_layers(const Genome &genom) {
     std::vector<std::vector<Neuron> > layers;
     std::vector<Neuron> input_layer;
     std::vector<Neuron> output_layer;

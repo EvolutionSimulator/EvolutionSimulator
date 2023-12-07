@@ -5,22 +5,28 @@
 
 namespace neat {
 
-Genome::Genome(int input_count, int output_count)
-    : input_count_(input_count),
-      output_count_(output_count),
+Genome::Genome(int input_count, int output_count):
       neurons_(),
       links_() {
-  for (int i = 0; i < input_count_; ++i) {
+  for (int i = 0; i < input_count; ++i) {
     AddNeuron(Neuron(NeuronType::kInput, 0.0));
   }
-  for (int i = 0; i < output_count_; ++i) {
+  for (int i = 0; i < output_count; ++i) {
     AddNeuron(Neuron(NeuronType::kOutput, 0.0));
   }
 }
 
-int Genome::GetInputCount() const { return input_count_; }
+int Genome::GetInputCount() const {
+    return std::count_if(neurons_.begin(), neurons_.end(), [](const Neuron &neuron) {
+        return neuron.GetType() == NeuronType::kInput;
+    });
+}
 
-int Genome::GetOutputCount() const { return output_count_; }
+int Genome::GetOutputCount() const {
+    return std::count_if(neurons_.begin(), neurons_.end(), [](const Neuron &neuron) {
+        return neuron.GetType() == NeuronType::kOutput;
+    });
+}
 
 const std::vector<Neuron> &Genome::GetNeurons() const { return neurons_; }
 
@@ -121,6 +127,32 @@ void Genome::RemoveNeuron(int id) {
 //  }
 //}
 
+void Genome::Mutate() {
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_real_distribution<> uniform(0.0, 1.0);
+
+  if (uniform(gen) < addNeuronMutationRate) {
+    MutateAddNeuron();
+  }
+
+  if (uniform(gen) < addLinkMutationRate) {
+    MutateAddLink();
+  }
+
+  if (uniform(gen) < removeNeuronMutationRate) {
+    MutateRemoveNeuron();
+  }
+
+  if (uniform(gen) < removeLinkMutationRate) {
+    MutateRemoveLink();
+  }
+
+  if (uniform(gen) < changeWeightMutationRate) {
+    MutateChangeWeight();
+  }
+}
+
 void Genome::MutateRemoveNeuron() {
   std::vector<int> hiddenIDs = {};
   for (const Neuron& neuron: GetNeurons()){
@@ -179,7 +211,7 @@ void Genome::MutateChangeWeight() {
   std::normal_distribution<> dis(0.0, standardDeviationWeight);
 
   for (Link &link : links_) {
-    if (uniform(gen) < kWeightMutationRate) {
+    if (uniform(gen) < weightMutationRate) {
       double delta = dis(gen);
       link.SetWeight(link.GetWeight() + delta);
 
@@ -204,7 +236,6 @@ void Genome::MutateChangeWeight() {
 //    // Neuron with the specified ID not found, return -1
 //    return -1;
 //}
-
 bool Genome::DFS(const Neuron& currentNeuron, std::unordered_set<int>& visited, std::unordered_set<int>& visiting) const {
     int currentId = currentNeuron.GetId();
 
@@ -267,7 +298,7 @@ void Genome::MutateAddLink(){
 
   //Check if cycle exists:
   AddLink(Link(n1, n2, 1));
-  Link newl = links_[-1];
+  Link newl = links_.back();
   if (DetectLoops(neurons_[indexRandomNeuron1])){
       RemoveLink(newl.GetId());
       return;
@@ -292,7 +323,7 @@ void Genome::MutateAddNeuron(){
     AddNeuron(Neuron(NeuronType::kHidden, 0.0));
 >>>>>>> 8b35ce8 (Restructure NEAT classes)
     //disable the initial link between the inId and outId
-    int newNeuronId = neurons_[-1].GetId();
+    int newNeuronId = neurons_.back().GetId();
     AddLink(Link(RandomLink.GetInId(), newNeuronId, 1));
     AddLink(Link(newNeuronId, RandomLink.GetOutId(), RandomLink.GetWeight()));
 }
@@ -300,7 +331,7 @@ void Genome::MutateAddNeuron(){
 
 
 Genome Crossover(const Genome &dominant, const Genome &recessive){
-  Genome offspring{dominant.GetInputCount(), dominant.GetOutputCount()};
+  Genome offspring{0, 0};
   for (const auto &dominant_neuron: dominant.GetNeurons()){
     int neuron_id= dominant_neuron.GetId();
     std::optional<Neuron> recessive_neuron;
