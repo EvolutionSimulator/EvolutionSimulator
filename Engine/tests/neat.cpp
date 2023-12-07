@@ -432,34 +432,6 @@ TEST(NeatTests, CrossoverLink) {
   EXPECT_GT(countB, 0);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-// To be rewritten with mutations
-// TEST(NeatTests, CrossoverGenome) {
-//     Genome dominantGenome{2, 1};
-//     Genome recessiveGenome{2, 1};
-//     dominantGenome.AddNeuron(NeuronType::kHidden, 0.3);
-//     recessiveGenome.AddNeuron(NeuronType::kHidden, -0.5);
-//     dominantGenome.AddLink(1, 2, 0.5);
-//     recessiveGenome.AddLink(1, 2, 0.7);
-//     Genome offspringGenome = Crossover(dominantGenome, recessiveGenome);
-//     EXPECT_EQ(offspringGenome.GetInputCount(), 2);
-//     EXPECT_EQ(offspringGenome.GetOutputCount(), 1);
-//     const auto& offspringNeurons = offspringGenome.GetNeurons();
-//     EXPECT_EQ(offspringNeurons[0].GetType(), NeuronType());
-//     EXPECT_GE(offspringNeurons[0].GetBias(), -1.0);
-//     EXPECT_LE(offspringNeurons[0].GetBias(), 1.0);
-//     const auto& offspringLinks = offspringGenome.GetLinks();
-//     EXPECT_EQ(offspringLinks.size(), 1);
-//     EXPECT_EQ(offspringLinks[0].GetInId(), 1);
-//     EXPECT_EQ(offspringLinks[0].GetOutId(), 2);
-//     EXPECT_GE(offspringLinks[0].GetWeight(), 0.0);
-//     EXPECT_LE(offspringLinks[0].GetWeight(), 1.0);
-//     std::cout << "Crossover test passed." << std::endl;
-// }
->>>>>>> 8b35ce8 (Restructure NEAT classes)
-=======
 TEST(NeatTests, Crossover) {
   Genome genomeA(3, 3);
 
@@ -590,4 +562,3 @@ TEST(NeatTests, ActivationAfterMutateCrossover) {
   std::cerr << nn.Activate({1, 0, 1})[0] << std::endl;
   std::cerr << nn.Activate({0, 1, 1})[0] << std::endl;
 }
->>>>>>> 6a18cbd (Implement Mutate)

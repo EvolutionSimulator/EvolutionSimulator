@@ -32,17 +32,9 @@ class Genome {
   void AddNeuron(const Neuron& neuron);
   void AddLink(const Link& link);
 
-<<<<<<< HEAD
-
   void DisableNeuron(int id); //don't use this for now
   void DisableLink(int id);
   void EnableNeuron(int id); //don't use this for now
-
-=======
-  void DisableNeuron(int id);  // don't use this for now
-  void DisableLink(int id);
-  void EnableNeuron(int id);  // don't use this for now
->>>>>>> 55d9d4c (Reformat code)
   void EnableLink(int id);
   void RemoveNeuron(int id);
   void RemoveLink(int id);
@@ -62,18 +54,10 @@ class Genome {
  private:
   std::vector<Neuron> neurons_;
   std::vector<Link> links_;
-<<<<<<< HEAD
   bool DFS(const Neuron& currentNeuron, std::unordered_set<int>& visited, std::unordered_set<int>& visiting) const;
 };
 
 Genome Crossover(const Genome &dominant, const Genome &recessive);
-=======
-
-  bool DFS(const Neuron& currentNeuron, std::unordered_set<int>& visited,
-           std::unordered_set<int>& visiting) const;
-};
-Genome Crossover(const Genome& dominant, const Genome& recessive);
->>>>>>> 55d9d4c (Reformat code)
 }  // namespace neat
 
 #endif  // NEATGENOME_H

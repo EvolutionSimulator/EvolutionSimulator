@@ -1,6 +1,7 @@
 #include "neat/neat-link.h"
 
 #include "random"
+#include "stdexcept"
 
 namespace neat {
 

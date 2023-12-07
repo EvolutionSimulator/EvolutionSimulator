@@ -1,11 +1,8 @@
 #include "neat/neat-genome.h"
 
 #include <algorithm>
-<<<<<<< HEAD
 #include <optional>
-=======
 #include <random>
->>>>>>> 55d9d4c (Reformat code)
 
 namespace neat {
 
@@ -318,25 +315,6 @@ void Genome::MutateAddNeuron() {
   if (links_.size() == 0) {
     return;
   }
-
-<<<<<<< HEAD
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<size_t> dist(0,links_.size()-1);
-    size_t randIndex=dist(gen);
-    Link RandomLink = links_[randIndex];
-    DisableLink(RandomLink.GetId()); //test
-<<<<<<< HEAD
-    AddNeuron(NeuronType::kHidden, 0.0);
-=======
-
-    AddNeuron(Neuron(NeuronType::kHidden, 0.0));
->>>>>>> 8b35ce8 (Restructure NEAT classes)
-    //disable the initial link between the inId and outId
-    int newNeuronId = neurons_.back().GetId();
-    AddLink(Link(RandomLink.GetInId(), newNeuronId, 1));
-    AddLink(Link(newNeuronId, RandomLink.GetOutId(), RandomLink.GetWeight()));
-=======
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_int_distribution<size_t> dist(0, links_.size() - 1);
@@ -349,7 +327,6 @@ void Genome::MutateAddNeuron() {
   int newNeuronId = neurons_.back().GetId();
   AddLink(Link(RandomLink.GetInId(), newNeuronId, 1));
   AddLink(Link(newNeuronId, RandomLink.GetOutId(), RandomLink.GetWeight()));
->>>>>>> 55d9d4c (Reformat code)
 }
 
 Genome Crossover(const Genome& dominant, const Genome& recessive) {
