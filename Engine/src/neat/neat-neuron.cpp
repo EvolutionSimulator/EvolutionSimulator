@@ -1,6 +1,7 @@
 #include "neat/neat-neuron.h"
 
 #include "random"
+#include "stdexcept"
 namespace neat {
 
 int Neuron::next_id_ = 1;
