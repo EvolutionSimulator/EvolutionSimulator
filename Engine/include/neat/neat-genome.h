@@ -1,12 +1,12 @@
 #ifndef NEATGENOME_H
 #define NEATGENOME_H
 
-#include <vector>
 #include <random>
+#include <unordered_set>
+#include <vector>
 
 #include "neat-link.h"
 #include "neat-neuron.h"
-#include <unordered_set>
 
 namespace neat {
 
@@ -26,15 +26,15 @@ class Genome {
   explicit Genome(int input_count, int output_count);
   int GetInputCount() const;
   int GetOutputCount() const;
-  const std::vector<Neuron> &GetNeurons() const;
-  const std::vector<Link> &GetLinks() const;
+  const std::vector<Neuron>& GetNeurons() const;
+  const std::vector<Link>& GetLinks() const;
 
-  void AddNeuron(const Neuron &neuron);
-  void AddLink(const Link &link);
+  void AddNeuron(const Neuron& neuron);
+  void AddLink(const Link& link);
 
-  void DisableNeuron(int id); //don't use this for now
+  void DisableNeuron(int id);  // don't use this for now
   void DisableLink(int id);
-  void EnableNeuron(int id); //don't use this for now
+  void EnableNeuron(int id);  // don't use this for now
   void EnableLink(int id);
   void RemoveNeuron(int id);
   void RemoveLink(int id);
@@ -55,9 +55,10 @@ class Genome {
   std::vector<Neuron> neurons_;
   std::vector<Link> links_;
 
-  bool DFS(const Neuron& currentNeuron, std::unordered_set<int>& visited, std::unordered_set<int>& visiting) const;
+  bool DFS(const Neuron& currentNeuron, std::unordered_set<int>& visited,
+           std::unordered_set<int>& visiting) const;
 };
-Genome Crossover(const Genome &dominant, const Genome &recessive);
+Genome Crossover(const Genome& dominant, const Genome& recessive);
 }  // namespace neat
 
 #endif  // NEATGENOME_H
