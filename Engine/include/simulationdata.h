@@ -33,7 +33,7 @@ public:
     std::vector<Creature> creatures_;
     std::vector<Food> food_entities_;
     Environment environment_;
-    std::unordered_map<int, std::unordered_map<int, std::vector<Creature>>> creature_grid_;
-    std::unordered_map<int, std::unordered_map<int, std::vector<Food>>> food_grid_;
+    std::unordered_map<int, std::unordered_map<int, std::vector<int>>> creature_grid_;
+    std::unordered_map<int, std::unordered_map<int, std::vector<int>>> food_grid_;
 
 };
