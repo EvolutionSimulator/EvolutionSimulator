@@ -1,7 +1,7 @@
 #include "neat/neat-link.h"
 
 #include "random"
-
+#include "stdexcept"
 namespace neat {
 
 int Link::next_id_ = 1;
