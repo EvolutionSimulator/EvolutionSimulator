@@ -4,6 +4,7 @@
 #include "neat/neat-neuron.h"
 #include "neat/neat-neural-network.h"
 
+
 TEST(NeatTests, GenomeConstructor) {
     int input_count = 5;
     int output_count = 3;

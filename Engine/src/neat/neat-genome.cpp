@@ -177,6 +177,25 @@ void Genome::RemoveLink(int id) {
     links_.erase(links_.begin()+index_to_delete);
   }
 }
+  
+void Genome::MutateChangeWeight() {
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::normal_distribution<> dis(0.0, standardDeviationWeight);
+
+  for (Link &link : links_) {
+    if (dis(gen) < kWeightMutationRate) {
+      double delta = dis(gen);
+      link.SetWeight(link.GetWeight() + delta);
+
+      if (link.GetWeight() > maxWeight) {
+        link.SetWeight(maxWeight);
+      } else if (link.GetWeight() < minWeight) {
+        link.SetWeight(minWeight);
+      }
+    }
+  }
+}
 
 
 //Neuron Genome::FindNeuronIndexById(int targetId) const {
