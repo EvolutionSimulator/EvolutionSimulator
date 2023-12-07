@@ -4,6 +4,7 @@
 #include "neat/neat-genome.h"
 #include "neat/neat-link.h"
 #include "neat/neat-neuron.h"
+#include "neat/neat-neural-network.h"
 
 void TestGenomeConstructor() {
   int input_count = 5;
@@ -243,6 +244,49 @@ void TestMutateRemoveLink() {
   std::cout << "MutateRemoveLink test passed!\n";
 }
 
+
+void TestGetLayers () {
+  neat::Genome genome(3, 2);
+  genome.AddLink(0, 3, 1);
+  genome.AddLink(2, 4, 1);
+  genome.AddLink(1, 4, 1);
+  genome.AddLink(2, 3, 1);
+  genome.AddNeuron(neat::NeuronType::kHidden, 0.5);
+  genome.AddLink(0, 5, 1);
+  genome.AddLink(5, 3, 1);
+ // genome.AddLink();
+
+  std::vector< std::vector<int> > true_layers = {{0,1,2}, {5}, {3,4}};
+  std::vector< std::vector<neat::Neuron> > result_layers = neat::get_layers(genome);
+
+  for (size_t i = 0; i < result_layers.size(); i++) {
+    for (size_t j = 0; j < result_layers[i].size(); j++) {
+      assert(true_layers[i][j] == result_layers[i][j].GetId());
+    }
+  }
+
+  std::cout << "Passed get_layers" << std::endl;
+}
+
+void TestNeuralNetworkActivate() {
+  neat::Genome genome(3, 2);
+  genome.AddLink(0, 3, 1);
+  genome.AddLink(2, 4, 1);
+  genome.AddLink(1, 4, 1);
+  genome.AddLink(2, 3, 1);
+  genome.AddNeuron(neat::NeuronType::kHidden, 0.5);
+  genome.AddLink(0, 5, 1);
+  genome.AddLink(5, 3, 1);
+  neat::NeuralNetwork neural_network(genome);
+  std::vector<double> input_values = {1, 1, 1};
+  std::vector<double> output_values = neural_network.Activate(input_values);
+  std::cout << "TestNeuralNetworkActivate - Output values:" << std::endl;
+  for (const double& val : output_values) {
+    std::cout << val << std::endl;
+  }
+}
+
+
 void TestAllNeat() {
   TestGenomeConstructor();
   TestAddNeuron();
@@ -260,4 +304,7 @@ void TestAllNeat() {
   TestRemoveLink();
   TestMutateRemoveNeuron();
   TestMutateRemoveLink();
+  TestGetLayers();
+  TestNeuralNetworkActivate();
+
 }

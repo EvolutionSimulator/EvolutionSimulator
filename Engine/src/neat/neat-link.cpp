@@ -3,7 +3,7 @@
 namespace neat {
 
 Link::Link(int id, int in_id, int out_id, double weight)
-    : id_(id), in_id_(in_id), out_id_(out_id), weight_(weight) {}
+    : id_(id), in_id_(in_id), out_id_(out_id), weight_(weight), active_(true) {}
 
 int Link::GetId() const { return id_; }
 
