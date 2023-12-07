@@ -16,7 +16,7 @@ public:
     void Move(double deltaTime);
     void Rotate(double deltaTime);
 
-private:
+protected:
     double velocity_forward_;
     double rotational_velocity_;
 };

@@ -15,7 +15,7 @@ public:
     void SetNutritionalValue(double value);
     double GetNutritionalValue() const;
 
-private:
+protected:
     double nutritional_value_;
 
 };

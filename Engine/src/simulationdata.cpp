@@ -40,9 +40,20 @@ void SimulationData::UpdateAllCreatures(double deltaTime)
 {
     for (Creature& creature: creatures_) {
         creature.Update(deltaTime);
+        if (creature.Fit()){
+            fit_reproduce_.push_back(creature);
+        }
     }
 }
 
+/*!
+ * Takes two creatures from fit_reproduce and makes a children out of them
+ */
+void SimulationData::ReproduceCreature(){
+    if (fit_reproduce_.size() > 2){
+
+    }
+}
 /*!
  * If the food density is less than the established in the environment it creates new food entities until that threshold is reached
  */

@@ -1,7 +1,8 @@
 #include "creature.h"
+#include "config.h"
 
 Creature::Creature(neat::Genome genome)
-    : MovableEntity(), energy_(0.0), brain_(neat::NeuralNetwork(genome)) {
+    : MovableEntity(), energy_(0.0), brain_(neat::NeuralNetwork(genome)), genome_(genome) {
 
 }
 
@@ -40,4 +41,15 @@ void Creature::SetState(states state){
 void Creature::Update(double deltaTime){
     this->Rotate(deltaTime);
     this->Move(deltaTime);
+}
+
+bool Creature::Fit(){
+    if (energy_ > cfg::reproduction_threshold){
+        return true;
+    }
+    return false;
+}
+
+neat::Genome Creature::GetGenome() const{
+    return genome_;
 }
