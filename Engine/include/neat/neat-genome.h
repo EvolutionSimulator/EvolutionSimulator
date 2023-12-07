@@ -6,8 +6,14 @@
 
 #include "neat-link.h"
 #include "neat-neuron.h"
+#include <unordered_set>
 
 namespace neat {
+
+constexpr double kWeightMutationRate = 0.2; // temporary value
+static double standardDeviationWeight = 0.1;
+static double maxWeight = 1.0;
+static double minWeight = 0.0;
 
 class Genome {
  public:
@@ -33,6 +39,10 @@ class Genome {
   void MutateRemoveLink();
   void MutateChangeWeight();
 
+  bool DetectLoops(const Neuron& n);
+
+  bool HasLink(const int& in_id, const int& ou_id);
+
  private:
   int input_count_;
   int output_count_;
@@ -40,6 +50,8 @@ class Genome {
   int next_link_id_;
   std::vector<Neuron> neurons_;
   std::vector<Link> links_;
+
+  bool DFS(const Neuron& currentNeuron, std::unordered_set<int>& visited, std::unordered_set<int>& visiting) const;
 };
 Genome Crossover(const Genome &dominant, const Genome &recessive);
 }  // namespace neat
