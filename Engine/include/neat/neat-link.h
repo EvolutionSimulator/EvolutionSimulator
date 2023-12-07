@@ -5,7 +5,7 @@ namespace neat {
 
 class Link {
  public:
-  Link(int id, int in_id, int out_id, double weight);
+  explicit Link(int in_id, int out_id, double weight);
 
   int GetId() const;
   int GetInId() const;
@@ -16,7 +16,10 @@ class Link {
   void SetWeight(double weight);
   void SetActive();
   void SetInactive();
+
  private:
+  static int next_id_;
+
   int id_;
   bool active_;
   double weight_;
