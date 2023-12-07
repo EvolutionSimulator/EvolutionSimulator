@@ -22,8 +22,7 @@ Food::Food(const double size)
 
 void Food::Eat()
 {
-    // Call the destructor of the base class Entity
-    this->Entity::~Entity();
+    SetState(Entity::Dead);
 }
 
 void Food::SetNutritionalValue(double value)
@@ -35,3 +34,4 @@ double Food::GetNutritionalValue() const
 {
     return nutritional_value_;
 }
+

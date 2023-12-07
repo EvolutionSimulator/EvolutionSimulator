@@ -6,10 +6,7 @@
 
 class Creature : public MovableEntity {
 public:
-    enum states {
-        Dead = 0,
-        Alive = 1
-    };
+
     Creature();
 
     void Dies();
@@ -18,12 +15,11 @@ public:
     double GetEnergy() const;
     void SetEnergy(double energy);
 
-    states GetState() const;
-    void SetState (states state);
+    virtual void OnCollision(Food& food);
+    virtual void OnCollision(Creature& creature);
 
 private:
     double energy_;
-    states state_;
 };
 
 #endif // CREATURE_HPP

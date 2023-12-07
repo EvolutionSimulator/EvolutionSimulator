@@ -29,10 +29,17 @@ void Creature::Eats(double nutritional_value){
     SetEnergy(GetEnergy() + nutritional_value);
 }
 
-Creature::states Creature::GetState() const{
-    return state_;
+void Creature::OnCollision(Food& food)
+{
+    if (food.GetState() == Entity::Alive)
+    {
+        Eats(food.GetNutritionalValue());
+        food.Eat();
+    }
 }
 
-void Creature::SetState(states state){
-    state_ = state;
+
+void Creature::OnCollision(Creature& creature)
+{
+
 }
