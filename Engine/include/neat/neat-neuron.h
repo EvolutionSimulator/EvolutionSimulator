@@ -19,13 +19,14 @@ class Neuron {
   void SetBias(double bias);
   void SetActive();
   void SetInactive();
-
  private:
   int id_;
   bool active_ = true;
   NeuronType type_;
   double bias_;
 };
+
+Neuron CrossoverNeuron(const Neuron &a, const Neuron &b);
 
 }  // namespace neat
 

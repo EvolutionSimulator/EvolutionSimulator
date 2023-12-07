@@ -244,7 +244,6 @@ void TestMutateRemoveLink() {
   std::cout << "MutateRemoveLink test passed!\n";
 }
 
-
 void TestMutateChangeWeight() {
   neat::Genome genome(5, 3);
 
@@ -287,7 +286,6 @@ void TestMutateChangeWeight() {
 
   std::cout << "MutateChangeWeight test passed!\n";
 }
-
 
 void TestGetLayers () {
   neat::Genome genome(3, 2);

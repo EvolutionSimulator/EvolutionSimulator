@@ -52,10 +52,13 @@ class Genome {
   int next_link_id_;
   std::vector<Neuron> neurons_;
   std::vector<Link> links_;
-
   bool DFS(const Neuron& currentNeuron, std::unordered_set<int>& visited, std::unordered_set<int>& visiting) const;
 };
 
+
+  bool DFS(const Neuron& currentNeuron, std::unordered_set<int>& visited, std::unordered_set<int>& visiting) const;
+};
+Genome Crossover(const Genome &dominant, const Genome &recessive);
 }  // namespace neat
 
 #endif  // NEATGENOME_H

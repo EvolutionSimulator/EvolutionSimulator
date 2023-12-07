@@ -1,6 +1,7 @@
 #include "neat/neat-genome.h"
 #include <random>
 #include <algorithm>
+#include <optional>
 
 namespace neat {
 
@@ -290,7 +291,6 @@ void Genome::MutateAddNeuron(){
     size_t randIndex=dist(gen);
     Link RandomLink = links_[randIndex];
     DisableLink(RandomLink.GetId()); //test
-
     AddNeuron(NeuronType::kHidden, 0.0);
     //disable the initial link between the inId and outId
     int newNeuronId = neurons_[-1].GetId();
@@ -300,4 +300,40 @@ void Genome::MutateAddNeuron(){
 
 
 
-}  // namespace neat
+Genome Crossover(const Genome &dominant, const Genome &recessive){
+  Genome offspring{dominant.GetInputCount(), dominant.GetOutputCount()};
+  for (const auto &dominant_neuron: dominant.GetNeurons()){
+    int neuron_id= dominant_neuron.GetId();
+    std::optional<Neuron> recessive_neuron;
+    for (const auto& recessive_neuron_candidate : recessive.GetNeurons()) {
+        if (recessive_neuron_candidate.GetId() == neuron_id) {
+            recessive_neuron = recessive_neuron_candidate;
+            break;
+        }
+    }
+    if (!recessive_neuron){
+        offspring.AddNeuron(dominant_neuron.GetType(),dominant_neuron.GetBias());
+    }else{
+        Neuron crossover_neuron = CrossoverNeuron(dominant_neuron, recessive_neuron.value());
+        offspring.AddNeuron(crossover_neuron.GetType(),crossover_neuron.GetBias());
+    }
+  }
+  for (const auto &dominant_link: dominant.GetLinks()){
+    int link_id= dominant_link.GetId();
+    std::optional<Link> recessive_link;
+    for (const auto& recessive_link_candidate : recessive.GetLinks()) {
+        if (recessive_link_candidate.GetId() == link_id) {
+            recessive_link = recessive_link_candidate;
+            break;
+        }
+    }
+    if (!recessive_link){
+        offspring.AddLink(dominant_link.GetInId(),dominant_link.GetOutId(),dominant_link.GetWeight());
+    }else{
+        Link crossover_link=CrossoverLink(dominant_link, recessive_link.value());
+        offspring.AddLink( crossover_link.GetInId(),crossover_link.GetOutId(),crossover_link.GetWeight());
+    }
+  }
+  return offspring;
+}
+} // namespace neat
