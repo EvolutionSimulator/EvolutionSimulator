@@ -19,6 +19,7 @@ class Neuron {
   void SetBias(double bias);
   void SetActive();
   void SetInactive();
+
  private:
   static int next_id_;
 

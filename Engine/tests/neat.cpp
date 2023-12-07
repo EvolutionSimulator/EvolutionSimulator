@@ -1,86 +1,87 @@
 #include <gtest/gtest.h>
+
 #include "neat/neat-genome.h"
 #include "neat/neat-link.h"
-#include "neat/neat-neuron.h"
 #include "neat/neat-neural-network.h"
+#include "neat/neat-neuron.h"
 
 using namespace neat;
 
 TEST(NeatTests, GenomeConstructor) {
-    int input_count = 5;
-    int output_count = 3;
-    Genome genome(input_count, output_count);
+  int input_count = 5;
+  int output_count = 3;
+  Genome genome(input_count, output_count);
 
-    EXPECT_EQ(genome.GetInputCount(), input_count);
-    EXPECT_EQ(genome.GetOutputCount(), output_count);
+  EXPECT_EQ(genome.GetInputCount(), input_count);
+  EXPECT_EQ(genome.GetOutputCount(), output_count);
 }
 
 TEST(NeatTests, AddNeuron) {
-    Genome genome(3, 2);
-    genome.AddNeuron(Neuron(NeuronType::kHidden, 0.5));
+  Genome genome(3, 2);
+  genome.AddNeuron(Neuron(NeuronType::kHidden, 0.5));
 
-    auto neurons = genome.GetNeurons();
-    EXPECT_EQ(neurons.back().GetType(), NeuronType::kHidden);
-    EXPECT_EQ(neurons.back().GetBias(), 0.5);
+  auto neurons = genome.GetNeurons();
+  EXPECT_EQ(neurons.back().GetType(), NeuronType::kHidden);
+  EXPECT_EQ(neurons.back().GetBias(), 0.5);
 }
 
 TEST(NeatTests, AddLink) {
-    Genome genome(3, 2);
-    genome.AddLink(Link(1, 2, 0.5));
+  Genome genome(3, 2);
+  genome.AddLink(Link(1, 2, 0.5));
 
-    auto links = genome.GetLinks();
-    EXPECT_EQ(links.back().GetInId(), 1);
-    EXPECT_EQ(links.back().GetOutId(), 2);
-    EXPECT_EQ(links.back().GetWeight(), 0.5);
+  auto links = genome.GetLinks();
+  EXPECT_EQ(links.back().GetInId(), 1);
+  EXPECT_EQ(links.back().GetOutId(), 2);
+  EXPECT_EQ(links.back().GetWeight(), 0.5);
 }
 
 TEST(NeatTests, LinkConstructor) {
-    int in_id = 2;
-    int out_id = 3;
-    double weight = 0.5;
-    Link link(in_id, out_id, weight);
+  int in_id = 2;
+  int out_id = 3;
+  double weight = 0.5;
+  Link link(in_id, out_id, weight);
 
-    EXPECT_EQ(link.GetInId(), in_id);
-    EXPECT_EQ(link.GetOutId(), out_id);
-    EXPECT_EQ(link.GetWeight(), weight);
+  EXPECT_EQ(link.GetInId(), in_id);
+  EXPECT_EQ(link.GetOutId(), out_id);
+  EXPECT_EQ(link.GetWeight(), weight);
 
-    Link link2(in_id, out_id, weight);
-    EXPECT_EQ(link.GetId(), link2.GetId() - 1);
+  Link link2(in_id, out_id, weight);
+  EXPECT_EQ(link.GetId(), link2.GetId() - 1);
 
-    Link link3(in_id, out_id, weight);
-    EXPECT_EQ(link2.GetId(), link3.GetId() - 1);
+  Link link3(in_id, out_id, weight);
+  EXPECT_EQ(link2.GetId(), link3.GetId() - 1);
 }
 
 TEST(NeatTests, SetWeight) {
-    Link link(2, 3, 0.5);
-    double new_weight = 0.7;
-    link.SetWeight(new_weight);
+  Link link(2, 3, 0.5);
+  double new_weight = 0.7;
+  link.SetWeight(new_weight);
 
-    EXPECT_EQ(link.GetWeight(), new_weight);
+  EXPECT_EQ(link.GetWeight(), new_weight);
 }
 
 TEST(NeatTests, NeuronConstructor) {
-    int id = 1;
-    NeuronType type = NeuronType::kHidden;
-    double bias = 0.5;
-    Neuron neuron(type, bias);
+  int id = 1;
+  NeuronType type = NeuronType::kHidden;
+  double bias = 0.5;
+  Neuron neuron(type, bias);
 
-    EXPECT_EQ(neuron.GetType(), type);
-    EXPECT_EQ(neuron.GetBias(), bias);
+  EXPECT_EQ(neuron.GetType(), type);
+  EXPECT_EQ(neuron.GetBias(), bias);
 
-    Neuron neuron2(type, bias);
-    EXPECT_EQ(neuron.GetId(), neuron2.GetId() - 1);
+  Neuron neuron2(type, bias);
+  EXPECT_EQ(neuron.GetId(), neuron2.GetId() - 1);
 
-    Neuron neuron3(type, bias);
-    EXPECT_EQ(neuron2.GetId(), neuron3.GetId() - 1);
+  Neuron neuron3(type, bias);
+  EXPECT_EQ(neuron2.GetId(), neuron3.GetId() - 1);
 }
 
 TEST(NeatTests, SetBias) {
-    Neuron neuron(NeuronType::kHidden, 0.5);
-    double new_bias = 0.7;
-    neuron.SetBias(new_bias);
+  Neuron neuron(NeuronType::kHidden, 0.5);
+  double new_bias = 0.7;
+  neuron.SetBias(new_bias);
 
-    EXPECT_EQ(neuron.GetBias(), new_bias);
+  EXPECT_EQ(neuron.GetBias(), new_bias);
 }
 
 // REENABLE WHEN DISABLE NEURON IS IMPLEMENTED
@@ -110,22 +111,22 @@ TEST(NeatTests, SetBias) {
 // }
 
 TEST(NeatTests, DisableLink) {
-    Genome genome(3, 2);
-    genome.AddLink(Link(1, 2, 0.5));
-    genome.AddLink(Link(2, 3, 0.7));
-    int id = genome.GetLinks().back().GetId();
-    genome.DisableLink(id);
+  Genome genome(3, 2);
+  genome.AddLink(Link(1, 2, 0.5));
+  genome.AddLink(Link(2, 3, 0.7));
+  int id = genome.GetLinks().back().GetId();
+  genome.DisableLink(id);
 
-    auto links = genome.GetLinks();
+  auto links = genome.GetLinks();
 
-    bool isLinkDisabled = false;
-    for (const auto& link : links) {
-        if (link.GetId() == id) {
-            ASSERT_TRUE(!link.IsActive());
-        } else {
-            ASSERT_TRUE(link.IsActive());
-        }
+  bool isLinkDisabled = false;
+  for (const auto& link : links) {
+    if (link.GetId() == id) {
+      ASSERT_TRUE(!link.IsActive());
+    } else {
+      ASSERT_TRUE(link.IsActive());
     }
+  }
 }
 
 // REENABLE WHEN ENABLE NEURON IS IMPLEMENTED
@@ -150,54 +151,54 @@ TEST(NeatTests, DisableLink) {
 // }
 
 TEST(NeatTests, EnableLink) {
-    Genome genome(3, 2);
-    genome.AddLink(Link(1, 2, 0.5));
-    genome.AddLink(Link(2, 3, 0.7));
-    int id = genome.GetLinks().back().GetId();
-    genome.DisableLink(id);
-    genome.EnableLink(id);
+  Genome genome(3, 2);
+  genome.AddLink(Link(1, 2, 0.5));
+  genome.AddLink(Link(2, 3, 0.7));
+  int id = genome.GetLinks().back().GetId();
+  genome.DisableLink(id);
+  genome.EnableLink(id);
 
-    const auto& links = genome.GetLinks();
-    bool anyEnabled = false;
-    for (const auto& link : links) {
-        if (link.IsActive()) {
-            anyEnabled = true;
-            break;
-        }
+  const auto& links = genome.GetLinks();
+  bool anyEnabled = false;
+  for (const auto& link : links) {
+    if (link.IsActive()) {
+      anyEnabled = true;
+      break;
     }
+  }
 
-    ASSERT_TRUE(anyEnabled);
+  ASSERT_TRUE(anyEnabled);
 }
 
 TEST(NeatTests, RemoveNeuron) {
-    Genome genome(3, 2);
-    Neuron neuron1(NeuronType::kHidden, 0.5);
-    Neuron neuron2(NeuronType::kOutput, 0.3);
-    Neuron neuron3(NeuronType::kInput, 0.2);
+  Genome genome(3, 2);
+  Neuron neuron1(NeuronType::kHidden, 0.5);
+  Neuron neuron2(NeuronType::kOutput, 0.3);
+  Neuron neuron3(NeuronType::kInput, 0.2);
 
-    genome.AddNeuron(neuron1);
-    genome.AddNeuron(neuron2);
-    genome.AddNeuron(neuron3);
-    genome.AddLink(Link(neuron1.GetId(), neuron2.GetId(), 0.7));
-    genome.AddLink(Link(neuron2.GetId(), neuron3.GetId(), 0.4));
-    int id = neuron1.GetId();
-    genome.RemoveNeuron(id);
+  genome.AddNeuron(neuron1);
+  genome.AddNeuron(neuron2);
+  genome.AddNeuron(neuron3);
+  genome.AddLink(Link(neuron1.GetId(), neuron2.GetId(), 0.7));
+  genome.AddLink(Link(neuron2.GetId(), neuron3.GetId(), 0.4));
+  int id = neuron1.GetId();
+  genome.RemoveNeuron(id);
 
-    const auto& neurons = genome.GetNeurons();
-    const auto& links = genome.GetLinks();
+  const auto& neurons = genome.GetNeurons();
+  const auto& links = genome.GetLinks();
 
-    ASSERT_EQ(neurons.size(), 7);
-    ASSERT_EQ(links.size(), 1);
-    EXPECT_TRUE(links[0].GetInId() != 0 && links[0].GetOutId() != 0);
+  ASSERT_EQ(neurons.size(), 7);
+  ASSERT_EQ(links.size(), 1);
+  EXPECT_TRUE(links[0].GetInId() != 0 && links[0].GetOutId() != 0);
 }
 
 TEST(NeatTests, RemoveLink) {
-    Genome genome(3, 2);
-    genome.AddLink(Link(1, 2, 0.5));
-    genome.AddLink(Link(2, 3, 0.7));
-    genome.RemoveLink(genome.GetLinks().back().GetId());
+  Genome genome(3, 2);
+  genome.AddLink(Link(1, 2, 0.5));
+  genome.AddLink(Link(2, 3, 0.7));
+  genome.RemoveLink(genome.GetLinks().back().GetId());
 
-    ASSERT_EQ(genome.GetLinks().size(), 1);
+  ASSERT_EQ(genome.GetLinks().size(), 1);
 }
 
 TEST(NeatTests, Mutate) {
@@ -255,22 +256,22 @@ TEST(NeatTests, Mutate) {
 }
 
 TEST(NeatTests, MutateRemoveNeuron) {
-    Genome genome(3, 2);
-    genome.AddNeuron(Neuron(NeuronType::kHidden, 0.5));
-    genome.AddNeuron(Neuron(NeuronType::kHidden, 0.4));
-    genome.AddNeuron(Neuron(NeuronType::kOutput, 0.3));
-    genome.MutateRemoveNeuron();
+  Genome genome(3, 2);
+  genome.AddNeuron(Neuron(NeuronType::kHidden, 0.5));
+  genome.AddNeuron(Neuron(NeuronType::kHidden, 0.4));
+  genome.AddNeuron(Neuron(NeuronType::kOutput, 0.3));
+  genome.MutateRemoveNeuron();
 
-    ASSERT_EQ(genome.GetNeurons().size(), 7);
+  ASSERT_EQ(genome.GetNeurons().size(), 7);
 }
 
 TEST(NeatTests, MutateRemoveLink) {
-    Genome genome(3, 2);
-    genome.AddLink(Link(1, 2, 0.5));
-    genome.AddLink(Link(2, 3, 0.7));
-    genome.MutateRemoveLink();
+  Genome genome(3, 2);
+  genome.AddLink(Link(1, 2, 0.5));
+  genome.AddLink(Link(2, 3, 0.7));
+  genome.MutateRemoveLink();
 
-    ASSERT_EQ(genome.GetLinks().size(), 1);
+  ASSERT_EQ(genome.GetLinks().size(), 1);
 }
 
 TEST(NeatTests, MutateChangeWeight) {
@@ -278,8 +279,9 @@ TEST(NeatTests, MutateChangeWeight) {
 
   // Add 100 links with varying weights
   for (int i = 0; i < 100; i++) {
-    double weight = 0.5 + static_cast<double>(i) / 200; // weights will vary from 0.5 to 1.0
-    genome.AddLink(Link(i, i+1, weight));
+    double weight = 0.5 + static_cast<double>(i) /
+                              200;  // weights will vary from 0.5 to 1.0
+    genome.AddLink(Link(i, i + 1, weight));
   }
 
   // Store the original weights
@@ -326,42 +328,46 @@ TEST(NeatTests, MutateChangeWeight) {
 }
 
 TEST(NeatTests, GetLayers) {
-    Genome genome(3, 2);
-    genome.AddLink(Link(0, 3, 1));
-    genome.AddLink(Link(2, 4, 1));
-    genome.AddLink(Link(1, 4, 1));
-    genome.AddLink(Link(2, 3, 1));
-    genome.AddNeuron(Neuron(NeuronType::kHidden, 0.5));
-    genome.AddLink(Link(0, 5, 1));
-    genome.AddLink(Link(5, 3, 1));
+  Genome genome(3, 2);
+  genome.AddLink(Link(0, 3, 1));
+  genome.AddLink(Link(2, 4, 1));
+  genome.AddLink(Link(1, 4, 1));
+  genome.AddLink(Link(2, 3, 1));
+  genome.AddNeuron(Neuron(NeuronType::kHidden, 0.5));
+  genome.AddLink(Link(0, 5, 1));
+  genome.AddLink(Link(5, 3, 1));
 
-    const std::vector<Neuron>& neurons = genome.GetNeurons();
-    std::vector<std::vector<Neuron>> true_layers = {{neurons[0], neurons[1], neurons[2]}, {neurons[5]}, {neurons[3], neurons[4]}};
-    std::vector<std::vector<Neuron>> result_layers = get_layers(genome);
+  const std::vector<Neuron>& neurons = genome.GetNeurons();
+  std::vector<std::vector<Neuron>> true_layers = {
+      {neurons[0], neurons[1], neurons[2]},
+      {neurons[5]},
+      {neurons[3], neurons[4]}};
+  std::vector<std::vector<Neuron>> result_layers = get_layers(genome);
 
-    ASSERT_EQ(result_layers.size(), true_layers.size());
-    for (size_t i = 0; i < result_layers.size(); i++) {
-        ASSERT_EQ(result_layers[i].size(), true_layers[i].size());
-        for (size_t j = 0; j < result_layers[i].size(); j++) {
-            EXPECT_EQ(true_layers[i][j].GetId(), result_layers[i][j].GetId());
-        }
+  ASSERT_EQ(result_layers.size(), true_layers.size());
+  for (size_t i = 0; i < result_layers.size(); i++) {
+    ASSERT_EQ(result_layers[i].size(), true_layers[i].size());
+    for (size_t j = 0; j < result_layers[i].size(); j++) {
+      EXPECT_EQ(true_layers[i][j].GetId(), result_layers[i][j].GetId());
     }
+  }
 }
 
 TEST(NeatTests, NeuralNetworkActivate) {
-    Genome genome(3, 2);
-    genome.AddLink(Link(0, 3, 1));
-    genome.AddLink(Link(2, 4, 1));
-    genome.AddLink(Link(1, 4, 1));
-    genome.AddLink(Link(2, 3, 1));
-    genome.AddNeuron(Neuron(NeuronType::kHidden, 0.5));
-    genome.AddLink(Link(0, 5, 1));
-    genome.AddLink(Link(5, 3, 1));
-    NeuralNetwork neural_network(genome);
-    std::vector<double> input_values = {1, 1, 1};
-    std::vector<double> output_values = neural_network.Activate(input_values);
+  Genome genome(3, 2);
+  genome.AddLink(Link(0, 3, 1));
+  genome.AddLink(Link(2, 4, 1));
+  genome.AddLink(Link(1, 4, 1));
+  genome.AddLink(Link(2, 3, 1));
+  genome.AddNeuron(Neuron(NeuronType::kHidden, 0.5));
+  genome.AddLink(Link(0, 5, 1));
+  genome.AddLink(Link(5, 3, 1));
+  NeuralNetwork neural_network(genome);
+  std::vector<double> input_values = {1, 1, 1};
+  std::vector<double> output_values = neural_network.Activate(input_values);
 
-    ASSERT_FALSE(output_values.empty()); // Replace with more specific checks as needed
+  ASSERT_FALSE(
+      output_values.empty());  // Replace with more specific checks as needed
 }
 
 TEST(NeatTests, CrossoverNeuron) {
@@ -402,7 +408,6 @@ TEST(NeatTests, CrossoverLink) {
 
   linkB = linkA;
   linkB.SetWeight(0.7);
-
 
   int countA = 0;
   int countB = 0;
@@ -475,33 +480,44 @@ TEST(NeatTests, Crossover) {
   // Perform crossover
   Genome crossoverResult = Crossover(genomeA, genomeB);
 
-  // Check that every neuron ID in crossoverResult also exists in genomeA and vice versa
+  // Check that every neuron ID in crossoverResult also exists in genomeA and
+  // vice versa
   for (const auto& neuron : crossoverResult.GetNeurons()) {
-    EXPECT_NE(std::find_if(genomeA.GetNeurons().begin(), genomeA.GetNeurons().end(),
-                           [&neuron](const Neuron& n) { return n.GetId() == neuron.GetId(); }),
-              genomeA.GetNeurons().end());
+    EXPECT_NE(
+        std::find_if(
+            genomeA.GetNeurons().begin(), genomeA.GetNeurons().end(),
+            [&neuron](const Neuron& n) { return n.GetId() == neuron.GetId(); }),
+        genomeA.GetNeurons().end());
   }
 
   for (const auto& neuron : genomeA.GetNeurons()) {
-    EXPECT_NE(std::find_if(crossoverResult.GetNeurons().begin(), crossoverResult.GetNeurons().end(),
-                           [&neuron](const Neuron& n) { return n.GetId() == neuron.GetId(); }),
+    EXPECT_NE(std::find_if(crossoverResult.GetNeurons().begin(),
+                           crossoverResult.GetNeurons().end(),
+                           [&neuron](const Neuron& n) {
+                             return n.GetId() == neuron.GetId();
+                           }),
               crossoverResult.GetNeurons().end());
   }
 
-  // Check that every link ID in crossoverResult also exists in genomeA and vice versa
+  // Check that every link ID in crossoverResult also exists in genomeA and vice
+  // versa
   for (const auto& link : crossoverResult.GetLinks()) {
-    EXPECT_NE(std::find_if(genomeA.GetLinks().begin(), genomeA.GetLinks().end(),
-                           [&link](const Link& l) { return l.GetId() == link.GetId(); }),
+    EXPECT_NE(std::find_if(
+                  genomeA.GetLinks().begin(), genomeA.GetLinks().end(),
+                  [&link](const Link& l) { return l.GetId() == link.GetId(); }),
               genomeA.GetLinks().end());
   }
 
   for (const auto& link : genomeA.GetLinks()) {
-    EXPECT_NE(std::find_if(crossoverResult.GetLinks().begin(), crossoverResult.GetLinks().end(),
-                           [&link](const Link& l) { return l.GetId() == link.GetId(); }),
+    EXPECT_NE(std::find_if(
+                  crossoverResult.GetLinks().begin(),
+                  crossoverResult.GetLinks().end(),
+                  [&link](const Link& l) { return l.GetId() == link.GetId(); }),
               crossoverResult.GetLinks().end());
   }
 
-  // Check that the bias of every neuron in crossoverResult corresponds to the bias of the same neuron in genomeA or genomeB
+  // Check that the bias of every neuron in crossoverResult corresponds to the
+  // bias of the same neuron in genomeA or genomeB
   for (const auto& neuron : crossoverResult.GetNeurons()) {
     auto itA = std::find_if(
         genomeA.GetNeurons().begin(), genomeA.GetNeurons().end(),
@@ -522,7 +538,8 @@ TEST(NeatTests, Crossover) {
     }
   }
 
-  // Check that the weight of every link in crossoverResult corresponds to the weight of the same link in genomeA or genomeB
+  // Check that the weight of every link in crossoverResult corresponds to the
+  // weight of the same link in genomeA or genomeB
   for (const auto& link : crossoverResult.GetLinks()) {
     auto itA = std::find_if(
         genomeA.GetLinks().begin(), genomeA.GetLinks().end(),
@@ -551,7 +568,7 @@ TEST(NeatTests, ActivationAfterMutateCrossover) {
   for (int i = 0; i < 1000; i++) {
     genomeA.Mutate();
     // for (auto &link : genomeA.GetLinks()) {
-    //     std::cerr << link.GetInId() << ' ' << link.GetOutId() << std::endl; 
+    //     std::cerr << link.GetInId() << ' ' << link.GetOutId() << std::endl;
     // }
     // std::cerr << std::endl;
   }
