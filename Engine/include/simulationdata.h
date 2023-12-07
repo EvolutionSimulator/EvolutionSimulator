@@ -36,4 +36,5 @@ public:
     std::unordered_map<int, std::unordered_map<int, std::vector<int>>> creature_grid_;
     std::unordered_map<int, std::unordered_map<int, std::vector<int>>> food_grid_;
 
+    double world_time_ = 0;
 };
