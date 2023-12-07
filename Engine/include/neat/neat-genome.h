@@ -17,14 +17,14 @@ static double minWeight = 0.0;
 
 class Genome {
  public:
-  Genome(int input_count, int output_count);
+  explicit Genome(int input_count, int output_count);
   int GetInputCount() const;
   int GetOutputCount() const;
   const std::vector<Neuron> &GetNeurons() const;
   const std::vector<Link> &GetLinks() const;
 
-  void AddNeuron(NeuronType type, double bias);
-  void AddLink(int in_id, int out_id, double weight);
+  void AddNeuron(const Neuron &neuron);
+  void AddLink(const Link &link);
 
 
   void DisableNeuron(int id); //don't use this for now
@@ -48,8 +48,6 @@ class Genome {
  private:
   int input_count_;
   int output_count_;
-  int next_neuron_id_;
-  int next_link_id_;
   std::vector<Neuron> neurons_;
   std::vector<Link> links_;
   bool DFS(const Neuron& currentNeuron, std::unordered_set<int>& visited, std::unordered_set<int>& visiting) const;
