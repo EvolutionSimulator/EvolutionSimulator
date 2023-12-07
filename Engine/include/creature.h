@@ -3,6 +3,7 @@
 
 #include "movable_entity.h"
 #include "food.h"
+#include "neat/neat-neural-network.h"
 
 class Creature : public MovableEntity {
 public:
@@ -25,6 +26,7 @@ public:
 private:
     double energy_;
     states state_;
+    neat::NeuralNetwork brain_;
 };
 
 #endif // CREATURE_HPP

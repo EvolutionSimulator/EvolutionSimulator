@@ -70,6 +70,7 @@ void SimulationData::InitializeCreatures() {
     for (double x = 0; x < world_width; x += 2.0) {
         for (double y = 0; y < world_height; y += 2.0) {
             if (std::rand() / (RAND_MAX + 1.0) < creature_density) {
+                neat::Genome genome(7, 3);
                 Creature new_creature;
                 new_creature.RandomInitialization(world_width, world_height);
                 creatures_.emplace_back(new_creature);
