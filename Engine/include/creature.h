@@ -11,15 +11,23 @@ public:
 
     void Dies();
     void Eats(double nutritional_value);
-    void UpdateEnergy();
+
+    void UpdateEnergy(const double energyToHealth, const double healthToEnergy);
     double GetEnergy() const;
     void SetEnergy(double energy);
+
+    double GetHealth() const;
+    void SetHealth(double health);
+
+    void HealthToEnergy();
+    void EnergyToHealth();
 
     virtual void OnCollision(Food& food);
     virtual void OnCollision(Creature& creature);
 
 private:
     double energy_;
+    double health_;
 };
 
 #endif // CREATURE_HPP
