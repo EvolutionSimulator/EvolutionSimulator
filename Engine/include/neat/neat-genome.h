@@ -53,7 +53,7 @@ class Genome {
 
   bool DFS(const Neuron& currentNeuron, std::unordered_set<int>& visited, std::unordered_set<int>& visiting) const;
 };
-
+Genome Crossover(const Genome &dominant, const Genome &recessive);
 }  // namespace neat
 
 #endif  // NEATGENOME_H

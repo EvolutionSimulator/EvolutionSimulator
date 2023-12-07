@@ -16,7 +16,6 @@ class Link {
   void SetWeight(double weight);
   void SetActive();
   void SetInactive();
-
  private:
   int id_;
   bool active_;
@@ -25,6 +24,7 @@ class Link {
   int out_id_;
 };
 
+Link CrossoverLink(const Link &a, const Link &b);
 }  // namespace neat
 
 #endif  // NEATLINK_H
