@@ -20,8 +20,6 @@ add_library(Engine STATIC
   include/neat/neat-genome.h src/neat/neat-genome.cpp
 
 
-  src/neat/neat-test.cpp
-  include/neat/neat-test.h
   include/neat/neat-neural-network.h
   src/neat/neat-neural-network.cpp
 

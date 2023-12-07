@@ -202,6 +202,58 @@ TEST(NeatTests, MutateRemoveLink) {
     ASSERT_EQ(genome.GetLinks().size(), 1);
 }
 
+TEST(NeatTests, MutateChangeWeight) {
+  neat::Genome genome(105, 3);
+
+  // Add 100 links with varying weights
+  for (int i = 0; i < 100; i++) {
+    double weight = 0.5 + static_cast<double>(i) / 200; // weights will vary from 0.5 to 1.0
+    genome.AddLink(i, i+1, weight);
+  }
+
+  // Store the original weights
+  std::vector<double> original_weights;
+  for (const auto& link : genome.GetLinks()) {
+    original_weights.push_back(link.GetWeight());
+  }
+
+  // Mutate the weights
+  genome.MutateChangeWeight();
+
+  // Check if at least one weight has changed
+  bool weight_changed = false;
+  int i = 0;
+  for (const auto& link : genome.GetLinks()) {
+    if (original_weights[i] != link.GetWeight()) {
+      weight_changed = true;
+      break;
+    }
+    i++;
+  }
+  EXPECT_TRUE(weight_changed);
+
+  // Store the second set of weights
+  std::vector<double> new_weights;
+  for (const auto& link : genome.GetLinks()) {
+    new_weights.push_back(link.GetWeight());
+  }
+
+  // Mutate the weights again
+  genome.MutateChangeWeight();
+
+  // Check if at least one weight has changed
+  weight_changed = false;
+  i = 0;
+  for (const auto& link : genome.GetLinks()) {
+    if (new_weights[i] != link.GetWeight()) {
+      weight_changed = true;
+      break;
+    }
+    i++;
+  }
+  EXPECT_TRUE(weight_changed);
+}
+
 TEST(NeatTests, GetLayers) {
     neat::Genome genome(3, 2);
     genome.AddLink(0, 3, 1);
