@@ -20,16 +20,15 @@ void Simulation::Start() {
 void Simulation::Update(double deltaTime)
 {
     std::lock_guard<std::mutex> lock(data_mutex_);
-    // Test function (DO NOT USE)
-    data_->ModifyAllCreatures(100 * deltaTime, 100 * deltaTime);
+
 }
 
 // Called at constant intervals
 void Simulation::FixedUpdate(double deltaTime)
 {
     std::lock_guard<std::mutex> lock(data_mutex_);
-    // Test function (DO NOT USE)
-    data_->ModifyAllCreatures(100 * deltaTime, 100 * deltaTime);
+    data_->UpdateAllCreatures(deltaTime);
+    data_->GenerateMoreFood();
     data_->UpdateGrid();
     data_->CheckCollisions();
 }

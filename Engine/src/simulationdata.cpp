@@ -36,11 +36,10 @@ void SimulationData::ModifyAllCreatures(double delta_x, double delta_y)
 /*!
  * Update all creatures position and orientation by a deltaTime interval
  */
-void SimulationData::MoveAllCreatures(double deltaTime)
+void SimulationData::UpdateAllCreatures(double deltaTime)
 {
     for (Creature& creature: creatures_) {
-        creature.Rotate(deltaTime);
-        creature.Move(deltaTime);
+        creature.Update(deltaTime);
     }
 }
 

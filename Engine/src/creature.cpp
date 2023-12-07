@@ -36,3 +36,8 @@ Creature::states Creature::GetState() const{
 void Creature::SetState(states state){
     state_ = state;
 }
+
+void Creature::Update(double deltaTime){
+    this->Rotate(deltaTime);
+    this->Move(deltaTime);
+}

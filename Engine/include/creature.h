@@ -17,6 +17,7 @@ public:
     void UpdateEnergy();
     double GetEnergy() const;
     void SetEnergy(double energy);
+    void Update(double deltaTime);
 
     states GetState() const;
     void SetState (states state);

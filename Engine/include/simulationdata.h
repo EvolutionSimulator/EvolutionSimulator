@@ -25,7 +25,7 @@ public:
     void UpdateGrid();
     void CheckCollisions();
     void ModifyAllCreatures(double delta_x, double delta_y);
-    void MoveAllCreatures(double deltaTime);
+    void UpdateAllCreatures(double deltaTime);
 
     std::vector<Creature> creatures_;
     std::vector<Food> food_entities_;
