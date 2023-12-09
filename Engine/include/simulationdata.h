@@ -29,7 +29,7 @@ public:
     void CheckCreatureCollisions();
 
     void ModifyAllCreatures(double delta_x, double delta_y);
-    void MoveAllCreatures(double deltaTime);
+    void UpdateAllCreatures(double deltaTime);
 
     void ReproduceCreatures();
 
