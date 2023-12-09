@@ -17,6 +17,7 @@ public:
     double GetEnergy() const;
     void SetEnergy(double energy);
     neat::Genome GetGenome();
+    void Update(double deltaTime, double const kMapWidth, double const kMapHeight);
 
     virtual void OnCollision(Food& food);
     virtual void OnCollision(Creature& creature);
