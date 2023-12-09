@@ -6,6 +6,7 @@
 #include "neat/neat-neural-network.h"
 #include "config.h"
 
+
 class Creature : public MovableEntity {
 public:
 
@@ -21,6 +22,7 @@ public:
 
     virtual void OnCollision(Food& food);
     virtual void OnCollision(Creature& creature);
+    bool Fit();
 
     bool Fit();
 
