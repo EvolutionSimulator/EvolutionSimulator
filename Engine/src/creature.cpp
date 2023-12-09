@@ -1,4 +1,5 @@
 #include "creature.h"
+#include "config.h"
 
 Creature::Creature()
     : MovableEntity(), energy_(0.0) {
@@ -27,6 +28,13 @@ void Creature::Dies(){
 
 void Creature::Eats(double nutritional_value){
     SetEnergy(GetEnergy() + nutritional_value);
+}
+
+bool Creature::Fit(){
+    if (energy_ > cfg::reproduction_threshold){
+        return true;
+    }
+    return false;
 }
 
 void Creature::OnCollision(Food& food)
