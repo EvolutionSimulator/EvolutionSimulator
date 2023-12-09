@@ -35,6 +35,7 @@ add_library(Engine STATIC
   include/movable_entity.h
   include/collisions.h
   src/collisions.cpp
+  include/config.h
 )
 
 add_subdirectory(tests)
