@@ -1,10 +1,8 @@
 #include "creature.h"
 #include "config.h"
 
-Creature::Creature()
-    : MovableEntity() {
-    health_ = 100;
-    energy_ = 100;
+Creature::Creature(neat::Genome genome)
+    : MovableEntity(), health_(100), energy_(100), brain_(neat::NeuralNetwork(genome)), genome_(genome) {
 }
 
 double Creature::GetEnergy() const {
