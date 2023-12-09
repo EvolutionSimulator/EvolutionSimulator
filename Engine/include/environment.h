@@ -6,8 +6,8 @@
 class Environment {
 public:
     // Map size
-    static constexpr double kMapWidth = 1000.0;
-    static constexpr double kMapHeight = 300.0;
+    static constexpr double kMapWidth = 1100.0;
+    static constexpr double kMapHeight = 450.0;
 
     // Variable for creature and food density
     double kFoodDensity;

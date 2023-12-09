@@ -27,7 +27,7 @@ void MovableEntity::Rotate(double deltaTime)
     this->SetOrientation(rotational_velocity);
 }
 
-void MovableEntity::Move(double deltaTime)
+void MovableEntity::Move(double deltaTime, const double kMapWidth, const double kMapHeight)
 {
     std::pair<double, double> coordinates = this->GetCoordinates();
     double orientation = this->GetOrientation();
@@ -35,7 +35,7 @@ void MovableEntity::Move(double deltaTime)
     double y_velocity = this->GetVelocityForward() * sin(orientation);
     coordinates.first = coordinates.first + deltaTime * x_velocity;
     coordinates.second = coordinates.second + deltaTime * y_velocity;
-    this->SetCoordinates(coordinates.first, coordinates.second);
+    this->SetCoordinates(coordinates.first, coordinates.second, kMapWidth, kMapHeight);
 }
 
 void MovableEntity::OnCollision(Entity& other_entity)

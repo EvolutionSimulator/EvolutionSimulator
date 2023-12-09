@@ -29,7 +29,7 @@ void SimulationData::ModifyAllCreatures(double delta_x, double delta_y)
         coordinates = creature.GetCoordinates();
         coordinates.first = coordinates.first + delta_x;
         coordinates.second = coordinates.second + delta_y;
-        creature.SetCoordinates(coordinates.first, coordinates.second);
+        creature.SetCoordinates(coordinates.first, coordinates.second, environment_.kMapWidth, environment_.kMapHeight);
     }
 }
 /*!
@@ -39,7 +39,7 @@ void SimulationData::MoveAllCreatures(double deltaTime)
 {
     for (Creature& creature: creatures_) {
         creature.Rotate(deltaTime);
-        creature.Move(deltaTime);
+        creature.Move(deltaTime, environment_.kMapWidth, environment_.kMapHeight);
     }
 }
 
