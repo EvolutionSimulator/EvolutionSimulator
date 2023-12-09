@@ -3,11 +3,12 @@
 
 #include "movable_entity.h"
 #include "food.h"
+#include "neat/neat-neural-network.h"
 
 class Creature : public MovableEntity {
 public:
 
-    Creature();
+    Creature(neat::Genome genome);
 
     void Dies();
     void Eats(double nutritional_value);
@@ -23,10 +24,13 @@ public:
 
     virtual void OnCollision(Food& food);
     virtual void OnCollision(Creature& creature);
+    bool Fit();
 
 protected:
     double energy_;
     double health_;
+    neat::NeuralNetwork brain_;
+    neat::Genome genome_;
 };
 
 #endif // CREATURE_HPP

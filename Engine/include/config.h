@@ -2,7 +2,9 @@
 #define CONFIG_H
 
 namespace cfg {
-double reproduction_threshold = 0.5;
+double constexpr reproduction_threshold = 0.5;
+int constexpr input_neurons = 7;
+int constexpr output_neurons = 3;
 }
 
 
