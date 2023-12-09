@@ -6,6 +6,7 @@
 #include "food.h"
 #include <cmath>
 #include "collisions.h"
+#include "config.h"
 
 void SimulationData::AddCreature(const Creature& creature)
 {
@@ -72,7 +73,9 @@ void SimulationData::InitializeCreatures() {
     for (double x = 0; x < world_width; x += 2.0) {
         for (double y = 0; y < world_height; y += 2.0) {
             if (std::rand() / (RAND_MAX + 1.0) < creature_density) {
-                Creature new_creature;
+                neat::Genome genome(cfg::input_neurons, cfg::output_neurons);
+                genome.Mutate();
+                Creature new_creature(genome);
                 new_creature.RandomInitialization(world_width, world_height, max_creature_size);
                 creatures_.emplace_back(new_creature);
             }
