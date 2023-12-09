@@ -23,6 +23,10 @@ public:
     // Tolerance of collisions
     static constexpr double kTolerance = 1e-3;
 
+    // Energy and Health conversion thresholds
+    static constexpr double energyToHealth = 70.0;
+    static constexpr double healthToEnergy = 10.0;
+
     // Constructor
     Environment();
 
