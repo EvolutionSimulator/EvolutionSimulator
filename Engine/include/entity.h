@@ -21,7 +21,7 @@ public:
     void SetSize(double size);
 
     std::pair<double, double> GetCoordinates() const;
-    void SetCoordinates(const double x_coord, const double y_coord);
+    void SetCoordinates(const double x, const double y, const double kMapWidth, const double kMapHeight);
 
     double GetOrientation() const;
     void SetOrientation(double orientation);
