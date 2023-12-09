@@ -42,10 +42,15 @@ std::pair<double, double> Entity::GetCoordinates() const
     return std::make_pair(x_coord_, y_coord_);
 }
 
-void Entity::SetCoordinates(const double x, const double y)
+void Entity::SetCoordinates(const double x, const double y, const double kMapWidth, const double kMapHeight)
 {
-    x_coord_ = x;
-    y_coord_ = y;
+    // Use fmod to ensure coordinates are within map bounds
+    x_coord_ = fmod(x, kMapWidth);
+    y_coord_ = fmod(y, kMapHeight);
+    if (x_coord_ < 0.0)
+        x_coord_ += kMapWidth;
+    if (y_coord_ < 0.0)
+        y_coord_ += kMapHeight;
 }
 
 double GetRandomFloat(double world_size) {
@@ -55,8 +60,6 @@ double GetRandomFloat(double world_size) {
 
     // Define a distribution for random floats between 0 and world_size
     std::uniform_real_distribution<double> dis(0.0, world_size);
-
-    // Generate a random float
     return dis(gen);
 }
 
