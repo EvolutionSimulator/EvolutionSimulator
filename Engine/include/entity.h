@@ -2,6 +2,7 @@
 #define ENTITY_H
 
 #include <vector>
+#include "collisions.h"
 
 class Entity
 {
@@ -30,6 +31,9 @@ public:
     void SetState (states state);
 
     double GetDistance(const Entity& otherEntity) const;
+    bool CheckCollisionWithEntity(const double tolerance, const Entity& otherEntity) const {
+        return CollisionCircleCircle(tolerance, GetCoordinates(), GetSize(), otherEntity.GetCoordinates(), otherEntity.GetSize());
+    }
 
 protected:
     double x_coord_, y_coord_, orientation_, size_;
