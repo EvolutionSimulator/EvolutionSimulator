@@ -124,6 +124,13 @@ TEST(CollisionTests, CheckCollisionWithEntity) {
     entity2.SetCoordinates(4.0, 6.0, kMapWidth, kMapHeight);
     entity2.SetSize(3.0);
     EXPECT_TRUE(entity1.CheckCollisionWithEntity(tolerance, entity2));
+
+    // Entities with coordinates outside of bounds, expected to be wrapped within bounds
+    entity1.SetCoordinates(90.0, 55.0, kMapWidth, kMapHeight);
+    entity1.SetSize(4.0);
+    entity2.SetCoordinates(90.0, 60.0, kMapWidth, kMapHeight);
+    entity2.SetSize(3.0);
+    EXPECT_TRUE(entity1.CheckCollisionWithEntity(tolerance, entity2));
 }
 
 
