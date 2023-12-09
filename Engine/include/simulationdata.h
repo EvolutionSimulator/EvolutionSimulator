@@ -4,6 +4,7 @@
 #include "food.h"
 #include <vector>
 #include <unordered_map>
+#include <queue>
 
 struct SimulationData {
 public:
@@ -30,8 +31,11 @@ public:
     void ModifyAllCreatures(double delta_x, double delta_y);
     void MoveAllCreatures(double deltaTime);
 
+    void ReproduceCreatures();
+
     std::vector<Creature> creatures_;
     std::vector<Food> food_entities_;
+    std::queue<Creature> reproduce_;
     Environment environment_;
     std::unordered_map<int, std::unordered_map<int, std::vector<int>>> creature_grid_;
     std::unordered_map<int, std::unordered_map<int, std::vector<int>>> food_grid_;
