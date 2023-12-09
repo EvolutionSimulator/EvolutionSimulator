@@ -58,6 +58,29 @@ void SimulationData::GenerateMoreFood(){
     }
 }
 
+/*!
+ * Takes the creatures from the reproduce queue in pairs and initializaes randomly a crossedover version
+ */
+void SimulationData::ReproduceCreatures(){
+    while (reproduce_.size() > 2){
+        Creature creature1 = reproduce_.front();
+        reproduce_.pop();
+        Creature creature2 = reproduce_.front();
+        reproduce_.pop();
+        double energy1 = creature1.GetEnergy();
+        double energy2 = creature2.GetEnergy();
+        if (energy1 > energy2){
+            neat::Genome new_genome = neat::Crossover(creature1.GetGenome(), creature2.GetGenome());
+            AddCreature(Creature(new_genome));
+        } else {
+            neat::Genome new_genome = neat::Crossover(creature2.GetGenome(), creature1.GetGenome());
+            AddCreature(Creature(new_genome));
+        }
+    }
+}
+
+
+
 void SimulationData::InitializeCreatures() {
     // Retrieve information from the environment
     double world_width = environment_.kMapWidth;
