@@ -31,7 +31,7 @@ public:
 
     double GetDistance(const Entity& otherEntity) const;
 
-private:
+protected:
     double x_coord_, y_coord_, orientation_, size_;
     states state_;
 };
