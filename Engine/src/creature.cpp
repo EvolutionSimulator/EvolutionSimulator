@@ -73,6 +73,11 @@ bool Creature::Fit(){
     return false;
 }
 
+void Creature::Update(double deltaTime, double const kMapWidth, double const kMapHeight){
+    this->Move(deltaTime, kMapWidth,  kMapHeight);
+    this->Rotate(deltaTime);
+}
+
 neat::Genome Creature::GetGenome(){
     return genome_;
 }

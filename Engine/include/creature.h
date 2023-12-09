@@ -17,6 +17,7 @@ public:
     double GetEnergy() const;
     void SetEnergy(double energy);
     neat::Genome GetGenome();
+    void Update(double deltaTime, double const kMapWidth, double const kMapHeight);
 
     double GetHealth() const;
     void SetHealth(double health);
