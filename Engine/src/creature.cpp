@@ -73,6 +73,9 @@ bool Creature::Fit(){
     return false;
 }
 
+neat::Genome Creature::GetGenome(){
+    return genome_;
+}
 void Creature::OnCollision(Food& food)
 {
     if (food.GetState() == Entity::Alive)
