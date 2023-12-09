@@ -13,7 +13,7 @@ public:
     void SetVelocityForward(double velocity);
     void SetRotationalVelocity(double rotational_velocity);
 
-    void Move(double deltaTime);
+    void Move(double deltaTime, const double kMapWidth, const double kMapHeight);
     void Rotate(double deltaTime);
 
     virtual void OnCollision(Entity& other_entity);
