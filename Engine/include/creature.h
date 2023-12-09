@@ -24,7 +24,6 @@ public:
     virtual void OnCollision(Creature& creature);
     bool Fit();
 
-    bool Fit();
 
 protected:
     double energy_;
