@@ -24,7 +24,7 @@ public:
 
     bool Fit();
 
-private:
+protected:
     double energy_;
     neat::NeuralNetwork brain_;
     neat::Genome genome_;
