@@ -4,6 +4,7 @@
 #include "movable_entity.h"
 #include "food.h"
 #include "neat/neat-neural-network.h"
+#include "config.h"
 
 class Creature : public MovableEntity {
 public:
