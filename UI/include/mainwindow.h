@@ -23,11 +23,13 @@ private slots: // Slots should be placed under this section
     void ChangeDensity(int value); // Make sure this is under 'private slots:'
     void PauseSimulation();
     void RestartSimulation();
+    void DisplayGraph();
+    void GraphExampleFunction();
 
 private:
     Ui::MainWindow* ui_; // Pointer to all UI widgets
 
     Engine* engine_; // Pointer to the simulation engine
+
     std::thread engine_thread_; // Thread for running the simulation engine
 };
-
