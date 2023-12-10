@@ -10,7 +10,6 @@ public:
     explicit Simulation(Environment& environment); // New constructor accepting Environment reference
     ~Simulation();
     SimulationData* GetSimulationData();
-
     void Start();
     void Update(double deltaTime);
     void FixedUpdate(double deltaTime);
