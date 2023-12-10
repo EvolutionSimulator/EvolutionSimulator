@@ -24,9 +24,9 @@ void Engine::Run()
     if(!running_) {
         running_ = true;
 
-        engineStartTime_ = timer::now();
-        lastUpdateTime_ = engineStartTime_;
-        lastFixedUpdateTime_ = engineStartTime_;
+        engine_start_time_ = timer::now();
+        last_update_time_ = engine_start_time_;
+        last_fixed_update_time_ = engine_start_time_;
 
         simulation_->Start();
 
@@ -35,26 +35,26 @@ void Engine::Run()
 
             // time since last FixedUpdate call
             double fixed_update_delta =
-                std::chrono::duration<double>(current_time - lastFixedUpdateTime_).count();
+                std::chrono::duration<double>(current_time - last_fixed_update_time_).count();
 
             // time since last Update call
             double update_delta =
-                std::chrono::duration<double>(current_time - lastUpdateTime_).count();
+                std::chrono::duration<double>(current_time - last_update_time_).count();
 
             // we calculate how many times we should call FixedUpdate using the time since last execution
-            int fixed_update_steps = std::floor(fixed_update_delta / fixedUpdateInterval);
+            int fixed_update_steps = std::floor(fixed_update_delta / kFixedUpdateInterval);
             for (int i = 0; i < fixed_update_steps; i++) {
-                simulation_->FixedUpdate(fixedUpdateInterval);
+                simulation_->FixedUpdate(kFixedUpdateInterval);
             }
 
             simulation_->Update(update_delta);
 
-            lastUpdateTime_ = current_time;
+            last_update_time_ = current_time;
             // we increment lastFixedUpdateTime_ by the (update interval) * (number of times we called it during this cycle)
-            lastFixedUpdateTime_ +=
-                std::chrono::duration_cast<timer::time_point::duration>(
-                    std::chrono::duration<double>(fixed_update_steps * fixedUpdateInterval)
-                );
+            auto duration_to_add = std::chrono::duration_cast<timer::time_point::duration>(
+                std::chrono::duration<double>(fixed_update_steps * kFixedUpdateInterval)
+            );
+            last_fixed_update_time_ += duration_to_add;
         }
     }
 }

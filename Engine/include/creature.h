@@ -18,7 +18,7 @@ public:
     virtual void OnCollision(Food& food);
     virtual void OnCollision(Creature& creature);
 
-private:
+protected:
     double energy_;
 };
 

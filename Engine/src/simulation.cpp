@@ -13,7 +13,7 @@ Simulation::~Simulation()
 
 // Called once at the start of the simulation
 void Simulation::Start() {
-
+    std::lock_guard<std::mutex> lock(data_mutex_);
 }
 
 // Called every update cycle
@@ -33,6 +33,8 @@ void Simulation::FixedUpdate(double deltaTime)
     data_->ModifyAllCreatures(100 * deltaTime, 100 * deltaTime);
     data_->CheckFoodCollisions();
     data_->UpdateGrid();
+
+    data_->world_time_ += deltaTime;
 }
 
 // Facilitates data processing with external functions in a thread-safe manner
