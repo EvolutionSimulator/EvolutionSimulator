@@ -5,7 +5,7 @@
 #include "qsfmlcanvas.h"
 #include "simulation.h"
 
-class SimulationCanvas : public QSFMLCanvas
+    class SimulationCanvas : public QSFMLCanvas
 {
     Q_OBJECT
 
@@ -14,6 +14,11 @@ public :
 
     void SetSimulation(Simulation* simulation);
     Simulation* GetSimulation();
+
+    void DrawGraph(sf::RenderWindow& window, double (*graphFunction)(double), double xMin, double xMax, double yMin, double yMax);
+
+    // New function declaration for drawing the number of creatures over time
+    void DrawCreatureCountOverTime(sf::RenderWindow& window, const std::vector<Creature>& creatures);
 
 private :
     virtual void OnInit() override;
