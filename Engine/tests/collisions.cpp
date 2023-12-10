@@ -6,6 +6,7 @@
 #include "creature.h"
 #include "food.h"
 
+
 using namespace testing;
 
 TEST(CollisionTests, CollisionCircleCircle) {
@@ -138,7 +139,8 @@ TEST(CollisionTests, OnCollisionWithFood) {
     const double tolerance = 0.1;
 
     // Create a Creature and Food for testing
-    Creature creature;
+    neat::Genome genome(0,0);
+    Creature creature(genome);
     Food food;
 
     // Case 1: Food is alive, and Creature collides with it
