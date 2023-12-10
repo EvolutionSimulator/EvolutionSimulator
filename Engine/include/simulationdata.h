@@ -8,11 +8,12 @@
 struct SimulationData {
 public:
 
-    SimulationData() : creatures_(), environment_(){
+    explicit SimulationData(Environment& env)
+        : environment_(env), creatures_(), food_entities_() {
         InitializeFood();
         InitializeCreatures();
         InitializeGrid();
-    };
+    }
 
     void InitializeCreatures();
     void InitializeFood();
@@ -32,9 +33,10 @@ public:
 
     std::vector<Creature> creatures_;
     std::vector<Food> food_entities_;
-    Environment environment_;
     std::unordered_map<int, std::unordered_map<int, std::vector<int>>> creature_grid_;
     std::unordered_map<int, std::unordered_map<int, std::vector<int>>> food_grid_;
-
     double world_time_ = 0;
+
+private:
+    Environment& environment_;
 };
