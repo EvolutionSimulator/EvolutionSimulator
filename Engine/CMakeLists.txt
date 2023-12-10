@@ -12,19 +12,29 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 
 add_library(Engine STATIC
-    include/engine.h src/engine.cpp
-    include/simulation.h src/simulation.cpp
-    include/simulationdata.h src/simulationdata.cpp
-    include/entity.h src/entity.cpp
-    include/food.h src/food.cpp
-    include/environment.h src/environment.cpp
-    include/creature.h src/creature.cpp
-    include/movable_entity.h src/movable_entity.cpp
-    include/collisions.h src/collisions.cpp
-    include/neat/neat-neuron.h src/neat/neat-neuron.cpp
-    include/neat/neat-link.h src/neat/neat-link.cpp
-    include/neat/neat-genome.h src/neat/neat-genome.cpp
-    include/neat/neat-neural-network.h src/neat/neat-neural-network.cpp
+  include/engine.h src/engine.cpp
+  include/simulation.h src/simulation.cpp
+  include/simulationdata.h
+  include/neat/neat-neuron.h src/neat/neat-neuron.cpp
+  include/neat/neat-link.h src/neat/neat-link.cpp
+  include/neat/neat-genome.h src/neat/neat-genome.cpp
+
+
+  include/neat/neat-neural-network.h
+  src/neat/neat-neural-network.cpp
+  include/entity.h
+  src/entity.cpp
+  src/simulationdata.cpp
+  include/food.h
+  src/food.cpp
+  include/environment.h
+  src/environment.cpp
+  include/creature.h
+  src/creature.cpp
+  src/movable_entity.cpp
+  include/movable_entity.h
+  include/collisions.h
+  src/collisions.cpp
 )
 
 add_subdirectory(tests)

@@ -18,7 +18,7 @@ public:
 
     virtual void OnCollision(Entity& other_entity);
 
-private:
+protected:
     double velocity_forward_;
     double rotational_velocity_;
 };
