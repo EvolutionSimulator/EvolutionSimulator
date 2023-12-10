@@ -202,9 +202,9 @@ void CheckCollisionsTemplate(
                         for (auto& entity2_index : entities2) {
                             EntityType1& entity1 = entity_vector_1[entity1_index];
                             EntityType2& entity2 = entity_vector_2[entity2_index];
-                            if (CollisionCircleCircle(tolerance, entity1.GetCoordinates(), entity1.GetSize(), entity2.GetCoordinates(), entity2.GetSize())) {
+                            if (entity1.CheckCollisionWithEntity(tolerance, entity2)) {
                                 // Handle the collision as needed<
-                                entity_vector_1[entity1_index].OnCollision(entity_vector_2[entity2_index]);
+                                entity1.OnCollision(entity2);
                             }
                         }
                     }

@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.16)
 # Specify the test executable
 add_executable(Engine_tests
     neat.cpp
+    collisions.cpp
 )
 
 # Link against Google Test and the Engine library
