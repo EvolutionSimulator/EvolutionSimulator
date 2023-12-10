@@ -6,6 +6,8 @@
 #include "neat/neat-neural-network.h"
 #include "config.h"
 
+#include <unordered_map>
+
 class Creature : public MovableEntity {
 public:
 
@@ -21,6 +23,9 @@ public:
 
     virtual void OnCollision(Food& food);
     virtual void OnCollision(Creature& creature);
+    Food* GetClosestFood
+        (std::unordered_map<int, std::unordered_map<int, std::vector<Entity*> > > &grid,
+         double GridCellSize) const;
 
     bool Fit();
 
@@ -29,5 +34,9 @@ private:
     neat::NeuralNetwork brain_;
     neat::Genome genome_;
 };
+
+std::vector<Food*> get_food_at_distance
+    (std::unordered_map<int, std::unordered_map<int, std::vector<Entity*> > > &grid,
+     int i_creature, int j_creature, int grid_distance);
 
 #endif // CREATURE_HPP
