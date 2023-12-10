@@ -186,22 +186,28 @@ void CheckCollisionsTemplate(
         for (auto& cell : row.second) {
             std::vector<int>& entities1 = cell.second;
 
-            // Check if there are entities in the corresponding cell in entityGrid2
-            auto it2 = entityGrid2.find(row.first);
-            if (it2 != entityGrid2.end()) {
-                auto& row2 = *it2;
-                auto itCell2 = row2.second.find(cell.first);
-                if (itCell2 != row2.second.end()) {
-                    std::vector<int>& entities2 = itCell2->second;
+            // Iterate over neighboring cells in entityGrid2
+            for (int xOffset = -1; xOffset <= 1; ++xOffset) {
+                for (int yOffset = -1; yOffset <= 1; ++yOffset) {
+                    int neighborRow = row.first + xOffset;
+                    int neighborCell = cell.first + yOffset;
 
-                    // Now, check for collisions only between entities1 and entities2
-                    for (auto& entity1_index : entities1) {
-                        for (auto& entity2_index : entities2) {
-                            EntityType1& entity1 = entity_vector_1[entity1_index];
-                            EntityType2& entity2 = entity_vector_2[entity2_index];
-                            if (entity1.CheckCollisionWithEntity(tolerance, entity2)) {
-                                // Handle the collision as needed<
-                                entity1.OnCollision(entity2);
+                    // Check if the neighboring row and cell indices are valid
+                    if (entityGrid2.count(neighborRow) > 0) {
+                        auto& row2 = entityGrid2[neighborRow];
+                        if (row2.count(neighborCell) > 0) {
+                            std::vector<int>& entities2 = row2[neighborCell];
+
+                            // Now, check for collisions between entities1 and entities2
+                            for (auto& entity1_index : entities1) {
+                                for (auto& entity2_index : entities2) {
+                                    EntityType1& entity1 = entity_vector_1[entity1_index];
+                                    EntityType2& entity2 = entity_vector_2[entity2_index];
+                                    if (entity1.CheckCollisionWithEntity(tolerance, entity2)) {
+                                        // Handle the collision as needed
+                                        entity1.OnCollision(entity2);
+                                    }
+                                }
                             }
                         }
                     }
@@ -210,6 +216,7 @@ void CheckCollisionsTemplate(
         }
     }
 }
+
 
 void SimulationData::CheckFoodCollisions() {
     CheckCollisionsTemplate<Creature,Food>(creature_grid_, food_grid_, creatures_, food_entities_, environment_);

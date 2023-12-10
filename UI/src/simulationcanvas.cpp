@@ -64,7 +64,7 @@ void SimulationCanvas::RenderSimulation(SimulationData* data)
 
     // Iterate through food and create a gradient circle shape for each
     for (const auto& food : data->food_entities_) {
-        sf::VertexArray foodShape = createGradientCircle(5, sf::Color(50, 100, 49), sf::Color(150, 250, 148));
+        sf::VertexArray foodShape = createGradientCircle(food.GetSize(), sf::Color(50, 100, 49), sf::Color(150, 250, 148));
 
         std::pair<double, double> foodCoordinates = food.GetCoordinates();
         sf::Transform foodTransform;
@@ -74,7 +74,7 @@ void SimulationCanvas::RenderSimulation(SimulationData* data)
 
     // Iterate through creatures and create a gradient circle shape for each
     for (const auto& creature : data->creatures_) {
-        sf::VertexArray creatureShape = createGradientCircle(10, sf::Color(79, 77, 64), sf::Color(41, 40, 38));
+        sf::VertexArray creatureShape = createGradientCircle(creature.GetSize(), sf::Color(79, 77, 64), sf::Color(41, 40, 38));
 
         std::pair<double, double> creatureCoordinates = creature.GetCoordinates();
         sf::Transform creatureTransform;

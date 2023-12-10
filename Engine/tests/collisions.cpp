@@ -139,7 +139,7 @@ TEST(CollisionTests, OnCollisionWithFood) {
     const double tolerance = 0.1;
 
     // Create a Creature and Food for testing
-    neat::Genome genome(0,0);
+    neat::Genome genome(2, 3);
     Creature creature(genome);
     Food food;
 

@@ -13,12 +13,13 @@ public:
     double kFoodDensity;
     double kCreatureDensity = 0.001;
 
+
     // Food and creature density for random initialization
-    static constexpr int kMaxFoodSize = 30;
-    static constexpr int kMaxCreatureSize = 30;
+    static constexpr int kMaxFoodSize = 15;
+    static constexpr int kMaxCreatureSize = 25;
 
     // Length of side of grid cell
-    static constexpr double kGridCellSize = 10.0;
+    static constexpr double kGridCellSize = 50.0;
 
     // Tolerance of collisions
     static constexpr double kTolerance = 1e-3;
