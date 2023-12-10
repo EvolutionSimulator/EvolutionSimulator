@@ -10,7 +10,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui_->densityFood->setMinimum(1);
     ui_->densityFood->setMaximum(1000);
     connect(ui_->runButton, &QPushButton::clicked, this, &MainWindow::RunSimulation);
-    connect(ui_->densityFood, SIGNAL(valueChanged(int)), this, SLOT(ChangeDensity(int)));
+    connect(ui_->densityFood, SIGNAL(valueChanged(int)), this, SLOT(ChangeFoodDensity(int)));
+    connect(ui_->densityCreature, SIGNAL(valueChanged(int)), this, SLOT(ChangeCreatureDensity(int)));
     connect(ui_->pauseButton, &QPushButton::clicked, this, &MainWindow::PauseSimulation);
     connect(ui_->restartButton, &QPushButton::clicked, this, &MainWindow::RestartSimulation);
     connect(ui_->graphButton, &QPushButton::clicked, this, &MainWindow::DisplayGraph);
@@ -33,11 +34,17 @@ void MainWindow::SetEngine(Engine *engine)
     ui_->canvas->SetSimulation(engine_->GetSimulation());
 }
 
-void MainWindow::ChangeDensity(int value)
+void MainWindow::ChangeFoodDensity(int value)
 {
-    double density = static_cast<double>(value) / 1000.0;
-    engine_->GetEnvironment().SetFoodDensity(density);
-    engine_->UpdateEnvironment();
+    food_density = static_cast<double>(value) / 1000.0; // Convert to density
+    engine_->GetEnvironment().SetFoodDensity(food_density); // Update the density
+    engine_->UpdateEnvironment(); // Apply the updated density
+}
+
+void MainWindow::ChangeCreatureDensity(int value)
+{
+    creature_density = static_cast<double>(value) / 1000.0; // Convert to density
+    RestartSimulation(); // restart simulation with new creature density
 }
 
 void MainWindow::RunSimulation()
@@ -61,10 +68,9 @@ void MainWindow::RestartSimulation()
         engine_->Stop();
         engine_thread_.join();
     }
-
-    Engine* newEngine = new Engine();
+    // Create a new instance of the Engine and set it in the UI
+    Engine* newEngine = new Engine(food_density, creature_density);
     SetEngine(newEngine);
-
     engine_thread_ = std::thread(&Engine::Run, engine_);
 }
 

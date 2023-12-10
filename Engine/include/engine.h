@@ -10,6 +10,7 @@ class Engine
 {
 public:
     Engine();
+    Engine(double food_density, double creature_density);
     ~Engine();
 
     void Run();

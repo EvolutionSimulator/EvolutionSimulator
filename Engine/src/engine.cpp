@@ -4,6 +4,12 @@
 
 Engine::Engine()
     : environment_(), simulation_(new Simulation(environment_)) {
+}
+
+Engine::Engine(double food_density, double creature_density)
+    : environment_() {
+    environment_.SetFoodDensity(food_density);
+    environment_.SetCreatureDensity(creature_density);
     simulation_ = new Simulation(environment_);
 }
 

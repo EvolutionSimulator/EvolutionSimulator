@@ -20,13 +20,16 @@ public:
 
 private slots: // Slots should be placed under this section
     void RunSimulation();
-    void ChangeDensity(int value); // Make sure this is under 'private slots:'
+    void ChangeFoodDensity(int value); // Make sure this is under 'private slots:'
+    void ChangeCreatureDensity(int value);
     void PauseSimulation();
     void RestartSimulation();
     void DisplayGraph();
     void GraphExampleFunction();
 
 private:
+    double creature_density = 0.001;
+    double food_density = 0.001;
     Ui::MainWindow* ui_; // Pointer to all UI widgets
 
     Engine* engine_; // Pointer to the simulation engine

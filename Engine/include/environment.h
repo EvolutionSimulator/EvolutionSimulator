@@ -9,9 +9,8 @@ public:
     static constexpr double kMapWidth = 1000.0;
     static constexpr double kMapHeight = 300.0;
 
-    static constexpr double kCreatureDensity = 0.001; // Constant for creature density
-    double kFoodDensity; // Variable for creature density
-
+    // Variable for creature and food density
+    double kCreatureDensity = 0.001;
 
     // Food and creature density for random initialization
     static constexpr int kMaxFoodSize = 30;
@@ -37,6 +36,15 @@ public:
     double GetFoodDensity() const {
         return kFoodDensity;
     }
+
+    // Getter and setter for creature density
+    void SetCreatureDensity(double density) { kCreatureDensity = density;}
+    double GetCreatureDensity() const {
+        return kCreatureDensity;
+    }
+private:
+    double kFoodDensity = 0.001;
+
 };
 
 
