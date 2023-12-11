@@ -37,18 +37,23 @@ public:
 
   void SetGrowthFactor(double growth_factor);
   double GetGrowthFactor();
-
   void SetMaxSize(double max_size);
   double GetMaxSize();
 
   void Grow(double energy);
 
+  void Think(std::unordered_map<int, std::unordered_map<int, std::vector<Entity*> > > &grid, double GridCellSize);
+  void ProcessVisionFood(std::unordered_map<int, std::unordered_map<int, std::vector<Entity*> > > &grid, double GridCellSize);
+
+
+
 protected:
-    double energy_, growth_factor_;
-    double max_size_ = 10;
-    double health_;
-    neat::NeuralNetwork brain_;
-    neat::Genome genome_;
+  double energy_, growth_factor_, health_;
+  double max_size_ = 10;
+  neat::NeuralNetwork brain_;
+  neat::Genome genome_;
+  double distance_food_;
+  double orientation_food_;
 };
 
 
