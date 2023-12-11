@@ -39,9 +39,16 @@ public:
   double GetRelativeOrientation(const Entity& otherEntity) const;
 
 
+<<<<<<< HEAD
 protected:
   double x_coord_, y_coord_, orientation_, size_;
   states state_;
+=======
+
+protected:
+    double x_coord_, y_coord_, orientation_, size_;
+    states state_;
+>>>>>>> d486fed (Add brain processing)
 };
 
 #endif // ENTITY_H
