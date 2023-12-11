@@ -54,6 +54,10 @@ void Creature::SetGrowthFactor(double growth_factor) {
 
 double Creature::GetGrowthFactor() { return growth_factor_; }
 
+void Creature::SetMaxSize(double max_size) { max_size_ = max_size; }
+
+double Creature::GetMaxSize() { return max_size_; }
+
 void Creature::Grow(double energy) {
   double size = GetSize() + energy * GetGrowthFactor();
   (size > GetMaxSize()) ? SetSize(GetMaxSize()) : SetSize(size);
