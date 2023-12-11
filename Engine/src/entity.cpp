@@ -77,6 +77,13 @@ double Entity::GetDistance(const Entity& other_entity) const {
     return std::hypot(x_coord_ - other_coordinates.first, y_coord_- other_coordinates.second);
 }
 
+double Entity::GetRelativeOrientation(const Entity& other_entity) const {
+    std::pair<double, double> other_coordinates = other_entity.GetCoordinates();
+    //assumes orientation = 0 is the x axis
+    double angle = std::atan((y_coord_-other_coordinates.second)/(x_coord_-other_coordinates.first));
+    return angle - orientation_;
+}
+
 double Entity::GetOrientation() const
 {
     return orientation_;
