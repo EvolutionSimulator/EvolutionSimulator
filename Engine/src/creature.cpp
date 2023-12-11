@@ -3,7 +3,7 @@
 #include <cassert>
 
 Creature::Creature(neat::Genome genome)
-    : MovableEntity(), health_(100), energy_(100), brain_(neat::NeuralNetwork(genome)), genome_(genome) {
+    : MovableEntity(), health_(100), energy_(100), brain_(neat::NeuralNetwork(genome)), genome_(genome), neuron_data_(8,0) {
 }
 
 double Creature::GetEnergy() const { return energy_; }
@@ -73,7 +73,7 @@ void Creature::Eats(double nutritional_value){
 
 void Creature::Update(double deltaTime, double const kMapWidth,
                       double const kMapHeight,
-                      std::unordered_map<int, std::unordered_map<int, std::vector<Entity*> > > &grid,
+                      std::vector<std::vector<std::vector<Entity*> > > &grid,
                       double GridCellSize) {
   this->Move(deltaTime, kMapWidth, kMapHeight);
   this->Rotate(deltaTime);
@@ -107,15 +107,12 @@ double Creature::GetGrowthFactor() { return growth_factor_; }
 void Creature::Think(std::vector<std::vector<std::vector<Entity*> > > &grid, double GridCellSize)
 {
     //Not pretty but we'll figure out a better way in the future
-    this->ProcessVisionFood(grid, GridCellSize);
     neuron_data_.at(0) = x_coord_;
     neuron_data_.at(1) = y_coord_;
     neuron_data_.at(2) = orientation_;
     neuron_data_.at(3) = energy_;
     neuron_data_.at(4) = velocity_forward_;
     neuron_data_.at(5) = rotational_velocity_;
-    neuron_data_.at(6) = distance_food_;
-    neuron_data_.at(7) = orientation_food_;
     std::vector<double> output = brain_.Activate(neuron_data_);
     velocity_forward_ = output.at(0);
     rotational_velocity_ = output.at(1);

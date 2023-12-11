@@ -20,7 +20,7 @@ public:
   neat::Genome GetGenome();
   void Update(double deltaTime, double const kMapWidth,
               double const kMapHeight,
-              std::unordered_map<int, std::unordered_map<int, std::vector<Entity*> > > &grid,
+              std::vector<std::vector<std::vector<Entity*> > > &grid,
               double GridCellSize);
 
 
@@ -44,14 +44,8 @@ public:
   double GetMaxSize();
 
   void Grow(double energy);
-<<<<<<< HEAD
-
-  void Think(std::unordered_map<int, std::unordered_map<int, std::vector<Entity*> > > &grid, double GridCellSize);
-  void ProcessVisionFood(std::unordered_map<int, std::unordered_map<int, std::vector<Entity*> > > &grid, double GridCellSize);
-=======
   void Think(std::vector<std::vector<std::vector<Entity*> > > &grid, double GridCellSize);
   void ProcessVisionFood(std::vector<std::vector<std::vector<Entity*> > > &grid, double GridCellSize);
->>>>>>> d486fed (Add brain processing)
 
 
 
