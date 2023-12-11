@@ -39,18 +39,7 @@ void Creature::Update(double deltaTime, double const kMapWidth,
 }
 
 neat::Genome Creature::GetGenome() { return genome_; }
-void Creature::OnCollision(Food &food) {
-  if (food.GetState() == Entity::Alive) {
-    Eats(food.GetNutritionalValue());
-    food.Eat();
-  }
-}
 
-void Creature::OnCollision(Creature &creature) {}
-
-neat::Genome Creature::GetGenome(){
-    return genome_;
-}
 void Creature::OnCollision(Entity& other_entity)
 {
     if (Food* food = dynamic_cast<Food*>(&other_entity))
