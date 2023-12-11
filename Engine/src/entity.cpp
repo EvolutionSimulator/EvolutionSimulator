@@ -94,3 +94,7 @@ Entity::states Entity::GetState() const{
 void Entity::SetState(Entity::states state){
     state_ = state;
 }
+
+void Entity::OnCollision(Entity& other_entity){
+
+}

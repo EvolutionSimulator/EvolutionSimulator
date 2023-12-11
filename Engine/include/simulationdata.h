@@ -39,15 +39,10 @@ public:
     std::vector<Creature> creatures_;
     std::vector<Food> food_entities_;
     std::queue<Creature> reproduce_;
-<<<<<<< HEAD
-    std::unordered_map<int, std::unordered_map<int, std::vector<int>>> creature_grid_;
-    std::unordered_map<int, std::unordered_map<int, std::vector<int>>> food_grid_;
+
     double world_time_ = 0;
 private:
     Environment& environment_;
-=======
-    Environment environment_;
-    std::unordered_map<int, std::unordered_map<int, std::vector<Entity*>>> grid_;
+    std::vector<std::vector<std::vector<Entity*> > > grid_;
 
->>>>>>> 87df37d (Update grid to hold pointers)
 };
