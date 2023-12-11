@@ -40,9 +40,10 @@ public:
   double GetRelativeOrientation(const Entity& otherEntity) const;
 
 
-private:
-  double x_coord_, y_coord_, orientation_, size_;
-  states state_;
+
+protected:
+    double x_coord_, y_coord_, orientation_, size_;
+    states state_;
 };
 
 #endif // ENTITY_H

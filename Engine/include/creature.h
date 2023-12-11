@@ -19,7 +19,10 @@ public:
   void SetEnergy(double energy);
   neat::Genome GetGenome();
   void Update(double deltaTime, double const kMapWidth,
-              double const kMapHeight);
+              double const kMapHeight,
+              std::unordered_map<int, std::unordered_map<int, std::vector<Entity*> > > &grid,
+              double GridCellSize);
+
 
   void OnCollision(Entity& other_entity) override;
   Food *GetClosestFood(
@@ -31,8 +34,8 @@ public:
   void SetMaxSize(double max_size);
   double GetMaxSize();
   void Grow(double energy);
-  void Think(std::unordered_map<int, std::unordered_map<int, std::vector<Entity*> > > &grid, double GridCellSize);
-  void ProcessVisionFood(std::unordered_map<int, std::unordered_map<int, std::vector<Entity*> > > &grid, double GridCellSize);
+  void Think(std::vector<std::vector<std::vector<Entity*> > > &grid, double GridCellSize);
+  void ProcessVisionFood(std::vector<std::vector<std::vector<Entity*> > > &grid, double GridCellSize);
 
   bool Fit();
 
@@ -43,6 +46,7 @@ private:
   neat::Genome genome_;
   double distance_food_;
   double orientation_food_;
+  std::vector<double> neuron_data_;
 };
 
 std::vector<Food *> get_food_at_distance(
