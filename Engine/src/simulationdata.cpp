@@ -196,7 +196,7 @@ void SimulationData::CheckCollisions() {
     for (int row = 0; row<num_rows; row++){
         for (int col = 0; col<num_cols; col++){
             for (Entity* entity1: grid_[row][col]){
-                const int layer_number = static_cast<int>(entity1->GetSize()/environment_.kGridCellSize)+1;
+                const int layer_number = ceil(2*(entity1->GetSize()/environment_.kGridCellSize));
                 std::vector<std::pair<int, int> > neighbours = GetNeighbours(num_rows, num_cols, {row, col}, layer_number);
                 for (const std::pair<int, int> neighbour: neighbours){
                     for (Entity* entity2: grid_[neighbour.first][neighbour.second]){
