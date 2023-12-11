@@ -30,6 +30,7 @@ public:
     states GetState() const;
     void SetState (states state);
 
+    virtual void OnCollision(Entity& other_entity);
 
     double GetDistance(const Entity& otherEntity) const;
     bool CheckCollisionWithEntity(const double tolerance, const Entity& otherEntity) const {

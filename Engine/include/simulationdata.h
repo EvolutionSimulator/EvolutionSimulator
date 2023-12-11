@@ -39,6 +39,6 @@ public:
     std::vector<Food> food_entities_;
     std::queue<Creature> reproduce_;
     Environment environment_;
-    std::unordered_map<int, std::unordered_map<int, std::vector<Entity*>>> grid_;
+    std::vector<std::vector<std::vector<Entity*> > > grid_;
 
 };
