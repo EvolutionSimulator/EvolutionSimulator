@@ -136,22 +136,24 @@ void SimulationData::InitializeGrid() {
     // Initialize the grid
     for (int i = 0; i < num_cells_x; ++i) {
         for (int j = 0; j < num_cells_y; ++j) {
-            creature_grid_[i][j] = std::vector<int>();
-            food_grid_[i][j] = std::vector<int>();
+            grid_[i][j] = std::vector<Entity*>();
         }
     }
 
     UpdateGrid();
 }
 
-template <typename EntityType>
-void UpdateGridTemplate(std::vector<EntityType>& entities, std::unordered_map<int, std::unordered_map<int, std::vector<int>>>& entityGrid, double cellSize) {
-    // Clear the grid
-    for (auto& row : entityGrid) {
+void SimulationData::ClearGrid() {
+    for (auto& row : grid_) {
         for (auto& cell : row.second) {
             cell.second.clear();
         }
     }
+}
+
+
+template <typename EntityType>
+void UpdateGridTemplate(std::vector<EntityType>& entities, std::unordered_map<int, std::unordered_map<int, std::vector<Entity*>>>& entityGrid, double cellSize) {
 
     // Remove dead entities from the entities vector and update the grid for alive entities
     entities.erase(std::remove_if(entities.begin(), entities.end(), [](const EntityType& entity) {
@@ -159,57 +161,59 @@ void UpdateGridTemplate(std::vector<EntityType>& entities, std::unordered_map<in
                    }), entities.end());
 
     // Update the grid based on entity positions and store entity indices
-    for (size_t i = 0; i < entities.size(); ++i) {
-        const EntityType& entity = entities[i];
+    for (EntityType& entity : entities) {
         // Update the grid for alive entities
         std::pair<double, double> coordinates = entity.GetCoordinates();
         int gridX = static_cast<int>(coordinates.first / cellSize);
         int gridY = static_cast<int>(coordinates.second / cellSize);
-        entityGrid[gridX][gridY].push_back(static_cast<int>(i));
+
+        entityGrid[gridX][gridY].push_back(&entity);
     }
 }
 
 void SimulationData::UpdateGrid() {
-    UpdateGridTemplate(creatures_, creature_grid_, environment_.kGridCellSize);
-    UpdateGridTemplate(food_entities_, food_grid_, environment_.kGridCellSize);
+    ClearGrid();
+    UpdateGridTemplate<Creature>(creatures_, grid_, environment_.kGridCellSize);
+    UpdateGridTemplate<Food>(food_entities_, grid_, environment_.kGridCellSize);
 }
 
+std::vector<std::pair<int, int>> GetNeighbours(const int& dimension_x, const int& dimension_y, const std::pair<int, int>& center, const int& layer_number){
+    int x_start = center.first-layer_number;
+    int x_end = center.first+layer_number+1;
+    int y_start = center.second-layer_number;
+    int y_end = center.second+layer_number+1;
 
-template<typename EntityType1, typename EntityType2>
-void CheckCollisionsTemplate(
-    std::unordered_map<int, std::unordered_map<int, std::vector<int>>>& entityGrid1,
-    std::unordered_map<int, std::unordered_map<int, std::vector<int>>>& entityGrid2,
-    std::vector<EntityType1>& entity_vector_1,
-    std::vector<EntityType2>& entity_vector_2,
-    const Environment& environment
-    ) {
-    double tolerance = environment.kTolerance;
+    if (x_start<0) x_start = 0;
+    if (x_end>dimension_x) x_end = dimension_x;
+    if (y_start<0) y_start = 0;
+    if (y_end>dimension_x) y_end = dimension_y;
 
-    for (auto& row : entityGrid1) {
-        for (auto& cell : row.second) {
-            std::vector<int>& entities1 = cell.second;
+    std::vector<std::pair<int, int>> neighbours;
+    for (int x = x_start; x<x_end; x++){
+        for (int y = y_start; y<y_end; y++){
+            neighbours.push_back(std::make_pair(x, y));
+        }
+    }
+    return neighbours;
+}
 
-            // Iterate over neighboring cells in entityGrid2
-            for (int xOffset = -1; xOffset <= 1; ++xOffset) {
-                for (int yOffset = -1; yOffset <= 1; ++yOffset) {
-                    int neighborRow = row.first + xOffset;
-                    int neighborCell = cell.first + yOffset;
-
-                    // Check if the neighboring row and cell indices are valid
-                    if (entityGrid2.count(neighborRow) > 0) {
-                        auto& row2 = entityGrid2[neighborRow];
-                        if (row2.count(neighborCell) > 0) {
-                            std::vector<int>& entities2 = row2[neighborCell];
-
-                            // Now, check for collisions between entities1 and entities2
-                            for (auto& entity1_index : entities1) {
-                                for (auto& entity2_index : entities2) {
-                                    EntityType1& entity1 = entity_vector_1[entity1_index];
-                                    EntityType2& entity2 = entity_vector_2[entity2_index];
-                                    if (entity1.CheckCollisionWithEntity(tolerance, entity2)) {
-                                        // Handle the collision as needed
-                                        entity1.OnCollision(entity2);
-                                    }
+void SimulationData::CheckCollisions() {
+    double tolerance = environment_.kTolerance;
+    const int numRows = grid_.size(); // Number of rows
+    const int numCols = (numRows > 0) ? grid_[0].size() : 0;
+    for (int row = 0; row<numRows; row++){
+        for (int col = 0; col<numCols; col++){
+            //check the proportion and check all neighbours
+            for (Entity* entity1: grid_[row][col]){
+                const int layer_number = ceil(2*entity1->GetSize());
+                std::vector<std::pair<int, int>> neighbours = GetNeighbours(numCols, numRows, {row, col}, layer_number);
+                for (const std::pair<int, int> neighbour: neighbours){
+                    for (Entity* entity2: grid_[neighbour.first][neighbour.second]){
+                        if (entity1->CheckCollisionWithEntity(tolerance, *entity2)) {
+                            // Check if entity1 is a Creature and entity2 is a Food
+                            if (Creature* creature = dynamic_cast<Creature*>(entity1)) {
+                                if (Food* food = dynamic_cast<Food*>(entity2)) {
+                                    creature->OnCollision(*food);
                                 }
                             }
                         }
@@ -218,9 +222,4 @@ void CheckCollisionsTemplate(
             }
         }
     }
-}
-
-
-void SimulationData::CheckFoodCollisions() {
-    CheckCollisionsTemplate<Creature,Food>(creature_grid_, food_grid_, creatures_, food_entities_, environment_);
 }
