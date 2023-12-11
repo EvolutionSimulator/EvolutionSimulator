@@ -43,7 +43,7 @@ void MainWindow::ChangeFoodDensity(int value)
 
 void MainWindow::ChangeCreatureDensity(int value)
 {
-    creature_density = static_cast<double>(value) / 1000.0; // Convert to density
+    creature_density = static_cast<double>(value) / 10000.0; // Convert to density
     RestartSimulation(); // restart simulation with new creature density
 }
 
