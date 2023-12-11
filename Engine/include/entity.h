@@ -37,6 +37,8 @@ public:
                                  otherEntity.GetCoordinates(),
                                  otherEntity.GetSize());
   }
+  double GetRelativeOrientation(const Entity& otherEntity) const;
+
 
 private:
   double x_coord_, y_coord_, orientation_, size_;
