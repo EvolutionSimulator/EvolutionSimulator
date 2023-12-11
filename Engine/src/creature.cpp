@@ -48,6 +48,25 @@ void Creature::OnCollision(Food &food) {
 
 void Creature::OnCollision(Creature &creature) {}
 
+neat::Genome Creature::GetGenome(){
+    return genome_;
+}
+void Creature::OnCollision(Entity& other_entity)
+{
+    if (Food* food = dynamic_cast<Food*>(&other_entity))
+    {
+        if (food->GetState() == Entity::Alive)
+        {
+            Eats(food->GetNutritionalValue());
+            food->Eat();
+        }
+    }
+
+    else
+    {
+        Entity::OnCollision(other_entity);
+    }
+}
 void Creature::SetGrowthFactor(double growth_factor) {
   growth_factor_ = growth_factor;
 }

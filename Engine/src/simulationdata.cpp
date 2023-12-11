@@ -130,30 +130,25 @@ void SimulationData::InitializeFood() {
 void SimulationData::InitializeGrid() {
 
     // Number of grid cells
-    int num_cells_x = environment_.kMapWidth / environment_.kGridCellSize;
-    int num_cells_y = environment_.kMapHeight / environment_.kGridCellSize;
+    int num_cells_x = static_cast<int>(std::ceil(static_cast<double>(environment_.kMapWidth) / environment_.kGridCellSize)) + 1;
+    int num_cells_y = static_cast<int>(std::ceil(static_cast<double>(environment_.kMapHeight) / environment_.kGridCellSize)) + 1;
+    // Resize the grid to the specified dimensions
+    grid_.assign(num_cells_x, std::vector<std::vector<Entity*> >(num_cells_y));
 
-    // Initialize the grid
-    for (int i = 0; i < num_cells_x; ++i) {
-        for (int j = 0; j < num_cells_y; ++j) {
-            grid_[i][j] = std::vector<Entity*>();
-        }
-    }
-
+    // Update the grid
     UpdateGrid();
 }
 
 void SimulationData::ClearGrid() {
     for (auto& row : grid_) {
-        for (auto& cell : row.second) {
-            cell.second.clear();
+        for (auto& cell : row) {
+            cell.clear();
         }
     }
 }
 
-
 template <typename EntityType>
-void UpdateGridTemplate(std::vector<EntityType>& entities, std::unordered_map<int, std::unordered_map<int, std::vector<Entity*>>>& entityGrid, double cellSize) {
+void UpdateGridTemplate(std::vector<EntityType>& entities, std::vector<std::vector<std::vector<Entity*> > >& entityGrid, double cellSize) {
 
     // Remove dead entities from the entities vector and update the grid for alive entities
     entities.erase(std::remove_if(entities.begin(), entities.end(), [](const EntityType& entity) {
@@ -177,16 +172,16 @@ void SimulationData::UpdateGrid() {
     UpdateGridTemplate<Food>(food_entities_, grid_, environment_.kGridCellSize);
 }
 
-std::vector<std::pair<int, int>> GetNeighbours(const int& dimension_x, const int& dimension_y, const std::pair<int, int>& center, const int& layer_number){
+std::vector<std::pair<int, int>> GetNeighbours(const int& num_rows, const int& num_cols, const std::pair<int, int>& center, const int& layer_number){
     int x_start = center.first-layer_number;
     int x_end = center.first+layer_number+1;
     int y_start = center.second-layer_number;
     int y_end = center.second+layer_number+1;
 
     if (x_start<0) x_start = 0;
-    if (x_end>dimension_x) x_end = dimension_x;
+    if (x_end>num_rows) x_end = num_rows;
     if (y_start<0) y_start = 0;
-    if (y_end>dimension_x) y_end = dimension_y;
+    if (y_end>num_cols) y_end = num_cols;
 
     std::vector<std::pair<int, int>> neighbours;
     for (int x = x_start; x<x_end; x++){
@@ -199,23 +194,17 @@ std::vector<std::pair<int, int>> GetNeighbours(const int& dimension_x, const int
 
 void SimulationData::CheckCollisions() {
     double tolerance = environment_.kTolerance;
-    const int numRows = grid_.size(); // Number of rows
-    const int numCols = (numRows > 0) ? grid_[0].size() : 0;
-    for (int row = 0; row<numRows; row++){
-        for (int col = 0; col<numCols; col++){
-            //check the proportion and check all neighbours
+    int num_rows = static_cast<int>(std::ceil(static_cast<double>(environment_.kMapWidth) / environment_.kGridCellSize))+1;
+    int num_cols = static_cast<int>(std::ceil(static_cast<double>(environment_.kMapHeight) / environment_.kGridCellSize))+1;
+    for (int row = 0; row<num_rows; row++){
+        for (int col = 0; col<num_cols; col++){
             for (Entity* entity1: grid_[row][col]){
-                const int layer_number = ceil(2*entity1->GetSize());
-                std::vector<std::pair<int, int>> neighbours = GetNeighbours(numCols, numRows, {row, col}, layer_number);
+                const int layer_number = static_cast<int>(entity1->GetSize()/environment_.kGridCellSize)+1;
+                std::vector<std::pair<int, int> > neighbours = GetNeighbours(num_rows, num_cols, {row, col}, layer_number);
                 for (const std::pair<int, int> neighbour: neighbours){
                     for (Entity* entity2: grid_[neighbour.first][neighbour.second]){
                         if (entity1->CheckCollisionWithEntity(tolerance, *entity2)) {
-                            // Check if entity1 is a Creature and entity2 is a Food
-                            if (Creature* creature = dynamic_cast<Creature*>(entity1)) {
-                                if (Food* food = dynamic_cast<Food*>(entity2)) {
-                                    creature->OnCollision(*food);
-                                }
-                            }
+                            entity1->OnCollision(*entity2);
                         }
                     }
                 }

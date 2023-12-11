@@ -25,6 +25,8 @@ public:
   double GetOrientation() const;
   void SetOrientation(double orientation);
 
+  virtual void OnCollision(Entity& other_entity);
+
   states GetState() const;
   void SetState(states state);
 

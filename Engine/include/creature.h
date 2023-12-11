@@ -21,8 +21,7 @@ public:
   void Update(double deltaTime, double const kMapWidth,
               double const kMapHeight);
 
-  virtual void OnCollision(Food &food);
-  virtual void OnCollision(Creature &creature);
+  void OnCollision(Entity& other_entity) override;
   Food *GetClosestFood(
       std::unordered_map<int, std::unordered_map<int, std::vector<Entity *>>>
           &grid,
@@ -33,8 +32,8 @@ public:
 
   void SetMaxSize(double max_size);
   double GetMaxSize();
-
   void Grow(double energy);
+
 
   bool Fit();
 
