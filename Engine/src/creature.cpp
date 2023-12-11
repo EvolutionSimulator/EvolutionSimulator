@@ -102,6 +102,16 @@ void Creature::SetGrowthFactor(double growth_factor) {
 
 double Creature::GetGrowthFactor() { return growth_factor_; }
 
+void Creature::Think(std::unordered_map<int, std::unordered_map<int, std::vector<Entity*> > > &grid, double GridCellSize)
+{
+
+}
+
+void Creature::ProcessVisionFood(std::unordered_map<int, std::unordered_map<int, std::vector<Entity*> > > &grid, double GridCellSize)
+{
+    Food* food = this->GetClosestFood(grid, GridCellSize);
+    distance_food_ = this->GetDistance(*food);
+}
 double Creature::GetMaxSize() { return max_size_; }
 void Creature::SetMaxSize(double max_size) { max_size_ = max_size; }
 
