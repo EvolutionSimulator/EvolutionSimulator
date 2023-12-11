@@ -7,15 +7,18 @@ Creature::Creature(neat::Genome genome)
 
 }
 
-double Creature::GetEnergy() const {
+double Creature::GetEnergy() const
+{
     return energy_;
 }
 
-void Creature::SetEnergy(double energy) {
+void Creature::SetEnergy(double energy)
+{
     energy_ = energy;
 }
 
-void Creature::UpdateEnergy(){
+void Creature::UpdateEnergy()
+{
     SetEnergy( GetEnergy() - (GetVelocityForward() + GetRotationalVelocity()) * GetSize());
 
     if (GetEnergy() <= 0){
@@ -23,27 +26,32 @@ void Creature::UpdateEnergy(){
     }
 }
 
-void Creature::Dies(){
+void Creature::Dies()
+{
     SetState(Dead);
 }
 
-void Creature::Eats(double nutritional_value){
+void Creature::Eats(double nutritional_value)
+{
     SetEnergy(GetEnergy() + nutritional_value);
 }
 
-bool Creature::Fit(){
+bool Creature::Fit()
+{
     if (energy_ > cfg::reproduction_threshold){
         return true;
     }
     return false;
 }
 
-void Creature::Update(double deltaTime, double const kMapWidth, double const kMapHeight){
+void Creature::Update(double deltaTime, double const kMapWidth, double const kMapHeight)
+{
     this->Move(deltaTime, kMapWidth,  kMapHeight);
     this->Rotate(deltaTime);
 }
 
-neat::Genome Creature::GetGenome(){
+neat::Genome Creature::GetGenome()
+{
     return genome_;
 }
 void Creature::OnCollision(Food& food)
@@ -61,6 +69,16 @@ void Creature::OnCollision(Creature& creature)
 
 }
 
+void Creature::Think(std::unordered_map<int, std::unordered_map<int, std::vector<Entity*> > > &grid, double GridCellSize)
+{
+
+}
+
+void Creature::ProcessVisionFood(std::unordered_map<int, std::unordered_map<int, std::vector<Entity*> > > &grid, double GridCellSize)
+{
+    Food* food = this->GetClosestFood(grid, GridCellSize);
+    distance_food_ = this->GetDistance(*food);
+}
 
 Food* Creature::GetClosestFood
     (std::unordered_map<int, std::unordered_map<int, std::vector<Entity*> > > &grid, double GridCellSize) const

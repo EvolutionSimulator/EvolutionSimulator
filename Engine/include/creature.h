@@ -27,12 +27,17 @@ public:
         (std::unordered_map<int, std::unordered_map<int, std::vector<Entity*> > > &grid,
          double GridCellSize) const;
 
+    void Think(std::unordered_map<int, std::unordered_map<int, std::vector<Entity*> > > &grid, double GridCellSize);
+    void ProcessVisionFood(std::unordered_map<int, std::unordered_map<int, std::vector<Entity*> > > &grid, double GridCellSize);
+
     bool Fit();
 
 private:
     double energy_;
     neat::NeuralNetwork brain_;
     neat::Genome genome_;
+    double distance_food_;
+    double orientation_food_;
 };
 
 std::vector<Food*> get_food_at_distance
