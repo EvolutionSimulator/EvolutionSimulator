@@ -36,7 +36,7 @@ void QSFMLCanvas::showEvent(QShowEvent*)
             XFlush(QX11Info::display());
         #endif
 
-        sf::RenderWindow::create(reinterpret_cast<sf::WindowHandle>(winId()));
+            sf::RenderWindow::create((sf::WindowHandle)(winId()));
 
         OnInit();
 
