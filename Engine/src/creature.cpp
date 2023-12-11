@@ -3,7 +3,7 @@
 #include <cassert>
 
 Creature::Creature(neat::Genome genome)
-    : MovableEntity(), health_(100), energy_(100), brain_(neat::NeuralNetwork(genome)), genome_(genome), neuron_data_(cfg::input_neurons,0) {
+    : MovableEntity(), health_(100), energy_(100), brain_(neat::NeuralNetwork(genome)), genome_(genome), neuron_data_(settings::environment::kInputNeurons,0) {
 }
 
 double Creature::GetEnergy() const { return energy_; }

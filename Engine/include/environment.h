@@ -2,51 +2,31 @@
 #define ENVIRONMENT_H
 #include <vector>
 #include <iostream>
+#include "config.h"
 
 namespace myEnvironment {
 class Environment {
 public:
-    // Map size
-    static constexpr double kMapWidth = 1100.0;
-    static constexpr double kMapHeight = 450.0;
-
-    // Variable for creature and food density
-    double kFoodDensity;
-    double kCreatureDensity = 0.0005;
-
-
-    // Food and creature density for random initialization
-    static constexpr int kMaxFoodSize = 15;
-    static constexpr int kMaxCreatureSize = 15;
-    static constexpr int kMinCreatureSize = 2;
-    static constexpr double kBaseNutritionalValue = 20.0;
-
-    // Length of side of grid cell
-    static constexpr double kGridCellSize = 50.0;
-
-    // Tolerance of collisions
-    static constexpr double kTolerance = 1e-3;
-
-    // Energy and Health conversion thresholds
-    static constexpr double energyToHealth = 70.0;
-    static constexpr double healthToEnergy = 10.0;
-
     // Constructor
     Environment();
 
     // Getter and setter for food density
     void SetFoodDensity(double density) {
-        kFoodDensity = density;
+        food_density_ = density;
     }
+    
     double GetFoodDensity() const {
-        return kFoodDensity;
+        return food_density_;
     }
 
     // Getter and setter for creature density
-    void SetCreatureDensity(double density) { kCreatureDensity = density;}
+    void SetCreatureDensity(double density) { creature_density_ = density;}
     double GetCreatureDensity() const {
-        return kCreatureDensity;
+        return creature_density_;
     }
+private:
+    double food_density_; // Variable for creature density
+    double creature_density_;
 };
 }
 

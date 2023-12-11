@@ -22,7 +22,7 @@ public:
 
 private:
     myEnvironment::Environment environment_;
-    const double kFixedUpdateInterval = 0.05; // how often FixedUpdate is called
+    const double kFixedUpdateInterval = settings::engine::kFixedUpdateInterval; // how often FixedUpdate is called
     Simulation* simulation_;
     bool running_ = false;
 
