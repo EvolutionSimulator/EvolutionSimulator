@@ -37,7 +37,7 @@ public:
         return CollisionCircleCircle(tolerance, GetCoordinates(), GetSize(), otherEntity.GetCoordinates(), otherEntity.GetSize());
     }
 
-private:
+protected:
     double x_coord_, y_coord_, orientation_, size_;
     states state_;
 };

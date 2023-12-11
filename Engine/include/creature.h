@@ -19,7 +19,7 @@ public:
     double GetEnergy() const;
     void SetEnergy(double energy);
     neat::Genome GetGenome();
-    void Update(double deltaTime, double const kMapWidth, double const kMapHeight);
+    void Update(double deltaTime, double const kMapWidth, double const kMapHeight, std::unordered_map<int, std::unordered_map<int, std::vector<Entity*> > > &grid, double GridCellSize);
 
     virtual void OnCollision(Food& food);
     virtual void OnCollision(Creature& creature);
@@ -32,12 +32,13 @@ public:
 
     bool Fit();
 
-private:
+protected:
     double energy_;
     neat::NeuralNetwork brain_;
     neat::Genome genome_;
     double distance_food_;
     double orientation_food_;
+    std::vector<double> neuron_data_;
 };
 
 std::vector<Food*> get_food_at_distance

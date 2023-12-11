@@ -40,7 +40,7 @@ void SimulationData::ModifyAllCreatures(double delta_x, double delta_y)
 void SimulationData::UpdateAllCreatures(double deltaTime)
 {
     for (Creature& creature: creatures_) {
-        creature.Update(deltaTime, environment_.kMapWidth, environment_.kMapHeight);
+        creature.Update(deltaTime, environment_.kMapWidth, environment_.kMapHeight, grid_, environment_.kGridCellSize);
         if (creature.Fit()){
             reproduce_.push(creature);
         }

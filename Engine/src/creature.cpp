@@ -44,10 +44,11 @@ bool Creature::Fit()
     return false;
 }
 
-void Creature::Update(double deltaTime, double const kMapWidth, double const kMapHeight)
+void Creature::Update(double deltaTime, double const kMapWidth, double const kMapHeight, std::unordered_map<int, std::unordered_map<int, std::vector<Entity*> > > &grid, double GridCellSize)
 {
     this->Move(deltaTime, kMapWidth,  kMapHeight);
     this->Rotate(deltaTime);
+    this->Think(grid, GridCellSize);
 }
 
 neat::Genome Creature::GetGenome()
@@ -71,13 +72,26 @@ void Creature::OnCollision(Creature& creature)
 
 void Creature::Think(std::unordered_map<int, std::unordered_map<int, std::vector<Entity*> > > &grid, double GridCellSize)
 {
-
+    //Not pretty but we'll figure out a better way in the future
+    this->ProcessVisionFood(grid, GridCellSize);
+    neuron_data_.at(0) = x_coord_;
+    neuron_data_.at(1) = y_coord_;
+    neuron_data_.at(2) = orientation_;
+    neuron_data_.at(3) = energy_;
+    neuron_data_.at(4) = velocity_forward_;
+    neuron_data_.at(5) = rotational_velocity_;
+    neuron_data_.at(6) = distance_food_;
+    neuron_data_.at(7) = orientation_food_;
+    std::vector<double> output = brain_.Activate(neuron_data_);
+    velocity_forward_ = output.at(0);
+    rotational_velocity_ = output.at(1);
 }
 
 void Creature::ProcessVisionFood(std::unordered_map<int, std::unordered_map<int, std::vector<Entity*> > > &grid, double GridCellSize)
 {
     Food* food = this->GetClosestFood(grid, GridCellSize);
     distance_food_ = this->GetDistance(*food);
+    orientation_food_ = this->GetRelativeOrientation(*food);
 }
 
 Food* Creature::GetClosestFood
