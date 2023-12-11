@@ -5,6 +5,7 @@
 #include "neat/neat-neural-network.h"
 #include "neat/neat-neuron.h"
 
+
 using namespace neat;
 
 TEST(NeatTests, GenomeConstructor) {
