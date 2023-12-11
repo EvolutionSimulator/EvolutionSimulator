@@ -6,11 +6,14 @@
 
 class Entity {
 public:
-  enum states { Dead = 0, Alive = 1 };
-  Entity();
-  Entity(const double x_coord, const double y_coord, const double size);
-  Entity(const double size);
-  virtual ~Entity();
+    enum states {
+        Dead,
+        Alive
+    };
+    Entity();
+    Entity(const double x_coord, const double y_coord, const double size);
+    Entity(const double size);
+    virtual ~Entity();
 
   void RandomInitialization(const double world_width, const double world_height,
                             const double max_creature_size, const double min_creature_size);
