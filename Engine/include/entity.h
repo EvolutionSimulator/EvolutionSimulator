@@ -32,6 +32,7 @@ public:
 
 
     double GetDistance(const Entity& otherEntity) const;
+    double GetRelativeOrientation(const Entity& otherEntity) const;
     bool CheckCollisionWithEntity(const double tolerance, const Entity& otherEntity) const {
         return CollisionCircleCircle(tolerance, GetCoordinates(), GetSize(), otherEntity.GetCoordinates(), otherEntity.GetSize());
     }
