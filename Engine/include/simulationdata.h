@@ -24,9 +24,11 @@ public:
 
     void GenerateMoreFood();
     void UpdateGrid();
+    void ClearGrid();
 
     void CheckFoodCollisions();
     void CheckCreatureCollisions();
+    void CheckCollisions();
 
     void ModifyAllCreatures(double delta_x, double delta_y);
     void UpdateAllCreatures(double deltaTime);
@@ -37,7 +39,6 @@ public:
     std::vector<Food> food_entities_;
     std::queue<Creature> reproduce_;
     Environment environment_;
-    std::unordered_map<int, std::unordered_map<int, std::vector<int>>> creature_grid_;
-    std::unordered_map<int, std::unordered_map<int, std::vector<int>>> food_grid_;
+    std::unordered_map<int, std::unordered_map<int, std::vector<Entity*>>> grid_;
 
 };
