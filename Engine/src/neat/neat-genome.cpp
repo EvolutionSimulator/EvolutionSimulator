@@ -136,27 +136,27 @@ void Genome::Mutate() {
   std::mt19937 gen(rd());
   std::uniform_real_distribution<> uniform(0.0, 1.0);
 
-  if (uniform(gen) < addNeuronMutationRate) {
+  if (uniform(gen) < settings::neat::kAddNeuronMutationRate) {
     MutateAddNeuron();
   }
 
-  if (uniform(gen) < addLinkMutationRate) {
+  if (uniform(gen) < settings::neat::kAddLinkMutationRate) {
     MutateAddLink();
   }
 
-  if (uniform(gen) < removeNeuronMutationRate) {
+  if (uniform(gen) < settings::neat::kRemoveNeuronMutationRate) {
     MutateRemoveNeuron();
   }
 
-  if (uniform(gen) < removeLinkMutationRate) {
+  if (uniform(gen) < settings::neat::kRemoveLinkMutationRate) {
     MutateRemoveLink();
   }
 
-  if (uniform(gen) < changeWeightMutationRate) {
+  if (uniform(gen) < settings::neat::kChangeWeightMutationRate) {
     MutateChangeWeight();
   }
 
-  if (uniform(gen) < changeBiasMutationRate) {
+  if (uniform(gen) < settings::neat::kChangeBiasMutationRate) {
     MutateChangeBias();
   }
 }
@@ -217,17 +217,17 @@ void Genome::MutateChangeWeight() {
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_real_distribution<> uniform(0.0, 1.0);
-  std::normal_distribution<> dis(0.0, standardDeviationWeight);
+  std::normal_distribution<> dis(0.0, settings::neat::kStandardDeviationWeight);
 
   for (Link& link : links_) {
-    if (uniform(gen) < weightMutationRate) {
+    if (uniform(gen) < settings::neat::kWeightMutationRate) {
       double delta = dis(gen);
       link.SetWeight(link.GetWeight() + delta);
 
-      if (link.GetWeight() > maxWeight) {
-        link.SetWeight(maxWeight);
-      } else if (link.GetWeight() < minWeight) {
-        link.SetWeight(minWeight);
+      if (link.GetWeight() > settings::neat::kMaxWeight) {
+        link.SetWeight(settings::neat::kMaxWeight);
+      } else if (link.GetWeight() < settings::neat::kMinWeight) {
+        link.SetWeight(settings::neat::kMinWeight);
       }
     }
   }
@@ -237,16 +237,16 @@ void Genome::MutateChangeBias() {
       std::random_device rd;
       std::mt19937 gen(rd());
       std::uniform_real_distribution<> uniform(0.0, 1.0);
-      std::normal_distribution<> dis(0.0, standardDeviationWeight);
+      std::normal_distribution<> dis(0.0, settings::neat::kStandardDeviationWeight);
 
       for (Neuron& neuron : neurons_) {
-            if (uniform(gen) < biasMutationRate) {
+    if (uniform(gen) < settings::neat::kBiasMutationRate) {
                 double delta = dis(gen);
                 neuron.SetBias(neuron.GetBias() + delta);
-                if (neuron.GetBias() > maxBias) {
-                        neuron.SetBias(maxBias);
-                                } else if (neuron.GetBias() < minBias) {
-                        neuron.SetBias(minBias);
+                if (neuron.GetBias() > settings::neat::kMaxBias) {
+                        neuron.SetBias(settings::neat::kMaxBias);
+                } else if (neuron.GetBias() < settings::neat::kMinBias) {
+                        neuron.SetBias(settings::neat::kMinBias);
                 }
             }
 
