@@ -52,8 +52,8 @@ void SimulationData::UpdateAllCreatures(double deltaTime)
  */
 void SimulationData::GenerateMoreFood(){
     double size = food_entities_.size();
-    double max_number = environment_.GetFoodDensity() * environment_.kMapHeight * environment_.kMapWidth;
-    while (size < max_number){
+    double max_number = environment_.GetFoodDensity() * environment_.kMapHeight * environment_.kMapWidth/100;
+        while (size < max_number){
         Food new_food = Food();
         new_food.RandomInitialization(environment_.kMapHeight, environment_.kMapWidth, environment_.kMaxCreatureSize);
         food_entities_.emplace_back(new_food);

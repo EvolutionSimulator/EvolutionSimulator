@@ -41,6 +41,7 @@ public:
 
 private:
   double energy_, growth_factor_;
+  double max_energy_ = 3000;
   double max_size_ = 10;
   neat::NeuralNetwork brain_;
   neat::Genome genome_;

@@ -3,7 +3,7 @@
 #include <cassert>
 
 Creature::Creature(neat::Genome genome)
-    : MovableEntity(), energy_(0.0), brain_(neat::NeuralNetwork(genome)),
+    : MovableEntity(), energy_(1000.0), brain_(neat::NeuralNetwork(genome)),
       genome_(genome), neuron_data_(8,0)  {}
 
 double Creature::GetEnergy() const { return energy_; }
@@ -12,7 +12,7 @@ void Creature::SetEnergy(double energy) { energy_ = energy; }
 
 void Creature::UpdateEnergy() {
   SetEnergy(GetEnergy() -
-            (GetVelocityForward() + GetRotationalVelocity()) * GetSize());
+            (GetVelocityForward() + GetRotationalVelocity()) * GetSize()/100);
 
   if (GetEnergy() <= 0) {
     Dies();
@@ -26,7 +26,7 @@ void Creature::Eats(double nutritional_value) {
 }
 
 bool Creature::Fit() {
-  if (energy_ > cfg::reproduction_threshold) {
+  if (energy_ > cfg::reproduction_threshold*max_energy_) {
     return true;
   }
   return false;
@@ -36,6 +36,7 @@ void Creature::Update(double deltaTime, double const kMapWidth,
                       double const kMapHeight,
                       std::vector<std::vector<std::vector<Entity*> > > &grid,
                       double GridCellSize) {
+  this->UpdateEnergy();
   this->Move(deltaTime, kMapWidth, kMapHeight);
   this->Rotate(deltaTime);
   this->Think(grid, GridCellSize);
@@ -74,8 +75,8 @@ void Creature::Think(std::vector<std::vector<std::vector<Entity*> > > &grid, dou
     neuron_data_.at(4) = velocity_forward_;
     neuron_data_.at(5) = rotational_velocity_;
     std::vector<double> output = brain_.Activate(neuron_data_);
-    velocity_forward_ = output.at(0);
-    rotational_velocity_ = output.at(1);
+    velocity_forward_ = 10*output.at(0);
+    rotational_velocity_ = 10*output.at(1);
 }
 
 void Creature::ProcessVisionFood(std::vector<std::vector<std::vector<Entity*> > > &grid, double GridCellSize)
