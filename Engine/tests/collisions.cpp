@@ -1,4 +1,4 @@
-
+#include <iostream>
 #include <gtest/gtest.h>
 #include <gmock/gmock-matchers.h>
 
@@ -186,14 +186,22 @@ TEST(CollisionTests, OnCollisionWithFood) {
 class CreatureTest : public ::testing::Test {
 protected:
     // Helper function to set up the grid for testing
-    std::unordered_map<int, std::unordered_map<int, std::vector<Entity*>>> CreateTestGrid() {
-        std::unordered_map<int, std::unordered_map<int, std::vector<Entity*>>> grid;
+    std::vector<std::vector<std::vector<Entity*> > > CreateTestGrid() {
+        std::vector<std::vector<std::vector<Entity*> > > grid;
+        for (int i = 0; i < 101; i++) {
+            std::vector<std::vector<Entity*> > v;
+            grid.push_back(v);
+            for (int j = 0; j < 101; j++) {
+                std::vector<Entity*> u;
+                grid[i].push_back(u);
+            }
+        }
 
-        Food food1(3.6, 4.9, 5.0);
-        Food food2(9.2, 7.1, 8.0);
+        Food* food1 = new Food(3.6, 4.9, 5.0);
+        Food* food2 = new Food(9.2, 7.1, 8.0);
 
-        grid[3][4].push_back(&food1);
-        grid[9][7].push_back(&food2);
+        grid[3][4].push_back(food1);
+        grid[9][7].push_back(food2);
 
         return grid;
     }
@@ -204,26 +212,33 @@ TEST_F(CreatureTest, GetClosestFood_EmptyGrid) {
     Creature creature(neat::Genome(2,3));
 
     // Set up an empty grid
-    std::unordered_map<int, std::unordered_map<int, std::vector<Entity*>>> grid;
+    std::vector<std::vector<std::vector<Entity*> > > grid;
+
 
     // Expectation: The grid is empty, so there should be no closest food
+    EXPECT_EQ( creature.GetClosestFood(grid, 1.0), nullptr);
+    /*
     ASSERT_DEATH({
         creature.GetClosestFood(grid, 1.0);
-    }, ".*");
+    }, ".*");*/
 }
 
 TEST_F(CreatureTest, GetClosestFood_NoFoodInGrid) {
     // Create a Creature with a mock genome
     Creature creature(neat::Genome(2,3));
+    creature.SetCoordinates(0, 0, 10, 10);
 
     // Set up a grid with creatures but no food
-    std::unordered_map<int, std::unordered_map<int, std::vector<Entity*>>> grid;
+    std::vector<std::vector<std::vector<Entity*> > > grid = { {{}, {}}, {{}, {}} };
+
     grid[0][0].push_back(&creature);  // Add a creature to the grid
 
     // Expectation: There is no food in the grid, so closestFood should be nullptr
+    EXPECT_EQ( creature.GetClosestFood(grid, 1.0), nullptr);
+    /*
     ASSERT_DEATH({
         creature.GetClosestFood(grid, 1.0);
-    }, ".*");
+    }, ".*");*/
 }
 
 TEST_F(CreatureTest, GetClosestFoodTest) {
@@ -242,7 +257,7 @@ TEST_F(CreatureTest, GetClosestFoodTest) {
     creature3.SetSize(8.0);
 
     // Set up the grid
-    std::unordered_map<int, std::unordered_map<int, std::vector<Entity*>>> grid = CreateTestGrid();
+    std::vector<std::vector<std::vector<Entity*> > > grid = CreateTestGrid();
 
     // Call the GetClosestFood function
     Food* closestFood1 = creature1.GetClosestFood(grid, 1.0);  // Assuming grid cell size is 1.0
@@ -250,7 +265,75 @@ TEST_F(CreatureTest, GetClosestFoodTest) {
     Food* closestFood3 = creature3.GetClosestFood(grid, 1.0);
 
     // Expectations: Check if the closest foods are as expected
-    ASSERT_EQ(dynamic_cast<Entity*>(closestFood1), grid[3][4][1]);  // Index 1 is the food1 in the grid at (3,4)
+    ASSERT_EQ(dynamic_cast<Entity*>(closestFood1), grid[3][4][0]);  // Index 0 is the food1 in the grid at (3,4)
     ASSERT_EQ(dynamic_cast<Entity*>(closestFood2), grid[9][7][0]);  // Index 0 is the food2 in the grid at (9,7)
-    ASSERT_EQ(dynamic_cast<Entity*>(closestFood3), grid[3][4][1]);  // Index 1 is the food1 in the grid at (3,4)
+    ASSERT_EQ(dynamic_cast<Entity*>(closestFood3), grid[3][4][0]);  // Index 0 is the food1 in the grid at (3,4)
+    delete grid[3][4][0];
+    delete grid[9][7][0];
 }
+
+TEST_F(CreatureTest, GetFoodAtDistanceTest) {
+    // Define the grid
+    std::vector<std::vector<std::vector<Entity*> > > grid;
+    for (int i = 0; i < 101; i++) {
+        std::vector<std::vector<Entity*> > v;
+        grid.push_back(v);
+        for (int j = 0; j < 101; j++) {
+            std::vector<Entity*> u;
+            grid[i].push_back(u);
+        }
+    }
+
+    Food* f1 = new Food();
+    Food* f2 = new Food();
+    Food* f3 = new Food();
+    Entity* e1 = new Entity();
+    grid[3][1].push_back(f1);
+    grid[3][3].push_back(f2);
+    grid[3][3].push_back(e1);
+    grid[2][1].push_back(f3);
+
+    std::vector<Food*> result = get_food_at_distance(grid, 1, 1, 1);
+
+    EXPECT_EQ(result.size(), 1);
+    delete f1;
+    delete f2;
+    delete e1;
+    delete f3;
+}
+
+TEST_F(CreatureTest, GetClosestFoodTest2) {
+    // Define the grid
+    std::vector<std::vector<std::vector<Entity*> > > grid;
+    for (int i = 0; i < 101; i++) {
+        std::vector<std::vector<Entity*> > v;
+        grid.push_back(v);
+        for (int j = 0; j < 101; j++) {
+            std::vector<Entity*> u;
+            grid[i].push_back(u);
+        }
+    }
+
+    double grid_cell_size = 1;
+    Creature* cr = new Creature(neat::Genome(2, 2));
+    cr->SetCoordinates(1.6, 1.1, 100.0, 100.0);
+    Food* f1 = new Food(2.5, 0.5);
+    Food* f2 = new Food(2.2, 0.9);
+    Food* f3 = new Food(2.9, 1.9);
+    Entity* e1 = new Entity(1.5, 1.1, 0.5);
+    grid[1][1].push_back(e1);
+    grid[2][1].push_back(f3);
+    grid[2][0].push_back(f2);
+    grid[2][0].push_back(f1);
+
+    Food* result = cr->GetClosestFood(grid, grid_cell_size);
+    EXPECT_EQ(result->GetCoordinates().first, 2.2);
+    EXPECT_EQ(result->GetCoordinates().second, 0.9);
+
+    delete f1;
+    delete f2;
+    delete e1;
+    delete f3;
+    delete cr;
+}
+

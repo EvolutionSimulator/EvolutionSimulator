@@ -72,26 +72,26 @@ void Creature::Grow(double energy) {
 }
 
 Food *Creature::GetClosestFood(
-    std::unordered_map<int, std::unordered_map<int, std::vector<Entity *>>>
-        &grid,
+    std::vector<std::vector<std::vector<Entity*> > > &grid,
     double GridCellSize) const {
+  if (grid.empty()) return nullptr;
   std::pair<double, double> coordinates_creature = GetCoordinates();
   int i_creature = (int)coordinates_creature.first / (int)GridCellSize;
   int j_creature = (int)coordinates_creature.second /
                    (int)GridCellSize; // position of the creature on the grid
   std::vector<Food *> closest_food_entities = get_food_at_distance(
-      grid, i_creature, j_creature,
-      0); // here we place the candidates for the closest food
+      grid, i_creature, j_creature, 0); // here we place the candidates for the closest food
   int grid_distance = 1;
   int boundary = std::max(grid.size(), grid[0].size());
 
-  while (closest_food_entities.size() == 0 && grid_distance < boundary) {
+  while (closest_food_entities.size() == 0 && grid_distance <= boundary) {
     // std::cout << "checking at distance " << grid_distance << std::endl;
     closest_food_entities =
         get_food_at_distance(grid, i_creature, j_creature, grid_distance);
     grid_distance++;
   }
-  assert(!closest_food_entities.empty());
+  //assert(!closest_food_entities.empty());
+  if (closest_food_entities.empty()) return nullptr;
 
   Food *closest_food = closest_food_entities.front();
   double smallest_distance = GetDistance(*closest_food);
@@ -106,10 +106,10 @@ Food *Creature::GetClosestFood(
 }
 
 std::vector<Food *> get_food_at_distance(
-    std::unordered_map<int, std::unordered_map<int, std::vector<Entity *>>>
-        &grid,
+    std::vector<std::vector<std::vector<Entity*> > > &grid,
     int i_creature, int j_creature, int grid_distance) {
   std::vector<Food *> food;
+  if (grid.empty()) return food;
   int grid_width = grid.size();
   int grid_height = grid[0].size();
 
