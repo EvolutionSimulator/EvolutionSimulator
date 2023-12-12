@@ -30,8 +30,10 @@ void Simulation::FixedUpdate(double deltaTime)
     std::lock_guard<std::mutex> lock(data_mutex_);
     // Test function (DO NOT USE)
     data_->UpdateAllCreatures(deltaTime);
+    data_->ReproduceCreatures();
     data_->CheckCollisions();
     data_->UpdateGrid();
+
 }
 
 // Facilitates data processing with external functions in a thread-safe manner
