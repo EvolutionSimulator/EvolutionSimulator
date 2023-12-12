@@ -98,7 +98,7 @@ void SimulationData::InitializeCreatures() {
         for (double y = 0; y < world_height; y += 2.0) {
             if (std::rand() / (RAND_MAX + 1.0) < creature_density) {
                 neat::Genome genome(cfg::input_neurons, cfg::output_neurons);
-                genome.Mutate();
+                for (int i = 0; i < 30; i++){genome.Mutate();}
                 Creature new_creature(genome);
                 new_creature.RandomInitialization(world_width, world_height, max_creature_size);
                 creatures_.emplace_back(new_creature);
