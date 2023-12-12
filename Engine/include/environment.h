@@ -10,6 +10,7 @@ public:
     static constexpr double kMapHeight = 300.0;
 
     // Variable for creature and food density
+    double kFoodDensity;
     double kCreatureDensity = 0.001;
 
     // Food and creature density for random initialization
@@ -42,9 +43,6 @@ public:
     double GetCreatureDensity() const {
         return kCreatureDensity;
     }
-private:
-    double kFoodDensity = 0.001;
-
 };
 
 

@@ -110,6 +110,8 @@
     </property>
     <property name="text">
      <string>TESTER</string>
+    </property>
+   </widget>
    <widget class="QSpinBox" name="densityCreature">
     <property name="geometry">
      <rect>
