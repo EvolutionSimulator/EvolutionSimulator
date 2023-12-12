@@ -29,11 +29,11 @@ public:
 
   void OnCollision(Entity& other_entity) override;
 
-  Food* GetClosestFood
-    (std::unordered_map<int, std::unordered_map<int, std::vector<Entity*> > > &grid,
-     double GridCellSize) const;
-
   bool Fit();
+
+  Food *GetClosestFood(
+      std::vector<std::vector<std::vector<Entity*> > > &grid,
+      double GridCellSize) const;
 
   void SetGrowthFactor(double growth_factor);
   double GetGrowthFactor();
@@ -53,7 +53,6 @@ protected:
 
 
 std::vector<Food *> get_food_at_distance(
-    std::unordered_map<int, std::unordered_map<int, std::vector<Entity *>>>
-        &grid,
+    std::vector<std::vector<std::vector<Entity*> > > &grid,
     int i_creature, int j_creature, int grid_distance);
 #endif // CREATURE_HPP
