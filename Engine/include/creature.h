@@ -47,10 +47,9 @@ public:
   void Think(std::vector<std::vector<std::vector<Entity*> > > &grid, double GridCellSize);
   void ProcessVisionFood(std::vector<std::vector<std::vector<Entity*> > > &grid, double GridCellSize);
 
-
-
 protected:
   double energy_, growth_factor_, health_;
+  double max_energy_ = 3000;
   double max_size_ = 10;
   neat::NeuralNetwork brain_;
   neat::Genome genome_;
