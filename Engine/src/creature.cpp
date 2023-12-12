@@ -17,6 +17,7 @@ void Creature::HealthToEnergy() {
     SetHealth(GetHealth() - 5);
 }
 
+
 void Creature::EnergyToHealth() {
     SetEnergy(GetEnergy() - 5);
     SetHealth(GetHealth() + 5);
@@ -57,8 +58,8 @@ void Creature::UpdateEnergy(const double energyToHealth, const double healthToEn
         Dies();
     }
 }
-bool Creature::Fit(){
-  if (energy_ > cfg::reproduction_threshold) {
+bool Creature::Fit() {
+  if (energy_ > cfg::reproduction_threshold*max_energy_) {
     return true;
   }
   return false;
@@ -75,6 +76,7 @@ void Creature::Update(double deltaTime, double const kMapWidth,
                       double const kMapHeight,
                       std::vector<std::vector<std::vector<Entity*> > > &grid,
                       double GridCellSize) {
+  this->UpdateEnergy(70, 5);
   this->Move(deltaTime, kMapWidth, kMapHeight);
   this->Rotate(deltaTime);
   this->Think(grid, GridCellSize);
@@ -114,8 +116,8 @@ void Creature::Think(std::vector<std::vector<std::vector<Entity*> > > &grid, dou
     neuron_data_.at(4) = velocity_forward_;
     neuron_data_.at(5) = rotational_velocity_;
     std::vector<double> output = brain_.Activate(neuron_data_);
-    velocity_forward_ = output.at(0);
-    rotational_velocity_ = output.at(1);
+    velocity_forward_ = 10*output.at(0);
+    rotational_velocity_ = 10*output.at(1);
 }
 
 void Creature::ProcessVisionFood(std::vector<std::vector<std::vector<Entity*> > > &grid, double GridCellSize)
