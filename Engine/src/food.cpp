@@ -17,12 +17,13 @@ Food::Food(const double x_coord, const double y_coord)
 Food::Food(const double size)
     : Entity(size)
 {
-    //Constructor implementation
+    SetNutritionalValue(size/Environment::kMaxFoodSize * max_nutritional_value_);
 }
 
 void Food::Eat()
 {
-    SetState(Entity::Dead);
+    // Call the destructor of the base class Entity
+    this->Entity::~Entity();
 }
 
 void Food::SetNutritionalValue(double value)
@@ -35,3 +36,24 @@ double Food::GetNutritionalValue() const
     return nutritional_value_;
 }
 
+
+// Simulate photosynthesis and update the nutritional value
+void Plant::Photosynthesize()
+{
+    double updated_nutritional_value = GetNutritionalValue() + photosynthesis_factor_;
+
+    if (updated_nutritional_value<=Food::max_nutritional_value_){
+        SetNutritionalValue(updated_nutritional_value);
+    }
+
+}
+
+void Meat::Rot()
+{
+    double updated_nutritional_value = GetNutritionalValue() - rot_factor_;
+
+    if (updated_nutritional_value<-3){
+        return; //kill the food
+    }
+    SetNutritionalValue(updated_nutritional_value);
+}
