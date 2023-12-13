@@ -3,7 +3,7 @@
 #include <cassert>
 
 Creature::Creature(neat::Genome genome)
-    : MovableEntity(), health_(100), energy_(100), brain_(neat::NeuralNetwork(genome)), genome_(genome), neuron_data_(8,0) {
+    : MovableEntity(), health_(100), energy_(100), brain_(neat::NeuralNetwork(genome)), genome_(genome), neuron_data_(cfg::input_neurons,0) {
 }
 
 double Creature::GetEnergy() const { return energy_; }
@@ -168,7 +168,9 @@ Food *Creature::GetClosestFood(
     assert( !closest_food_entities.empty());
     return closest_food;
     }
+  return nullptr;
 }
+
 std::vector<Food *> get_food_at_distance(
     std::vector<std::vector<std::vector<Entity*> > > &grid,
     int i_creature, int j_creature, int grid_distance) {
