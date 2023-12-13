@@ -17,6 +17,7 @@ public:
     // Food and creature density for random initialization
     static constexpr int kMaxFoodSize = 15;
     static constexpr int kMaxCreatureSize = 25;
+    static constexpr double kBaseNutritionalValue = 20.0;
 
     // Length of side of grid cell
     static constexpr double kGridCellSize = 50.0;
