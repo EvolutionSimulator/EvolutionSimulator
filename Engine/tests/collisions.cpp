@@ -188,14 +188,7 @@ protected:
     // Helper function to set up the grid for testing
     std::vector<std::vector<std::vector<Entity*> > > CreateTestGrid() {
         std::vector<std::vector<std::vector<Entity*> > > grid;
-        for (int i = 0; i < 101; i++) {
-            std::vector<std::vector<Entity*> > v;
-            grid.push_back(v);
-            for (int j = 0; j < 101; j++) {
-                std::vector<Entity*> u;
-                grid[i].push_back(u);
-            }
-        }
+        grid.assign(100, std::vector<std::vector<Entity*> >(100));
 
         Food* food1 = new Food(3.6, 4.9, 5.0);
         Food* food2 = new Food(9.2, 7.1, 8.0);
@@ -275,14 +268,7 @@ TEST_F(CreatureTest, GetClosestFoodTest) {
 TEST_F(CreatureTest, GetFoodAtDistanceTest) {
     // Define the grid
     std::vector<std::vector<std::vector<Entity*> > > grid;
-    for (int i = 0; i < 101; i++) {
-        std::vector<std::vector<Entity*> > v;
-        grid.push_back(v);
-        for (int j = 0; j < 101; j++) {
-            std::vector<Entity*> u;
-            grid[i].push_back(u);
-        }
-    }
+    grid.assign(100, std::vector<std::vector<Entity*> >(100));
 
     Food* f1 = new Food();
     Food* f2 = new Food();
@@ -305,14 +291,7 @@ TEST_F(CreatureTest, GetFoodAtDistanceTest) {
 TEST_F(CreatureTest, GetClosestFoodTest2) {
     // Define the grid
     std::vector<std::vector<std::vector<Entity*> > > grid;
-    for (int i = 0; i < 101; i++) {
-        std::vector<std::vector<Entity*> > v;
-        grid.push_back(v);
-        for (int j = 0; j < 101; j++) {
-            std::vector<Entity*> u;
-            grid[i].push_back(u);
-        }
-    }
+    grid.assign(100, std::vector<std::vector<Entity*> >(100));
 
     double grid_cell_size = 1;
     Creature* cr = new Creature(neat::Genome(2, 2));

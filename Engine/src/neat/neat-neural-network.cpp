@@ -58,7 +58,11 @@ std::vector<double> NeuralNetwork::Activate(
         }
       }
       value += ffneuron.bias;
-      value = activation_funtion(value);
+
+      if (std::find(output_ids_.begin(), output_ids_.end(), ffneuron.id) == output_ids_.end()) {
+        value = activation_function(value);
+      }
+
       values[ffneuron.id] = value;
     }
   }
@@ -126,5 +130,5 @@ std::vector<std::vector<Neuron> > get_layers(const Genome &genom) {
   return layers;
 }
 
-double activation_funtion(double x) { return 1 / (1 + exp(-x)); }
+double activation_function(double x) { return 1 / (1 + exp(-x)); }
 }  // end of namespace neat

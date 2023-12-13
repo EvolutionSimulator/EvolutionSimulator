@@ -11,15 +11,20 @@
 namespace neat {
 
 static double weightMutationRate = 0.2;
+static double biasMutationRate = 0.2;
 static double standardDeviationWeight = 0.1;
 static double maxWeight = 1.0;
 static double minWeight = 0.0;
+static double maxBias = 0.1;
+static double minBias = 0.0;
 
 static double addNeuronMutationRate = 0.05;
 static double addLinkMutationRate = 0.25;
 static double removeNeuronMutationRate = 0.02;
 static double removeLinkMutationRate = 0.15;
 static double changeWeightMutationRate = 0.6;
+static double changeBiasMutationRate = 0.6;
+static double adjustmentProbability = 0.8;
 
 class Genome {
  public:
@@ -46,6 +51,7 @@ class Genome {
   void MutateRemoveNeuron();
   void MutateRemoveLink();
   void MutateChangeWeight();
+  void MutateChangeBias();
 
   bool DetectLoops(const Neuron& n);
 
