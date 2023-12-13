@@ -11,7 +11,7 @@ public:
 
     // Variable for creature and food density
     double kFoodDensity;
-    double kCreatureDensity = 0.001;
+    double kCreatureDensity = 0.0005;
 
 
     // Food and creature density for random initialization
