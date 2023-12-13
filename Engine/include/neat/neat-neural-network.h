@@ -34,6 +34,6 @@ std::vector<std::vector<Neuron> > get_layers(
     const Genome
         &genom);  // organize neurons from a Genome into layers (by neurons ids)
 
-double activation_funtion(double x);
+double activation_function(double x);
 
 }  // end of namespace neat

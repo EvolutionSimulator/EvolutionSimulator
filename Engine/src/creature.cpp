@@ -17,7 +17,6 @@ void Creature::HealthToEnergy() {
     SetHealth(GetHealth() - 5);
 }
 
-
 void Creature::EnergyToHealth() {
     SetEnergy(GetEnergy() - 5);
     SetHealth(GetHealth() + 5);
@@ -46,7 +45,7 @@ void Creature::SetEnergy(double energy) {
 }
 
 void Creature::UpdateEnergy(const double energyToHealth, const double healthToEnergy){
-    SetEnergy( GetEnergy() - (GetVelocityForward() + GetRotationalVelocity()) * GetSize());
+    SetEnergy( GetEnergy() - (GetVelocityForward() + GetRotationalVelocity()) * GetSize()/1000);
 
     if (GetEnergy() <= healthToEnergy){
         HealthToEnergy();
@@ -116,8 +115,8 @@ void Creature::Think(std::vector<std::vector<std::vector<Entity*> > > &grid, dou
     neuron_data_.at(4) = velocity_forward_;
     neuron_data_.at(5) = rotational_velocity_;
     std::vector<double> output = brain_.Activate(neuron_data_);
-    velocity_forward_ = 10*output.at(0);
-    rotational_velocity_ = 10*output.at(1);
+    velocity_forward_ = output.at(0);
+    rotational_velocity_ = output.at(1);
 }
 
 void Creature::ProcessVisionFood(std::vector<std::vector<std::vector<Entity*> > > &grid, double GridCellSize)

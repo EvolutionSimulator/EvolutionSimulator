@@ -155,6 +155,10 @@ void Genome::Mutate() {
   if (uniform(gen) < changeWeightMutationRate) {
     MutateChangeWeight();
   }
+
+  if (uniform(gen) < changeBiasMutationRate) {
+    MutateChangeBias();
+  }
 }
 
 void Genome::MutateRemoveNeuron() {
@@ -227,6 +231,26 @@ void Genome::MutateChangeWeight() {
       }
     }
   }
+}
+
+void Genome::MutateChangeBias() {
+      std::random_device rd;
+      std::mt19937 gen(rd());
+      std::uniform_real_distribution<> uniform(0.0, 1.0);
+      std::normal_distribution<> dis(0.0, standardDeviationWeight);
+
+      for (Neuron& neuron : neurons_) {
+            if (uniform(gen) < biasMutationRate) {
+                double delta = dis(gen);
+                neuron.SetBias(neuron.GetBias() + delta);
+                if (neuron.GetBias() > maxBias) {
+                        neuron.SetBias(maxBias);
+                                } else if (neuron.GetBias() < minBias) {
+                        neuron.SetBias(minBias);
+                }
+            }
+
+      }
 }
 
 // Neuron Genome::FindNeuronIndexById(int targetId) const {
