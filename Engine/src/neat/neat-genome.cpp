@@ -102,34 +102,33 @@ void Genome::RemoveNeuron(int id) {
 
   if (index_to_delete != -1) {
     std::vector<int> links_to_remove;
-
-    for (const Link& link : links_) {
-      if (neurons_[index_to_delete].GetId() == link.GetInId() ||
-          neurons_[index_to_delete].GetId() == link.GetOutId()) {
-        links_to_remove.push_back(link.GetId());
+    for (int i=links_.size()-1; i>=0; i--){
+      if (neurons_[index_to_delete].GetId() == links_[i].GetInId() ||
+          neurons_[index_to_delete].GetId() == links_[i].GetOutId()) {
+          links_to_remove.push_back(links_[i].GetId());
       }
     }
 
-    for (int link_id : links_to_remove) {
-      RemoveLink(link_id);
+    for (int i : links_to_remove) {
+      links_.erase(links_.begin() + i);
     }
 
     neurons_.erase(neurons_.begin() + index_to_delete);
   }
 }
 
-// void Genome::RemoveLink(int id) {
-//   int index_to_delete = -1;
-//   for (int i = 0; i<links_.size(); i++){
-//     if (links_[i].GetId()==id){
-//         index_to_delete = i;
-//         break;
-//     }
-//   }
-//   if (index_to_delete!=-1){
-//     links_.erase(links_.begin()+index_to_delete);
-//   }
-// }
+void Genome::RemoveLink(int id) {
+  int index_to_delete = -1;
+  for (int i = 0; i < links_.size(); i++) {
+    if (links_[i].GetId() == id) {
+      index_to_delete = i;
+      break;
+    }
+  }
+  if (index_to_delete != -1) {
+    links_.erase(links_.begin() + index_to_delete);
+  }
+}
 
 void Genome::Mutate() {
   std::random_device rd;
@@ -198,19 +197,6 @@ bool Genome::HasLink(const int& inID, const int& outID) {
     }
   }
   return false;
-}
-
-void Genome::RemoveLink(int id) {
-  int index_to_delete = -1;
-  for (int i = 0; i < links_.size(); i++) {
-    if (links_[i].GetId() == id) {
-      index_to_delete = i;
-      break;
-    }
-  }
-  if (index_to_delete != -1) {
-    links_.erase(links_.begin() + index_to_delete);
-  }
 }
 
 void Genome::MutateChangeWeight() {
