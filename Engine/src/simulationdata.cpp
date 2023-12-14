@@ -26,7 +26,7 @@ myEnvironment::Environment SimulationData::GetEnvironment()
     return environment_;
 }
 
-myEnvironment::Environment SimulationData::SetEnvironment(myEnvironment::Environment& environment)
+void SimulationData::SetEnvironment(myEnvironment::Environment& environment)
 {
     environment_ = environment;
 }

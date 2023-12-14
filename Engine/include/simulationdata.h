@@ -35,7 +35,7 @@ public:
     void UpdateAllCreatures(double deltaTime);
 
     myEnvironment::Environment GetEnvironment();
-    myEnvironment::Environment SetEnvironment(myEnvironment::Environment& environment);
+    void SetEnvironment(myEnvironment::Environment& environment);
     std::vector<std::vector<std::vector<Entity*> > > GetGrid();
 
 
@@ -51,3 +51,5 @@ private:
     std::vector<std::vector<std::vector<Entity*> > > grid_;
 
 };
+
+std::vector<std::pair<int, int>> GetNeighbours(const int& num_rows, const int& num_cols, const std::pair<int, int>& center, const int& layer_number);
