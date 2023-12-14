@@ -5,6 +5,7 @@
 #include "food.h"
 #include <cmath>
 #include "collisions.h"
+#include <cassert>
 #include "config.h"
 
 void SimulationData::AddCreature(const Creature& creature)
@@ -54,7 +55,7 @@ void SimulationData::GenerateMoreFood(){
     double max_number = environment_.GetFoodDensity() * environment_.kMapHeight * environment_.kMapWidth/100;
         while (size < max_number){
         Food new_food = Food();
-        new_food.RandomInitialization(environment_.kMapHeight, environment_.kMapWidth, environment_.kMaxFoodSize);
+        new_food.RandomInitialization(environment_.kMapWidth, environment_.kMapHeight, environment_.kMaxFoodSize);
         food_entities_.emplace_back(new_food);
         size++;
     }
