@@ -67,6 +67,8 @@ void Engine::Run()
 
 void Engine::UpdateEnvironment() {
     simulation_->GetSimulationData()->InitializeFood();
+    simulation_->GetSimulationData()->ClearGrid();
+    simulation_->GetSimulationData()->UpdateGrid();
 }
 
 void Engine::Stop()
