@@ -32,6 +32,9 @@ public:
   bool Fit();
   void Reproduced();
 
+  double GetMaxEnergy() const;
+  void SetMaxEnergy(double max_energy);
+
   void BalanceHealthEnergy();
 
 
