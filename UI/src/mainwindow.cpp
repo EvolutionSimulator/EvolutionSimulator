@@ -109,3 +109,4 @@ void MainWindow::GraphExampleFunction()
         std::cout << "x: " << x << ", f(x): " << result << std::endl;
     }
 }
+
