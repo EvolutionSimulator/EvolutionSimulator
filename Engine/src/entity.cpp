@@ -102,6 +102,37 @@ void Entity::SetState(Entity::states state){
     state_ = state;
 }
 
-void Entity::OnCollision(Entity& other_entity){
+void Entity::OnCollision(Entity& other_entity, double const kMapWidth,
+                         double const kMapHeight) {
+  // Check if the entity is colliding with itself
+  if (this == &other_entity) return;
 
+  // Get the coordinates and size of the other entity
+  std::pair<double, double> other_coordinates = other_entity.GetCoordinates();
+  double other_size = other_entity.GetSize();
+
+  // Calculate the distance between the two entities
+  double distance = GetDistance(other_entity);
+
+  // If the distance is zero, throw an error
+  if (distance == 0.0) throw std::runtime_error("Collision distance is 0");
+
+  // Calculate the overlap between the two entities
+  double overlap = size_ + other_size - distance;
+
+  // Calculate the overlap in the x and y directions
+  double x_overlap = overlap * (x_coord_ - other_coordinates.first) / distance;
+  double y_overlap = overlap * (y_coord_ - other_coordinates.second) / distance;
+
+  // If this entity is larger than the other entity, move the other entity
+  // Otherwise, move this entity
+  if (GetSize() > other_entity.GetSize()) {
+    other_entity.SetCoordinates(other_coordinates.first - x_overlap,
+                                other_coordinates.second - y_overlap, kMapWidth, kMapHeight);
+  } else {
+    SetCoordinates(x_coord_ + x_overlap, y_coord_ + y_overlap, kMapWidth, kMapHeight);
+  }
+
+  // Assert that the entities are no longer overlapping
+  assert(size_ + other_size - GetDistance(other_entity) < 0.0001);
 }
