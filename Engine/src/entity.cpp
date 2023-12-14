@@ -73,11 +73,13 @@ void Entity::RandomInitialization(const double world_width, const double world_h
     size_ = GetRandomFloat(max_creature_size-min_creature_size) + min_creature_size;
 }
 
-double Entity::GetDistance(const Entity& other_entity) const {
+double Entity::GetDistance(const Entity& other_entity, const double kMapWidth, const double kMapHeight) const {
     std::pair<double, double> other_coordinates = other_entity.GetCoordinates();
 
     // Use std::hypot for optimized distance calculation
-    return std::hypot(x_coord_ - other_coordinates.first, y_coord_- other_coordinates.second);
+    const double x_diff = abs(x_coord_ - other_coordinates.first);
+    const double y_diff = abs(y_coord_- other_coordinates.second);
+    return std::hypot(fmin(x_diff, kMapWidth-x_diff), fmin(y_diff, kMapHeight-y_diff));
 }
 
 double Entity::GetRelativeOrientation(const Entity& other_entity) const {
@@ -115,7 +117,7 @@ void Entity::OnCollision(Entity& other_entity, double const kMapWidth,
   double other_size = other_entity.GetSize();
 
   // Calculate the distance between the two entities
-  double distance = GetDistance(other_entity);
+  double distance = GetDistance(other_entity, kMapWidth, kMapHeight);
 
   // If the distance is zero, return
   if (distance == 0.0) return;
@@ -137,5 +139,5 @@ void Entity::OnCollision(Entity& other_entity, double const kMapWidth,
   }
 
   // Assert that the entities are no longer overlapping
-  assert(size_ + other_size - GetDistance(other_entity) < 0.0001);
+  assert(size_ + other_size - GetDistance(other_entity, kMapWidth, kMapHeight) < 0.0001);
 }
