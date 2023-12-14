@@ -4,6 +4,7 @@
 
 Creature::Creature(neat::Genome genome)
     : MovableEntity(), health_(100), energy_(100), brain_(neat::NeuralNetwork(genome)), genome_(genome), neuron_data_(settings::environment::kInputNeurons,0), reproduction_cooldown_(10) {
+
 }
 
 int Creature::GetGeneration() const {return generation_;}
@@ -14,19 +15,26 @@ void Creature::SetGeneration(int generation){
 
 double Creature::GetEnergy() const { return energy_; }
 
+
 void Creature::HealthToEnergy() {
     if (GetEnergy() < 0) {
         SetHealth(GetHealth() + GetEnergy()-5);
         SetEnergy(5);
+            SetHealth((GetHealth()+GetEnergy()) / 2);
+            SetEnergy(GetHealth());
+        }
+    } else if (GetEnergy() > max_energy_) {
+        SetHealth(GetHealth()+ (GetEnergy()-max_energy_));
+        SetEnergy(max_energy_);
+    } else if (GetHealth() > GetEnergy() && GetEnergy() <= healthToEnergy){
+        SetEnergy(GetEnergy()+5);
+        SetHealth(GetHealth()-5);
+    } else if (GetHealth() < GetEnergy() && GetEnergy() >= energyToHealth){
+        SetEnergy(GetEnergy()-5);
+        SetHealth(GetHealth()+5);
     }
-    SetEnergy(GetEnergy() + 5);
-    SetHealth(GetHealth() - 5);
 }
 
-void Creature::EnergyToHealth() {
-    SetEnergy(GetEnergy() - 5);
-    SetHealth(GetHealth() + 5);
-}
 
 double Creature::GetHealth() const {
     return health_;
@@ -38,9 +46,11 @@ void Creature::SetHealth(double health) {
     } else {
         health_ = health;
     }
+
 }
 
 void Creature::Dies() { SetState(Dead); }
+
 
 void Creature::SetEnergy(double energy) {
     if (energy > max_energy_) {
@@ -50,19 +60,18 @@ void Creature::SetEnergy(double energy) {
     }
 }
 
+
+
 void Creature::UpdateEnergy(const double energyToHealth, const double healthToEnergy, double deltaTime){
     SetEnergy( GetEnergy() - (GetVelocityForward() + GetRotationalVelocity() + 50) * GetSize() * deltaTime/100);
 
-    if (GetEnergy() <= healthToEnergy){
-        HealthToEnergy();
-    } else if (GetEnergy() >= energyToHealth){
-        EnergyToHealth();
-    }
+    BalanceHealthEnergy();
 
     if (GetHealth() <= 0){
         Dies();
     }
 }
+
 bool Creature::Fit() {
     if (energy_ > settings::environment::kReproductionThreshold*max_energy_ && reproduction_cooldown_ == 0.0) {
     return true;
@@ -78,9 +87,10 @@ void Creature::Reproduced() {
 void Creature::Eats(double nutritional_value){
   SetEnergy(GetEnergy() + nutritional_value);
   if (GetEnergy() > max_energy_) {
-    EnergyToHealth();
+    BalanceHealthEnergy();
   }
 }
+
 
 void Creature::Update(double deltaTime, double const kMapWidth,
                       double const kMapHeight,
