@@ -134,7 +134,7 @@ void Creature::Think(std::vector<std::vector<std::vector<Entity*> > > &grid, dou
 void Creature::ProcessVisionFood(std::vector<std::vector<std::vector<Entity*> > > &grid, double GridCellSize)
 {
     Food* food = this->GetClosestFood(grid, GridCellSize);
-    distance_food_ = this->GetDistance(*food);
+    distance_food_ = this->GetDistance(*food, settings::environment::kMapWidth, settings::environment::kMapHeight);
     orientation_food_ = this->GetRelativeOrientation(*food);
 }
 double Creature::GetMaxSize() { return max_size_; }
@@ -170,9 +170,9 @@ Food *Creature::GetClosestFood(
   if (closest_food_entities.empty()) return nullptr;
 
   Food *closest_food = closest_food_entities.front();
-  double smallest_distance = GetDistance(*closest_food);
+  double smallest_distance = GetDistance(*closest_food, settings::environment::kMapWidth, settings::environment::kMapHeight);
   for (Food *&food : closest_food_entities) {
-    double distance = GetDistance(*food);
+    double distance = GetDistance(*food,  settings::environment::kMapWidth, settings::environment::kMapHeight);
     if (distance < smallest_distance) {
       closest_food = food;
       smallest_distance = distance;

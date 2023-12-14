@@ -90,6 +90,48 @@ TEST(CollisionTests, CollisionCircleLine) {
 
 }
 
+TEST(CollisionTests, GetDistance_NoWrapAround) {
+    Entity e1(10.0, 10.0, 10.0);
+    Entity e2(13.0, 14.0, 3.0);
+    double mapWidth = 100;
+    int mapHeight = 100;
+
+    double expectedDistance = std::hypot(3, 4);
+    ASSERT_NEAR(e1.GetDistance(e2, mapWidth, mapHeight), expectedDistance, 1e-6);
+}
+
+TEST(CollisionTests, GetDistance_WrapAroundXCoordinate) {
+    Entity e1(1.0, 10.0, 2.0);
+    Entity e2(99.0, 10.0, 5.0);
+    double mapWidth = 100;
+    int mapHeight = 100;
+
+    double expectedDistance = 2;
+    ASSERT_NEAR(e1.GetDistance(e2, mapWidth, mapHeight), expectedDistance, 1e-6);
+}
+
+TEST(CollisionTests, GetDistance_WrapAroundYCoordinate) {
+    Entity e1(10.0, 1.0, 3.0);
+    Entity e2(10.0, 99.0, 2.0);
+    double mapWidth = 100;
+    int mapHeight = 100;
+
+    double expectedDistance = 2;
+    ASSERT_NEAR(e1.GetDistance(e2, mapWidth, mapHeight), expectedDistance, 1e-6);
+}
+
+TEST(CollisionTests, GetDistance_WrapAroundBothCoordinates) {
+    Entity e1(1.0, 1.0, 2.0);
+    Entity e2(99.0, 99.0, 3.0);
+    double mapWidth = 100;
+    int mapHeight = 100;
+
+    double expectedDistance = std::hypot(2, 2);
+    ASSERT_NEAR(e1.GetDistance(e2, mapWidth, mapHeight), expectedDistance, 1e-6);
+}
+
+
+
 TEST(CollisionTests, CheckCollisionWithEntity) {
     const double tolerance = 0.1;
     const double kMapWidth = 100.0;
@@ -144,6 +186,7 @@ TEST(CollisionTests, OnCollisionWithFood) {
     neat::Genome genome(2, 3);
     Creature creature(genome);
     Food food;
+    food.SetSize(1.0);
 
     // Case 1: Food is alive, and Creature collides with it
     food.SetState(Entity::Alive);
@@ -200,7 +243,7 @@ TEST(CollisionTests, OnCollisionWithEntity) {
     entity1.OnCollision(entity2, kMapWidth, kMapHeight);
 
     // Check if the distance between the entities is greater than the sum of their sizes
-    double distance = entity1.GetDistance(entity2);
+    double distance = entity1.GetDistance(entity2, kMapWidth, kMapHeight);
     double sum_of_sizes = entity1.GetSize() + entity2.GetSize();
     EXPECT_FALSE(entity1.CheckCollisionWithEntity(0.0, entity2));
 }

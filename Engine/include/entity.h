@@ -33,7 +33,8 @@ public:
 
   virtual void OnCollision(Entity &otherEntity, double const kMapWidth,
                            double const kMapHeight);
-  double GetDistance(const Entity &otherEntity) const;
+  double GetDistance(const Entity &otherEntity,  double const kMapWidth,
+                     double const kMapHeight) const;
   bool CheckCollisionWithEntity(const double tolerance,
                                 const Entity &otherEntity) const {
   return CollisionCircleCircle(tolerance, GetCoordinates(), GetSize(),
