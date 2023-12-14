@@ -26,13 +26,14 @@ public:
   double GetHealth() const;
   void SetHealth(double health);
 
-  void HealthToEnergy();
-  void EnergyToHealth();
   void OnCollision(Entity &other_entity, double const kMapWidth,
                    double const kMapHeight) override;
 
   bool Fit();
   void Reproduced();
+
+  void BalanceHealthEnergy();
+
 
   Food *GetClosestFood(
       std::vector<std::vector<std::vector<Entity*> > > &grid,
