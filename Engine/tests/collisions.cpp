@@ -430,3 +430,47 @@ TEST(SimulationDataTest, CorrectEntityPlacementInGrid) {
     EXPECT_NE(simData.GetGrid()[creatureGridX][creatureGridY].empty(), true);
     EXPECT_NE(simData.GetGrid()[foodGridX][foodGridY].empty(), true);
 }
+
+
+TEST(GetNeighboursTest, BasicFunctionality) {
+    auto neighbours = GetNeighbours(10, 10, {5, 5}, 1);
+    std::vector<std::pair<int, int>> expected = {{4, 4}, {4, 5}, {4, 6}, {5, 4}, {5, 5}, {5, 6}, {6, 4}, {6, 5}, {6, 6}};
+    EXPECT_EQ(neighbours, expected);
+}
+
+TEST(GetNeighboursTest, CenterAtEdge) {
+    auto neighbours = GetNeighbours(10, 10, {0, 0}, 1);
+    std::vector<std::pair<int, int>> expected = {{0, 0}, {0, 1}, {1, 0}, {1, 1}};
+    EXPECT_EQ(neighbours, expected);
+}
+
+TEST(GetNeighboursTest, LargeLayerNumber) {
+    auto neighbours = GetNeighbours(5, 5, {2, 2}, 10);
+    std::vector<std::pair<int, int>> expected;
+    for (int x = 0; x < 5; x++) {
+        for (int y = 0; y < 5; y++) {
+          expected.push_back({x, y});
+        }
+    }
+    EXPECT_EQ(neighbours, expected);
+}
+
+TEST(GetNeighboursTest, ZeroLayerNumber) {
+    auto neighbours = GetNeighbours(10, 10, {5, 5}, 0);
+    std::vector<std::pair<int, int>> expected = {{5, 5}};
+    EXPECT_EQ(neighbours, expected);
+}
+
+TEST(GetNeighboursTest, SingleCellGrid) {
+    auto neighbours = GetNeighbours(1, 1, {0, 0}, 1);
+    std::vector<std::pair<int, int>> expected = {{0, 0}};
+    EXPECT_EQ(neighbours, expected);
+}
+
+TEST(GetNeighboursTest, CenterOutsideGrid) {
+    auto neighbours = GetNeighbours(10, 10, {11, 11}, 1);
+    EXPECT_TRUE(neighbours.empty());
+}
+
+
+
