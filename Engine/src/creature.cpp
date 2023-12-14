@@ -3,8 +3,9 @@
 #include <cassert>
 
 Creature::Creature(neat::Genome genome)
-    : MovableEntity(), health_(100), energy_(100), brain_(neat::NeuralNetwork(genome)), genome_(genome), neuron_data_(settings::environment::kInputNeurons,0), reproduction_cooldown_(10) {
-
+    : MovableEntity(), health_(100), energy_(100), brain_(neat::NeuralNetwork(genome)),
+    genome_(genome), neuron_data_(settings::environment::kInputNeurons,0),
+    reproduction_cooldown_(10), age_(0) {
 }
 
 int Creature::GetGeneration() const {return generation_;}
@@ -100,7 +101,21 @@ double Creature::GetMaxEnergy() const {
 }
 
 void Creature::SetMaxEnergy(double max_energy) {
-  max_energy_ = max_energy;
+    if (max_energy < GetSize()*2){
+        max_energy_ = GetSize()*2;
+    } else {
+    max_energy_ = max_energy;
+    }
+}
+
+double Creature::GetAge() const {
+  return age_;
+}
+
+void Creature::SetAge(double age) {
+  SetMaxEnergy(GetMaxEnergy()-(GetAge() - age));
+
+  age_ = age;
 }
 
 void Creature::Eats(double nutritional_value){
@@ -119,6 +134,7 @@ void Creature::Update(double deltaTime, double const kMapWidth,
   this->Move(deltaTime, kMapWidth, kMapHeight);
   this->Rotate(deltaTime);
   this->Think(grid, GridCellSize);
+  age_ += 0.05;
   if (reproduction_cooldown_ <= 0){
     reproduction_cooldown_ = 0.0;
   } else {

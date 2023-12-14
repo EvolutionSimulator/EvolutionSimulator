@@ -35,6 +35,9 @@ public:
   double GetMaxEnergy() const;
   void SetMaxEnergy(double max_energy);
 
+  double GetAge() const;
+  void SetAge(double age);
+
   void BalanceHealthEnergy();
 
 
@@ -55,7 +58,7 @@ public:
   void SetGeneration(int generation);
 
 protected:
-  double energy_, growth_factor_, health_;
+  double energy_, growth_factor_, health_, age_;
   double max_energy_ = 300;
   double max_size_ = 10;
   neat::NeuralNetwork brain_;
