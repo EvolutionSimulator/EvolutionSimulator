@@ -91,6 +91,7 @@ void Genome::EnableLink(int id) {
   }
 }
 
+
 void Genome::RemoveNeuron(int id) {
   int index_to_delete = -1;
   for (int i = 0; i < neurons_.size(); ++i) {
@@ -105,12 +106,12 @@ void Genome::RemoveNeuron(int id) {
     for (int i=links_.size()-1; i>=0; i--){
       if (neurons_[index_to_delete].GetId() == links_[i].GetInId() ||
           neurons_[index_to_delete].GetId() == links_[i].GetOutId()) {
-          links_to_remove.push_back(links_[i].GetId());
+        links_to_remove.push_back(i);
       }
     }
 
-    for (int i : links_to_remove) {
-      links_.erase(links_.begin() + i);
+    for (int index : links_to_remove) {
+      links_.erase(links_.begin() + index);
     }
 
     neurons_.erase(neurons_.begin() + index_to_delete);
