@@ -116,8 +116,8 @@ void Entity::OnCollision(Entity& other_entity, double const kMapWidth,
   // Calculate the distance between the two entities
   double distance = GetDistance(other_entity);
 
-  // If the distance is zero, throw an error
-  if (distance == 0.0) throw std::runtime_error("Collision distance is 0");
+  // If the distance is zero, return
+  if (distance == 0.0) return;
 
   // Calculate the overlap between the two entities
   double overlap = size_ + other_size - distance;
