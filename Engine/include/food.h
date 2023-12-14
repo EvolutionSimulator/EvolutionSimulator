@@ -31,12 +31,13 @@ protected:
 class Plant : public Food
 {
 public:
-    void Photosynthesize();
+    void Grow();
 private:
     inline const static double max_nutritional_value_ = Environment::kMaxFoodSize * 0.5; //up to 5
     inline const static double default_nutrituonal_value = 0.5;
     inline const static int default_lifespan_ = 30;
     inline const static double photosynthesis_factor_ = 0.1;
+    int age_=0;
 };
 
 class Meat : public Food

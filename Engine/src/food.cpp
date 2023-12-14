@@ -37,23 +37,37 @@ double Food::GetNutritionalValue() const
 }
 
 
-// Simulate photosynthesis and update the nutritional value
-void Plant::Photosynthesize()
+void Plant::Grow()
 {
     double updated_nutritional_value = GetNutritionalValue() + photosynthesis_factor_;
-
-    if (updated_nutritional_value<=Food::max_nutritional_value_){
+    if (updated_nutritional_value <= max_nutritional_value_)
+    {
         SetNutritionalValue(updated_nutritional_value);
     }
 
+    age_++;
+
+    double aging_factor = 0.02; // Adjust this factor
+    updated_nutritional_value = GetNutritionalValue() - aging_factor * age_;
+
+    if (updated_nutritional_value >= 0)
+    {
+        SetNutritionalValue(updated_nutritional_value);
+    }
+    else
+    {
+        SetState(Entity::Dead);
+    }
 }
+
 
 void Meat::Rot()
 {
     double updated_nutritional_value = GetNutritionalValue() - rot_factor_;
-
-    if (updated_nutritional_value<-3){
-        return; //kill the food
+    if (updated_nutritional_value < 0)
+    {
+        SetState(Entity::Dead);
+        return;
     }
     SetNutritionalValue(updated_nutritional_value);
 }
