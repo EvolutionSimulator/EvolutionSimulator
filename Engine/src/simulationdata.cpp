@@ -201,7 +201,7 @@ void SimulationData::CheckCollisions() {
                 for (const std::pair<int, int> neighbour: neighbours){
                     for (Entity* entity2: grid_[neighbour.first][neighbour.second]){
                         if (entity1->CheckCollisionWithEntity(tolerance, *entity2)) {
-                            entity1->OnCollision(*entity2);
+                            entity1->OnCollision(*entity2, environment_.kMapWidth, environment_.kMapHeight);
                         }
                     }
                 }

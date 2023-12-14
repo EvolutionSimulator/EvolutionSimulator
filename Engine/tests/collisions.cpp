@@ -147,7 +147,7 @@ TEST(CollisionTests, OnCollisionWithFood) {
     food.SetState(Entity::Alive);
     food.SetNutritionalValue(10.0);
     double initialEnergy = creature.GetEnergy();
-    creature.OnCollision(food);
+    creature.OnCollision(food, 100, 100);
 
     // Expected result: Creature's energy increases by nutritional value, and food is dead
     EXPECT_EQ(creature.GetEnergy(), initialEnergy + 10.0);
@@ -157,7 +157,7 @@ TEST(CollisionTests, OnCollisionWithFood) {
     food.SetState(Entity::Dead);
     food.SetNutritionalValue(10.0);
     initialEnergy = creature.GetEnergy();
-    creature.OnCollision(food);
+    creature.OnCollision(food, 100, 100);
 
     // Expected result: Creature's energy remains unchanged, and food is still dead
     EXPECT_EQ(creature.GetEnergy(), initialEnergy);
@@ -167,7 +167,7 @@ TEST(CollisionTests, OnCollisionWithFood) {
     creature.SetEnergy(0.0);
     food.SetState(Entity::Alive);
     food.SetNutritionalValue(10.0);
-    creature.OnCollision(food);
+    creature.OnCollision(food, 100, 100);
 
     // Expected result: Creature's energy increases by nutritional value, and food is dead
     EXPECT_EQ(creature.GetEnergy(), 10.0);
@@ -175,13 +175,32 @@ TEST(CollisionTests, OnCollisionWithFood) {
 
     // Case 4: Food is dead, Creature has non-zero energy, and Creature collides again
     double initialEnergy2 = creature.GetEnergy();
-    creature.OnCollision(food);
+    creature.OnCollision(food, 100, 100);
 
     // Expected result: Creature's energy remains unchanged, and food is still dead
     EXPECT_EQ(creature.GetEnergy(), initialEnergy2);
     EXPECT_EQ(food.GetState(), Entity::Dead);
 }
 
+TEST(CollisionTests, OnCollisionWithEntity) {
+    Entity entity1, entity2;
+    double kMapWidth = 100.0, kMapHeight = 100.0;
+
+    // Set initial coordinates and sizes
+    entity1.SetCoordinates(50.0, 50.0, kMapWidth, kMapHeight);
+    entity1.SetSize(10.0);
+    entity2.SetCoordinates(60.0, 60.0, kMapWidth, kMapHeight);
+    entity2.SetSize(10.0);
+    EXPECT_TRUE(entity1.CheckCollisionWithEntity(0.0, entity2));
+
+    // Call OnCollision
+    entity1.OnCollision(entity2, kMapWidth, kMapHeight);
+
+    // Check if the distance between the entities is greater than the sum of their sizes
+    double distance = entity1.GetDistance(entity2);
+    double sum_of_sizes = entity1.GetSize() + entity2.GetSize();
+    EXPECT_FALSE(entity1.CheckCollisionWithEntity(0.0, entity2));
+}
 
 // Test suite for Creature class
 class CreatureTest : public ::testing::Test {

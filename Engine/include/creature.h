@@ -29,8 +29,8 @@ public:
 
   void HealthToEnergy();
   void EnergyToHealth();
-
-  void OnCollision(Entity& other_entity) override;
+  void OnCollision(Entity &other_entity, double const kMapWidth,
+                   double const kMapHeight) override;
 
   bool Fit();
 
