@@ -21,6 +21,21 @@ void SimulationData::RemoveCreature(const Creature& creature)
                      creatures_.end());
 }
 
+myEnvironment::Environment SimulationData::GetEnvironment()
+{
+    return environment_;
+}
+
+myEnvironment::Environment SimulationData::SetEnvironment(myEnvironment::Environment& environment)
+{
+    environment_ = environment;
+}
+
+std::vector<std::vector<std::vector<Entity*> > > SimulationData::GetGrid()
+{
+    return grid_;
+}
+
 /*!
  * Iterate through the vector and modify each entity
  */
@@ -83,19 +98,18 @@ void SimulationData::ReproduceCreatures(){
 }
 
 
-
+/*!
+ * Initializes creatures randomly on the map, mutating their genome 30 times
+ */
 void SimulationData::InitializeCreatures() {
-    // Retrieve information from the environment
     double world_width = environment_.kMapWidth;
     double world_height = environment_.kMapHeight;
     double creature_density = environment_.kCreatureDensity;
     double max_creature_size = environment_.kMaxCreatureSize;
     double min_creature_size = environment_.kMinCreatureSize;
 
-    // Clear existing entities
     creatures_.clear();
 
-    // Initialize entities randomly on the map
     for (double x = 0; x < world_width; x += 2.0) {
         for (double y = 0; y < world_height; y += 2.0) {
             if (std::rand() / (RAND_MAX + 1.0) < creature_density) {
@@ -109,14 +123,14 @@ void SimulationData::InitializeCreatures() {
     }
 }
 
-// Function to initialize the environment
-void SimulationData::InitializeFood() {
-    double kFoodDensity = environment_.GetFoodDensity(); // Use the getter here
+/*!
+ * Initializes food randomly on the map
+ */
 
-    // Clear existing food entities before repopulating
+void SimulationData::InitializeFood() {
+    double kFoodDensity = environment_.GetFoodDensity();
     food_entities_.clear();
 
-    // Populate the vector with food entities based on the current food density
     for (double x = 0; x < environment_.kMapWidth; x += 10.0) {
         for (double y = 0; y < environment_.kMapHeight; y += 10.0) {
             if (std::rand() / (RAND_MAX + 1.0) < kFoodDensity) {
@@ -126,15 +140,16 @@ void SimulationData::InitializeFood() {
     }
 }
 
+/*!
+ * Initializes the empty grid to place entities in and places them in the right square
+ */
 void SimulationData::InitializeGrid() {
 
-    // Number of grid cells
     int num_cells_x = static_cast<int>(std::ceil(static_cast<double>(environment_.kMapWidth) / environment_.kGridCellSize)) + 1;
     int num_cells_y = static_cast<int>(std::ceil(static_cast<double>(environment_.kMapHeight) / environment_.kGridCellSize)) + 1;
-    // Resize the grid to the specified dimensions
+
     grid_.assign(num_cells_x, std::vector<std::vector<Entity*> >(num_cells_y));
 
-    // Update the grid
     UpdateGrid();
 }
 
@@ -146,17 +161,17 @@ void SimulationData::ClearGrid() {
     }
 }
 
+/*!
+ * Deletes dead entities, and places remaining ones in grid
+ */
 template <typename EntityType>
 void UpdateGridTemplate(std::vector<EntityType>& entities, std::vector<std::vector<std::vector<Entity*> > >& entityGrid, double cellSize) {
 
-    // Remove dead entities from the entities vector and update the grid for alive entities
     entities.erase(std::remove_if(entities.begin(), entities.end(), [](const EntityType& entity) {
                        return entity.GetState() != Entity::Alive;
                    }), entities.end());
 
-    // Update the grid based on entity positions and store entity indices
     for (EntityType& entity : entities) {
-        // Update the grid for alive entities
         std::pair<double, double> coordinates = entity.GetCoordinates();
         int gridX = static_cast<int>(coordinates.first / cellSize);
         int gridY = static_cast<int>(coordinates.second / cellSize);
@@ -164,6 +179,7 @@ void UpdateGridTemplate(std::vector<EntityType>& entities, std::vector<std::vect
         entityGrid[gridX][gridY].push_back(&entity);
     }
 }
+
 
 void SimulationData::UpdateGrid() {
     ClearGrid();

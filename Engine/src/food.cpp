@@ -3,19 +3,19 @@
 #include "cstdlib"
 #include "environment.h"
 Food::Food()
-    : Entity(std::rand()%Environment::kMaxFoodSize), nutritional_value_(Environment::kBaseNutritionalValue)
+    : Entity(std::rand()%myEnvironment::Environment::kMaxFoodSize), nutritional_value_(myEnvironment::Environment::kBaseNutritionalValue)
 {
     // Constructor implementation
 }
 
 Food::Food(const double x_coord, const double y_coord)
-    : Entity(x_coord, y_coord, std::rand()%Environment::kMaxFoodSize), nutritional_value_(Environment::kBaseNutritionalValue)
+    : Entity(x_coord, y_coord, std::rand()%myEnvironment::Environment::kMaxFoodSize), nutritional_value_(myEnvironment::Environment::kBaseNutritionalValue)
 {
     //Constructor implementation
 }
 
 Food::Food(const double x_coord, const double y_coord, const double size)
-    : Entity(x_coord, y_coord, size), nutritional_value_(Environment::kBaseNutritionalValue)
+    : Entity(x_coord, y_coord, size), nutritional_value_(myEnvironment::Environment::kBaseNutritionalValue)
 {
     //Constructor implementation
 }

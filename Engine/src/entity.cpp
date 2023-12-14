@@ -3,6 +3,7 @@
 #include <cmath>
 #include <stdexcept>
 #include <cassert>
+#include "environment.h"
 
 // Entity constructor
 Entity::Entity()

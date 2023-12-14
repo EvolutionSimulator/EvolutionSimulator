@@ -18,10 +18,10 @@ public:
     void UpdateEnvironment();
 
     Simulation* GetSimulation();
-    Environment& GetEnvironment();
+    myEnvironment::Environment& GetEnvironment();
 
 private:
-    Environment environment_;
+    myEnvironment::Environment environment_;
     const double kFixedUpdateInterval = 0.05; // how often FixedUpdate is called
     Simulation* simulation_;
     bool running_ = false;
