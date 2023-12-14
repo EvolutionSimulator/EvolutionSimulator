@@ -7,7 +7,7 @@
 
 class Simulation {
 public:
-    explicit Simulation(Environment& environment); // New constructor accepting Environment reference
+  explicit Simulation(myEnvironment::Environment& environment); // New constructor accepting Environment reference
     ~Simulation();
     SimulationData* GetSimulationData();
     void Start();

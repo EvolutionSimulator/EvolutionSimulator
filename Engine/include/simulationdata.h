@@ -9,7 +9,7 @@
 struct SimulationData {
 public:
 
-    explicit SimulationData(Environment& env)
+  explicit SimulationData(myEnvironment::Environment& env)
         : environment_(env), creatures_(), food_entities_() {
         InitializeFood();
         InitializeCreatures();
@@ -34,6 +34,11 @@ public:
     void ModifyAllCreatures(double delta_x, double delta_y);
     void UpdateAllCreatures(double deltaTime);
 
+    myEnvironment::Environment GetEnvironment();
+    myEnvironment::Environment SetEnvironment(myEnvironment::Environment& environment);
+    std::vector<std::vector<std::vector<Entity*> > > GetGrid();
+
+
     void ReproduceCreatures();
 
     std::vector<Creature> creatures_;
@@ -42,7 +47,7 @@ public:
 
     double world_time_ = 0;
 private:
-    Environment& environment_;
+    myEnvironment::Environment& environment_;
     std::vector<std::vector<std::vector<Entity*> > > grid_;
 
 };

@@ -5,6 +5,8 @@
 #include "collisions.h"
 #include "creature.h"
 #include "food.h"
+#include "simulationdata.h"
+#include "environment.h"
 
 
 using namespace testing;
@@ -146,6 +148,7 @@ TEST(CollisionTests, OnCollisionWithFood) {
     // Case 1: Food is alive, and Creature collides with it
     food.SetState(Entity::Alive);
     food.SetNutritionalValue(10.0);
+    creature.SetEnergy(30.0);
     double initialEnergy = creature.GetEnergy();
     creature.OnCollision(food, 100, 100);
 
@@ -336,3 +339,94 @@ TEST_F(CreatureTest, GetClosestFoodTest2) {
     delete cr;
 }
 
+TEST(SimulationDataTest, GridInitialization) {
+    myEnvironment::Environment environment;
+    SimulationData simData(environment);
+    simData.InitializeGrid();
+
+    int expectedNumCellsX = static_cast<int>(std::ceil(static_cast<double>(simData.GetEnvironment().kMapWidth) / simData.GetEnvironment().kGridCellSize)) + 1;
+    int expectedNumCellsY = static_cast<int>(std::ceil(static_cast<double>(simData.GetEnvironment().kMapHeight) / simData.GetEnvironment().kGridCellSize)) + 1;
+
+    EXPECT_EQ(simData.GetGrid().size(), expectedNumCellsX);
+    for (const auto& row : simData.GetGrid()) {
+        EXPECT_EQ(row.size(), expectedNumCellsY);
+    }
+}
+
+TEST(SimulationDataTest, UpdateGridWithAliveEntities) {
+    myEnvironment::Environment environment;
+    SimulationData simData(environment);
+    simData.InitializeGrid();
+    simData.creatures_.clear();
+    simData.food_entities_.clear();
+    simData.ClearGrid();
+
+    Creature creature_1(neat::Genome(2,3));
+    creature_1.SetCoordinates(2.1,3.4,100.0,100.0);
+    creature_1.SetSize(10.0);
+    simData.creatures_.push_back(creature_1);
+
+    Creature creature_2(neat::Genome(2,3));
+    creature_2.SetCoordinates(1.1,2.4,100.0,100.0);
+    creature_2.SetSize(10.0);
+    creature_2.SetState(Entity::Dead);
+    simData.creatures_.push_back(creature_2);
+
+    simData.food_entities_.push_back(Food(2.5,3.4,5.0));
+    simData.food_entities_.push_back(Food(2.7,9,5.0));
+    Food food(5.3, 6.7, 4.0);
+    food.SetState(Entity::Dead);
+    simData.food_entities_.push_back(food);
+
+    simData.UpdateGrid();
+
+    for (const auto& row : simData.GetGrid()) {
+        for (const auto& cell : row) {
+          for (const auto& entity : cell) {
+            EXPECT_EQ(entity->GetState(), Entity::Alive);
+          }
+        }
+    }
+}
+
+
+TEST(SimulationDataTest, CorrectEntityPlacementInGrid) {
+    myEnvironment::Environment environment;
+    SimulationData simData(environment);
+    simData.InitializeGrid();
+    simData.creatures_.clear();
+    simData.food_entities_.clear();
+    simData.ClearGrid();
+
+    Creature creature_1(neat::Genome(2,3));
+    creature_1.SetCoordinates(200.1, 300.4,environment.kMapWidth, environment.kMapHeight);
+    creature_1.SetSize(10.0);
+    simData.creatures_.push_back(creature_1);
+
+    Creature creature_2(neat::Genome(2,3));
+    creature_2.SetCoordinates(100.1, 350.4,environment.kMapWidth, environment.kMapHeight);
+    creature_2.SetSize(10.0);
+    creature_2.SetState(Entity::Dead);
+    simData.creatures_.push_back(creature_2);
+
+    Food food_1(200.5,300.4,5.0);
+    Food food_2(200.7,400,5.0);
+    simData.food_entities_.push_back(food_1);
+    simData.food_entities_.push_back(food_2);
+    Food food_3(50.3, 60.7, 4.0);
+    food_3.SetState(Entity::Dead);
+    simData.food_entities_.push_back(food_3);
+
+    simData.UpdateGrid();
+
+    auto creatureCoordinates = creature_1.GetCoordinates();
+    int creatureGridX = static_cast<int>(creatureCoordinates.first / simData.GetEnvironment().kGridCellSize);
+    int creatureGridY = static_cast<int>(creatureCoordinates.second / simData.GetEnvironment().kGridCellSize);
+
+    auto foodCoordinates = food_1.GetCoordinates();
+    int foodGridX = static_cast<int>(foodCoordinates.first / simData.GetEnvironment().kGridCellSize);
+    int foodGridY = static_cast<int>(foodCoordinates.second / simData.GetEnvironment().kGridCellSize);
+
+    EXPECT_NE(simData.GetGrid()[creatureGridX][creatureGridY].empty(), true);
+    EXPECT_NE(simData.GetGrid()[foodGridX][foodGridY].empty(), true);
+}
