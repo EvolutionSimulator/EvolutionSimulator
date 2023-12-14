@@ -15,21 +15,32 @@ void Creature::SetGeneration(int generation){
 
 double Creature::GetEnergy() const { return energy_; }
 
-
-void Creature::HealthToEnergy() {
+void Creature::BalanceHealthEnergy() {
     if (GetEnergy() < 0) {
         SetHealth(GetHealth() + GetEnergy()-5);
         SetEnergy(5);
+        if (GetHealth() >= (GetEnergy()-5)) {
+            SetHealth(GetHealth()- GetEnergy()-5);
+            SetEnergy(5);
+        } else {
             SetHealth((GetHealth()+GetEnergy()) / 2);
             SetEnergy(GetHealth());
         }
-    } else if (GetEnergy() > max_energy_) {
-        SetHealth(GetHealth()+ (GetEnergy()-max_energy_));
-        SetEnergy(max_energy_);
-    } else if (GetHealth() > GetEnergy() && GetEnergy() <= healthToEnergy){
+    } else if (GetHealth() < 0) {
+        if (GetEnergy() >= (GetHealth()-5)) {
+            SetEnergy(GetEnergy()- GetHealth()-5);
+            SetHealth(5);
+        } else {
+            SetHealth((GetHealth()+GetEnergy()) / 2);
+            SetEnergy(GetHealth());
+        }
+    } else if (GetEnergy() > GetMaxEnergy()) {
+        SetHealth(GetHealth()+ (GetEnergy()-GetMaxEnergy()));
+        SetEnergy(GetMaxEnergy());
+    } else if (GetHealth() > GetEnergy() && GetEnergy() <= settings::environment::kHealthToEnergy){
         SetEnergy(GetEnergy()+5);
         SetHealth(GetHealth()-5);
-    } else if (GetHealth() < GetEnergy() && GetEnergy() >= energyToHealth){
+    } else if (GetHealth() < GetEnergy() && GetEnergy() >= settings::environment::kEnergyToHealth){
         SetEnergy(GetEnergy()-5);
         SetHealth(GetHealth()+5);
     }
@@ -82,6 +93,14 @@ bool Creature::Fit() {
 void Creature::Reproduced() {
   SetEnergy(GetEnergy() - 0.75*max_energy_);
   reproduction_cooldown_ = settings::environment::kReproductionCooldown;
+}
+
+double Creature::GetMaxEnergy() const {
+  return max_energy_;
+}
+
+void Creature::SetMaxEnergy(double max_energy) {
+  max_energy_ = max_energy;
 }
 
 void Creature::Eats(double nutritional_value){
