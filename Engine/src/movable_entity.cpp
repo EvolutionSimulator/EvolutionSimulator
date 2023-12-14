@@ -38,7 +38,7 @@ void MovableEntity::Move(double deltaTime, const double kMapWidth, const double 
     this->SetCoordinates(coordinates.first, coordinates.second, kMapWidth, kMapHeight);
 }
 
-void MovableEntity::OnCollision(Entity& other_entity)
-{
-
+void MovableEntity::OnCollision(Entity& other_entity, double const kMapWidth,
+                                double const kMapHeight) {
+  Entity::OnCollision(other_entity, kMapWidth, kMapHeight);
 }

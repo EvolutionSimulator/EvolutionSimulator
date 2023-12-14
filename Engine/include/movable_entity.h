@@ -16,7 +16,8 @@ public:
     void Move(double deltaTime, const double kMapWidth, const double kMapHeight);
     void Rotate(double deltaTime);
 
-    virtual void OnCollision(Entity& other_entity);
+    virtual void OnCollision(Entity& other_entity, double const kMapWidth,
+                             double const kMapHeight);
 
 protected:
     double velocity_forward_;

@@ -83,7 +83,8 @@ void Creature::Update(double deltaTime, double const kMapWidth,
 
 neat::Genome Creature::GetGenome() { return genome_; }
 
-void Creature::OnCollision(Entity& other_entity)
+void Creature::OnCollision(Entity &other_entity, double const kMapWidth,
+                           double const kMapHeight)
 {
     if (Food* food = dynamic_cast<Food*>(&other_entity))
     {
@@ -95,7 +96,7 @@ void Creature::OnCollision(Entity& other_entity)
     }
     else
     {
-        Entity::OnCollision(other_entity);
+        Entity::OnCollision(other_entity, kMapWidth, kMapHeight);
     }
 }
 
