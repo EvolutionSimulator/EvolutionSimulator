@@ -7,7 +7,6 @@
 #include <QMouseEvent>
 #include <QPainter>
 
-
 SimulationCanvas::SimulationCanvas(QWidget* Parent) : QSFMLCanvas(Parent), showInfoPanel(false) {
     render_lambda_ = [this](SimulationData* data) {
         this->RenderSimulation(data);
@@ -37,19 +36,23 @@ void SimulationCanvas::OnUpdate() {
         sf::Vector2f panelSize(200.f, 100.f);
         sf::Vector2f panelPosition(clickedCreaturePos->first, clickedCreaturePos->second);
 
-        // Draw a gray rectangle
         sf::RectangleShape panel(panelSize);
-        panel.setFillColor(sf::Color(200, 200, 200, 200)); // Semi-transparent gray
+        panel.setFillColor(sf::Color(50, 50, 50, 205));
+        panel.setOutlineThickness(2.0f);
+        panel.setOutlineColor(sf::Color::Black);
         panel.setPosition(panelPosition);
 
-        // Create text
         sf::Text text;
-        sf::Font font; // In SFML, sf::Font has a default constructor you can use for the default font
+        sf::Font font;
+
+        if (!font.loadFromFile("../../../../../EvolutionSimulator/UI/font.ttf")) {
+            std::cerr << "Failed to load font!" << std::endl;
+            return;
+        }
         text.setFont(font);
         text.setString("This is a creature");
         text.setCharacterSize(20);
-        text.setFillColor(sf::Color::Black);
-        // Position the text inside the panel with some padding
+        text.setFillColor(sf::Color::White);
         text.setPosition(panelPosition.x + 10, panelPosition.y + 10);
 
         draw(panel);
@@ -245,7 +248,7 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
         std::cout << "A creature was clicked at (" << mousePos.x << ", " << mousePos.y << ")" << std::endl;
         showInfoPanel = true;
         clickedCreaturePos = std::make_pair(mousePos.x, mousePos.y);
-        repaint(); // Request to repaint the widget
+        repaint();
     } else {
         std::cout << "No creature was clicked." << std::endl;
         showInfoPanel = false;
