@@ -1,6 +1,8 @@
 #include "entity.h"
 #include <random>
 #include <cmath>
+#include <stdexcept>
+#include <cassert>
 
 // Entity constructor
 Entity::Entity()
