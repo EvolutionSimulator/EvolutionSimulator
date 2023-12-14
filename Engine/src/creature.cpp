@@ -3,28 +3,60 @@
 #include <cassert>
 
 Creature::Creature(neat::Genome genome)
-    : MovableEntity(), energy_(1000.0), brain_(neat::NeuralNetwork(genome)),
-      genome_(genome), neuron_data_(8,0)  {}
+    : MovableEntity(), health_(100), energy_(100), brain_(neat::NeuralNetwork(genome)), genome_(genome), neuron_data_(8,0) {
+}
 
 double Creature::GetEnergy() const { return energy_; }
 
-void Creature::SetEnergy(double energy) { energy_ = energy; }
+void Creature::HealthToEnergy() {
+    if (GetEnergy() < 0) {
+        SetHealth(GetHealth()- GetEnergy()-5);
+        SetEnergy(5);
+    }
+    SetEnergy(GetEnergy() + 5);
+    SetHealth(GetHealth() - 5);
+}
 
-void Creature::UpdateEnergy() {
-  SetEnergy(GetEnergy() -
-            (GetVelocityForward() + GetRotationalVelocity()) * GetSize()/10000);
+void Creature::EnergyToHealth() {
+    SetEnergy(GetEnergy() - 5);
+    SetHealth(GetHealth() + 5);
+}
 
-  if (GetEnergy() <= 0) {
-    Dies();
-  }
+double Creature::GetHealth() const {
+    return health_;
+}
+
+void Creature::SetHealth(double health) {
+    if (health > 100) {
+        health_ = 100;
+    } else {
+        health_ = health;
+    }
 }
 
 void Creature::Dies() { SetState(Dead); }
 
-void Creature::Eats(double nutritional_value) {
-  SetEnergy(GetEnergy() + nutritional_value);
+void Creature::SetEnergy(double energy) {
+    if (energy > 100) {
+        energy_ = 100;
+    } else {
+        energy_ = energy;
+    }
 }
 
+void Creature::UpdateEnergy(const double energyToHealth, const double healthToEnergy){
+    SetEnergy( GetEnergy() - (GetVelocityForward() + GetRotationalVelocity()) * GetSize()/1000);
+
+    if (GetEnergy() <= healthToEnergy){
+        HealthToEnergy();
+    } else if (GetEnergy() >= energyToHealth){
+        EnergyToHealth();
+    }
+
+    if (GetHealth() <= 0){
+        Dies();
+    }
+}
 bool Creature::Fit() {
   if (energy_ > cfg::reproduction_threshold*max_energy_) {
     return true;
@@ -32,11 +64,18 @@ bool Creature::Fit() {
   return false;
 }
 
+void Creature::Eats(double nutritional_value){
+  SetEnergy(GetEnergy() + nutritional_value);
+  if (GetEnergy() > 100) {
+    EnergyToHealth();
+  }
+}
+
 void Creature::Update(double deltaTime, double const kMapWidth,
                       double const kMapHeight,
                       std::vector<std::vector<std::vector<Entity*> > > &grid,
                       double GridCellSize) {
-  this->UpdateEnergy();
+  this->UpdateEnergy(70, 5);
   this->Move(deltaTime, kMapWidth, kMapHeight);
   this->Rotate(deltaTime);
   this->Think(grid, GridCellSize);
@@ -59,6 +98,7 @@ void Creature::OnCollision(Entity& other_entity)
         Entity::OnCollision(other_entity);
     }
 }
+
 void Creature::SetGrowthFactor(double growth_factor) {
   growth_factor_ = growth_factor;
 }
@@ -124,8 +164,9 @@ Food *Creature::GetClosestFood(
       closest_food = food;
       smallest_distance = distance;
     }
-  }
-  return closest_food;
+    assert( !closest_food_entities.empty());
+    return closest_food;
+    }
 }
 
 std::vector<Food *> get_food_at_distance(

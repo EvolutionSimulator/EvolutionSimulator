@@ -1,8 +1,8 @@
 #include "simulation.h"
 
-Simulation::Simulation()
+Simulation::Simulation(Environment& environment)
 {
-    data_ = new SimulationData();
+    data_ = new SimulationData(environment);
     is_running_ = true; // Initialize the flag to true
 }
 
@@ -13,7 +13,7 @@ Simulation::~Simulation()
 
 // Called once at the start of the simulation
 void Simulation::Start() {
-
+    std::lock_guard<std::mutex> lock(data_mutex_);
 }
 
 // Called every update cycle
@@ -33,7 +33,7 @@ void Simulation::FixedUpdate(double deltaTime)
     data_->ReproduceCreatures();
     data_->CheckCollisions();
     data_->UpdateGrid();
-
+    data_->world_time_ += deltaTime;
 }
 
 // Facilitates data processing with external functions in a thread-safe manner

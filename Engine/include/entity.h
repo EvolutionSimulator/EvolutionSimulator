@@ -25,25 +25,22 @@ public:
   double GetOrientation() const;
   void SetOrientation(double orientation);
 
-  virtual void OnCollision(Entity& other_entity);
-
   states GetState() const;
   void SetState(states state);
 
+  virtual void OnCollision(Entity &otherEntity);
   double GetDistance(const Entity &otherEntity) const;
   bool CheckCollisionWithEntity(const double tolerance,
                                 const Entity &otherEntity) const {
-    return CollisionCircleCircle(tolerance, GetCoordinates(), GetSize(),
+  return CollisionCircleCircle(tolerance, GetCoordinates(), GetSize(),
                                  otherEntity.GetCoordinates(),
                                  otherEntity.GetSize());
   }
   double GetRelativeOrientation(const Entity& otherEntity) const;
 
-
-
 protected:
-    double x_coord_, y_coord_, orientation_, size_;
-    states state_;
+  double x_coord_, y_coord_, orientation_, size_;
+  states state_;
 };
 
 #endif // ENTITY_H

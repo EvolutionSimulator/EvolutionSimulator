@@ -10,6 +10,7 @@ class Engine
 {
 public:
     Engine();
+    Engine(double food_density, double creature_density);
     ~Engine();
 
     void Run();
@@ -21,12 +22,12 @@ public:
 
 private:
     Environment environment_;
-    const double fixedUpdateInterval = 0.05; // how often FixedUpdate is called
+    const double kFixedUpdateInterval = 0.05; // how often FixedUpdate is called
     Simulation* simulation_;
     bool running_ = false;
 
     typedef std::chrono::system_clock timer;
-    timer::time_point engineStartTime_;
-    timer::time_point lastUpdateTime_;
-    timer::time_point lastFixedUpdateTime_;
+    timer::time_point engine_start_time_;
+    timer::time_point last_update_time_;
+    timer::time_point last_fixed_update_time_;
 };

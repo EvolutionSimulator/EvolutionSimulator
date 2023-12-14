@@ -14,7 +14,7 @@ public:
 
   void Dies();
   void Eats(double nutritional_value);
-  void UpdateEnergy();
+  void UpdateEnergy(const double energyToHealth, const double healthToEnergy);
   double GetEnergy() const;
   void SetEnergy(double energy);
   neat::Genome GetGenome();
@@ -24,7 +24,16 @@ public:
               double GridCellSize);
 
 
+  double GetHealth() const;
+  void SetHealth(double health);
+
+  void HealthToEnergy();
+  void EnergyToHealth();
+
   void OnCollision(Entity& other_entity) override;
+
+  bool Fit();
+
   Food *GetClosestFood(
       std::vector<std::vector<std::vector<Entity*> > > &grid,
       double GridCellSize) const;
@@ -33,14 +42,13 @@ public:
   double GetGrowthFactor();
   void SetMaxSize(double max_size);
   double GetMaxSize();
+
   void Grow(double energy);
   void Think(std::vector<std::vector<std::vector<Entity*> > > &grid, double GridCellSize);
   void ProcessVisionFood(std::vector<std::vector<std::vector<Entity*> > > &grid, double GridCellSize);
 
-  bool Fit();
-
-private:
-  double energy_, growth_factor_;
+protected:
+  double energy_, growth_factor_, health_;
   double max_energy_ = 3000;
   double max_size_ = 10;
   neat::NeuralNetwork brain_;
@@ -53,5 +61,4 @@ private:
 std::vector<Food *> get_food_at_distance(
     std::vector<std::vector<std::vector<Entity*> > > &grid,
     int i_creature, int j_creature, int grid_distance);
-
 #endif // CREATURE_HPP

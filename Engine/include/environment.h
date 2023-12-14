@@ -1,6 +1,7 @@
 #ifndef ENVIRONMENT_H
 #define ENVIRONMENT_H
 #include <vector>
+#include <iostream>
 
 class Environment {
 public:
@@ -8,9 +9,9 @@ public:
     static constexpr double kMapWidth = 1100.0;
     static constexpr double kMapHeight = 450.0;
 
-    // Member variable for food density
-
-    static constexpr double kCreatureDensity = 0.0005; // Constant for creature density
+    // Variable for creature and food density
+    double kFoodDensity;
+    double kCreatureDensity = 0.001;
 
     // Food and creature density for random initialization
     static constexpr int kMaxFoodSize = 15;
@@ -23,16 +24,26 @@ public:
     // Tolerance of collisions
     static constexpr double kTolerance = 1e-3;
 
+    // Energy and Health conversion thresholds
+    static constexpr double energyToHealth = 70.0;
+    static constexpr double healthToEnergy = 10.0;
+
     // Constructor
     Environment();
 
     // Getter and setter for food density
-    void SetFoodDensity(double density) { kFoodDensity = density;}
+    void SetFoodDensity(double density) {
+        kFoodDensity = density;
+    }
     double GetFoodDensity() const {
         return kFoodDensity;
     }
-private:
-    double kFoodDensity = 0.001;
+
+    // Getter and setter for creature density
+    void SetCreatureDensity(double density) { kCreatureDensity = density;}
+    double GetCreatureDensity() const {
+        return kCreatureDensity;
+    }
 };
 
 
