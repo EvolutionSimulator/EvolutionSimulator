@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 
+namespace myEnvironment {
 class Environment {
 public:
     // Map size
@@ -47,6 +48,7 @@ public:
         return kCreatureDensity;
     }
 };
+}
 
 
 #endif // ENVIRONMENT_H

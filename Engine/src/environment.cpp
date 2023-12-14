@@ -4,7 +4,7 @@
 #include <random>
 
 // Constructor implementation
-Environment::Environment()
+myEnvironment::Environment::Environment()
     : kFoodDensity(0.005) // Initialize food density here
 {
 

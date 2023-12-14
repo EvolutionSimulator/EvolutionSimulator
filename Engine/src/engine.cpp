@@ -18,7 +18,7 @@ Engine::~Engine()
     delete simulation_;
 }
 
-Environment& Engine::GetEnvironment() {
+myEnvironment::Environment& Engine::GetEnvironment() {
     return environment_;
 }
 
