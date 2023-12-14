@@ -35,23 +35,24 @@ sf::VertexArray createGradientCircle(float radius, const sf::Color& centerColor,
     const int points = 100;
     sf::VertexArray circle(sf::TriangleFan, points + 2);
 
-    circle[0].position = sf::Vector2f(radius, radius);
+           // Set the center of the circle at the origin (0, 0)
+    circle[0].position = sf::Vector2f(0, 0);
     circle[0].color = centerColor;
 
     for (int i = 1; i <= points + 1; ++i) {
-        float angle = (i - 1) * (2 * M_PI / points);
-        sf::Vector2f point(radius * cos(angle) + radius, radius * sin(angle) + radius);
+      float angle = (i - 1) * (2 * M_PI / points);
+      // The points are now calculated from the origin
+      sf::Vector2f point(radius * cos(angle), radius * sin(angle));
 
-        // Distance from center
-        float dist = std::sqrt(std::pow(point.x - radius, 2) + std::pow(point.y - radius, 2)) / radius;
-        sf::Color color(
-            static_cast<sf::Uint8>(centerColor.r * (1 - dist) + edgeColor.r * dist),
-            static_cast<sf::Uint8>(centerColor.g * (1 - dist) + edgeColor.g * dist),
-            static_cast<sf::Uint8>(centerColor.b * (1 - dist) + edgeColor.b * dist)
-            );
+      float dist = std::sqrt(point.x * point.x + point.y * point.y) / radius;
+      sf::Color color(
+          static_cast<sf::Uint8>(centerColor.r * (1 - dist) + edgeColor.r * dist),
+          static_cast<sf::Uint8>(centerColor.g * (1 - dist) + edgeColor.g * dist),
+          static_cast<sf::Uint8>(centerColor.b * (1 - dist) + edgeColor.b * dist)
+          );
 
-        circle[i].position = point;
-        circle[i].color = color;
+      circle[i].position = point;
+      circle[i].color = color;
     }
 
     return circle;
