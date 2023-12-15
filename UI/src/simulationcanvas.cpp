@@ -6,6 +6,8 @@
 #include <cmath>
 #include <QMouseEvent>
 #include <QPainter>
+#include <sstream>
+
 
 SimulationCanvas::SimulationCanvas(QWidget* Parent) : QSFMLCanvas(Parent), showInfoPanel(false) {
     render_lambda_ = [this](SimulationData* data) {
@@ -42,26 +44,30 @@ void SimulationCanvas::OnUpdate() {
         panel.setOutlineColor(sf::Color::Black);
         panel.setPosition(panelPosition);
 
-        sf::Text text;
+        sf::Text infoText;
         sf::Font font;
-
         if (!font.loadFromFile("../../../../../EvolutionSimulator/UI/font.ttf")) {
             std::cerr << "Failed to load font!" << std::endl;
             return;
         }
-        text.setFont(font);
-        text.setString("This is a creature");
-        text.setCharacterSize(20);
-        text.setFillColor(sf::Color::White);
-        text.setPosition(panelPosition.x + 10, panelPosition.y + 10);
+
+        // Using the creature information stored in the creatureInfo member
+        // Assuming creatureInfo is updated in the mousePressEvent method
+        infoText.setFont(font);
+        infoText.setString(creatureInfo.toStdString()); // Convert QString to std::string
+        infoText.setCharacterSize(15);
+        infoText.setFillColor(sf::Color::White);
+        infoText.setPosition(panelPosition.x + 10, panelPosition.y + 10);
 
         draw(panel);
-        draw(text);
+        draw(infoText);
     } else if (showInfoPanel) {
         std::cout << "Info panel flag is set, but no creature position is recorded." << std::endl;
     } else {
+        // Any other logic when the info panel is not shown
     }
 }
+
 
 sf::VertexArray createGradientCircle(float radius, const sf::Color& centerColor, const sf::Color& edgeColor) {
     const int points = 100;
@@ -243,43 +249,46 @@ void SimulationCanvas::DrawCreatureCountOverTime(sf::RenderWindow& window, const
 }
 
 void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
-    std::cout << "Mouse click detected at widget coordinates (" << event->pos().x() << ", " << event->pos().y() << ")" << std::endl;
     sf::Vector2f mousePos = mapPixelToCoords(sf::Vector2i(event->pos().x(), event->pos().y()));
-    std::cout << "Converted to SFML coordinates (" << mousePos.x << ", " << mousePos.y << ")" << std::endl;
 
-    if (isCreatureClicked(mousePos)) {
-        std::cout << "A creature was clicked at (" << mousePos.x << ", " << mousePos.y << ")" << std::endl;
-        showInfoPanel = true;
-        clickedCreaturePos = std::make_pair(mousePos.x, mousePos.y);
-        repaint();
-    } else {
-        std::cout << "No creature was clicked." << std::endl;
-        showInfoPanel = false;
-    }
-}
-
-
-
-bool SimulationCanvas::isCreatureClicked(const sf::Vector2f& mousePos) {
-    std::cout << "Checking if a creature is clicked..." << std::endl;
     for (const auto& creature : simulation_->GetSimulationData()->creatures_) {
         auto [x, y] = creature.GetCoordinates();
         sf::Vector2f creaturePos(x, y);
-        std::cout << "Creature position: (" << creaturePos.x << ", " << creaturePos.y << ")" << std::endl;
         if (sqrt(pow(mousePos.x - creaturePos.x, 2) + pow(mousePos.y - creaturePos.y, 2)) <= 20) { // Assuming a creature radius of 10
-            std::cout << "Creature clicked!" << std::endl;
+            showInfoPanel = true;
+            clickedCreaturePos = std::make_pair(mousePos.x, mousePos.y);
+            creatureInfo = QString::fromStdString(formatCreatureInfo(creature));
+            repaint();
+            return;
+        }
+    }
+    showInfoPanel = false;
+}
+
+
+bool SimulationCanvas::isCreatureClicked(const sf::Vector2f& mousePos) {
+    for (const auto& creature : simulation_->GetSimulationData()->creatures_) {
+        auto [x, y] = creature.GetCoordinates();
+        sf::Vector2f creaturePos(x, y);
+        if (sqrt(pow(mousePos.x - creaturePos.x, 2) + pow(mousePos.y - creaturePos.y, 2)) <= 20) { // Assuming a creature radius of 10
             return true;
         }
     }
-    std::cout << "No creature at the clicked position." << std::endl;
     return false;
 }
 
 void SimulationCanvas::displayInfoPanel() {
     if (clickedCreaturePos) {
-        std::cout << "This is a creature at position: " << std::endl;
         showInfoPanel = true;
-        creatureInfo = "This is a creature";
         panelRect = QRectF(clickedCreaturePos->first, clickedCreaturePos->second, 200, 100);
     }
+}
+
+std::string SimulationCanvas::formatCreatureInfo(const Creature& creature) {
+    std::stringstream ss;
+    ss << "Creature\n";
+    ss << "Size: " << creature.GetSize() << "\n"; // Assuming Creature class has GetSize method
+    ss << "Health: " << creature.GetHealth() << "\n"; // Assuming Creature class has GetHealth method
+    ss << "Energy Level: " << creature.GetEnergy() << "\n"; // Assuming Creature class has GetEnergyLevel method
+    return ss.str();
 }

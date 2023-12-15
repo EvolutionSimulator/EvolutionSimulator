@@ -5,7 +5,7 @@
 #include "qsfmlcanvas.h"
 #include "simulation.h"
 
-    class SimulationCanvas : public QSFMLCanvas
+class SimulationCanvas : public QSFMLCanvas
 {
     Q_OBJECT
 
@@ -40,5 +40,8 @@ private :
     bool isCreatureClicked(const sf::Vector2f& mousePos);
 
     void displayInfoPanel();
+    std::string formatCreatureInfo(const Creature& creature);
 
 };
+
+
