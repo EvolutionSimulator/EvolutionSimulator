@@ -75,7 +75,9 @@ void SimulationCanvas::RenderSimulation(SimulationData* data)
 
     // Iterate through creatures and create a gradient circle shape for each
     for (const auto& creature : data->creatures_) {
-        sf::VertexArray creatureShape = createGradientCircle(creature.GetSize(), sf::Color(79, 77, 64), sf::Color(41, 40, 38));
+        int generation = creature.GetGeneration();
+        sf::Color color(20 + generation*20, 77, 64);
+        sf::VertexArray creatureShape = createGradientCircle(creature.GetSize(), color, sf::Color(41, 40, 38));
 
         std::pair<double, double> creatureCoordinates = creature.GetCoordinates();
         sf::Transform creatureTransform;

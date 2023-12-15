@@ -21,17 +21,17 @@ namespace settings {
     }
 
     namespace environment {
-        constexpr double kMapWidth                  = 1000.0;
-        constexpr double kMapHeight                 = 300.0;
+        constexpr double kMapWidth                  = 1100.0;
+        constexpr double kMapHeight                 = 450.0;
         constexpr double kCreatureDensity           = 0.001;
-        constexpr int    kMaxFoodSize               = 30;
-        constexpr int    kMaxCreatureSize           = 30;
+        constexpr int    kMaxFoodSize               = 15;
+        constexpr int    kMaxCreatureSize           = 15;
         constexpr double kTolerance                 = 1e-3;
         constexpr double kDefaultFoodDensity        = 0.005;
         constexpr double kEnergyToHealth            = 70.0;
         constexpr double kHealthToEnergy            = 10.0;
         constexpr double kDefaultCreatureDensity    = 0.001;
-        constexpr double kBaseNutritionalValue      = 20.0;
+        constexpr double kBaseNutritionalValue      = 4.0;
         constexpr double kGridCellSize              = 50.0;
         constexpr int    kMinCreatureSize           = 2;
         constexpr double kReproductionThreshold     = 0.5;
