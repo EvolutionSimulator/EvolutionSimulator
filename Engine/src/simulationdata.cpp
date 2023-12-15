@@ -200,12 +200,48 @@ void UpdateGridTemplate(std::vector<EntityType>& entities, std::vector<std::vect
     }
 }
 
+/*!
+ * @brief Removes creatures with a state of 'Dead' from a given queue.
+ *
+ * This function iterates through the provided queue of creatures, `reproduce`,
+ * and removes any creature that has a state of 'Dead'. It maintains the order
+ * of the remaining creatures. The removal is achieved by transferring creatures
+ * that are not dead to a temporary queue, and then replacing the original queue
+ * with this temporary queue. It's assumed that the Creature class has a
+ * `GetState` method that returns the creature's current state, and there's an
+ * enumerator `CreatureState::Dead` representing the dead state.
+ *
+ * @param reproduce A queue of Creature objects, potentially containing dead creatures.
+ * @return void The function does not return a value but modifies the queue in place.
+ */
+void UpdateQueue(std::queue<Creature>& reproduce) {
+    std::queue<Creature> tempQueue;
+
+    while (!reproduce.empty()) {
+        Creature currentCreature = reproduce.front();
+        reproduce.pop();
+
+        // Check if the current creature is not dead
+        if (currentCreature.GetState() != Entity::Dead) {
+            tempQueue.push(currentCreature);
+        }
+    }
+
+    // Replace the original queue with the temporary queue
+    // containing all living creatures
+    reproduce = std::move(tempQueue);
+}
+
 
 void SimulationData::UpdateGrid() {
     ClearGrid();
     UpdateGridTemplate<Creature>(creatures_, grid_, settings::environment::kGridCellSize);
     UpdateGridTemplate<Food>(food_entities_, grid_, settings::environment::kGridCellSize);
+    UpdateQueue(reproduce_);
 }
+
+
+
 
 //Neighbours including the center itself
 std::vector<std::pair<int, int>> GetNeighbours(const int& num_rows, const int& num_cols, const std::pair<int, int>& center, const int& layer_number){
