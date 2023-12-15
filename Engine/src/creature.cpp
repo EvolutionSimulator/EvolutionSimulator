@@ -6,7 +6,11 @@ Creature::Creature(neat::Genome genome)
     : MovableEntity(), health_(100), energy_(100), brain_(neat::NeuralNetwork(genome)), genome_(genome), neuron_data_(settings::environment::kInputNeurons,0) {
 }
 
-int Creature::getGeneration() const {return generation_;}
+int Creature::GetGeneration() const {return generation_;}
+
+void Creature::SetGeneration(int generation){
+    generation_ = generation;
+}
 
 double Creature::GetEnergy() const { return energy_; }
 
@@ -39,7 +43,7 @@ void Creature::SetHealth(double health) {
 void Creature::Dies() { SetState(Dead); }
 
 void Creature::SetEnergy(double energy) {
-    if (energy > 100) {
+    if (energy > max_energy_) {
         energy_ = 100;
     } else {
         energy_ = energy;
@@ -47,7 +51,7 @@ void Creature::SetEnergy(double energy) {
 }
 
 void Creature::UpdateEnergy(const double energyToHealth, const double healthToEnergy, double deltaTime){
-    SetEnergy( GetEnergy() - (GetVelocityForward() + GetRotationalVelocity() + 10) * GetSize() * deltaTime/100);
+    SetEnergy( GetEnergy() - (GetVelocityForward() + GetRotationalVelocity() + 50) * GetSize() * deltaTime/100);
 
     if (GetEnergy() <= healthToEnergy){
         HealthToEnergy();
@@ -121,8 +125,9 @@ void Creature::Think(std::vector<std::vector<std::vector<Entity*> > > &grid, dou
     if(output.at(0) > 50){
         velocity_forward_=50;
     } else {
-        velocity_forward_ = output.at(0);
+        velocity_forward_ = output.at(0) > 0 ? output.at(0) : 0;
     }
+
     rotational_velocity_ = output.at(1);
 }
 
