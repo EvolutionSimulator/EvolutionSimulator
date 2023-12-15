@@ -21,7 +21,7 @@ void Creature::BalanceHealthEnergy() {
         SetHealth(GetHealth() + GetEnergy()-5);
         SetEnergy(5);
         if (GetHealth() >= (GetEnergy()-5)) {
-            SetHealth(GetHealth()- GetEnergy()-5);
+            SetHealth(GetHealth()+ (GetEnergy()-5));
             SetEnergy(5);
         } else {
             SetHealth((GetHealth()+GetEnergy()) / 2);
@@ -74,7 +74,7 @@ void Creature::SetEnergy(double energy) {
 
 
 
-void Creature::UpdateEnergy(const double energyToHealth, const double healthToEnergy, double deltaTime){
+void Creature::UpdateEnergy(double deltaTime){
     SetEnergy( GetEnergy() - (GetVelocityForward() + GetRotationalVelocity() + 50) * GetSize() * deltaTime/100);
 
     BalanceHealthEnergy();
@@ -130,7 +130,7 @@ void Creature::Update(double deltaTime, double const kMapWidth,
                       double const kMapHeight,
                       std::vector<std::vector<std::vector<Entity*> > > &grid,
                       double GridCellSize) {
-  this->UpdateEnergy(70, 5, deltaTime);
+  this->UpdateEnergy(deltaTime);
   this->Move(deltaTime, kMapWidth, kMapHeight);
   this->Rotate(deltaTime);
   this->Think(grid, GridCellSize);

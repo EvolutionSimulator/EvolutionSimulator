@@ -14,7 +14,7 @@ public:
 
   void Dies();
   void Eats(double nutritional_value);
-  void UpdateEnergy(const double energyToHealth, const double healthToEnergy, double deltaTime);
+  void UpdateEnergy(double deltaTime);
   double GetEnergy() const;
   void SetEnergy(double energy);
   neat::Genome GetGenome();
