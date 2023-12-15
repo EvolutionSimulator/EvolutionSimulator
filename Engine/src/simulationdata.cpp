@@ -100,6 +100,7 @@ void SimulationData::ReproduceCreatures(){
             new_genome.Mutate();
             Creature new_creature(new_genome);
             new_creature.RandomInitialization(world_width, world_height, max_creature_size, min_creature_size);
+            new_creature.SetGeneration(creature1.GetGeneration()+1);
             AddCreature(new_creature);
         } else {
             neat::Genome new_genome = neat::Crossover(creature2.GetGenome(), creature1.GetGenome());
@@ -107,6 +108,7 @@ void SimulationData::ReproduceCreatures(){
             new_genome.Mutate();
             Creature new_creature(new_genome);
             new_creature.RandomInitialization(world_width, world_height, max_creature_size, min_creature_size);
+            new_creature.SetGeneration(creature2.GetGeneration()+1);
             AddCreature(new_creature);
         }
     }

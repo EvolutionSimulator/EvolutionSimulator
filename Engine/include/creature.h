@@ -47,6 +47,9 @@ public:
   void Think(std::vector<std::vector<std::vector<Entity*> > > &grid, double GridCellSize);
   void ProcessVisionFood(std::vector<std::vector<std::vector<Entity*> > > &grid, double GridCellSize);
 
+  int GetGeneration() const;
+  void SetGeneration(int generation);
+
 protected:
   double energy_, growth_factor_, health_;
   double max_energy_ = 300;
@@ -57,6 +60,7 @@ protected:
   double orientation_food_;
   std::vector<double> neuron_data_;
   bool fit_;
+  int generation_ = 0;
 };
 
 
