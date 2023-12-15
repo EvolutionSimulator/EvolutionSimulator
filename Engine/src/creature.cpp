@@ -6,6 +6,8 @@ Creature::Creature(neat::Genome genome)
     : MovableEntity(), health_(100), energy_(100), brain_(neat::NeuralNetwork(genome)), genome_(genome), neuron_data_(settings::environment::kInputNeurons,0) {
 }
 
+int Creature::getGeneration() const {return generation_;}
+
 double Creature::GetEnergy() const { return energy_; }
 
 void Creature::HealthToEnergy() {
@@ -45,7 +47,7 @@ void Creature::SetEnergy(double energy) {
 }
 
 void Creature::UpdateEnergy(const double energyToHealth, const double healthToEnergy, double deltaTime){
-    SetEnergy( GetEnergy() - (GetVelocityForward() + GetRotationalVelocity() + 10) * GetSize() * deltaTime);
+    SetEnergy( GetEnergy() - (GetVelocityForward() + GetRotationalVelocity() + 10) * GetSize() * deltaTime/100);
 
     if (GetEnergy() <= healthToEnergy){
         HealthToEnergy();
@@ -109,6 +111,7 @@ double Creature::GetGrowthFactor() { return growth_factor_; }
 void Creature::Think(std::vector<std::vector<std::vector<Entity*> > > &grid, double GridCellSize)
 {
     //Not pretty but we'll figure out a better way in the future
+    ProcessVisionFood(grid, GridCellSize);
     neuron_data_.at(0) = energy_;
     neuron_data_.at(1) = velocity_forward_;
     neuron_data_.at(2) = rotational_velocity_;
