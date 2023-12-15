@@ -43,7 +43,6 @@ namespace settings {
     namespace engine {
         constexpr double kFixedUpdateInterval       = 0.05;
     }
-
 }
 
 #endif // CONFIG_H
