@@ -55,7 +55,7 @@ void SimulationData::GenerateMoreFood(){
     double max_number = environment_.GetFoodDensity() * environment_.kMapHeight * environment_.kMapWidth/100;
         while (size < max_number){
         Food new_food = Food();
-        new_food.RandomInitialization(environment_.kMapWidth, environment_.kMapHeight, environment_.kMaxFoodSize);
+        new_food.RandomInitialization(environment_.kMapWidth, environment_.kMapHeight, environment_.kMaxFoodSize, environment_.kMinCreatureSize);
         food_entities_.emplace_back(new_food);
         size++;
     }
@@ -90,6 +90,7 @@ void SimulationData::InitializeCreatures() {
     double world_height = environment_.kMapHeight;
     double creature_density = environment_.kCreatureDensity;
     double max_creature_size = environment_.kMaxCreatureSize;
+    double min_creature_size = environment_.kMinCreatureSize;
 
     // Clear existing entities
     creatures_.clear();
@@ -101,7 +102,7 @@ void SimulationData::InitializeCreatures() {
                 neat::Genome genome(cfg::input_neurons, cfg::output_neurons);
                 for (int i = 0; i < 30; i++){genome.Mutate();}
                 Creature new_creature(genome);
-                new_creature.RandomInitialization(world_width, world_height, max_creature_size);
+                new_creature.RandomInitialization(world_width, world_height, max_creature_size, min_creature_size);
                 creatures_.emplace_back(new_creature);
             }
         }

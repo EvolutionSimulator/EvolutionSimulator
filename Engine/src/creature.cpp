@@ -45,7 +45,7 @@ void Creature::SetEnergy(double energy) {
 }
 
 void Creature::UpdateEnergy(const double energyToHealth, const double healthToEnergy){
-    SetEnergy( GetEnergy() - (GetVelocityForward() + GetRotationalVelocity()) * GetSize()/1000);
+    SetEnergy( GetEnergy() - (GetVelocityForward() + GetRotationalVelocity() + 10) * GetSize()/1000);
 
     if (GetEnergy() <= healthToEnergy){
         HealthToEnergy();
@@ -58,10 +58,15 @@ void Creature::UpdateEnergy(const double energyToHealth, const double healthToEn
     }
 }
 bool Creature::Fit() {
-  if (energy_ > cfg::reproduction_threshold*max_energy_) {
+  if(fit_){
+    fit_ = false;
     return true;
   }
   return false;
+  //if (energy_ > cfg::reproduction_threshold*max_energy_) {
+  //  return true;
+  //}
+  //return false;
 }
 
 void Creature::Eats(double nutritional_value){
@@ -69,6 +74,7 @@ void Creature::Eats(double nutritional_value){
   if (GetEnergy() > 100) {
     EnergyToHealth();
   }
+  fit_ = true;
 }
 
 void Creature::Update(double deltaTime, double const kMapWidth,
@@ -109,14 +115,18 @@ double Creature::GetGrowthFactor() { return growth_factor_; }
 void Creature::Think(std::vector<std::vector<std::vector<Entity*> > > &grid, double GridCellSize)
 {
     //Not pretty but we'll figure out a better way in the future
-    neuron_data_.at(0) = x_coord_;
-    neuron_data_.at(1) = y_coord_;
-    neuron_data_.at(2) = orientation_;
-    neuron_data_.at(3) = energy_;
-    neuron_data_.at(4) = velocity_forward_;
-    neuron_data_.at(5) = rotational_velocity_;
+    neuron_data_.at(0) = orientation_;
+    neuron_data_.at(1) = energy_;
+    neuron_data_.at(2) = velocity_forward_;
+    neuron_data_.at(3) = rotational_velocity_;
+    neuron_data_.at(4) = orientation_food_;
+    neuron_data_.at(5) = distance_food_;
     std::vector<double> output = brain_.Activate(neuron_data_);
-    velocity_forward_ = output.at(0);
+    if(output.at(0) > 50){
+        velocity_forward_=50;
+    } else {
+        velocity_forward_ = output.at(0);
+    }
     rotational_velocity_ = output.at(1);
 }
 

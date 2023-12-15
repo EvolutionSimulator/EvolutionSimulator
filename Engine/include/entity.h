@@ -13,7 +13,7 @@ public:
   virtual ~Entity();
 
   void RandomInitialization(const double world_width, const double world_height,
-                            const double max_creature_size);
+                            const double max_creature_size, const double min_creature_size);
 
   double GetSize() const;
   void SetSize(double size);
