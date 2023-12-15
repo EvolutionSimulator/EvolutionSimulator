@@ -1,8 +1,8 @@
 #include "movable_entity.h"
 #include "math.h"
 
-MovableEntity::MovableEntity()
-    : Entity(), velocity_forward_(0.0), rotational_velocity_(0.0) {
+MovableEntity::MovableEntity(double size)
+    : Entity(size), velocity_forward_(0.0), rotational_velocity_(0.0) {
 }
 
 double MovableEntity::GetVelocityForward() const {
