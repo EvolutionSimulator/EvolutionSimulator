@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 3.16)
 add_executable(Engine_tests
     neat.cpp
     collisions.cpp
+    creature.cpp
 )
 
 # Link against Google Test and the Engine library
