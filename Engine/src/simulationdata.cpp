@@ -83,6 +83,10 @@ void SimulationData::GenerateMoreFood(){
  * Takes the creatures from the reproduce queue in pairs and initializaes randomly a crossedover version
  */
 void SimulationData::ReproduceCreatures(){
+    double world_width = settings::environment::kMapWidth;
+    double world_height = settings::environment::kMapHeight;
+    double max_creature_size = settings::environment::kMaxCreatureSize;
+    double min_creature_size = settings::environment::kMinCreatureSize;
     while (reproduce_.size() > 2){
         Creature creature1 = reproduce_.front();
         reproduce_.pop();
@@ -92,10 +96,18 @@ void SimulationData::ReproduceCreatures(){
         double energy2 = creature2.GetEnergy();
         if (energy1 > energy2){
             neat::Genome new_genome = neat::Crossover(creature1.GetGenome(), creature2.GetGenome());
-            AddCreature(Creature(new_genome));
+            new_genome.Mutate();
+            new_genome.Mutate();
+            Creature new_creature(new_genome);
+            new_creature.RandomInitialization(world_width, world_height, max_creature_size, min_creature_size);
+            AddCreature(new_creature);
         } else {
             neat::Genome new_genome = neat::Crossover(creature2.GetGenome(), creature1.GetGenome());
-            AddCreature(Creature(new_genome));
+            new_genome.Mutate();
+            new_genome.Mutate();
+            Creature new_creature(new_genome);
+            new_creature.RandomInitialization(world_width, world_height, max_creature_size, min_creature_size);
+            AddCreature(new_creature);
         }
     }
 }
@@ -118,7 +130,7 @@ void SimulationData::InitializeCreatures() {
         for (double y = 0; y < world_height; y += 2.0) {
             if (std::rand() / (RAND_MAX + 1.0) < creature_density) {
                 neat::Genome genome(settings::environment::kInputNeurons, settings::environment::kOutputNeurons);
-                for (int i = 0; i < 30; i++){genome.Mutate();}
+                for (int i = 0; i < 40; i++){genome.Mutate();}
                 Creature new_creature(genome);
                 new_creature.RandomInitialization(world_width, world_height, max_creature_size, min_creature_size);
                 creatures_.emplace_back(new_creature);

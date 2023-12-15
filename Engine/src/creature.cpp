@@ -10,7 +10,7 @@ double Creature::GetEnergy() const { return energy_; }
 
 void Creature::HealthToEnergy() {
     if (GetEnergy() < 0) {
-        SetHealth(GetHealth()- GetEnergy()-5);
+        SetHealth(GetHealth() + GetEnergy()-5);
         SetEnergy(5);
     }
     SetEnergy(GetEnergy() + 5);
@@ -44,8 +44,8 @@ void Creature::SetEnergy(double energy) {
     }
 }
 
-void Creature::UpdateEnergy(const double energyToHealth, const double healthToEnergy){
-    SetEnergy( GetEnergy() - (GetVelocityForward() + GetRotationalVelocity() + 10) * GetSize()/1000);
+void Creature::UpdateEnergy(const double energyToHealth, const double healthToEnergy, double deltaTime){
+    SetEnergy( GetEnergy() - (GetVelocityForward() + GetRotationalVelocity() + 10) * GetSize() * deltaTime);
 
     if (GetEnergy() <= healthToEnergy){
         HealthToEnergy();
@@ -58,30 +58,24 @@ void Creature::UpdateEnergy(const double energyToHealth, const double healthToEn
     }
 }
 bool Creature::Fit() {
-  if(fit_){
-    fit_ = false;
+    if (energy_ > settings::environment::kReproductionThreshold*max_energy_) {
     return true;
   }
   return false;
-  //if (energy_ > cfg::reproduction_threshold*max_energy_) {
-  //  return true;
-  //}
-  //return false;
 }
 
 void Creature::Eats(double nutritional_value){
   SetEnergy(GetEnergy() + nutritional_value);
-  if (GetEnergy() > 100) {
+  if (GetEnergy() > max_energy_) {
     EnergyToHealth();
   }
-  fit_ = true;
 }
 
 void Creature::Update(double deltaTime, double const kMapWidth,
                       double const kMapHeight,
                       std::vector<std::vector<std::vector<Entity*> > > &grid,
                       double GridCellSize) {
-  this->UpdateEnergy(70, 5);
+  this->UpdateEnergy(70, 5, deltaTime);
   this->Move(deltaTime, kMapWidth, kMapHeight);
   this->Rotate(deltaTime);
   this->Think(grid, GridCellSize);
@@ -96,7 +90,7 @@ void Creature::OnCollision(Entity &other_entity, double const kMapWidth,
     {
         if (food->GetState() == Entity::Alive)
         {
-            Eats(food->GetNutritionalValue());
+            Eats(food->GetNutritionalValue() * food->GetSize());
             food->Eat();
         }
     }
@@ -115,12 +109,11 @@ double Creature::GetGrowthFactor() { return growth_factor_; }
 void Creature::Think(std::vector<std::vector<std::vector<Entity*> > > &grid, double GridCellSize)
 {
     //Not pretty but we'll figure out a better way in the future
-    neuron_data_.at(0) = orientation_;
-    neuron_data_.at(1) = energy_;
-    neuron_data_.at(2) = velocity_forward_;
-    neuron_data_.at(3) = rotational_velocity_;
-    neuron_data_.at(4) = orientation_food_;
-    neuron_data_.at(5) = distance_food_;
+    neuron_data_.at(0) = energy_;
+    neuron_data_.at(1) = velocity_forward_;
+    neuron_data_.at(2) = rotational_velocity_;
+    neuron_data_.at(3) = orientation_food_;
+    neuron_data_.at(4) = distance_food_;
     std::vector<double> output = brain_.Activate(neuron_data_);
     if(output.at(0) > 50){
         velocity_forward_=50;

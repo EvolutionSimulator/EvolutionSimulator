@@ -14,7 +14,7 @@ public:
 
   void Dies();
   void Eats(double nutritional_value);
-  void UpdateEnergy(const double energyToHealth, const double healthToEnergy);
+  void UpdateEnergy(const double energyToHealth, const double healthToEnergy, double deltaTime);
   double GetEnergy() const;
   void SetEnergy(double energy);
   neat::Genome GetGenome();
@@ -49,7 +49,7 @@ public:
 
 protected:
   double energy_, growth_factor_, health_;
-  double max_energy_ = 3000;
+  double max_energy_ = 300;
   double max_size_ = 10;
   neat::NeuralNetwork brain_;
   neat::Genome genome_;
