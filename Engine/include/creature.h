@@ -56,6 +56,7 @@ protected:
   double distance_food_;
   double orientation_food_;
   std::vector<double> neuron_data_;
+  bool fit_;
 };
 
 
