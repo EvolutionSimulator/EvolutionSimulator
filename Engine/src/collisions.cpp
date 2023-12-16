@@ -9,7 +9,7 @@ double ShortestDistancePointLineSegment(const std::pair<double, double>& point, 
     // Calculate coefficients of the line equation Ax + By + C = 0
     double A = linePoint2.second - linePoint1.second;
     double B = linePoint1.first - linePoint2.first;
-    double C = linePoint1.first * linePoint2.second - linePoint2.first * linePoint1.second;
+    double C = linePoint2.first * linePoint1.second - linePoint1.first * linePoint2.second;
 
     // Calculate the distance using the formula for an infinite line
     double dist = std::abs(A * point.first + B * point.second + C) / std::sqrt(A * A + B * B);
