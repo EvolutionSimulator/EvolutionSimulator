@@ -31,9 +31,9 @@ void Simulation::FixedUpdate(double deltaTime)
     // Test function (DO NOT USE)
     data_->UpdateAllCreatures(deltaTime);
     data_->ReproduceCreatures();
-    data_->CheckCollisions();
     data_->GenerateMoreFood();
     data_->UpdateGrid();
+    data_->CheckCollisions();
     data_->world_time_ += deltaTime;
 }
 

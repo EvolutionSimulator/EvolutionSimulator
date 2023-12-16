@@ -32,6 +32,7 @@ public:
                    double const kMapHeight) override;
 
   bool Fit();
+  void Reproduced();
 
   Food *GetClosestFood(
       std::vector<std::vector<std::vector<Entity*> > > &grid,
@@ -60,6 +61,7 @@ protected:
   std::vector<double> neuron_data_;
   bool fit_;
   int generation_ = 0;
+  double reproduction_cooldown_;
 };
 
 
