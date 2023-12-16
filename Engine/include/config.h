@@ -31,14 +31,19 @@ namespace settings {
         constexpr double kEnergyToHealth            = 70.0;
         constexpr double kHealthToEnergy            = 10.0;
         constexpr double kDefaultCreatureDensity    = 0.0001;
-        constexpr double kBaseNutritionalValue      = 2.0;
+        constexpr double kPlantNutritionalValue     = 2.0;
+        constexpr double kMeatNutritionalValue      = 3.0;
+        constexpr double kRotFactor                 = 1.0;
         constexpr double kGridCellSize              = 50.0;
         constexpr int    kMinCreatureSize           = 2;
         constexpr double kReproductionThreshold     = 0.90;
         constexpr double kReproductionCooldown      = 10;
         constexpr int    kInputNeurons              = 6;
         constexpr int    kOutputNeurons             = 2;
-        
+        constexpr double kMaxNutritionalValue       = 5;
+        constexpr double kDefaultLifespan           = 30;
+        constexpr double kPhotosynthesisFactor      = 0.1;
+
     }
 
     namespace engine {
