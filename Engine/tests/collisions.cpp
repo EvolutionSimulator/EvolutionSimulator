@@ -453,7 +453,7 @@ TEST(SimulationDataTest, CorrectEntityPlacementInGrid) {
     simData.creatures_.push_back(creature_2);
 
     Food food_1(200.5,300.4,5.0);
-    Food food_2(200.7,400,5.0);
+    Food food_2(200.7,200,5.0);
     simData.food_entities_.push_back(food_1);
     simData.food_entities_.push_back(food_2);
     Food food_3(50.3, 60.7, 4.0);
