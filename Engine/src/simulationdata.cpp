@@ -183,6 +183,9 @@ void SimulationData::ClearGrid() {
     }
 }
 
+
+
+
 /*!
  * Deletes dead entities, and places remaining ones in grid
  */
@@ -201,6 +204,7 @@ void UpdateGridTemplate(std::vector<EntityType>& entities, std::vector<std::vect
         entityGrid[gridX][gridY].push_back(&entity);
     }
 }
+
 
 /*!
  * @brief Removes creatures with a state of 'Dead' from a given queue.
