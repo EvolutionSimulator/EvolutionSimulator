@@ -111,6 +111,8 @@ void SimulationData::ReproduceCreatures(){
             new_creature.SetGeneration(creature2.GetGeneration()+1);
             AddCreature(new_creature);
         }
+        creature1.Reproduced();
+        creature2.Reproduced();
     }
 }
 

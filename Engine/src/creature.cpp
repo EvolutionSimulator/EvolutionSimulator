@@ -3,7 +3,7 @@
 #include <cassert>
 
 Creature::Creature(neat::Genome genome)
-    : MovableEntity(), health_(100), energy_(100), brain_(neat::NeuralNetwork(genome)), genome_(genome), neuron_data_(settings::environment::kInputNeurons,0) {
+    : MovableEntity(), health_(100), energy_(100), brain_(neat::NeuralNetwork(genome)), genome_(genome), neuron_data_(settings::environment::kInputNeurons,0), reproduction_cooldown_(10) {
 }
 
 int Creature::GetGeneration() const {return generation_;}
@@ -44,7 +44,7 @@ void Creature::Dies() { SetState(Dead); }
 
 void Creature::SetEnergy(double energy) {
     if (energy > max_energy_) {
-        energy_ = 100;
+        energy_ = max_energy_;
     } else {
         energy_ = energy;
     }
@@ -64,10 +64,15 @@ void Creature::UpdateEnergy(const double energyToHealth, const double healthToEn
     }
 }
 bool Creature::Fit() {
-    if (energy_ > settings::environment::kReproductionThreshold*max_energy_) {
+    if (energy_ > settings::environment::kReproductionThreshold*max_energy_ && reproduction_cooldown_ == 0.0) {
     return true;
   }
   return false;
+}
+
+void Creature::Reproduced() {
+  SetEnergy(GetEnergy() - 0.75*max_energy_);
+  reproduction_cooldown_ = settings::environment::kReproductionCooldown;
 }
 
 void Creature::Eats(double nutritional_value){
@@ -85,6 +90,11 @@ void Creature::Update(double deltaTime, double const kMapWidth,
   this->Move(deltaTime, kMapWidth, kMapHeight);
   this->Rotate(deltaTime);
   this->Think(grid, GridCellSize);
+  if (reproduction_cooldown_ <= 0){
+    reproduction_cooldown_ = 0.0;
+  } else {
+    reproduction_cooldown_-= deltaTime;
+  }
 }
 
 neat::Genome Creature::GetGenome() { return genome_; }
