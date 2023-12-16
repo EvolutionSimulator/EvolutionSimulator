@@ -22,7 +22,7 @@ namespace settings {
 
     namespace environment {
         constexpr double kMapWidth                  = 1000.0;
-        constexpr double kMapHeight                 = 300.0;
+        constexpr double kMapHeight                 = 450.0;
         constexpr double kCreatureDensity           = 0.0005;
         constexpr int    kMaxFoodSize               = 15;
         constexpr int    kMaxCreatureSize           = 15;
