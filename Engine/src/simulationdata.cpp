@@ -212,7 +212,7 @@ std::vector<std::pair<int, int>> GetNeighbours(const int& num_rows, const int& n
     std::vector<std::pair<int, int>> neighbours;
     for (int y = center.first-layer_number; y<center.first+layer_number+1; y++){
         for (int x = center.second-layer_number; x<center.second+layer_number+1; x++){
-            neighbours.push_back(std::make_pair(y%num_rows, x%num_cols));
+            neighbours.push_back(std::make_pair((y + num_rows) % num_rows, (x + num_cols) % num_cols));
         }
     }
     return neighbours;

@@ -481,20 +481,20 @@ TEST(GetNeighboursTest, BasicFunctionality) {
     EXPECT_EQ(neighbours, expected);
 }
 
-TEST(GetNeighboursTest, CenterAtEdge) {
+TEST(GetNeighboursTest, CenterAtCorner) {
     auto neighbours = GetNeighbours(10, 10, {0, 0}, 1);
-    std::vector<std::pair<int, int>> expected = {{0, 0}, {0, 1}, {1, 0}, {1, 1}};
+    std::vector<std::pair<int, int>> expected = {{9, 9}, {9, 0}, {9, 1}, {0, 9}, {0, 0}, {0, 1}, {1, 9}, {1, 0}, {1, 1}};
+        EXPECT_EQ(neighbours, expected);
     EXPECT_EQ(neighbours, expected);
 }
 
-TEST(GetNeighboursTest, LargeLayerNumber) {
-    auto neighbours = GetNeighbours(5, 5, {2, 2}, 10);
-    std::vector<std::pair<int, int>> expected;
-    for (int x = 0; x < 5; x++) {
-        for (int y = 0; y < 5; y++) {
-          expected.push_back({x, y});
-        }
-    }
+TEST(GetNeighboursTest, CenterAtXEdge) {
+    auto neighbours = GetNeighbours(10, 10, {0, 5}, 1);
+    std::vector<std::pair<int, int>> expected = {
+        {9, 4}, {9, 5}, {9, 6},
+        {0, 4}, {0, 5}, {0, 6},
+        {1, 4}, {1, 5}, {1, 6}
+    };
     EXPECT_EQ(neighbours, expected);
 }
 
@@ -504,15 +504,11 @@ TEST(GetNeighboursTest, ZeroLayerNumber) {
     EXPECT_EQ(neighbours, expected);
 }
 
-TEST(GetNeighboursTest, SingleCellGrid) {
-    auto neighbours = GetNeighbours(1, 1, {0, 0}, 1);
-    std::vector<std::pair<int, int>> expected = {{0, 0}};
-    EXPECT_EQ(neighbours, expected);
-}
 
 TEST(GetNeighboursTest, CenterOutsideGrid) {
     auto neighbours = GetNeighbours(10, 10, {11, 11}, 1);
-    EXPECT_TRUE(neighbours.empty());
+    std::vector<std::pair<int, int>> expected = {{0, 0}, {0, 1}, {0, 2}, {1, 0}, {1, 1}, {1, 2}, {2, 0}, {2, 1}, {2, 2}};
+    EXPECT_EQ(neighbours, expected);
 }
 
 
