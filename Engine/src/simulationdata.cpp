@@ -207,45 +207,12 @@ void SimulationData::UpdateGrid() {
     UpdateGridTemplate<Food>(food_entities_, grid_, settings::environment::kGridCellSize);
 }
 
+//Neighbours including the center itself
 std::vector<std::pair<int, int>> GetNeighbours(const int& num_rows, const int& num_cols, const std::pair<int, int>& center, const int& layer_number){
-    int y_start = center.first-layer_number;
-    int y_end = center.first+layer_number+1;
-    int x_start = center.second-layer_number;
-    int x_end = center.second+layer_number+1;
-    int y_add_start = 0;
-    int y_add_end = 0;
-    int x_add_start = 0;
-    int x_add_end = 0;
-
-    //Assumes there is no entity greater than the grid
-    if (y_start<0){
-        y_add_start = y_start+num_rows;
-        y_add_end = num_rows;
-        y_start = 0;
-    }
-    else if (y_end>num_rows) {
-        y_add_end = y_end-num_rows;
-        y_end = num_rows;
-    }
-    if (x_start<0){
-        x_add_start = x_start+num_cols;
-        x_add_end = num_cols;
-        x_start = 0;
-    }
-    else if (x_end>num_cols) {
-        x_add_end = x_end-num_cols;
-        x_end = num_cols;
-    }
-
     std::vector<std::pair<int, int>> neighbours;
-    for (int x = x_start; x<x_end; x++){
-        for (int y = y_start; y<y_end; y++){
-            neighbours.push_back(std::make_pair(x, y));
-        }
-    }
-    for (int x = x_add_start; x<x_add_end; x++){
-        for (int y = y_add_start; y<y_add_end; y++){
-            neighbours.push_back(std::make_pair(y, x));
+    for (int y = center.first-layer_number; y<center.first+layer_number+1; y++){
+        for (int x = center.second-layer_number; x<center.second+layer_number+1; x++){
+            neighbours.push_back(std::make_pair(y%num_rows, x%num_cols));
         }
     }
     return neighbours;
