@@ -22,7 +22,7 @@ Food::Food(const double x_coord, const double y_coord, const double size)
 void Food::Eat()
 {
     // Call the destructor of the base class Entity
-    this->Entity::~Entity();
+    SetState(Entity::Dead);
 }
 
 void Food::SetNutritionalValue(double value)
