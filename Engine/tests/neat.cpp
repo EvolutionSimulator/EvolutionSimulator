@@ -5,9 +5,21 @@
 #include "neat/neat-neural-network.h"
 #include "neat/neat-neuron.h"
 
+/*!
+ * @file neat_tests.cpp
+ * @brief Unit tests for NEAT Genome, Link, and Neuron functionalities.
+ *
+ * @details This file contains tests to validate the construction and operation of the NEAT Genome, Link, and Neuron classes.
+ */
 
 using namespace neat;
 
+
+/*!
+ * @brief Tests the Genome constructor for correct initialization of input and output counts.
+ *
+ * @details Ensures that a Genome object is correctly initialized with the specified number of input and output neurons.
+ */
 TEST(NeatTests, GenomeConstructor) {
   int input_count = 5;
   int output_count = 3;
@@ -17,6 +29,11 @@ TEST(NeatTests, GenomeConstructor) {
   EXPECT_EQ(genome.GetOutputCount(), output_count);
 }
 
+/*!
+ * @brief Tests adding a neuron to the Genome.
+ *
+ * @details Validates that a new neuron can be added to the Genome and that its properties are correctly set.
+ */
 TEST(NeatTests, AddNeuron) {
   Genome genome(3, 2);
   genome.AddNeuron(Neuron(NeuronType::kHidden, 0.5));
@@ -26,6 +43,11 @@ TEST(NeatTests, AddNeuron) {
   EXPECT_EQ(neurons.back().GetBias(), 0.5);
 }
 
+/*!
+ * @brief Tests adding a link to the Genome.
+ *
+ * @details Ensures that a new link can be added to the Genome and that its properties are correctly set.
+ */
 TEST(NeatTests, AddLink) {
   Genome genome(3, 2);
   genome.AddLink(Link(1, 2, 0.5));
@@ -36,6 +58,11 @@ TEST(NeatTests, AddLink) {
   EXPECT_EQ(links.back().GetWeight(), 0.5);
 }
 
+/*!
+ * @brief Tests the Link constructor for correct initialization.
+ *
+ * @details Validates that a Link object is correctly initialized with specified input and output neuron IDs and weight.
+ */
 TEST(NeatTests, LinkConstructor) {
   int in_id = 2;
   int out_id = 3;
@@ -53,6 +80,11 @@ TEST(NeatTests, LinkConstructor) {
   EXPECT_EQ(link2.GetId(), link3.GetId() - 1);
 }
 
+/*!
+ * @brief Tests setting a new weight for a Link.
+ *
+ * @details Ensures that the weight of a Link can be changed and that the new weight is correctly reflected.
+ */
 TEST(NeatTests, SetWeight) {
   Link link(2, 3, 0.5);
   double new_weight = 0.7;
@@ -61,6 +93,11 @@ TEST(NeatTests, SetWeight) {
   EXPECT_EQ(link.GetWeight(), new_weight);
 }
 
+/*!
+ * @brief Tests the Neuron constructor for correct initialization.
+ *
+ * @details Validates that a Neuron object is correctly initialized with a specified type and bias.
+ */
 TEST(NeatTests, NeuronConstructor) {
   int id = 1;
   NeuronType type = NeuronType::kHidden;
@@ -77,6 +114,11 @@ TEST(NeatTests, NeuronConstructor) {
   EXPECT_EQ(neuron2.GetId(), neuron3.GetId() - 1);
 }
 
+/*!
+ * @brief Tests setting a new bias for a Neuron.
+ *
+ * @details Ensures that the bias of a Neuron can be changed and that the new bias is correctly reflected.
+ */
 TEST(NeatTests, SetBias) {
   Neuron neuron(NeuronType::kHidden, 0.5);
   double new_bias = 0.7;
@@ -111,6 +153,11 @@ TEST(NeatTests, SetBias) {
 //     }
 // }
 
+/*!
+ * @brief Tests disabling a link in the Genome.
+ *
+ * @details Ensures that a link can be disabled and that its active state is correctly updated.
+ */
 TEST(NeatTests, DisableLink) {
   Genome genome(3, 2);
   genome.AddLink(Link(1, 2, 0.5));
@@ -151,6 +198,11 @@ TEST(NeatTests, DisableLink) {
 //     ASSERT_TRUE(anyEnabled);
 // }
 
+/*!
+ * @brief Tests enabling a previously disabled link in the Genome.
+ *
+ * @details Ensures that a link can be re-enabled and that its active state is correctly updated.
+ */
 TEST(NeatTests, EnableLink) {
   Genome genome(3, 2);
   genome.AddLink(Link(1, 2, 0.5));
@@ -171,6 +223,11 @@ TEST(NeatTests, EnableLink) {
   ASSERT_TRUE(anyEnabled);
 }
 
+/*!
+ * @brief Tests removing a neuron from the Genome.
+ *
+ * @details Validates that a neuron and its associated links can be removed from the Genome.
+ */
 TEST(NeatTests, RemoveNeuron) {
   Genome genome(3, 2);
   Neuron neuron1(NeuronType::kHidden, 0.5);
@@ -193,6 +250,11 @@ TEST(NeatTests, RemoveNeuron) {
   EXPECT_TRUE(links[0].GetInId() != 0 && links[0].GetOutId() != 0);
 }
 
+/*!
+ * @brief Tests removing a link from the Genome.
+ *
+ * @details Ensures that a link can be removed from the Genome.
+ */
 TEST(NeatTests, RemoveLink) {
   Genome genome(3, 2);
   genome.AddLink(Link(1, 2, 0.5));
@@ -202,6 +264,11 @@ TEST(NeatTests, RemoveLink) {
   ASSERT_EQ(genome.GetLinks().size(), 1);
 }
 
+/*!
+ * @brief Tests various mutation operations on the Genome.
+ *
+ * @details Validates that the Genome can undergo various mutations, including adding and removing neurons and links, and changing weights.
+ */
 TEST(NeatTests, Mutate) {
   auto HasAnyWeightChanged = [](const Genome& original, const Genome& mutated) {
     const std::vector<Link>& originalLinks = original.GetLinks();
@@ -256,6 +323,11 @@ TEST(NeatTests, Mutate) {
   EXPECT_GT(countChangeWeight, 0);
 }
 
+/*!
+ * @brief Tests removing a neuron via mutation in the Genome.
+ *
+ * @details Ensures that a neuron can be removed from the Genome via mutation.
+ */
 TEST(NeatTests, MutateRemoveNeuron) {
   Genome genome(3, 2);
   genome.AddNeuron(Neuron(NeuronType::kHidden, 0.5));
@@ -266,6 +338,11 @@ TEST(NeatTests, MutateRemoveNeuron) {
   ASSERT_EQ(genome.GetNeurons().size(), 7);
 }
 
+/*!
+ * @brief Tests removing a link via mutation in the Genome.
+ *
+ * @details Ensures that a link can be removed from the Genome via mutation.
+ */
 TEST(NeatTests, MutateRemoveLink) {
   Genome genome(3, 2);
   genome.AddLink(Link(1, 2, 0.5));
@@ -275,6 +352,11 @@ TEST(NeatTests, MutateRemoveLink) {
   ASSERT_EQ(genome.GetLinks().size(), 1);
 }
 
+/*!
+ * @brief Tests changing the weights of links in the Genome via mutation.
+ *
+ * @details Validates that the weights of links in the Genome can be altered through mutation.
+ */
 TEST(NeatTests, MutateChangeWeight) {
   Genome genome(105, 3);
 
@@ -328,6 +410,11 @@ TEST(NeatTests, MutateChangeWeight) {
   EXPECT_TRUE(weight_changed);
 }
 
+/*!
+ * @brief Tests generating layers of neurons from a Genome.
+ *
+ * @details Validates that the get_layers function correctly organizes neurons into layers based on their connections and types.
+ */
 TEST(NeatTests, GetLayers) {
   Genome genome(3, 2);
   genome.AddLink(Link(0, 3, 1));
@@ -354,6 +441,11 @@ TEST(NeatTests, GetLayers) {
   }
 }
 
+/*!
+ * @brief Tests the activation function of the NeuralNetwork constructed from a Genome.
+ *
+ * @details Ensures that the NeuralNetwork activates correctly with given input values and produces expected output values.
+ */
 TEST(NeatTests, NeuralNetworkActivate) {
   Genome genome(3, 2);
   genome.AddLink(Link(0, 3, 1));
@@ -371,6 +463,11 @@ TEST(NeatTests, NeuralNetworkActivate) {
       output_values.empty());  // Replace with more specific checks as needed
 }
 
+/*!
+ * @brief Tests the crossover functionality for Neuron objects.
+ *
+ * @details Validates that two neurons can be combined to create a new neuron with properties derived from both parent neurons.
+ */
 TEST(NeatTests, CrossoverNeuron) {
   Neuron neuronA{NeuronType::kHidden, 0.3};
   Neuron neuronB{NeuronType::kHidden, 0.7};
@@ -401,6 +498,11 @@ TEST(NeatTests, CrossoverNeuron) {
   EXPECT_GT(countB, 0);
 }
 
+/*!
+ * @brief Tests the crossover functionality for Link objects.
+ *
+ * @details Ensures that two links can be combined to create a new link with properties derived from both parent links.
+ */
 TEST(NeatTests, CrossoverLink) {
   Link linkA{10, 20, 0.3};
   Link linkB{10, 20, 0.7};
@@ -433,6 +535,11 @@ TEST(NeatTests, CrossoverLink) {
   EXPECT_GT(countB, 0);
 }
 
+/*!
+ * @brief Tests the crossover functionality between two Genomes.
+ *
+ * @details Validates that two Genomes can be combined to create a new Genome with characteristics inherited from both parents.
+ */
 TEST(NeatTests, Crossover) {
   Genome genomeA(3, 3);
 
@@ -534,6 +641,12 @@ TEST(NeatTests, Crossover) {
   }
 }
 
+
+/*!
+ * @brief Tests the functionality of NeuralNetwork activation after mutations and crossover of Genomes.
+ *
+ * @details Ensures that a NeuralNetwork constructed from a Genome that underwent mutations and crossover activates correctly.
+ */
 TEST(NeatTests, ActivationAfterMutateCrossover) {
   Genome genomeA(3, 1);
 
