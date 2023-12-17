@@ -43,7 +43,7 @@ constexpr int kOutputNeurons = 3;
 constexpr double kMaxNutritionalValue = 5;
 constexpr double kDefaultLifespan = 30;
 constexpr double kPhotosynthesisFactor = 0.1;
-constexpr double kFrictionalCoefficient = 0.1;
+constexpr double kFrictionalCoefficient = 0.00001;
 } // namespace environment
 
 namespace engine {
