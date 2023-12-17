@@ -1,4 +1,8 @@
 #include "neat/neat-genome.h"
+/*!
+ * @file neat-genome.h
+ * @brief Defines the Genome class used in NEAT (NeuroEvolution of Augmenting Topologies).
+ */
 
 #include <algorithm>
 #include <optional>
@@ -6,6 +10,12 @@
 
 namespace neat {
 
+/*!
+ * @brief Constructs a Genome with a specified number of input and output neurons.
+ *
+ * @param input_count Number of input neurons.
+ * @param output_count Number of output neurons.
+ */
 Genome::Genome(int input_count, int output_count) : neurons_(), links_() {
   for (int i = 0; i < input_count; ++i) {
     AddNeuron(Neuron(NeuronType::kInput, 0.0));
@@ -15,6 +25,11 @@ Genome::Genome(int input_count, int output_count) : neurons_(), links_() {
   }
 }
 
+/*!
+ * @brief Gets the number of input neurons in the Genome.
+ *
+ * @return The count of input neurons.
+ */
 int Genome::GetInputCount() const {
   return std::count_if(neurons_.begin(), neurons_.end(),
                        [](const Neuron& neuron) {
@@ -22,6 +37,11 @@ int Genome::GetInputCount() const {
                        });
 }
 
+/*!
+ * @brief Gets the number of output neurons in the Genome.
+ *
+ * @return The count of output neurons.
+ */
 int Genome::GetOutputCount() const {
   return std::count_if(neurons_.begin(), neurons_.end(),
                        [](const Neuron& neuron) {
@@ -29,12 +49,32 @@ int Genome::GetOutputCount() const {
                        });
 }
 
+/*!
+ * @brief Gets the list of neurons in the Genome.
+ *
+ * @return A constant reference to the vector of Neurons.
+ */
 const std::vector<Neuron>& Genome::GetNeurons() const { return neurons_; }
 
+/*!
+ * @brief Gets the list of links (connections) in the Genome.
+ *
+ * @return A constant reference to the vector of Links.
+ */
 const std::vector<Link>& Genome::GetLinks() const { return links_; }
 
+/*!
+ * @brief Adds a neuron to the Genome.
+ *
+ * @param neuron The Neuron to be added.
+ */
 void Genome::AddNeuron(const Neuron& neuron) { neurons_.push_back(neuron); }
 
+/*!
+ * @brief Adds a link (connection) between neurons in the Genome.
+ *
+ * @param link The Link to be added.
+ */
 void Genome::AddLink(const Link& link) { links_.push_back(link); }
 
 // The function should not be used for now
@@ -55,6 +95,11 @@ neuron.GetId()==link.GetOutId()){ DisableLink(link.GetId());
 }
 */
 
+/*!
+ * @brief Disables a link in the Genome by its ID.
+ *
+ * @param id The unique identifier of the link to disable.
+ */
 void Genome::DisableLink(int id) {
   for (Link& link : links_) {
     if (link.GetId() == id) {
@@ -83,6 +128,11 @@ neuron.GetId()==link.GetOutId()){
 }
 */
 
+/*!
+ * @brief Enables a previously disabled link in the Genome by its ID.
+ *
+ * @param id The unique identifier of the link to enable.
+ */
 void Genome::EnableLink(int id) {
   for (Link& link : links_) {
     if (link.GetId() == id) {
@@ -91,6 +141,11 @@ void Genome::EnableLink(int id) {
   }
 }
 
+/*!
+ * @brief Removes a neuron and its associated links from the Genome by its ID.
+ *
+ * @param id The unique identifier of the neuron to remove.
+ */
 void Genome::RemoveNeuron(int id) {
   int index_to_delete = -1;
   for (int i = 0; i < neurons_.size(); ++i) {
@@ -130,6 +185,11 @@ void Genome::RemoveNeuron(int id) {
 //   }
 // }
 
+/*!
+ * @brief Mutates the Genome, potentially altering its structure and weights.
+ *
+ * @details This method randomly applies various mutation operations based on predefined probabilities.
+ */
 void Genome::Mutate() {
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -160,6 +220,11 @@ void Genome::Mutate() {
   }
 }
 
+/*!
+ * @brief Mutates the Genome by removing a neuron.
+ *
+ * @details Randomly selects and removes a neuron from the Genome, along with its associated links.
+ */
 void Genome::MutateRemoveNeuron() {
   std::vector<int> hiddenIDs = {};
   for (const Neuron& neuron : GetNeurons()) {
@@ -176,6 +241,11 @@ void Genome::MutateRemoveNeuron() {
   }
 }
 
+/*!
+ * @brief Mutates the Genome by removing a link.
+ *
+ * @details Randomly selects and removes a link between neurons in the Genome.
+ */
 void Genome::MutateRemoveLink() {
   if (!links_.empty()) {
     std::random_device rd;
@@ -189,6 +259,14 @@ void Genome::MutateRemoveLink() {
   }
 }
 
+/*!
+ * @brief Checks if a link exists between two neurons in the Genome.
+ *
+ * @param inID The unique identifier of the input neuron.
+ * @param outID The unique identifier of the output neuron.
+ *
+ * @return True if the link exists, false otherwise.
+ */
 bool Genome::HasLink(const int& inID, const int& outID) {
   for (const auto& link : links_) {
     if (link.GetInId() == inID && link.GetOutId() == outID ||
@@ -199,6 +277,11 @@ bool Genome::HasLink(const int& inID, const int& outID) {
   return false;
 }
 
+/*!
+ * @brief Removes a link from the Genome by its ID.
+ *
+ * @param id The unique identifier of the link to remove.
+ */
 void Genome::RemoveLink(int id) {
   int index_to_delete = -1;
   for (int i = 0; i < links_.size(); i++) {
@@ -212,6 +295,11 @@ void Genome::RemoveLink(int id) {
   }
 }
 
+/*!
+ * @brief Mutates the Genome by changing the weights of its links.
+ *
+ * @details Adjusts the weights of links in the Genome based on a normal distribution.
+ */
 void Genome::MutateChangeWeight() {
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -232,6 +320,11 @@ void Genome::MutateChangeWeight() {
   }
 }
 
+/*!
+ * @brief Mutates the Genome by changing the bias values of its neurons.
+ *
+ * @details Adjusts the bias values of neurons in the Genome based on a normal distribution.
+ */
 void Genome::MutateChangeBias() {
       std::random_device rd;
       std::mt19937 gen(rd());
@@ -263,6 +356,18 @@ void Genome::MutateChangeBias() {
 //    // Neuron with the specified ID not found, return -1
 //    return -1;
 //}
+
+/*!
+ * @brief Performs a Depth-First Search (DFS) to detect cycles in the Genome.
+ *
+ * @details This function is used internally to ensure the neural network represented by the Genome does not contain cycles.
+ *
+ * @param currentNeuron The neuron to start the DFS from.
+ * @param visited A set of neuron IDs that have already been visited.
+ * @param visiting A set of neuron IDs currently being visited.
+ *
+ * @return True if a cycle is detected, false otherwise.
+ */
 bool Genome::DFS(const Neuron& currentNeuron, std::unordered_set<int>& visited,
                  std::unordered_set<int>& visiting) const {
   int currentId = currentNeuron.GetId();
@@ -298,6 +403,13 @@ bool Genome::DFS(const Neuron& currentNeuron, std::unordered_set<int>& visited,
   return false;
 }
 
+/*!
+ * @brief Detects cycles in the Genome starting from a specified neuron.
+ *
+ * @param startNeuron The neuron from which to start the cycle detection.
+ *
+ * @return True if a cycle is detected, false otherwise.
+ */
 bool Genome::DetectLoops(const Neuron& startNeuron) {
   std::unordered_set<int> visited;
   std::unordered_set<int> visiting;
@@ -305,6 +417,11 @@ bool Genome::DetectLoops(const Neuron& startNeuron) {
   return DFS(startNeuron, visited, visiting);
 }
 
+/*!
+ * @brief Mutates the Genome by adding a new link between neurons.
+ *
+ * @details Adds a new link between two randomly chosen neurons, ensuring no cycles are formed.
+ */
 void Genome::MutateAddLink() {
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -334,6 +451,11 @@ void Genome::MutateAddLink() {
   }
 }
 
+/*!
+ * @brief Mutates the Genome by adding a new neuron.
+ *
+ * @details Adds a new neuron by splitting an existing link and connecting the new neuron in between.
+ */
 void Genome::MutateAddNeuron() {
   if (links_.size() == 0) {
     return;
@@ -352,39 +474,64 @@ void Genome::MutateAddNeuron() {
   AddLink(Link(newNeuronId, RandomLink.GetOutId(), RandomLink.GetWeight()));
 }
 
+/*!
+ * @brief Performs crossover between two Genomes to produce an offspring Genome.
+ *
+ * @param dominant The dominant Genome in the crossover.
+ * @param recessive The recessive Genome in the crossover.
+ *
+ * @return A new Genome resulting from the crossover of the two parent Genomes.
+ */
 Genome Crossover(const Genome& dominant, const Genome& recessive) {
+  // Initialize the offspring Genome with no inputs and outputs initially.
   Genome offspring{0, 0};
+
+  // Iterate over the neurons in the dominant Genome.
   for (const auto& dominant_neuron : dominant.GetNeurons()) {
     int neuron_id = dominant_neuron.GetId();
     std::optional<Neuron> recessive_neuron;
+
+    // Search for the corresponding neuron in the recessive Genome.
     for (const auto& recessive_neuron_candidate : recessive.GetNeurons()) {
       if (recessive_neuron_candidate.GetId() == neuron_id) {
         recessive_neuron = recessive_neuron_candidate;
         break;
       }
     }
+
+    // If the neuron is not found in the recessive Genome, add it to the offspring.
     if (!recessive_neuron) {
       offspring.AddNeuron(dominant_neuron);
     } else {
+      // If the neuron is found, combine the properties from both parents.
       offspring.AddNeuron(
           CrossoverNeuron(dominant_neuron, recessive_neuron.value()));
     }
   }
+
+  // Similar process for links - iterate over links in the dominant Genome.
   for (const auto& dominant_link : dominant.GetLinks()) {
     int link_id = dominant_link.GetId();
     std::optional<Link> recessive_link;
+
+    // Search for the corresponding link in the recessive Genome.
     for (const auto& recessive_link_candidate : recessive.GetLinks()) {
       if (recessive_link_candidate.GetId() == link_id) {
         recessive_link = recessive_link_candidate;
         break;
       }
     }
+
+    // If the link is not found in the recessive Genome, add it to the offspring.
     if (!recessive_link) {
       offspring.AddLink(dominant_link);
     } else {
+      // If the link is found, combine the properties from both parents.
       offspring.AddLink(CrossoverLink(dominant_link, recessive_link.value()));
     }
   }
+
+  // Return the new Genome that is a combination of both parents.
   return offspring;
 }
 }  // namespace neat
