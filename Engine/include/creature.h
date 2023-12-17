@@ -8,17 +8,6 @@
 
 #include <unordered_map>
 
-/*!
- * @class Creature
- *
- * @brief Represents a creature, derived from MovableEntity, with various biological attributes.
- *
- * @details This class encompasses various functions that simulate biological behaviors of a creature,
- *          including energy consumption, movement, growth, and reproduction. It integrates a neural
- *          network for decision making and inherits properties and behaviors from MovableEntity.
- *
- * @inherit MovableEntity
- */
 class Creature : public MovableEntity {
 public:
   Creature(neat::Genome genome);
@@ -69,20 +58,21 @@ public:
   void SetGeneration(int generation);
 
 protected:
-  double energy_; ///< Stores the current energy level of the creature.
-      double growth_factor_; ///< Determines how the creature grows in relation to energy intake.
-      double health_; ///< Represents the current health status of the creature.
-      double age_; ///< Tracks the age of the creature.
-      double max_energy_ = 300; ///< The maximum energy level the creature can attain.
-      double max_size_ = 10; ///< The maximum size the creature can grow to.
-      neat::NeuralNetwork brain_; ///< Neural network for processing environmental stimuli and decision making.
-      neat::Genome genome_; ///< Genetic makeup of the creature.
-      double distance_food_; ///< Distance to the nearest food source.
-      double orientation_food_; ///< Orientation relative to the nearest food source.
-      std::vector<double> neuron_data_; ///< Neuron data used in the neural network.
-      bool fit_; ///< Indicates whether the creature is fit in the evolutionary sense.
-      int generation_ = 0; ///< Generation count of the creature.
-      double reproduction_cooldown_; ///< Cooldown period before the creature can reproduce again.
+  double energy_; /*!< Stores the current energy level of the creature. */
+  double growth_factor_; /*!< Determines how the creature grows in relation to energy intake. */
+  double health_; /*!< Represents the current health status of the creature. */
+  double age_; /*!< Tracks the age of the creature. */
+  double max_energy_ = 300; /*!< The maximum energy level the creature can attain. */
+  double max_size_ = 10; /*!< The maximum size the creature can grow to. */
+  neat::NeuralNetwork brain_; /*!< Neural network for processing environmental stimuli and decision making. */
+  neat::Genome genome_; /*!< Genetic makeup of the creature. */
+  double distance_food_; /*!< Distance to the nearest food source. */
+  double orientation_food_; /*!< Orientation relative to the nearest food source. */
+  std::vector<double> neuron_data_; /*!< Neuron data used in the neural network. */
+  bool fit_; /*!< Indicates whether the creature is fit in the evolutionary sense. */
+  int generation_ = 0; /*!< Generation count of the creature. */
+  double reproduction_cooldown_; /*!< Cooldown period before the creature can reproduce again. */
+
 };
 
 

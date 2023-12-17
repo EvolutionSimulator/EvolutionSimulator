@@ -6,6 +6,10 @@
 
 class Entity {
 public:
+    /*!
+     * @enum states
+     * @brief Enumerates the possible states of an Entity.
+     */
     enum states {
         Dead,
         Alive
