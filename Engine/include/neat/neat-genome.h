@@ -43,8 +43,8 @@ class Genome {
   bool HasLink(const int& in_id, const int& ou_id);
 
  private:
-  std::vector<Neuron> neurons_;
-  std::vector<Link> links_;
+  std::vector<Neuron> neurons_; /*!< A vector of Neuron objects representing the neurons in the Genome. */
+  std::vector<Link> links_; /*!< A vector of Link objects representing the connections between neurons in the Genome. */
   bool DFS(const Neuron& currentNeuron, std::unordered_set<int>& visited, std::unordered_set<int>& visiting) const;
 };
 
