@@ -2,6 +2,21 @@
 
 #include <creature.h>
 
+/*!
+ * @file creature_tests.cpp
+ *
+ * @brief Unit tests for the Creature class functionalities.
+ *
+ * @details This file contains tests to validate the basic functionalities of the Creature class,
+ *          including its construction, and getting and setting energy and health values.
+ */
+
+
+/*!
+ * @brief Tests the Creature's constructor for correct initialization.
+ *
+ * @details Validates that a Creature object is correctly initialized with default energy and health values.
+ */
 TEST(CreatureTests, CreatureConstructor){
     neat::Genome genome(0,0);
     Creature creature(genome);
@@ -12,6 +27,11 @@ TEST(CreatureTests, CreatureConstructor){
     EXPECT_EQ(creature.GetHealth(), initial_h);
 }
 
+/*!
+ * @brief Tests the Creature's constructor for correct initialization.
+ *
+ * @details Validates that a Creature object is correctly initialized with default energy and health values.
+ */
 TEST(CreatureTests, GetEnergy){
     neat::Genome genome(0,0);
     Creature creature(genome);
@@ -19,6 +39,11 @@ TEST(CreatureTests, GetEnergy){
     EXPECT_EQ(creature.GetEnergy(), 100);
 }
 
+/*!
+ * @brief Tests the Creature's constructor for correct initialization.
+ *
+ * @details Validates that a Creature object is correctly initialized with default energy and health values.
+ */
 TEST(CreatureTests, SetEnergy){
     neat::Genome genome(0,0);
     Creature creature(genome);
@@ -27,6 +52,11 @@ TEST(CreatureTests, SetEnergy){
     EXPECT_EQ(creature.GetEnergy(), 50);
 }
 
+/*!
+ * @brief Tests the Creature's ability to retrieve its health value.
+ *
+ * @details Ensures that the GetHealth method correctly returns the Creature's current health.
+ */
 TEST(CreatureTests, GetHealth){
     neat::Genome genome(0,0);
     Creature creature(genome);
@@ -34,6 +64,12 @@ TEST(CreatureTests, GetHealth){
     EXPECT_EQ(creature.GetHealth(), 100);
 }
 
+
+/*!
+ * @brief Tests the Creature's ability to set its health value.
+ *
+ * @details Validates that the SetHealth method correctly updates the Creature's health.
+ */
 TEST(CreatureTests, SetHealth){
     neat::Genome genome(0,0);
     Creature creature(genome);
