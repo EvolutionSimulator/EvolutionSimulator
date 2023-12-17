@@ -122,6 +122,7 @@ void Creature::Update(double deltaTime, double const kMapWidth,
                       std::vector<std::vector<std::vector<Entity *>>> &grid,
                       double GridCellSize) {
   this->UpdateEnergy(deltaTime);
+  this->UpdateVelocities(deltaTime);
   this->Move(deltaTime, kMapWidth, kMapHeight);
   this->Rotate(deltaTime);
   this->Think(grid, GridCellSize);
@@ -143,7 +144,7 @@ void Creature::OnCollision(Entity &other_entity, double const kMapWidth,
       food->Eat();
     }
   } else {
-    Entity::OnCollision(other_entity, kMapWidth, kMapHeight);
+    MovableEntity::OnCollision(other_entity, kMapWidth, kMapHeight);
   }
 }
 
