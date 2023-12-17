@@ -24,26 +24,23 @@ public:
 
 
 protected:
-    double nutritional_value_;
-    int lifespan_;
+    double nutritional_value_; /*!< Nutritional value of the Food. */
+    int lifespan_; /*!< Lifespan of the Food in simulation time units. */
 };
 
 
 class Plant : public Food
 {
 public:
-    void Grow();
-private:
-    int age_=0;
+    void Grow(double deltaTime);
+protected:
+    double age_ = 0.0; /*!< Age of the Plant in simulation time units. */
 };
 
 class Meat : public Food
 {
 public:
     void Rot();
-
-private:
-
 };
 
 #endif // FOOD_H
