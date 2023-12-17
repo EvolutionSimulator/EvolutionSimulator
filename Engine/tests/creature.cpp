@@ -3,7 +3,7 @@
 #include <creature.h>
 
 /*!
- * @file creature_tests.cpp
+ * @file creature.cpp
  *
  * @brief Unit tests for the Creature class functionalities.
  *

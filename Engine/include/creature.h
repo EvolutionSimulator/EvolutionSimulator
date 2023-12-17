@@ -8,6 +8,25 @@
 
 #include <unordered_map>
 
+/*!
+ * @file creature.h
+ * @brief Defines the Creature class and related functionalities in a NEAT-based simulation environment.
+ *
+ * @details The Creature class, derived from MovableEntity, represents an agent in the simulation. It includes
+ *          attributes like health, energy, age, and a neural network for decision-making. This class handles
+ *          creature behaviors such as consuming food, energy management, growth, and collision responses.
+ */
+
+
+/*!
+ * @class Creature
+ * @brief Represents an agent in a NEAT-based simulation environment, inheriting from MovableEntity.
+ *
+ * @details This class models a creature with various attributes and behaviors pivotal for a NEAT-based simulation.
+ *          It encompasses aspects like health, energy, age, and growth, and integrates a neural network for decision-making.
+ *          The creature's behavior includes responding to collisions, searching for and consuming food, and managing its energy
+ *          and health. The class also supports evolutionary features like reproduction and genetic inheritance.
+ */
 class Creature : public MovableEntity {
 public:
   Creature(neat::Genome genome);

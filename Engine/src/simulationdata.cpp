@@ -8,10 +8,22 @@
 #include <cassert>
 #include "config.h"
 
+/*!
+ * @brief Adds a creature to the simulation.
+ *
+ * @param creature The Creature object to be added to the simulation's creature list.
+ */
+
 void SimulationData::AddCreature(const Creature& creature)
 {
     creatures_.push_back(creature);
 }
+
+/*!
+ * @brief Removes a specified creature from the simulation.
+ *
+ * @param creature The Creature object to be removed from the simulation's creature list.
+ */
 
 void SimulationData::RemoveCreature(const Creature& creature)
 {
@@ -21,15 +33,33 @@ void SimulationData::RemoveCreature(const Creature& creature)
                      creatures_.end());
 }
 
+/*!
+ * @brief Retrieves the current environment of the simulation.
+ *
+ * @return Returns the simulation's current environment.
+ */
+
 myEnvironment::Environment SimulationData::GetEnvironment()
 {
     return environment_;
 }
 
+/*!
+ * @brief Sets the environment for the simulation.
+ *
+ * @param environment The new environment to be set for the simulation.
+ */
+
 void SimulationData::SetEnvironment(myEnvironment::Environment& environment)
 {
     environment_ = environment;
 }
+
+/*!
+ * @brief Retrieves the simulation's grid.
+ *
+ * @return Returns a 3D vector representing the simulation's spatial grid.
+ */
 
 std::vector<std::vector<std::vector<Entity*> > > SimulationData::GetGrid()
 {
@@ -37,8 +67,12 @@ std::vector<std::vector<std::vector<Entity*> > > SimulationData::GetGrid()
 }
 
 /*!
- * Iterate through the vector and modify each entity
+ * @brief Modifies the positions of all creatures in the simulation.
+ *
+ * @param delta_x The change in x-coordinate for each creature.
+ * @param delta_y The change in y-coordinate for each creature.
  */
+
 void SimulationData::ModifyAllCreatures(double delta_x, double delta_y)
 {
     std::pair<double, double> coordinates;
@@ -49,9 +83,13 @@ void SimulationData::ModifyAllCreatures(double delta_x, double delta_y)
         creature.SetCoordinates(coordinates.first, coordinates.second, settings::environment::kMapWidth, settings::environment::kMapHeight);
     }
 }
+
 /*!
- * Update all creatures position and orientation by a deltaTime interval
+ * @brief Updates the state of all creatures for a given time interval.
+ *
+ * @param deltaTime The time interval for which the creatures' states are updated.
  */
+
 void SimulationData::UpdateAllCreatures(double deltaTime)
 {
     for (Creature& creature: creatures_) {
@@ -63,7 +101,7 @@ void SimulationData::UpdateAllCreatures(double deltaTime)
 }
 
 /*!
- * If the food density is less than the established in the environment it creates new food entities until that threshold is reached
+ * @brief Generates additional food entities based on the environment's food density.
  */
 void SimulationData::GenerateMoreFood(){
     double size = food_entities_.size();
@@ -80,7 +118,9 @@ void SimulationData::GenerateMoreFood(){
 }
 
 /*!
- * Takes the creatures from the reproduce queue in pairs and initializaes randomly a crossedover version
+ * @brief Handles the reproduction process of creatures in the simulation.
+ *
+ * @details Pairs creatures from the reproduction queue and creates offspring with crossed-over genomes.
  */
 void SimulationData::ReproduceCreatures(){
     double world_width = settings::environment::kMapWidth;
@@ -118,7 +158,7 @@ void SimulationData::ReproduceCreatures(){
 
 
 /*!
- * Initializes creatures randomly on the map, mutating their genome 30 times
+ * @brief Initializes creatures randomly on the map, mutating their genome multiple times.
  */
 void SimulationData::InitializeCreatures() {
     // Retrieve information from the environment
@@ -144,9 +184,8 @@ void SimulationData::InitializeCreatures() {
 }
 
 /*!
- * Initializes food randomly on the map
+ * @brief Initializes food entities randomly on the map.
  */
-
 void SimulationData::InitializeFood() {
     double kFoodDensity = environment_.GetFoodDensity();
     food_entities_.clear();
@@ -162,7 +201,7 @@ void SimulationData::InitializeFood() {
 }
 
 /*!
- * Initializes the empty grid to place entities in and places them in the right square
+ * @brief Initializes the simulation grid and places entities within it.
  */
 void SimulationData::InitializeGrid() {
 
@@ -175,6 +214,9 @@ void SimulationData::InitializeGrid() {
     UpdateGrid();
 }
 
+/*!
+ * @brief Clears the simulation grid of all entities.
+ */
 void SimulationData::ClearGrid() {
     for (auto& row : grid_) {
         for (auto& cell : row) {
@@ -187,7 +229,11 @@ void SimulationData::ClearGrid() {
 
 
 /*!
- * Deletes dead entities, and places remaining ones in grid
+ * @brief Template function that erases the dead entities from their corresponding vectors and fills the grid with the remaining entities.
+ *
+ * @tparam entities Vector of EntityType.
+ * @param entityGrid 3D vector of entities.
+ * @param cellSize Size of the grid cells.
  */
 template <typename EntityType>
 void UpdateGridTemplate(std::vector<EntityType>& entities, std::vector<std::vector<std::vector<Entity*> > >& entityGrid, double cellSize) {
@@ -209,16 +255,7 @@ void UpdateGridTemplate(std::vector<EntityType>& entities, std::vector<std::vect
 /*!
  * @brief Removes creatures with a state of 'Dead' from a given queue.
  *
- * This function iterates through the provided queue of creatures, `reproduce`,
- * and removes any creature that has a state of 'Dead'. It maintains the order
- * of the remaining creatures. The removal is achieved by transferring creatures
- * that are not dead to a temporary queue, and then replacing the original queue
- * with this temporary queue. It's assumed that the Creature class has a
- * `GetState` method that returns the creature's current state, and there's an
- * enumerator `CreatureState::Dead` representing the dead state.
- *
  * @param reproduce A queue of Creature objects, potentially containing dead creatures.
- * @return void The function does not return a value but modifies the queue in place.
  */
 void UpdateQueue(std::queue<Creature>& reproduce) {
     std::queue<Creature> tempQueue;
@@ -238,7 +275,9 @@ void UpdateQueue(std::queue<Creature>& reproduce) {
     reproduce = std::move(tempQueue);
 }
 
-
+/*!
+ * @brief Updates the simulation grid, removing dead entities and placing the living ones.
+ */
 void SimulationData::UpdateGrid() {
     ClearGrid();
     UpdateGridTemplate<Creature>(creatures_, grid_, settings::environment::kGridCellSize);
@@ -249,7 +288,16 @@ void SimulationData::UpdateGrid() {
 
 
 
-//Neighbours including the center itself
+/*!
+ * @brief Retrieves neighboring cells in the grid, including the center cell itself.
+ *
+ * @param num_rows Number of rows in the grid.
+ * @param num_cols Number of columns in the grid.
+ * @param center The center cell coordinates.
+ * @param layer_number The number of layers around the center cell to include.
+ *
+ * @return A vector of pairs representing the coordinates of neighboring cells.
+ */
 std::vector<std::pair<int, int>> GetNeighbours(const int& num_rows, const int& num_cols, const std::pair<int, int>& center, const int& layer_number){
     std::vector<std::pair<int, int>> neighbours;
     for (int y = center.first-layer_number; y<center.first+layer_number+1; y++){
@@ -260,6 +308,11 @@ std::vector<std::pair<int, int>> GetNeighbours(const int& num_rows, const int& n
     return neighbours;
 }
 
+/*!
+ * @brief Checks for collisions between entities in the simulation.
+ *
+ * @details Iterates through the grid to detect and handle collisions between different entities.
+ */
 void SimulationData::CheckCollisions() {
     double tolerance = settings::environment::kTolerance;
     int num_rows = static_cast<int>(std::ceil(static_cast<double>(settings::environment::kMapWidth) / settings::environment::kGridCellSize))+1;

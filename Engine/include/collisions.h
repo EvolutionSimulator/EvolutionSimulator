@@ -2,6 +2,11 @@
 #define COLLISIONS_H
 
 #include <vector>
+/*!
+ * @file collisions.h
+ *
+ * @brief Defines the functions for collision detection functions in a simulation environment.
+ */
 
 bool CollisionCircleCircle(const double& tolerance, const std::pair<double, double>& center1, const double& radius1, const std::pair<double, double>& center2, const double& radius2);
 bool CollisionCircleLine(const double& tolerance, const std::pair<double, double>& center, const double& radius,
