@@ -119,7 +119,7 @@ void MovableEntity::Move(double deltaTime, const double kMapWidth,
 
 void MovableEntity::Rotate(double deltaTime) {
   double new_orientation =
-      GetOrientation() + (rotational_velocity_ * deltaTime);
+      GetOrientation() + (GetRotationalVelocity() * deltaTime);
   SetOrientation(new_orientation);
 }
 
