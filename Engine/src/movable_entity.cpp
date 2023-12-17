@@ -46,7 +46,7 @@ void MovableEntity::SetRotationalVelocity(double rotational_velocity) {
 }
 
 double MovableEntity::GetForwardFriction() const {
-  return GetVelocity() * GetSize() *
+  return GetVelocity() * sqrt(GetSize()) *
          settings::environment::kFrictionalCoefficient *
          (1 + strafing_difficulty * abs(sin(GetVelocityAngle())));
 }
@@ -101,12 +101,10 @@ void MovableEntity::UpdateVelocities(double deltaTime) {
 
 void MovableEntity::Move(double deltaTime, const double kMapWidth,
                          const double kMapHeight) {
-  double orientation_rad = GetOrientation();
+  double orientation = GetOrientation();
 
-  double delta_x =
-      velocity_ * cos(orientation_rad + velocity_angle_) * deltaTime;
-  double delta_y =
-      velocity_ * sin(orientation_rad + velocity_angle_) * deltaTime;
+  double delta_x = velocity_ * cos(orientation + velocity_angle_) * deltaTime;
+  double delta_y = velocity_ * sin(orientation + velocity_angle_) * deltaTime;
 
   // Update position
   auto [current_x, current_y] = GetCoordinates();
