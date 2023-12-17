@@ -1,23 +1,40 @@
 #include "creature.h"
 #include <algorithm>
 #include <cassert>
+/*!
+ * @file creature.cpp
+ *
+ * @brief Implementation of the Creature class in a NEAT-based simulation environment.
+ *
+ * @details This file contains the implementation of the Creature class, which represents an agent in a simulation
+ * environment. Creatures are characterized by attributes such as health, energy, genome, and neural network
+ * (brain), and can perform various actions like moving, reproducing, and consuming food. This file provides
+ * detailed implementations for creature creation, state management, and interactions with the environment.
+ *
+ * The Creature class is central to the simulation, representing the agents that evolve and interact within
+ * the simulated ecosystem. They are equipped with a neural network that drives their decision-making processes,
+ * and they undergo evolutionary processes driven by their genetic makeup.
+ */
+
+
 
 /*!
  * @brief Construct a new Creature object.
  *
- * Initializes a Creature instance with a given NEAT genome. The constructor sets up various
+ * @details Initializes a Creature instance with a given NEAT genome. The constructor sets up various
  * creature attributes like health, energy, brain (neural network), genome, neuron data, reproduction cooldown,
  * and age. It also initializes the creature as a movable entity.
  *
  * @param genome A `neat::Genome` object that represents the genetic makeup of the creature,
  *               which is used to initialize the creature's neural network (`brain_`).
  *
- * The Creature is initialized with the following default properties:
- * - Health and energy are set to 100.
- * - The brain (neural network) is constructed using the provided genome.
- * - Neuron data is initialized with zeros, with a size equal to `settings::environment::kInputNeurons`.
- * - Reproduction cooldown is set to `settings::environment::kReproductionCooldown`.
- * - Age is initialized to 0.
+ * Default properties:
+ * - Health: 100
+ * - Energy: 100
+ * - Brain (Neural Network): Constructed from the provided genome.
+ * - Neuron Data: Initialized with zeros (size equal to `settings::environment::kInputNeurons`).
+ * - Reproduction Cooldown: Set to `settings::environment::kReproductionCooldown`.
+ * - Age: 0
  */
 Creature::Creature(neat::Genome genome)
     : MovableEntity(), health_(100), energy_(100),
