@@ -1,21 +1,6 @@
 #include "creature.h"
 #include <algorithm>
 #include <cassert>
-/*!
- * @file creature.cpp
- *
- * @brief Implementation of the Creature class in a NEAT-based simulation environment.
- *
- * @details This file contains the implementation of the Creature class, which represents an agent in a simulation
- * environment. Creatures are characterized by attributes such as health, energy, genome, and neural network
- * (brain), and can perform various actions like moving, reproducing, and consuming food. This file provides
- * detailed implementations for creature creation, state management, and interactions with the environment.
- *
- * The Creature class is central to the simulation, representing the agents that evolve and interact within
- * the simulated ecosystem. They are equipped with a neural network that drives their decision-making processes,
- * and they undergo evolutionary processes driven by their genetic makeup.
- */
-
 
 
 /*!

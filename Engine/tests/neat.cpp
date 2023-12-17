@@ -6,7 +6,7 @@
 #include "neat/neat-neuron.h"
 
 /*!
- * @file neat_tests.cpp
+ * @file neat.cpp
  * @brief Unit tests for NEAT Genome, Link, and Neuron functionalities.
  *
  * @details This file contains tests to validate the construction and operation of the NEAT Genome, Link, and Neuron classes.

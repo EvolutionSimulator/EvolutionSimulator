@@ -9,7 +9,7 @@
 #include "environment.h"
 
 /*!
- * @file collision_tests.cpp
+ * @file collisions.cpp
  *
  * @brief Unit tests for collision detection, creature interactions, and grid functionalities in the simulation environment.
  *
