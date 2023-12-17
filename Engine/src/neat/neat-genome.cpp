@@ -1,6 +1,7 @@
 #include "neat/neat-genome.h"
 /*!
  * @file neat-genome.h
+ *
  * @brief Defines the Genome class used in NEAT (NeuroEvolution of Augmenting Topologies).
  */
 
