@@ -26,7 +26,7 @@ double MovableEntity::GetRotationalVelocity() const {
 }
 
 void MovableEntity::SetAcceleration(double acceleration) {
-  acceleration_ = acceleration;
+  acceleration_ = abs(acceleration);
 }
 
 void MovableEntity::SetAccelerationAngle(double angle) {
