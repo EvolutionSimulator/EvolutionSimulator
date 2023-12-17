@@ -6,8 +6,18 @@
 #include <iostream>
 #include <unordered_map>
 
+/*!
+ * @file neat-neural-network.h
+ * @brief Defines the NeuralNetwork class and related functions for NEAT.
+ */
+
 namespace neat {
 
+/*!
+ * @brief Constructs a NeuralNetwork from a given Genome.
+ *
+ * @param genome The Genome to construct the NeuralNetwork from.
+ */
 NeuralNetwork::NeuralNetwork(const Genome &genom) {
   std::vector<std::vector<Neuron> > layers = get_layers(genom);
   // std::vector<Neuron> neurons = genom.GetNeurons();
@@ -38,6 +48,13 @@ NeuralNetwork::NeuralNetwork(const Genome &genom) {
   ffneurons_ = ffneurons;
 }
 
+/*!
+ * @brief Activates the neural network with a given set of input values.
+ *
+ * @param input_values The input values to feed into the network.
+ *
+ * @return A vector of output values after network activation.
+ */
 std::vector<double> NeuralNetwork::Activate(
     const std::vector<double> &input_values) const {
   assert(input_values.size() == input_ids_.size());
@@ -73,6 +90,13 @@ std::vector<double> NeuralNetwork::Activate(
   return result;
 }
 
+/*!
+ * @brief Constructs layers of neurons from a given Genome.
+ *
+ * @param genome The Genome to construct the layers from.
+ *
+ * @return A vector of neuron layers, where each layer is a vector of Neuron.
+ */
 std::vector<std::vector<Neuron> > get_layers(const Genome &genom) {
   std::vector<std::vector<Neuron> > layers;
   std::vector<Neuron> input_layer;
@@ -130,5 +154,12 @@ std::vector<std::vector<Neuron> > get_layers(const Genome &genom) {
   return layers;
 }
 
+/*!
+ * @brief Activation function used in the neural network.
+ *
+ * @param x The input value to the activation function.
+ *
+ * @return The output of the activation function.
+ */
 double activation_function(double x) { return 1 / (1 + exp(-x)); }
 }  // end of namespace neat

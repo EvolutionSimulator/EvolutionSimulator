@@ -11,6 +11,13 @@
 
 namespace neat {
 
+/*!
+ * @class Genome
+ *
+ * @brief Represents a genetic encoding of a neural network for use in NEAT.
+ *
+ * @details The Genome class contains neurons and links representing the topology and weights of a neural network.
+ */
 class Genome {
  public:
   explicit Genome(int input_count, int output_count);
