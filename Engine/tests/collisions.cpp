@@ -8,9 +8,26 @@
 #include "simulationdata.h"
 #include "environment.h"
 
+/*!
+ * @file collision_tests.cpp
+ *
+ * @brief Unit tests for collision detection, creature interactions, and grid functionalities in the simulation environment.
+ *
+ * @details This file contains tests to validate the correctness of collision detection algorithms,
+ *          creature behaviors in response to different scenarios, grid initialization, and neighbor
+ *          calculation algorithms within the simulation environment.
+ */
+
 
 using namespace testing;
 
+/*!
+ * @brief Tests for various scenarios of circle-circle collision detection.
+ *
+ * @details Validates the CollisionCircleCircle function across different cases:
+ *          touching circles, overlapping circles, circles with the same center,
+ *          circles with one inside the other, and separated circles.
+ */
 TEST(CollisionTests, CollisionCircleCircle) {
     double tolerance = 0.1;
 
@@ -50,6 +67,12 @@ TEST(CollisionTests, CollisionCircleCircle) {
     EXPECT_FALSE(CollisionCircleCircle(tolerance, center1_case5, radius1_case5, center2_case5, radius2_case5));
 }
 
+/*!
+ * @brief Tests for collision detection between a circle and a line segment.
+ *
+ * @details Validates the CollisionCircleLine function for intersecting and non-intersecting
+ *          scenarios, including vertical and horizontal line segments.
+ */
 TEST(CollisionTests, CollisionCircleLine) {
     const double tolerance = 0.1;
 
@@ -90,6 +113,12 @@ TEST(CollisionTests, CollisionCircleLine) {
 
 }
 
+/*!
+ * @brief Tests for distance calculation between two entities without considering map wrap-around.
+ *
+ * @details Ensures that the GetDistance method correctly calculates the Euclidean distance
+ *          between entities when wrap-around is not applicable.
+ */
 TEST(CollisionTests, GetDistance_NoWrapAround) {
     Entity e1(10.0, 10.0, 10.0);
     Entity e2(13.0, 14.0, 3.0);
@@ -100,6 +129,12 @@ TEST(CollisionTests, GetDistance_NoWrapAround) {
     ASSERT_NEAR(e1.GetDistance(e2, mapWidth, mapHeight), expectedDistance, 1e-6);
 }
 
+/*!
+ * @brief Tests for distance calculation between entities considering map wrap-around along the X-axis.
+ *
+ * @details Ensures that the GetDistance method correctly calculates the shortest distance between entities,
+ *          considering the wrap-around effect along the X-axis of the map.
+ */
 TEST(CollisionTests, GetDistance_WrapAroundXCoordinate) {
     Entity e1(1.0, 10.0, 2.0);
     Entity e2(99.0, 10.0, 5.0);
@@ -110,6 +145,12 @@ TEST(CollisionTests, GetDistance_WrapAroundXCoordinate) {
     ASSERT_NEAR(e1.GetDistance(e2, mapWidth, mapHeight), expectedDistance, 1e-6);
 }
 
+/*!
+ * @brief Tests for distance calculation between entities considering map wrap-around along the Y-axis.
+ *
+ * @details Ensures that the GetDistance method correctly calculates the shortest distance between entities,
+ *          considering the wrap-around effect along the Y-axis of the map.
+ */
 TEST(CollisionTests, GetDistance_WrapAroundYCoordinate) {
     Entity e1(10.0, 1.0, 3.0);
     Entity e2(10.0, 99.0, 2.0);
@@ -120,6 +161,12 @@ TEST(CollisionTests, GetDistance_WrapAroundYCoordinate) {
     ASSERT_NEAR(e1.GetDistance(e2, mapWidth, mapHeight), expectedDistance, 1e-6);
 }
 
+/*!
+ * @brief Tests for distance calculation between entities considering map wrap-around along both coordinates.
+ *
+ * @details Ensures that the GetDistance method correctly calculates the shortest distance between entities,
+ *          considering the wrap-around effect along both the X-axis and Y-axis of the map.
+ */
 TEST(CollisionTests, GetDistance_WrapAroundBothCoordinates) {
     Entity e1(1.0, 1.0, 2.0);
     Entity e2(99.0, 99.0, 3.0);
@@ -131,7 +178,12 @@ TEST(CollisionTests, GetDistance_WrapAroundBothCoordinates) {
 }
 
 
-
+/*!
+ * @brief Tests for checking collision detection between two entities.
+ *
+ * @details Validates the CheckCollisionWithEntity function in various scenarios including overlapping entities,
+ *          entities placed far apart, entities with one inside the other, and entities wrapped within the map bounds.
+ */
 TEST(CollisionTests, CheckCollisionWithEntity) {
     const double tolerance = 0.1;
     const double kMapWidth = 100.0;
@@ -178,7 +230,12 @@ TEST(CollisionTests, CheckCollisionWithEntity) {
     EXPECT_TRUE(entity1.CheckCollisionWithEntity(tolerance, entity2));
 }
 
-
+/*!
+ * @brief Tests the interaction between creatures and food entities upon collision.
+ *
+ * @details Validates different scenarios like collision with alive and dead food,
+ *          and changes in creature's energy based on the nutritional value of the food.
+ */
 TEST(CollisionTests, OnCollisionWithFood) {
     const double tolerance = 0.1;
 
@@ -228,6 +285,13 @@ TEST(CollisionTests, OnCollisionWithFood) {
     EXPECT_EQ(food.GetState(), Entity::Dead);
 }
 
+/*!
+ * @brief Tests for handling collision between a creature and food entities.
+ *
+ * @details Validates various collision scenarios between creatures and food, including collisions with alive and dead food,
+ *          changes in creature's energy based on food's nutritional value, and scenarios where food is within and outside
+ *          the creature's reach.
+ */
 TEST(CollisionTests, OnCollisionWithEntity) {
     Entity entity1, entity2;
     double kMapWidth = 100.0, kMapHeight = 100.0;
@@ -248,7 +312,13 @@ TEST(CollisionTests, OnCollisionWithEntity) {
     EXPECT_FALSE(entity1.CheckCollisionWithEntity(0.0, entity2));
 }
 
-// Test suite for Creature class
+
+/*!
+ * @brief Tests for Creature class functionalities.
+ *
+ * @details This test suite checks various behaviors of creatures, including interactions with food entities
+ *          and their positioning within the simulation environment.
+ */
 class CreatureTest : public ::testing::Test {
 protected:
     // Helper function to set up the grid for testing
@@ -282,6 +352,11 @@ TEST_F(CreatureTest, GetClosestFood_EmptyGrid) {
     }, ".*");*/
 }
 
+/*!
+ * @brief Tests the Creature's ability to identify the closest food entity in an empty grid.
+ *
+ * @details Validates that the Creature correctly identifies the absence of food entities in an empty grid.
+ */
 TEST_F(CreatureTest, GetClosestFood_NoFoodInGrid) {
     // Create a Creature with a mock genome
     Creature creature(neat::Genome(2,3));
@@ -300,6 +375,11 @@ TEST_F(CreatureTest, GetClosestFood_NoFoodInGrid) {
     }, ".*");*/
 }
 
+/*!
+ * @brief Tests the Creature's ability to identify the closest food entity in a grid with multiple food entities.
+ *
+ * @details Validates that the Creature correctly identifies the nearest food entity based on its position in the grid.
+ */
 TEST_F(CreatureTest, GetClosestFoodTest) {
     // Create a Creature with a mock genome
     Creature creature1(neat::Genome(2, 2));
@@ -331,6 +411,11 @@ TEST_F(CreatureTest, GetClosestFoodTest) {
     delete grid[9][7][0];
 }
 
+/*!
+ * @brief Tests retrieving food entities at a specific distance from a given position in the grid.
+ *
+ * @details Ensures that food entities at a specified distance from a given position are correctly identified and retrieved.
+ */
 TEST_F(CreatureTest, GetFoodAtDistanceTest) {
     // Define the grid
     std::vector<std::vector<std::vector<Entity*> > > grid;
@@ -354,6 +439,11 @@ TEST_F(CreatureTest, GetFoodAtDistanceTest) {
     delete f3;
 }
 
+/*!
+ * @brief Tests the Creature's ability to identify the closest food entity under different scenarios.
+ *
+ * @details Validates that the Creature correctly identifies the closest food entity, considering various positions and states of food entities.
+ */
 TEST_F(CreatureTest, GetClosestFoodTest2) {
     // Define the grid
     std::vector<std::vector<std::vector<Entity*> > > grid;
@@ -382,6 +472,12 @@ TEST_F(CreatureTest, GetClosestFoodTest2) {
     delete cr;
 }
 
+/*!
+ * @brief Tests for correct initialization of the simulation grid.
+ *
+ * @details Ensures that the grid is initialized with the expected number of cells
+ *          based on the simulation settings.
+ */
 TEST(SimulationDataTest, GridInitialization) {
     myEnvironment::Environment environment;
     SimulationData simData(environment);
@@ -396,6 +492,11 @@ TEST(SimulationDataTest, GridInitialization) {
     }
 }
 
+/*!
+ * @brief Tests for updating the grid with alive entities.
+ *
+ * @details Validates that the grid correctly places alive entities and ignores dead ones.
+ */
 TEST(SimulationDataTest, UpdateGridWithAliveEntities) {
     myEnvironment::Environment environment;
     SimulationData simData(environment);
@@ -432,7 +533,12 @@ TEST(SimulationDataTest, UpdateGridWithAliveEntities) {
     }
 }
 
-
+/*!
+ * @brief Tests for correct placement of entities in the grid.
+ *
+ * @details Ensures that entities are placed in the correct grid cells even when
+ *          their coordinates are outside the nominal bounds of the map.
+ */
 TEST(SimulationDataTest, CorrectEntityPlacementInGrid) {
     myEnvironment::Environment environment;
     SimulationData simData(environment);
@@ -474,13 +580,30 @@ TEST(SimulationDataTest, CorrectEntityPlacementInGrid) {
     EXPECT_NE(simData.GetGrid()[foodGridX][foodGridY].empty(), true);
 }
 
+/*!
+ * @brief Tests for calculating neighboring cells in a grid.
+ *
+ * @details Validates the GetNeighbours function for various scenarios, including
+ *          cells at corners, edges, and outside the grid boundaries.
+ */
 
+
+/*!
+ * @brief Tests the basic functionality of the GetNeighbours function.
+ *
+ * @details Ensures that the correct neighboring grid cells are identified for a given central cell in a standard scenario.
+ */
 TEST(GetNeighboursTest, BasicFunctionality) {
     auto neighbours = GetNeighbours(10, 10, {5, 5}, 1);
     std::vector<std::pair<int, int>> expected = {{4, 4}, {4, 5}, {4, 6}, {5, 4}, {5, 5}, {5, 6}, {6, 4}, {6, 5}, {6, 6}};
     EXPECT_EQ(neighbours, expected);
 }
 
+/*!
+ * @brief Tests neighbor calculation when the center cell is at a corner of the grid.
+ *
+ * @details Validates that GetNeighbours correctly identifies neighbors for a cell located at the corner of the grid, considering wrap-around effects.
+ */
 TEST(GetNeighboursTest, CenterAtCorner) {
     auto neighbours = GetNeighbours(10, 10, {0, 0}, 1);
     std::vector<std::pair<int, int>> expected = {{9, 9}, {9, 0}, {9, 1}, {0, 9}, {0, 0}, {0, 1}, {1, 9}, {1, 0}, {1, 1}};
@@ -488,6 +611,11 @@ TEST(GetNeighboursTest, CenterAtCorner) {
     EXPECT_EQ(neighbours, expected);
 }
 
+/*!
+ * @brief Tests neighbor calculation when the center cell is on the edge of the grid along the X-axis.
+ *
+ * @details Ensures that GetNeighbours correctly identifies neighbors for a cell located on the horizontal edge of the grid, accounting for wrap-around.
+ */
 TEST(GetNeighboursTest, CenterAtXEdge) {
     auto neighbours = GetNeighbours(10, 10, {0, 5}, 1);
     std::vector<std::pair<int, int>> expected = {
@@ -498,13 +626,22 @@ TEST(GetNeighboursTest, CenterAtXEdge) {
     EXPECT_EQ(neighbours, expected);
 }
 
+/*!
+ * @brief Tests the GetNeighbours function when the layer number is zero.
+ *
+ * @details Validates that GetNeighbours correctly identifies only the central cell when the layer number is zero.
+ */
 TEST(GetNeighboursTest, ZeroLayerNumber) {
     auto neighbours = GetNeighbours(10, 10, {5, 5}, 0);
     std::vector<std::pair<int, int>> expected = {{5, 5}};
     EXPECT_EQ(neighbours, expected);
 }
 
-
+/*!
+ * @brief Tests neighbor calculation when the center cell is outside the grid boundaries.
+ *
+ * @details Ensures that GetNeighbours handles out-of-bound center cell coordinates correctly, applying wrap-around logic to identify neighbors.
+ */
 TEST(GetNeighboursTest, CenterOutsideGrid) {
     auto neighbours = GetNeighbours(10, 10, {11, 11}, 1);
     std::vector<std::pair<int, int>> expected = {{0, 0}, {0, 1}, {0, 2}, {1, 0}, {1, 1}, {1, 2}, {2, 0}, {2, 1}, {2, 2}};
