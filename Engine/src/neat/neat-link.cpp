@@ -1,13 +1,13 @@
 #include "neat/neat-link.h"
-
-#include "random"
-#include "stdexcept"
-
 /*!
  * @file neat-link.h
  *
  * @brief Defines the Link class and related functions for NEAT.
  */
+
+#include "random"
+#include "stdexcept"
+
 
 namespace neat {
 

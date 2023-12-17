@@ -1,4 +1,9 @@
 #include "neat/neat-neural-network.h"
+/*!
+ * @file neat-neural-network.h
+ *
+ * @brief Defines the NeuralNetwork class and related functions for NEAT.
+ */
 
 #include <algorithm>
 #include <cassert>
@@ -6,10 +11,7 @@
 #include <iostream>
 #include <unordered_map>
 
-/*!
- * @file neat-neural-network.h
- * @brief Defines the NeuralNetwork class and related functions for NEAT.
- */
+
 
 namespace neat {
 
