@@ -58,3 +58,7 @@ compile_commands.json
 build
 .DS_Store
 .clang-format
+
+# Automatic Documentation
+html/
+latex/
