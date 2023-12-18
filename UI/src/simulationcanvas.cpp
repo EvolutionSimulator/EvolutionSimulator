@@ -70,72 +70,58 @@ void SimulationCanvas::OnUpdate() {
   simulation_->ProcessData(render_lambda_);
   RenderSimulation(simulation_->GetSimulationData());
 
+
+  // Check if a creature is selected and draw the red border if true
   if (showInfoPanel && selectedCreatureInfo) {
+    // Right info panel setup
+    sf::Vector2f panelSize(200, getSize().y);  // Width of 200 and full height of the canvas
+    sf::Vector2f panelPosition(getSize().x - panelSize.x, 0);  // Positioned on the right side
+
+    // Info panel background
+    sf::RectangleShape panel(panelSize);
+    panel.setFillColor(sf::Color(50, 50, 20, 205));  // Semi-transparent
+    panel.setPosition(panelPosition);
+    draw(panel);
+
     const auto& creatures = simulation_->GetSimulationData()->creatures_;
+    auto creature_it = std::find_if(creatures.begin(), creatures.end(),
+                                    [this](const Creature& c) {
+                                        return c.GetID() == selectedCreatureInfo->id;
+                                    });
     auto it = std::find_if(creatures.begin(), creatures.end(), [this](const Creature& c) {
         return c.GetID() == selectedCreatureInfo->id;
     });
 
-    if (it != creatures.end()) {
+    if (creature_it != creatures.end()) {
       const Creature& creature = *it;
-
-      // Update the info panel with the latest creature data
       creatureInfo = QString::fromStdString(formatCreatureInfo(creature));
 
-      // Here you adjust the panel size based on the text size
-      sf::Vector2f panelSize(200, 170);
-      sf::Vector2f panelPosition(
-          selectedCreatureInfo->x - panelSize.x / 2,
-          selectedCreatureInfo->y - creature.GetSize() / 2 - panelSize.y - 10); // Adjust for creature size and give some space
+      if (selectedCreatureInfo && creature.GetID() == selectedCreatureInfo->id) {
+          sf::CircleShape redCircle(creature.GetSize()); // Adjust as needed
+          redCircle.setOutlineColor(sf::Color::Red);
+          redCircle.setOutlineThickness(2); // Adjust thickness as needed
+          redCircle.setFillColor(sf::Color::Transparent);
+          redCircle.setPosition(creature.GetCoordinates().first - creature.GetSize(),
+                                creature.GetCoordinates().second - creature.GetSize());
+          draw(redCircle);
 
-      sf::RectangleShape panel(panelSize);
-      panel.setFillColor(sf::Color(50, 50, 50, 205));
-      panel.setOutlineThickness(2.0f);
-      panel.setOutlineColor(sf::Color::Black);
-      panel.setPosition(panelPosition);
+          // Check if the creature's health is 0 and display the message
+          if (creature.GetHealth() == 0) {
+              creatureInfo = QString::fromStdString("Creature " + std::to_string(creature.GetID()) + " is dead");
+          } else {
+              // Update the creature info normally
+              creatureInfo = QString::fromStdString(formatCreatureInfo(creature));
+          }
+      }
 
+      // Prepare and draw the creature info text inside the panel
       sf::Text infoText;
       infoText.setFont(font_);
       infoText.setString(creatureInfo.toStdString());
       infoText.setCharacterSize(15);
       infoText.setFillColor(sf::Color::White);
-      infoText.setPosition(panelPosition.x + 10, panelPosition.y + 10);
-
-      draw(panel);
+      infoText.setPosition(panelPosition.x + 10, 10);  // Adjust the Y position as needed
       draw(infoText);
-
-      // Update the position of the creature
-      selectedCreatureInfo->x = creature.GetCoordinates().first;
-      selectedCreatureInfo->y = creature.GetCoordinates().second;
-
-      sf::Vector2f creatureCenter(selectedCreatureInfo->x, selectedCreatureInfo->y);
-      sf::Vector2f panelCenter = panelPosition + sf::Vector2f(panelSize.x / 2, panelSize.y);
-
-      // Create the arrow line (shaft)
-      sf::VertexArray arrowLine(sf::Lines, 2);
-      arrowLine[0].position = panelCenter;
-      arrowLine[1].position = creatureCenter;
-      arrowLine[0].color = sf::Color::Black;
-      arrowLine[1].color = sf::Color::Black;
-
-      // Draw the arrow line
-      draw(arrowLine);
-
-      // Create the arrowhead
-      float arrowHeadLength = 10.0f; // Length of the arrowhead lines
-      sf::ConvexShape arrowHead;
-      arrowHead.setPointCount(3);
-      sf::Vector2f direction = creatureCenter - panelCenter;
-      float angle = std::atan2(direction.y, direction.x);
-
-      // Set the points for the arrowhead triangle
-      arrowHead.setPoint(0, creatureCenter);
-      arrowHead.setPoint(1, creatureCenter - sf::Vector2f(std::cos(angle - M_PI / 4) * arrowHeadLength, std::sin(angle - M_PI / 4) * arrowHeadLength));
-      arrowHead.setPoint(2, creatureCenter - sf::Vector2f(std::cos(angle + M_PI / 4) * arrowHeadLength, std::sin(angle + M_PI / 4) * arrowHeadLength));
-      arrowHead.setFillColor(sf::Color::Black);
-
-      // Draw the arrowhead
-      draw(arrowHead);
     }
   }else if (showInfoPanel) {
     std::cout << "Info panel flag is set, but no creature position is recorded."
@@ -416,12 +402,13 @@ void SimulationCanvas::displayInfoPanel() {
 // Structure of the info panel (appearing when a creature is clicked)
 std::string SimulationCanvas::formatCreatureInfo(const Creature& creature) {
   std::stringstream ss;
-  ss << "Creature ID: " << creature.GetID() << "\n";
+  ss << "Creature ID: " << creature.GetID() << "\n\n";
   ss << "Size: " << creature.GetSize() << "\n";
   ss << "Age: " << creature.GetAge() << "\n";
   ss << "Generation: " << creature.GetGeneration() << "\n";
   ss << "Health: " << creature.GetHealth() << "\n";
-  ss << "Energy Level: " << creature.GetEnergy() << "\n\n";
+  ss << "Energy Level: " << creature.GetEnergy() << "\n";
+  ss << "Velocity: " << creature.GetVelocity() << "\n\n";
   auto [x, y] = creature.GetCoordinates();
   ss << "(x=" << x << ", y=" << y << ")\n";
   return ss.str();
