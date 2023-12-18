@@ -12,10 +12,11 @@ class SimulationCanvas : public QSFMLCanvas {
 
  public:
  struct CreatureInfo {
-     double x;
-     double y;
-     float size;
-
+     int id = -1; // ID of the creature, initialize with an invalid value
+     double x = 0.0;
+     double y = 0.0;
+     float size = 0.0f;
+     // You might want to add other properties like health, age, etc., if necessary
  };
 
   SimulationCanvas(QWidget* Parent);
