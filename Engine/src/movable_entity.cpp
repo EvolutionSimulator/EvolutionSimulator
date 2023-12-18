@@ -221,7 +221,7 @@ void MovableEntity::Move(double deltaTime, const double kMapWidth,
   auto [current_x, current_y] = GetCoordinates();
   double new_x = current_x + delta_x;
 
-  double new_y = std::fmod(current_y + delta_y, kMapHeight);
+  double new_y = fmod(current_y + delta_y, kMapHeight);
 
   SetCoordinates(new_x, new_y, kMapWidth, kMapHeight);
 }
