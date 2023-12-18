@@ -76,7 +76,8 @@ std::vector<double> NeuralNetwork::Activate(
       }
       value += ffneuron.bias;
 
-      if (std::find(output_ids_.begin(), output_ids_.end(), ffneuron.id) == output_ids_.end()) {
+      if (std::find(output_ids_.begin(), output_ids_.end(), ffneuron.id) ==
+          output_ids_.end()) {
         value = activation_function(value);
       }
 

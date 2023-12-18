@@ -1,23 +1,21 @@
 #include "qsfmlcanvas.h"
 
-QSFMLCanvas::QSFMLCanvas(QWidget* Parent) :
-    QWidget       (Parent)
-{
-    // Setup some states to allow direct rendering into the widget
-    setAttribute(Qt::WA_PaintOnScreen);
-    setAttribute(Qt::WA_OpaquePaintEvent);
-    setAttribute(Qt::WA_NoSystemBackground);
+QSFMLCanvas::QSFMLCanvas(QWidget* Parent) : QWidget(Parent) {
+  // Setup some states to allow direct rendering into the widget
+  setAttribute(Qt::WA_PaintOnScreen);
+  setAttribute(Qt::WA_OpaquePaintEvent);
+  setAttribute(Qt::WA_NoSystemBackground);
 
-    // Set strong focus to enable keyboard events to be received
-    setFocusPolicy(Qt::StrongFocus);
+  // Set strong focus to enable keyboard events to be received
+  setFocusPolicy(Qt::StrongFocus);
 
-    // Setup the timer with a specified refresh interval (0 means it updates as fast as possible)
-    timer_.setInterval(0);
+  // Setup the timer with a specified refresh interval (0 means it updates as
+  // fast as possible)
+  timer_.setInterval(0);
 }
 
-void QSFMLCanvas::SetRefreshInterval(int milliseconds)
-{
-    timer_.setInterval(milliseconds);
+void QSFMLCanvas::SetRefreshInterval(int milliseconds) {
+  timer_.setInterval(milliseconds);
 }
 
 #ifdef Q_WS_X11
@@ -25,37 +23,31 @@ void QSFMLCanvas::SetRefreshInterval(int milliseconds)
 #include <X11/Xlib.h>
 #endif
 
+void QSFMLCanvas::showEvent(QShowEvent*) {
+  if (!isOpen()) {
+// Under X11, we need to flush the commands sent to the server to ensure that
+// SFML will get an updated view of the windows
+#ifdef Q_WS_X11
+    XFlush(QX11Info::display());
+#endif
 
-void QSFMLCanvas::showEvent(QShowEvent*)
-{
-    if (!isOpen())
-    {
-        // Under X11, we need to flush the commands sent to the server to ensure that
-        // SFML will get an updated view of the windows
-        #ifdef Q_WS_X11
-            XFlush(QX11Info::display());
-        #endif
+    sf::RenderWindow::create((sf::WindowHandle)(winId()));
 
-            sf::RenderWindow::create((sf::WindowHandle)(winId()));
+    OnInit();
 
-        OnInit();
-
-        // Setup the timer to trigger a refresh at specified framerate
-        connect(&timer_, SIGNAL(timeout()), this, SLOT(repaint()));
-        timer_.start();
-    }
+    // Setup the timer to trigger a refresh at specified framerate
+    connect(&timer_, SIGNAL(timeout()), this, SLOT(repaint()));
+    timer_.start();
+  }
 }
 
-// I have no clue what this does exactly but if its not present then the widget flickers like crazy
-QPaintEngine* QSFMLCanvas::paintEngine() const
-{
-    return nullptr;
-}
+// I have no clue what this does exactly but if its not present then the widget
+// flickers like crazy
+QPaintEngine* QSFMLCanvas::paintEngine() const { return nullptr; }
 
 // called when the widget is repainted
-void QSFMLCanvas::paintEvent(QPaintEvent*)
-{
-    OnUpdate();
+void QSFMLCanvas::paintEvent(QPaintEvent*) {
+  OnUpdate();
 
-    display();
+  display();
 }

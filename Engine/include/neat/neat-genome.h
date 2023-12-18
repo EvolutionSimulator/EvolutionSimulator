@@ -16,7 +16,8 @@ namespace neat {
  *
  * @brief Represents a genetic encoding of a neural network for use in NEAT.
  *
- * @details The Genome class contains neurons and links representing the topology and weights of a neural network.
+ * @details The Genome class contains neurons and links representing the
+ * topology and weights of a neural network.
  */
 class Genome {
  public:
@@ -29,9 +30,9 @@ class Genome {
   void AddNeuron(const Neuron& neuron);
   void AddLink(const Link& link);
 
-  void DisableNeuron(int id); //don't use this for now
+  void DisableNeuron(int id);  // don't use this for now
   void DisableLink(int id);
-  void EnableNeuron(int id); //don't use this for now
+  void EnableNeuron(int id);  // don't use this for now
   void EnableLink(int id);
   void RemoveNeuron(int id);
   void RemoveLink(int id);
@@ -50,12 +51,15 @@ class Genome {
   bool HasLink(const int& in_id, const int& ou_id);
 
  private:
-  std::vector<Neuron> neurons_; /*!< A vector of Neuron objects representing the neurons in the Genome. */
-  std::vector<Link> links_; /*!< A vector of Link objects representing the connections between neurons in the Genome. */
-  bool DFS(const Neuron& currentNeuron, std::unordered_set<int>& visited, std::unordered_set<int>& visiting) const;
+  std::vector<Neuron> neurons_; /*!< A vector of Neuron objects representing the
+                                   neurons in the Genome. */
+  std::vector<Link> links_;     /*!< A vector of Link objects representing the
+                                   connections between neurons in the Genome. */
+  bool DFS(const Neuron& currentNeuron, std::unordered_set<int>& visited,
+           std::unordered_set<int>& visiting) const;
 };
 
-Genome Crossover(const Genome &dominant, const Genome &recessive);
+Genome Crossover(const Genome& dominant, const Genome& recessive);
 }  // namespace neat
 
 #endif  // NEATGENOME_H

@@ -4,24 +4,24 @@
 #include "entity.h"
 
 class MovableEntity : public Entity {
-public:
+ public:
   MovableEntity();
 
   double GetAcceleration() const;
-  double
-  GetAccelerationAngle() const; // Angle relative to orientation of entity
+  double GetAccelerationAngle()
+      const;  // Angle relative to orientation of entity
   double GetRotationalAcceleration() const;
   double GetVelocity() const;
-  double GetVelocityAngle() const; // Angle relative to orientation of entity
+  double GetVelocityAngle() const;  // Angle relative to orientation of entity
   double GetRotationalVelocity() const;
 
   void SetAcceleration(double acceleration);
-  void
-  SetAccelerationAngle(double angle); // Angle relative to orientation of entity
+  void SetAccelerationAngle(
+      double angle);  // Angle relative to orientation of entity
   void SetRotationalAcceleration(double rotational_acceleration);
   void SetVelocity(double velocity);
-  void
-  SetVelocityAngle(double angle); // Angle relative to orientation of entity
+  void SetVelocityAngle(
+      double angle);  // Angle relative to orientation of entity
   void SetRotationalVelocity(double rotational_velocity);
 
   double GetForwardFriction() const;
@@ -37,10 +37,10 @@ public:
   virtual void OnCollision(Entity &other_entity, double const kMapWidth,
                            double const kMapHeight);
 
-protected:
+ protected:
   double acceleration_, acceleration_angle, rotational_acceleration;
   double velocity_, velocity_angle_, rotational_velocity_;
   double strafing_difficulty;
 };
 
-#endif // CREATURE_HPP
+#endif  // CREATURE_HPP

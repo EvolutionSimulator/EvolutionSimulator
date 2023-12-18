@@ -18,7 +18,7 @@ constexpr double kMaxBias = 0.1;
 constexpr double kMinBias = 0.0;
 constexpr double kChangeBiasMutationRate = 0.6;
 constexpr double kAdjustmentProbability = 0.8;
-} // namespace neat
+}  // namespace neat
 
 namespace environment {
 constexpr double kMapWidth = 1000.0;
@@ -44,13 +44,13 @@ constexpr double kMaxNutritionalValue = 5;
 constexpr double kDefaultLifespan = 30;
 constexpr double kPhotosynthesisFactor = 0.1;
 constexpr double kFrictionalCoefficient =
-    0.5; // 0.5 seems to provide a good balance at the beginning  then goes to
-         // shit
-} // namespace environment
+    0.5;  // 0.5 seems to provide a good balance at the beginning  then goes to
+          // shit
+}  // namespace environment
 
 namespace engine {
 constexpr double kFixedUpdateInterval = 0.05;
 }
-} // namespace settings
+}  // namespace settings
 
-#endif // CONFIG_H
+#endif  // CONFIG_H

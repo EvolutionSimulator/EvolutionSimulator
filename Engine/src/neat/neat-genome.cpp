@@ -2,7 +2,8 @@
 /*!
  * @file neat-genome.h
  *
- * @brief Defines the Genome class used in NEAT (NeuroEvolution of Augmenting Topologies).
+ * @brief Defines the Genome class used in NEAT (NeuroEvolution of Augmenting
+ * Topologies).
  */
 
 #include <algorithm>
@@ -12,7 +13,8 @@
 namespace neat {
 
 /*!
- * @brief Constructs a Genome with a specified number of input and output neurons.
+ * @brief Constructs a Genome with a specified number of input and output
+ * neurons.
  *
  * @param input_count Number of input neurons.
  * @param output_count Number of output neurons.
@@ -158,10 +160,10 @@ void Genome::RemoveNeuron(int id) {
 
   if (index_to_delete != -1) {
     std::vector<int> links_to_remove;
-    for (int i=links_.size()-1; i>=0; i--){
+    for (int i = links_.size() - 1; i >= 0; i--) {
       if (neurons_[index_to_delete].GetId() == links_[i].GetInId() ||
           neurons_[index_to_delete].GetId() == links_[i].GetOutId()) {
-          links_to_remove.push_back(i);
+        links_to_remove.push_back(i);
       }
     }
 
@@ -189,7 +191,8 @@ void Genome::RemoveNeuron(int id) {
 /*!
  * @brief Mutates the Genome, potentially altering its structure and weights.
  *
- * @details This method randomly applies various mutation operations based on predefined probabilities.
+ * @details This method randomly applies various mutation operations based on
+ * predefined probabilities.
  */
 void Genome::Mutate() {
   std::random_device rd;
@@ -224,7 +227,8 @@ void Genome::Mutate() {
 /*!
  * @brief Mutates the Genome by removing a neuron.
  *
- * @details Randomly selects and removes a neuron from the Genome, along with its associated links.
+ * @details Randomly selects and removes a neuron from the Genome, along with
+ * its associated links.
  */
 void Genome::MutateRemoveNeuron() {
   std::vector<int> hiddenIDs = {};
@@ -299,7 +303,8 @@ void Genome::RemoveLink(int id) {
 /*!
  * @brief Mutates the Genome by changing the weights of its links.
  *
- * @details Adjusts the weights of links in the Genome based on a normal distribution.
+ * @details Adjusts the weights of links in the Genome based on a normal
+ * distribution.
  */
 void Genome::MutateChangeWeight() {
   std::random_device rd;
@@ -324,26 +329,26 @@ void Genome::MutateChangeWeight() {
 /*!
  * @brief Mutates the Genome by changing the bias values of its neurons.
  *
- * @details Adjusts the bias values of neurons in the Genome based on a normal distribution.
+ * @details Adjusts the bias values of neurons in the Genome based on a normal
+ * distribution.
  */
 void Genome::MutateChangeBias() {
-      std::random_device rd;
-      std::mt19937 gen(rd());
-      std::uniform_real_distribution<> uniform(0.0, 1.0);
-      std::normal_distribution<> dis(0.0, settings::neat::kStandardDeviationWeight);
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_real_distribution<> uniform(0.0, 1.0);
+  std::normal_distribution<> dis(0.0, settings::neat::kStandardDeviationWeight);
 
-      for (Neuron& neuron : neurons_) {
+  for (Neuron& neuron : neurons_) {
     if (uniform(gen) < settings::neat::kBiasMutationRate) {
-                double delta = dis(gen);
-                neuron.SetBias(neuron.GetBias() + delta);
-                if (neuron.GetBias() > settings::neat::kMaxBias) {
-                        neuron.SetBias(settings::neat::kMaxBias);
-                } else if (neuron.GetBias() < settings::neat::kMinBias) {
-                        neuron.SetBias(settings::neat::kMinBias);
-                }
-            }
-
+      double delta = dis(gen);
+      neuron.SetBias(neuron.GetBias() + delta);
+      if (neuron.GetBias() > settings::neat::kMaxBias) {
+        neuron.SetBias(settings::neat::kMaxBias);
+      } else if (neuron.GetBias() < settings::neat::kMinBias) {
+        neuron.SetBias(settings::neat::kMinBias);
       }
+    }
+  }
 }
 
 // Neuron Genome::FindNeuronIndexById(int targetId) const {
@@ -361,7 +366,8 @@ void Genome::MutateChangeBias() {
 /*!
  * @brief Performs a Depth-First Search (DFS) to detect cycles in the Genome.
  *
- * @details This function is used internally to ensure the neural network represented by the Genome does not contain cycles.
+ * @details This function is used internally to ensure the neural network
+ * represented by the Genome does not contain cycles.
  *
  * @param currentNeuron The neuron to start the DFS from.
  * @param visited A set of neuron IDs that have already been visited.
@@ -421,7 +427,8 @@ bool Genome::DetectLoops(const Neuron& startNeuron) {
 /*!
  * @brief Mutates the Genome by adding a new link between neurons.
  *
- * @details Adds a new link between two randomly chosen neurons, ensuring no cycles are formed.
+ * @details Adds a new link between two randomly chosen neurons, ensuring no
+ * cycles are formed.
  */
 void Genome::MutateAddLink() {
   std::random_device rd;
@@ -455,7 +462,8 @@ void Genome::MutateAddLink() {
 /*!
  * @brief Mutates the Genome by adding a new neuron.
  *
- * @details Adds a new neuron by splitting an existing link and connecting the new neuron in between.
+ * @details Adds a new neuron by splitting an existing link and connecting the
+ * new neuron in between.
  */
 void Genome::MutateAddNeuron() {
   if (links_.size() == 0) {
@@ -500,7 +508,8 @@ Genome Crossover(const Genome& dominant, const Genome& recessive) {
       }
     }
 
-    // If the neuron is not found in the recessive Genome, add it to the offspring.
+    // If the neuron is not found in the recessive Genome, add it to the
+    // offspring.
     if (!recessive_neuron) {
       offspring.AddNeuron(dominant_neuron);
     } else {
@@ -523,7 +532,8 @@ Genome Crossover(const Genome& dominant, const Genome& recessive) {
       }
     }
 
-    // If the link is not found in the recessive Genome, add it to the offspring.
+    // If the link is not found in the recessive Genome, add it to the
+    // offspring.
     if (!recessive_link) {
       offspring.AddLink(dominant_link);
     } else {

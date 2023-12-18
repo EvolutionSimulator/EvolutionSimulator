@@ -1,23 +1,26 @@
 #pragma once
 
-#include "simulationdata.h"
-#include "environment.h" // Include the Environment header
 #include <functional>
 #include <mutex>
 
-class Simulation {
-public:
-  explicit Simulation(myEnvironment::Environment& environment); // New constructor accepting Environment reference
-    ~Simulation();
-    SimulationData* GetSimulationData();
-    void Start();
-    void Update(double deltaTime);
-    void FixedUpdate(double deltaTime);
-    void Stop(); // Gives us the possibility to stop the simulation
-    void ProcessData(std::function<void(SimulationData*)> processFunc);
+#include "environment.h"  // Include the Environment header
+#include "simulationdata.h"
 
-private:
-    SimulationData* data_;
-    std::mutex data_mutex_;
-    bool is_running_; // New boolean flag to control simulation state
+class Simulation {
+ public:
+  explicit Simulation(
+      myEnvironment::Environment&
+          environment);  // New constructor accepting Environment reference
+  ~Simulation();
+  SimulationData* GetSimulationData();
+  void Start();
+  void Update(double deltaTime);
+  void FixedUpdate(double deltaTime);
+  void Stop();  // Gives us the possibility to stop the simulation
+  void ProcessData(std::function<void(SimulationData*)> processFunc);
+
+ private:
+  SimulationData* data_;
+  std::mutex data_mutex_;
+  bool is_running_;  // New boolean flag to control simulation state
 };

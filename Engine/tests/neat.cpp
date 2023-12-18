@@ -9,16 +9,18 @@
  * @file neat.cpp
  * @brief Unit tests for NEAT Genome, Link, and Neuron functionalities.
  *
- * @details This file contains tests to validate the construction and operation of the NEAT Genome, Link, and Neuron classes.
+ * @details This file contains tests to validate the construction and operation
+ * of the NEAT Genome, Link, and Neuron classes.
  */
 
 using namespace neat;
 
-
 /*!
- * @brief Tests the Genome constructor for correct initialization of input and output counts.
+ * @brief Tests the Genome constructor for correct initialization of input and
+ * output counts.
  *
- * @details Ensures that a Genome object is correctly initialized with the specified number of input and output neurons.
+ * @details Ensures that a Genome object is correctly initialized with the
+ * specified number of input and output neurons.
  */
 TEST(NeatTests, GenomeConstructor) {
   int input_count = 5;
@@ -32,7 +34,8 @@ TEST(NeatTests, GenomeConstructor) {
 /*!
  * @brief Tests adding a neuron to the Genome.
  *
- * @details Validates that a new neuron can be added to the Genome and that its properties are correctly set.
+ * @details Validates that a new neuron can be added to the Genome and that its
+ * properties are correctly set.
  */
 TEST(NeatTests, AddNeuron) {
   Genome genome(3, 2);
@@ -46,7 +49,8 @@ TEST(NeatTests, AddNeuron) {
 /*!
  * @brief Tests adding a link to the Genome.
  *
- * @details Ensures that a new link can be added to the Genome and that its properties are correctly set.
+ * @details Ensures that a new link can be added to the Genome and that its
+ * properties are correctly set.
  */
 TEST(NeatTests, AddLink) {
   Genome genome(3, 2);
@@ -61,7 +65,8 @@ TEST(NeatTests, AddLink) {
 /*!
  * @brief Tests the Link constructor for correct initialization.
  *
- * @details Validates that a Link object is correctly initialized with specified input and output neuron IDs and weight.
+ * @details Validates that a Link object is correctly initialized with specified
+ * input and output neuron IDs and weight.
  */
 TEST(NeatTests, LinkConstructor) {
   int in_id = 2;
@@ -83,7 +88,8 @@ TEST(NeatTests, LinkConstructor) {
 /*!
  * @brief Tests setting a new weight for a Link.
  *
- * @details Ensures that the weight of a Link can be changed and that the new weight is correctly reflected.
+ * @details Ensures that the weight of a Link can be changed and that the new
+ * weight is correctly reflected.
  */
 TEST(NeatTests, SetWeight) {
   Link link(2, 3, 0.5);
@@ -96,7 +102,8 @@ TEST(NeatTests, SetWeight) {
 /*!
  * @brief Tests the Neuron constructor for correct initialization.
  *
- * @details Validates that a Neuron object is correctly initialized with a specified type and bias.
+ * @details Validates that a Neuron object is correctly initialized with a
+ * specified type and bias.
  */
 TEST(NeatTests, NeuronConstructor) {
   int id = 1;
@@ -117,7 +124,8 @@ TEST(NeatTests, NeuronConstructor) {
 /*!
  * @brief Tests setting a new bias for a Neuron.
  *
- * @details Ensures that the bias of a Neuron can be changed and that the new bias is correctly reflected.
+ * @details Ensures that the bias of a Neuron can be changed and that the new
+ * bias is correctly reflected.
  */
 TEST(NeatTests, SetBias) {
   Neuron neuron(NeuronType::kHidden, 0.5);
@@ -156,7 +164,8 @@ TEST(NeatTests, SetBias) {
 /*!
  * @brief Tests disabling a link in the Genome.
  *
- * @details Ensures that a link can be disabled and that its active state is correctly updated.
+ * @details Ensures that a link can be disabled and that its active state is
+ * correctly updated.
  */
 TEST(NeatTests, DisableLink) {
   Genome genome(3, 2);
@@ -201,7 +210,8 @@ TEST(NeatTests, DisableLink) {
 /*!
  * @brief Tests enabling a previously disabled link in the Genome.
  *
- * @details Ensures that a link can be re-enabled and that its active state is correctly updated.
+ * @details Ensures that a link can be re-enabled and that its active state is
+ * correctly updated.
  */
 TEST(NeatTests, EnableLink) {
   Genome genome(3, 2);
@@ -226,7 +236,8 @@ TEST(NeatTests, EnableLink) {
 /*!
  * @brief Tests removing a neuron from the Genome.
  *
- * @details Validates that a neuron and its associated links can be removed from the Genome.
+ * @details Validates that a neuron and its associated links can be removed from
+ * the Genome.
  */
 TEST(NeatTests, RemoveNeuron) {
   Genome genome(3, 2);
@@ -267,7 +278,8 @@ TEST(NeatTests, RemoveLink) {
 /*!
  * @brief Tests various mutation operations on the Genome.
  *
- * @details Validates that the Genome can undergo various mutations, including adding and removing neurons and links, and changing weights.
+ * @details Validates that the Genome can undergo various mutations, including
+ * adding and removing neurons and links, and changing weights.
  */
 TEST(NeatTests, Mutate) {
   auto HasAnyWeightChanged = [](const Genome& original, const Genome& mutated) {
@@ -355,7 +367,8 @@ TEST(NeatTests, MutateRemoveLink) {
 /*!
  * @brief Tests changing the weights of links in the Genome via mutation.
  *
- * @details Validates that the weights of links in the Genome can be altered through mutation.
+ * @details Validates that the weights of links in the Genome can be altered
+ * through mutation.
  */
 TEST(NeatTests, MutateChangeWeight) {
   Genome genome(105, 3);
@@ -413,7 +426,8 @@ TEST(NeatTests, MutateChangeWeight) {
 /*!
  * @brief Tests generating layers of neurons from a Genome.
  *
- * @details Validates that the get_layers function correctly organizes neurons into layers based on their connections and types.
+ * @details Validates that the get_layers function correctly organizes neurons
+ * into layers based on their connections and types.
  */
 TEST(NeatTests, GetLayers) {
   Genome genome(3, 2);
@@ -442,9 +456,11 @@ TEST(NeatTests, GetLayers) {
 }
 
 /*!
- * @brief Tests the activation function of the NeuralNetwork constructed from a Genome.
+ * @brief Tests the activation function of the NeuralNetwork constructed from a
+ * Genome.
  *
- * @details Ensures that the NeuralNetwork activates correctly with given input values and produces expected output values.
+ * @details Ensures that the NeuralNetwork activates correctly with given input
+ * values and produces expected output values.
  */
 TEST(NeatTests, NeuralNetworkActivate) {
   Genome genome(3, 2);
@@ -466,7 +482,8 @@ TEST(NeatTests, NeuralNetworkActivate) {
 /*!
  * @brief Tests the crossover functionality for Neuron objects.
  *
- * @details Validates that two neurons can be combined to create a new neuron with properties derived from both parent neurons.
+ * @details Validates that two neurons can be combined to create a new neuron
+ * with properties derived from both parent neurons.
  */
 TEST(NeatTests, CrossoverNeuron) {
   Neuron neuronA{NeuronType::kHidden, 0.3};
@@ -501,7 +518,8 @@ TEST(NeatTests, CrossoverNeuron) {
 /*!
  * @brief Tests the crossover functionality for Link objects.
  *
- * @details Ensures that two links can be combined to create a new link with properties derived from both parent links.
+ * @details Ensures that two links can be combined to create a new link with
+ * properties derived from both parent links.
  */
 TEST(NeatTests, CrossoverLink) {
   Link linkA{10, 20, 0.3};
@@ -538,7 +556,8 @@ TEST(NeatTests, CrossoverLink) {
 /*!
  * @brief Tests the crossover functionality between two Genomes.
  *
- * @details Validates that two Genomes can be combined to create a new Genome with characteristics inherited from both parents.
+ * @details Validates that two Genomes can be combined to create a new Genome
+ * with characteristics inherited from both parents.
  */
 TEST(NeatTests, Crossover) {
   Genome genomeA(3, 3);
@@ -641,11 +660,12 @@ TEST(NeatTests, Crossover) {
   }
 }
 
-
 /*!
- * @brief Tests the functionality of NeuralNetwork activation after mutations and crossover of Genomes.
+ * @brief Tests the functionality of NeuralNetwork activation after mutations
+ * and crossover of Genomes.
  *
- * @details Ensures that a NeuralNetwork constructed from a Genome that underwent mutations and crossover activates correctly.
+ * @details Ensures that a NeuralNetwork constructed from a Genome that
+ * underwent mutations and crossover activates correctly.
  */
 TEST(NeatTests, ActivationAfterMutateCrossover) {
   Genome genomeA(3, 1);

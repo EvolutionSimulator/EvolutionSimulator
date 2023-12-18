@@ -1,26 +1,23 @@
 #include <engine.h>
-#include <iostream>
+
+#include <QApplication>
 #include <SFML/Graphics.hpp>
+#include <iostream>
+#include <thread>
+
 #include "mainwindow.h"
 #include "qsfmlcanvas.h"
 
-#include <QApplication>
-#include <thread>
+int main(int argc, char *argv[]) {
+  QApplication app(argc, argv);
 
+  Engine mainEngine;
 
+  MainWindow window;
+  window.SetEngine(&mainEngine);
+  window.show();
 
-int main(int argc, char *argv[])
-{
-    QApplication app(argc, argv);
+  int result = app.exec();
 
-    Engine mainEngine;
-
-    MainWindow window;
-    window.SetEngine(&mainEngine);
-    window.show();
-
-    int result = app.exec();
-
-    return result;
+  return result;
 }
-

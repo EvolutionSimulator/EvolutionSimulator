@@ -35,7 +35,6 @@ int Neuron::GetId() const { return id_; }
  */
 NeuronType Neuron::GetType() const { return type_; }
 
-
 /*!
  * @brief Gets the bias of the neuron.
  *
@@ -77,7 +76,8 @@ void Neuron::SetInactive() { active_ = false; }
  *
  * @throws std::invalid_argument if the two neurons have different IDs or types.
  *
- * @details The crossover Neuron's bias is randomly chosen from either 'a' or 'b'.
+ * @details The crossover Neuron's bias is randomly chosen from either 'a' or
+ * 'b'.
  */
 Neuron CrossoverNeuron(const Neuron &a, const Neuron &b) {
   if (a.GetId() != b.GetId()) {
