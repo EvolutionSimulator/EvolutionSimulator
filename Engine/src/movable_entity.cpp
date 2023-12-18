@@ -123,7 +123,7 @@ void MovableEntity::SetRotationalVelocity(double rotational_velocity) {
  * @return The calculated forward friction.
  */
 double MovableEntity::GetForwardFriction() const {
-  return GetVelocity() * sqrt(GetSize()) *
+  return GetVelocity() *
          settings::environment::kFrictionalCoefficient *
          (1 + strafing_difficulty * fabs(sin(GetVelocityAngle())));
 }
@@ -139,8 +139,9 @@ double MovableEntity::GetEffectiveAccelerationAngle() const {
   double accel_angle = GetAccelerationAngle();
   double f = GetForwardFriction();
   double f_angle = GetVelocityAngle() + M_PI;
-  return atan2(accel * sin(accel_angle) + f * sin(f_angle),
-               accel * cos(accel_angle) + f * cos(f_angle));
+  double effective_angle = atan2(accel * sin(accel_angle) + f * sin(f_angle),
+                                 accel * cos(accel_angle) + f * cos(f_angle));
+  return effective_angle;
 }
 
 /*!
@@ -152,9 +153,10 @@ double MovableEntity::GetEffectiveForwardAcceleration() const {
   double acceleration = GetAcceleration();
   double friction = GetForwardFriction();
   // return the acceleration magnitude using the cosine formula
-  return sqrt(pow(acceleration, 2) + pow(friction, 2) +
-              2 * acceleration * friction *
-                  cos(acceleration_angle - GetVelocityAngle()));
+  double effective_acceleration = sqrt(pow(acceleration, 2) + pow(friction, 2) +
+                                2 * acceleration * friction *
+                                    cos(acceleration_angle - GetVelocityAngle()));
+  return effective_acceleration;
 }
 
 /*!

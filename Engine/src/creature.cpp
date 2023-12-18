@@ -377,7 +377,7 @@ void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
   neuron_data_.at(4) = orientation_food_;
   neuron_data_.at(5) = distance_food_;
   std::vector<double> output = brain_.Activate(neuron_data_);
-  SetAcceleration(output.at(0));
+  SetAcceleration(std::tanh(output.at(0))*max_force_);
   SetAccelerationAngle(output.at(1));
   SetRotationalAcceleration(output.at(2));
 }
