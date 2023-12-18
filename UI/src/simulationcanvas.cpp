@@ -72,29 +72,40 @@ void SimulationCanvas::OnUpdate() {
 
   // Display the info panel when the creature is clicked
   if (showInfoPanel && selectedCreatureInfo) {
-    // Here you adjust the panel size based on the creature's size
-    sf::Vector2f panelSize(200, 170);
+    const auto& creatures = simulation_->GetSimulationData()->creatures_;
+    auto it = std::find_if(creatures.begin(), creatures.end(), [this](const Creature& c) {
+        return c.GetID() == selectedCreatureInfo->id;
+    });
 
-    // Adjust the panel position so it centers on the creature
-    sf::Vector2f panelPosition(
-        selectedCreatureInfo->x,
-        selectedCreatureInfo->y);
+    if (it != creatures.end()) {
+      const Creature& creature = *it;
+      // Update the creature info panel with the latest data
+      creatureInfo = QString::fromStdString(formatCreatureInfo(creature));
 
-    sf::RectangleShape panel(panelSize);
-    panel.setFillColor(sf::Color(50, 50, 50, 205));
-    panel.setOutlineThickness(2.0f);
-    panel.setOutlineColor(sf::Color::Black);
-    panel.setPosition(panelPosition);
+        // Here you adjust the panel size based on the text size
+        sf::Vector2f panelSize(200, 170);
 
-    sf::Text infoText;
-    infoText.setFont(font_);
-    infoText.setString(creatureInfo.toStdString());
-    infoText.setCharacterSize(15);
-    infoText.setFillColor(sf::Color::White);
-    infoText.setPosition(panelPosition.x + 10, panelPosition.y + 10);
+        // Adjust the panel position so it centers on the creature
+        sf::Vector2f panelPosition(
+            selectedCreatureInfo->x,
+            selectedCreatureInfo->y);
 
-    draw(panel);
-    draw(infoText);
+        sf::RectangleShape panel(panelSize);
+        panel.setFillColor(sf::Color(50, 50, 50, 205));
+        panel.setOutlineThickness(2.0f);
+        panel.setOutlineColor(sf::Color::Black);
+        panel.setPosition(panelPosition);
+
+        sf::Text infoText;
+        infoText.setFont(font_);
+        infoText.setString(creatureInfo.toStdString());
+        infoText.setCharacterSize(15);
+        infoText.setFillColor(sf::Color::White);
+        infoText.setPosition(panelPosition.x + 10, panelPosition.y + 10);
+
+        draw(panel);
+        draw(infoText);
+    }
   }else if (showInfoPanel) {
     std::cout << "Info panel flag is set, but no creature position is recorded."
               << std::endl;
@@ -329,19 +340,23 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
 
   for (const auto& creature : simulation_->GetSimulationData()->creatures_) {
     auto [creatureX, creatureY] = creature.GetCoordinates();
-    float creatureSize = creature.GetSize(); // Assuming Creature has a GetSize method
+    float creatureSize = creature.GetSize();
     sf::Vector2f creaturePos(creatureX, creatureY);
     if (sqrt(pow(mousePos.x - creaturePos.x, 2) + pow(mousePos.y - creaturePos.y, 2)) <= creatureSize) {
       showInfoPanel = true;
-      selectedCreatureInfo = CreatureInfo{creatureX, creatureY, creatureSize};
-      // Store additional creature details as needed
-      creatureInfo = QString::fromStdString(formatCreatureInfo(creature));
+      selectedCreatureInfo = CreatureInfo{
+          creature.GetID(),              // Store the ID
+          creatureX,                     // X coordinate
+          creatureY,                     // Y coordinate
+          creatureSize                   // Size
+      };
+      // No need to set creatureInfo here, it will be set in OnUpdate.
       repaint();
       return;
     }
   }
   showInfoPanel = false;
-  selectedCreatureInfo.reset(); // Clear the selected creature info
+  selectedCreatureInfo.reset();
 }
 
 
@@ -370,17 +385,12 @@ void SimulationCanvas::displayInfoPanel() {
 // Structure of the info panel (appearing when a creature is clicked)
 std::string SimulationCanvas::formatCreatureInfo(const Creature& creature) {
   std::stringstream ss;
-  ss << "Creature\n";
-  ss << "Size: " << creature.GetSize()
-     << "\n";
-  ss << "Age: " << creature.GetAge()
-     << "\n";
-  ss << "Generation: " << creature.GetGeneration()
-     << "\n";
-  ss << "Health: " << creature.GetHealth()
-     << "\n";
-  ss << "Energy Level: " << creature.GetEnergy()
-     << "\n\n";
+  ss << "Creature ID: " << creature.GetID() << "\n";
+  ss << "Size: " << creature.GetSize() << "\n";
+  ss << "Age: " << creature.GetAge() << "\n";
+  ss << "Generation: " << creature.GetGeneration() << "\n";
+  ss << "Health: " << creature.GetHealth() << "\n";
+  ss << "Energy Level: " << creature.GetEnergy() << "\n\n";
   auto [x, y] = creature.GetCoordinates();
   ss << "(x=" << x << ", y=" << y << ")\n";
   return ss.str();
