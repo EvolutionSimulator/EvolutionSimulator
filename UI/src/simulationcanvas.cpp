@@ -99,6 +99,26 @@ void SimulationCanvas::OnUpdate() {
     std::cout << "Info panel flag is set, but no creature position is recorded."
               << std::endl;
   }
+
+  sf::Vector2i mousePixelPos = sf::Mouse::getPosition(*this);
+  sf::Vector2f mousePos = mapPixelToCoords(mousePixelPos);
+
+  // Prepare the text to display the mouse coordinates
+  sf::Text mouseCoordsText;
+  mouseCoordsText.setFont(font_);
+  std::ostringstream ss;
+  ss << "(X: " << mousePos.x << " Y: " << mousePos.y << ")";
+  mouseCoordsText.setString(ss.str());
+  mouseCoordsText.setCharacterSize(12);
+  mouseCoordsText.setFillColor(sf::Color::White);
+
+  // Position the text on the bottom right corner
+  sf::FloatRect textRect = mouseCoordsText.getLocalBounds();
+  mouseCoordsText.setOrigin(textRect.left + textRect.width, textRect.top + textRect.height);
+  mouseCoordsText.setPosition(getSize().x - 10, getSize().y - 5);
+
+  // Draw the mouse coordinates text
+  draw(mouseCoordsText);
 }
 
 sf::VertexArray createGradientCircle(float radius, const sf::Color& centerColor,
