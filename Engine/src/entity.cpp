@@ -1,19 +1,21 @@
 #include "entity.h"
-#include "environment.h"
+
 #include <cassert>
 #include <cmath>
 #include <random>
 #include <stdexcept>
 
+#include "environment.h"
 
 /*!
- * @brief Default constructor initializing an Entity at the origin with zero size.
+ * @brief Default constructor initializing an Entity at the origin with zero
+ * size.
  */
 Entity::Entity() : x_coord_(0.0), y_coord_(0.0), size_(0.0), state_(Alive) {}
 
-
 /*!
- * @brief Parameterized constructor to initialize an Entity with specified coordinates and size.
+ * @brief Parameterized constructor to initialize an Entity with specified
+ * coordinates and size.
  *
  * @param x_coord X-coordinate of the entity.
  * @param y_coord Y-coordinate of the entity.
@@ -23,12 +25,12 @@ Entity::Entity(const double x_coord, const double y_coord, const double size)
     : x_coord_(x_coord), y_coord_(y_coord), size_(size), state_(Alive) {}
 
 /*!
- * @brief Constructor to initialize an Entity with a specified size at the origin.
+ * @brief Constructor to initialize an Entity with a specified size at the
+ * origin.
  * @param size Size of the entity.
  */
 Entity::Entity(const double size)
     : x_coord_(0.0), y_coord_(0.0), size_(size), state_(Alive) {}
-
 
 /*!
  * @brief Destructor sets the state of the entity to Dead.
@@ -59,9 +61,11 @@ std::pair<double, double> Entity::GetCoordinates() const {
 }
 
 /*!
- * @brief Sets the coordinates of the entity, ensuring they are within the bounds of the map.
+ * @brief Sets the coordinates of the entity, ensuring they are within the
+ * bounds of the map.
  *
- * @details Coordinates are adjusted using the modulo operation to wrap around the map boundaries.
+ * @details Coordinates are adjusted using the modulo operation to wrap around
+ * the map boundaries.
  *
  * @param x New X-coordinate of the entity.
  * @param y New Y-coordinate of the entity.
@@ -73,16 +77,15 @@ void Entity::SetCoordinates(const double x, const double y,
   // Use fmod to ensure coordinates are within map bounds
   x_coord_ = fmod(x, kMapWidth);
   y_coord_ = fmod(y, kMapHeight);
-  if (x_coord_ < 0.0)
-    x_coord_ += kMapWidth;
-  if (y_coord_ < 0.0)
-    y_coord_ += kMapHeight;
+  if (x_coord_ < 0.0) x_coord_ += kMapWidth;
+  if (y_coord_ < 0.0) y_coord_ += kMapHeight;
 }
 
 /*!
  * @brief Generates a random floating-point number within a given range.
  *
- * @details This function uses a uniform distribution to ensure an even spread of values.
+ * @details This function uses a uniform distribution to ensure an even spread
+ * of values.
  *
  * @param world_size The upper limit of the random number range.
  *
@@ -99,7 +102,8 @@ double GetRandomFloat(double world_size) {
 }
 
 /*!
- * @brief Randomly initializes the entity's position and size within the world bounds.
+ * @brief Randomly initializes the entity's position and size within the world
+ * bounds.
  *
  * @param world_width Maximum width of the world for positioning.
  * @param world_height Maximum height of the world for positioning.
@@ -117,13 +121,16 @@ void Entity::RandomInitialization(const double world_width,
 }
 
 /*!
- * @brief Calculates the distance between this entity and another entity, considering world wrap-around.
+ * @brief Calculates the distance between this entity and another entity,
+ * considering world wrap-around.
  *
  * @param other_entity The other entity to measure distance to.
  * @param kMapWidth Width of the map, used for calculating wrap-around distance.
- * @param kMapHeight Height of the map, used for calculating wrap-around distance.
+ * @param kMapHeight Height of the map, used for calculating wrap-around
+ * distance.
  *
- * @return The shortest distance between this entity and another, considering map boundaries.
+ * @return The shortest distance between this entity and another, considering
+ * map boundaries.
  */
 double Entity::GetDistance(const Entity &other_entity, const double kMapWidth,
                            const double kMapHeight) const {
@@ -136,9 +143,9 @@ double Entity::GetDistance(const Entity &other_entity, const double kMapWidth,
                     fmin(y_diff, kMapHeight - y_diff));
 }
 
-
 /*!
- * @brief Calculates the relative orientation from this entity to another entity.
+ * @brief Calculates the relative orientation from this entity to another
+ * entity.
  *
  * @param other_entity The other entity to calculate orientation towards.
  *
@@ -183,7 +190,8 @@ void Entity::SetState(Entity::states state) { state_ = state; }
 /*!
  * @brief Handles the collision between this entity and another entity.
  *
- * @details This method moves the smaller entity to resolve overlaps based on their sizes.
+ * @details This method moves the smaller entity to resolve overlaps based on
+ * their sizes.
  *
  * @param other_entity The other entity involved in the collision.
  * @param kMapWidth Width of the map, used for position adjustments.
@@ -192,8 +200,7 @@ void Entity::SetState(Entity::states state) { state_ = state; }
 void Entity::OnCollision(Entity &other_entity, double const kMapWidth,
                          double const kMapHeight) {
   // Check if the entity is colliding with itself
-  if (this == &other_entity)
-    return;
+  if (this == &other_entity) return;
 
   // Get the coordinates and size of the other entity
   std::pair<double, double> other_coordinates = other_entity.GetCoordinates();
@@ -203,8 +210,7 @@ void Entity::OnCollision(Entity &other_entity, double const kMapWidth,
   double distance = GetDistance(other_entity, kMapWidth, kMapHeight);
 
   // If the distance is zero, return
-  if (distance == 0.0)
-    return;
+  if (distance == 0.0) return;
 
   // Calculate the overlap between the two entities
   double overlap = size_ + other_size - distance;

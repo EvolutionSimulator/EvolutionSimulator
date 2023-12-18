@@ -8,13 +8,13 @@
 #include "random"
 #include "stdexcept"
 
-
 namespace neat {
 
 int Link::next_id_ = 1;
 
 /*!
- * @brief Constructs a Link with specified input and output neuron IDs and weight.
+ * @brief Constructs a Link with specified input and output neuron IDs and
+ * weight.
  *
  * @param in_id The ID of the input neuron.
  * @param out_id The ID of the output neuron.
@@ -42,7 +42,6 @@ int Link::GetId() const { return id_; }
  */
 int Link::GetInId() const { return in_id_; }
 
-
 /*!
  * @brief Gets the ID of the output neuron.
  *
@@ -56,7 +55,6 @@ int Link::GetOutId() const { return out_id_; }
  * @return The weight of the connection.
  */
 double Link::GetWeight() const { return weight_; }
-
 
 /*!
  * @brief Checks if the link is active.
@@ -83,7 +81,8 @@ void Link::SetActive() { active_ = true; }
 void Link::SetInactive() { active_ = false; }
 
 /*!
- * @brief Creates a new Link with specified input and output neuron IDs and weight.
+ * @brief Creates a new Link with specified input and output neuron IDs and
+ * weight.
  *
  * @param in_id The ID of the input neuron.
  * @param out_id The ID of the output neuron.
@@ -102,7 +101,8 @@ Link NewLink(int in_id, int out_id, double weight);
  *
  * @throws std::invalid_argument if the two links have different IDs.
  *
- * @details The crossover Link's weight is randomly chosen from either 'a' or 'b'.
+ * @details The crossover Link's weight is randomly chosen from either 'a' or
+ * 'b'.
  */
 Link CrossoverLink(const Link &a, const Link &b) {
   if (a.GetId() != b.GetId()) {

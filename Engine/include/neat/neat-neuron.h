@@ -12,7 +12,8 @@ enum class NeuronType { kInput, kOutput, kHidden };
  *
  * @brief Represents a neuron in a NEAT neural network.
  *
- * @details Each neuron has a unique identifier, a type (input, output, hidden), a bias, and an active state.
+ * @details Each neuron has a unique identifier, a type (input, output, hidden),
+ * a bias, and an active state.
  */
 class Neuron {
  public:
@@ -28,11 +29,12 @@ class Neuron {
   void SetInactive();
 
  private:
-  static int next_id_; /*!< Static variable used to assign unique IDs to new neurons. */
-  int id_; /*!< Unique identifier for the neuron. */
-  NeuronType type_; /*!< Type of the neuron (input, output, hidden). */
-  double bias_; /*!< Bias of the neuron. */
-  bool active_; /*!< Indicates whether the neuron is active or not. */
+  static int next_id_; /*!< Static variable used to assign unique IDs to new
+                          neurons. */
+  int id_;             /*!< Unique identifier for the neuron. */
+  NeuronType type_;    /*!< Type of the neuron (input, output, hidden). */
+  double bias_;        /*!< Bias of the neuron. */
+  bool active_;        /*!< Indicates whether the neuron is active or not. */
 };
 
 Neuron CrossoverNeuron(const Neuron &a, const Neuron &b);

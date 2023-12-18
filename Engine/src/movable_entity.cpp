@@ -1,4 +1,5 @@
 #include "movable_entity.h"
+
 #include "config.h"
 #include "math.h"
 
@@ -6,15 +7,14 @@
  * @file movable_entity.h
  * @brief Defines the MovableEntity class.
  *
- * The MovableEntity class extends from the Entity class, adding functionality for motion
- * including linear and rotational movements. It introduces motion parameters such as
- * acceleration, velocity, and rotational equivalents, along with methods to manipulate
- * and utilize these parameters. This class is essential for simulating entities that
- * move and interact in a dynamic environment, providing the basis for more complex behaviors
- * in derived classes.
+ * The MovableEntity class extends from the Entity class, adding functionality
+ * for motion including linear and rotational movements. It introduces motion
+ * parameters such as acceleration, velocity, and rotational equivalents, along
+ * with methods to manipulate and utilize these parameters. This class is
+ * essential for simulating entities that move and interact in a dynamic
+ * environment, providing the basis for more complex behaviors in derived
+ * classes.
  */
-
-
 
 /*!
  * @brief Constructs a new MovableEntity object.
@@ -22,9 +22,14 @@
  * @details Initializes the movable entity with default motion parameters.
  */
 MovableEntity::MovableEntity()
-    : Entity(), acceleration_(0), acceleration_angle(0),
-      rotational_acceleration(0), velocity_(0), velocity_angle_(0),
-      rotational_velocity_(0), strafing_difficulty(0.5) {}
+    : Entity(),
+      acceleration_(0),
+      acceleration_angle(0),
+      rotational_acceleration(0),
+      velocity_(0),
+      velocity_angle_(0),
+      rotational_velocity_(0),
+      strafing_difficulty(0.5) {}
 
 /*!
  * @brief Returns the linear acceleration.
@@ -33,26 +38,26 @@ double MovableEntity::GetAcceleration() const { return acceleration_; }
 
 /*!
  * @brief Returns the angle of acceleration.
-*/
+ */
 double MovableEntity::GetAccelerationAngle() const {
   return acceleration_angle;
 }
 
 /*!
  * @brief Returns the rotational acceleration.
-*/
+ */
 double MovableEntity::GetRotationalAcceleration() const {
   return rotational_acceleration;
 }
 
 /*!
  * @brief Returns the linear velocity.
-*/
+ */
 double MovableEntity::GetVelocity() const { return velocity_; }
 
 /*!
  * @brief Returns the angle of velocity.
-*/
+ */
 double MovableEntity::GetVelocityAngle() const { return velocity_angle_; }
 
 /*!
@@ -172,7 +177,8 @@ double MovableEntity::GetEffectiveRotationalAcceleration() const {
 }
 
 /*!
- * @brief Updates the velocities (linear and rotational) based on acceleration, friction, and time.
+ * @brief Updates the velocities (linear and rotational) based on acceleration,
+ * friction, and time.
  *
  * @param deltaTime The time interval over which to update the velocities.
  */
@@ -197,7 +203,8 @@ void MovableEntity::UpdateVelocities(double deltaTime) {
 }
 
 /*!
- * @brief Updates the position of the entity based on its velocity, orientation, and time.
+ * @brief Updates the position of the entity based on its velocity, orientation,
+ * and time.
  *
  * @param deltaTime The time interval over which to update the position.
  * @param kMapWidth Width of the map for wrapping around.
@@ -220,7 +227,8 @@ void MovableEntity::Move(double deltaTime, const double kMapWidth,
 }
 
 /*!
- * @brief Updates the orientation of the entity based on its rotational velocity and time.
+ * @brief Updates the orientation of the entity based on its rotational velocity
+ * and time.
  *
  * @param deltaTime The time interval over which to update the orientation.
  */
