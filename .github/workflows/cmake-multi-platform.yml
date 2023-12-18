@@ -67,7 +67,8 @@ jobs:
         version: '6'
 
     - name: Install dependencies
-      run: sudo apt-get update && sudo apt-get install -y libsfml-dev libudev-dev libopenal-dev libvorbis-dev libflac-dev
+      run: sudo apt-get update && sudo apt-get install -y libsfml-dev libudev-dev libopenal-dev libvorbis-dev libflac-dev xorg-dev
+
       if: '${{ matrix.build_type }} == "ubuntu-latest"'
 
     - name: Configure CMake
