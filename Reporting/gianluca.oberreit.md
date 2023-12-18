@@ -10,3 +10,6 @@ Make the creature use accelerations instead of velocities to change move.
 Add a frictional force that depends on size, velocity and angle of velocity with respect to orientation (strafing takes more energy than forward movement).
 Refactor the codebase to follow google styleguide.
 Start setting up automatic testing.
+
+## Week 4
+Use the "CMake on multiple platforms" action and add necessary installations for ubuntu. Disable the windows tests for now. Enable mandatory passing of the checks when merging to main and **/main branches.
