@@ -48,6 +48,7 @@ class SimulationCanvas : public QSFMLCanvas {
 
   void RenderSimulation(SimulationData* data);
 
+
   Simulation* simulation_ = nullptr;
   std::function<void(SimulationData*)>
       render_lambda_;  // we will pass this to the ProcessData method of
