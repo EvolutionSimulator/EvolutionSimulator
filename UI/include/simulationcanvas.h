@@ -8,9 +8,16 @@
 #include "simulation.h"
 
 class SimulationCanvas : public QSFMLCanvas {
-  Q_OBJECT
+ Q_OBJECT
 
  public:
+ struct CreatureInfo {
+     double x;
+     double y;
+     float size;
+
+ };
+
   SimulationCanvas(QWidget* Parent);
 
   void SetSimulation(Simulation* simulation);
@@ -29,6 +36,7 @@ class SimulationCanvas : public QSFMLCanvas {
  private:
   virtual void OnInit() override;
   virtual void OnUpdate() override;
+  std::optional<CreatureInfo> selectedCreatureInfo;
 
   sf::Font font_;
 
