@@ -73,7 +73,7 @@ double MovableEntity::GetRotationalVelocity() const {
  * @param acceleration The new linear acceleration value.
  */
 void MovableEntity::SetAcceleration(double acceleration) {
-  acceleration_ = abs(acceleration);
+  acceleration_ = fabs(acceleration);
 }
 
 /*!
@@ -125,7 +125,7 @@ void MovableEntity::SetRotationalVelocity(double rotational_velocity) {
 double MovableEntity::GetForwardFriction() const {
   return GetVelocity() * sqrt(GetSize()) *
          settings::environment::kFrictionalCoefficient *
-         (1 + strafing_difficulty * abs(sin(GetVelocityAngle())));
+         (1 + strafing_difficulty * fabs(sin(GetVelocityAngle())));
 }
 
 /*!

@@ -164,7 +164,7 @@ void Creature::SetEnergy(double energy) {
  */
 void Creature::UpdateEnergy(double deltaTime) {
   SetEnergy(GetEnergy() -
-            (abs(GetAcceleration()) + abs(GetRotationalAcceleration()) + 50) *
+            (fabs(GetAcceleration()) + fabs(GetRotationalAcceleration()) + 50) *
                 GetSize() * deltaTime / 100);
 
   BalanceHealthEnergy();
