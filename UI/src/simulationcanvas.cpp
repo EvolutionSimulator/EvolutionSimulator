@@ -70,7 +70,6 @@ void SimulationCanvas::OnUpdate() {
   simulation_->ProcessData(render_lambda_);
   RenderSimulation(simulation_->GetSimulationData());
 
-  // Display the info panel when the creature is clicked
   if (showInfoPanel && selectedCreatureInfo) {
     const auto& creatures = simulation_->GetSimulationData()->creatures_;
     auto it = std::find_if(creatures.begin(), creatures.end(), [this](const Creature& c) {
@@ -79,32 +78,64 @@ void SimulationCanvas::OnUpdate() {
 
     if (it != creatures.end()) {
       const Creature& creature = *it;
-      // Update the creature info panel with the latest data
+
+      // Update the info panel with the latest creature data
       creatureInfo = QString::fromStdString(formatCreatureInfo(creature));
 
-        // Here you adjust the panel size based on the text size
-        sf::Vector2f panelSize(200, 170);
+      // Here you adjust the panel size based on the text size
+      sf::Vector2f panelSize(200, 170);
+      sf::Vector2f panelPosition(
+          selectedCreatureInfo->x - panelSize.x / 2,
+          selectedCreatureInfo->y - creature.GetSize() / 2 - panelSize.y - 10); // Adjust for creature size and give some space
 
-        // Adjust the panel position so it centers on the creature
-        sf::Vector2f panelPosition(
-            selectedCreatureInfo->x,
-            selectedCreatureInfo->y);
+      sf::RectangleShape panel(panelSize);
+      panel.setFillColor(sf::Color(50, 50, 50, 205));
+      panel.setOutlineThickness(2.0f);
+      panel.setOutlineColor(sf::Color::Black);
+      panel.setPosition(panelPosition);
 
-        sf::RectangleShape panel(panelSize);
-        panel.setFillColor(sf::Color(50, 50, 50, 205));
-        panel.setOutlineThickness(2.0f);
-        panel.setOutlineColor(sf::Color::Black);
-        panel.setPosition(panelPosition);
+      sf::Text infoText;
+      infoText.setFont(font_);
+      infoText.setString(creatureInfo.toStdString());
+      infoText.setCharacterSize(15);
+      infoText.setFillColor(sf::Color::White);
+      infoText.setPosition(panelPosition.x + 10, panelPosition.y + 10);
 
-        sf::Text infoText;
-        infoText.setFont(font_);
-        infoText.setString(creatureInfo.toStdString());
-        infoText.setCharacterSize(15);
-        infoText.setFillColor(sf::Color::White);
-        infoText.setPosition(panelPosition.x + 10, panelPosition.y + 10);
+      draw(panel);
+      draw(infoText);
 
-        draw(panel);
-        draw(infoText);
+      // Update the position of the creature
+      selectedCreatureInfo->x = creature.GetCoordinates().first;
+      selectedCreatureInfo->y = creature.GetCoordinates().second;
+
+      sf::Vector2f creatureCenter(selectedCreatureInfo->x, selectedCreatureInfo->y);
+      sf::Vector2f panelCenter = panelPosition + sf::Vector2f(panelSize.x / 2, panelSize.y);
+
+      // Create the arrow line (shaft)
+      sf::VertexArray arrowLine(sf::Lines, 2);
+      arrowLine[0].position = panelCenter;
+      arrowLine[1].position = creatureCenter;
+      arrowLine[0].color = sf::Color::Black;
+      arrowLine[1].color = sf::Color::Black;
+
+      // Draw the arrow line
+      draw(arrowLine);
+
+      // Create the arrowhead
+      float arrowHeadLength = 10.0f; // Length of the arrowhead lines
+      sf::ConvexShape arrowHead;
+      arrowHead.setPointCount(3);
+      sf::Vector2f direction = creatureCenter - panelCenter;
+      float angle = std::atan2(direction.y, direction.x);
+
+      // Set the points for the arrowhead triangle
+      arrowHead.setPoint(0, creatureCenter);
+      arrowHead.setPoint(1, creatureCenter - sf::Vector2f(std::cos(angle - M_PI / 4) * arrowHeadLength, std::sin(angle - M_PI / 4) * arrowHeadLength));
+      arrowHead.setPoint(2, creatureCenter - sf::Vector2f(std::cos(angle + M_PI / 4) * arrowHeadLength, std::sin(angle + M_PI / 4) * arrowHeadLength));
+      arrowHead.setFillColor(sf::Color::Black);
+
+      // Draw the arrowhead
+      draw(arrowHead);
     }
   }else if (showInfoPanel) {
     std::cout << "Info panel flag is set, but no creature position is recorded."
