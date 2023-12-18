@@ -137,8 +137,8 @@ double Entity::GetDistance(const Entity &other_entity, const double kMapWidth,
   std::pair<double, double> other_coordinates = other_entity.GetCoordinates();
 
   // Use std::hypot for optimized distance calculation
-  const double x_diff = abs(x_coord_ - other_coordinates.first);
-  const double y_diff = abs(y_coord_ - other_coordinates.second);
+  const double x_diff = fabs(x_coord_ - other_coordinates.first);
+  const double y_diff = fabs(y_coord_ - other_coordinates.second);
   return std::hypot(fmin(x_diff, kMapWidth - x_diff),
                     fmin(y_diff, kMapHeight - y_diff));
 }
