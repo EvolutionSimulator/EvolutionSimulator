@@ -18,6 +18,18 @@ else()
     set(ENGINE_LIB_EXT ".a")
 endif()
 
+# Specify the resource file
+set(UI_RESOURCES qrc_resource_file.qrc)
+
+# Check the Qt version and add the resource file accordingly
+if(QT_VERSION_MAJOR EQUAL 6)
+    qt_add_resources(RESOURCES ${UI_RESOURCES})
+elseif(QT_VERSION_MAJOR EQUAL 5)
+    qt5_add_resources(RESOURCES ${UI_RESOURCES})
+else()
+    message(FATAL_ERROR "Unsupported Qt version: ${QT_VERSION_MAJOR}")
+endif()
+
 qt_add_executable(UI
     MANUAL_FINALIZATION
     src/main.cpp
@@ -25,7 +37,7 @@ qt_add_executable(UI
     src/mainwindow.ui
     include/qsfmlcanvas.h src/qsfmlcanvas.cpp
     include/simulationcanvas.h src/simulationcanvas.cpp
-
+    ${RESOURCES}
 )
 
 target_link_libraries(UI PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)

@@ -27,6 +27,8 @@ private :
     virtual void OnInit() override;
     virtual void OnUpdate() override;
 
+    sf::Font font_;
+
     bool showInfoPanel;
     std::optional<std::pair<float, float>> clickedCreaturePos;
     QString creatureInfo;

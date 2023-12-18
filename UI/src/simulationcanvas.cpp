@@ -1,6 +1,10 @@
 #include "simulationcanvas.h"
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include <QFile>
+#include <QDir>
+#include <QDebug>
+#include <QUuid>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/Text.hpp>
 #include <cmath>
@@ -13,6 +17,42 @@ SimulationCanvas::SimulationCanvas(QWidget* Parent) : QSFMLCanvas(Parent), showI
     render_lambda_ = [this](SimulationData* data) {
         this->RenderSimulation(data);
     };
+
+    QFile resourceFile(":/font.ttf");
+    if (!resourceFile.open(QIODevice::ReadOnly)) {
+        qDebug() << "Failed to open font resource!";
+        return;
+    }
+
+    // Generate a unique temporary filename
+    QString tempFileName = "temp_font_" + QUuid::createUuid().toString(QUuid::WithoutBraces) + ".ttf";
+    QString tempFilePath = QDir::temp().absoluteFilePath(tempFileName);
+    qDebug() << "Temporary file path:" << tempFilePath;
+
+    QFile tempFile(tempFilePath);
+    if (tempFile.exists()) {
+        qDebug() << "Temporary file already exists. Deleting...";
+        if (!tempFile.remove()) {
+            qDebug() << "Failed to remove existing temporary file.";
+            return;
+        }
+    }
+
+    if (!resourceFile.copy(tempFilePath)) {
+        qDebug() << "Failed to copy font to temporary file!";
+        qDebug() << "Error:" << resourceFile.errorString();
+        return;
+    }
+    resourceFile.close();
+
+    if (!font_.loadFromFile(tempFilePath.toStdString())) {
+        qDebug() << "Failed to load font from file!";
+        QFile::remove(tempFilePath);
+        return;
+    }
+
+    // Clean up the temporary file after use
+    QFile::remove(tempFilePath);
 }
 
 void SimulationCanvas::SetSimulation(Simulation* simulation)
@@ -45,15 +85,12 @@ void SimulationCanvas::OnUpdate() {
         panel.setPosition(panelPosition);
 
         sf::Text infoText;
-        sf::Font font;
-        if (!font.loadFromFile("../../../../../EvolutionSimulator/UI/font.ttf")) {
-            std::cerr << "Failed to load font!" << std::endl;
-            return;
-        }
+
+        // Set the font for the text
+        infoText.setFont(font_);
 
         // Using the creature information stored in the creatureInfo member
         // Assuming creatureInfo is updated in the mousePressEvent method
-        infoText.setFont(font);
         infoText.setString(creatureInfo.toStdString()); // Convert QString to std::string
         infoText.setCharacterSize(15);
         infoText.setFillColor(sf::Color::White);
