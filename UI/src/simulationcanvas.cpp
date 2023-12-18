@@ -71,10 +71,14 @@ void SimulationCanvas::OnUpdate() {
   RenderSimulation(simulation_->GetSimulationData());
 
   // Display the info panel when the creature is clicked
-  if (showInfoPanel && clickedCreaturePos) {
-    sf::Vector2f panelSize(200.f, 130.f);
-    sf::Vector2f panelPosition(clickedCreaturePos->first,
-                               clickedCreaturePos->second);
+  if (showInfoPanel && selectedCreatureInfo) {
+    // Here you adjust the panel size based on the creature's size
+    sf::Vector2f panelSize(200, 170);
+
+    // Adjust the panel position so it centers on the creature
+    sf::Vector2f panelPosition(
+        selectedCreatureInfo->x,
+        selectedCreatureInfo->y);
 
     sf::RectangleShape panel(panelSize);
     panel.setFillColor(sf::Color(50, 50, 50, 205));
@@ -83,24 +87,38 @@ void SimulationCanvas::OnUpdate() {
     panel.setPosition(panelPosition);
 
     sf::Text infoText;
-
-    // Set the font for the text
     infoText.setFont(font_);
-
-    // Using the creature information stored in the creatureInfo member
-    // Assuming creatureInfo is updated in the mousePressEvent method
-    infoText.setString(
-        creatureInfo.toStdString());  // Convert QString to std::string
+    infoText.setString(creatureInfo.toStdString());
     infoText.setCharacterSize(15);
     infoText.setFillColor(sf::Color::White);
     infoText.setPosition(panelPosition.x + 10, panelPosition.y + 10);
 
     draw(panel);
     draw(infoText);
-  } else if (showInfoPanel) {
+  }else if (showInfoPanel) {
     std::cout << "Info panel flag is set, but no creature position is recorded."
               << std::endl;
   }
+
+  sf::Vector2i mousePixelPos = sf::Mouse::getPosition(*this);
+  sf::Vector2f mousePos = mapPixelToCoords(mousePixelPos);
+
+  // Prepare the text to display the mouse coordinates
+  sf::Text mouseCoordsText;
+  mouseCoordsText.setFont(font_);
+  std::ostringstream ss;
+  ss << "(X: " << mousePos.x << " Y: " << mousePos.y << ")";
+  mouseCoordsText.setString(ss.str());
+  mouseCoordsText.setCharacterSize(12);
+  mouseCoordsText.setFillColor(sf::Color::White);
+
+  // Position the text on the bottom right corner
+  sf::FloatRect textRect = mouseCoordsText.getLocalBounds();
+  mouseCoordsText.setOrigin(textRect.left + textRect.width, textRect.top + textRect.height);
+  mouseCoordsText.setPosition(getSize().x - 10, getSize().y - 5);
+
+  // Draw the mouse coordinates text
+  draw(mouseCoordsText);
 }
 
 sf::VertexArray createGradientCircle(float radius, const sf::Color& centerColor,
@@ -307,24 +325,25 @@ void SimulationCanvas::DrawCreatureCountOverTime(
 }
 
 void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
-  sf::Vector2f mousePos =
-      mapPixelToCoords(sf::Vector2i(event->pos().x(), event->pos().y()));
+  sf::Vector2f mousePos = mapPixelToCoords(sf::Vector2i(event->pos().x(), event->pos().y()));
 
   for (const auto& creature : simulation_->GetSimulationData()->creatures_) {
-    auto [x, y] = creature.GetCoordinates();
-    sf::Vector2f creaturePos(x, y);
-    if (sqrt(pow(mousePos.x - creaturePos.x, 2) +
-             pow(mousePos.y - creaturePos.y, 2)) <=
-        20) {
+    auto [creatureX, creatureY] = creature.GetCoordinates();
+    float creatureSize = creature.GetSize(); // Assuming Creature has a GetSize method
+    sf::Vector2f creaturePos(creatureX, creatureY);
+    if (sqrt(pow(mousePos.x - creaturePos.x, 2) + pow(mousePos.y - creaturePos.y, 2)) <= creatureSize) {
       showInfoPanel = true;
-      clickedCreaturePos = std::make_pair(mousePos.x, mousePos.y);
+      selectedCreatureInfo = CreatureInfo{creatureX, creatureY, creatureSize};
+      // Store additional creature details as needed
       creatureInfo = QString::fromStdString(formatCreatureInfo(creature));
       repaint();
       return;
     }
   }
   showInfoPanel = false;
+  selectedCreatureInfo.reset(); // Clear the selected creature info
 }
+
 
 // Functions checking if a creature has been clicked
 bool SimulationCanvas::isCreatureClicked(const sf::Vector2f& mousePos) {
@@ -333,7 +352,7 @@ bool SimulationCanvas::isCreatureClicked(const sf::Vector2f& mousePos) {
     sf::Vector2f creaturePos(x, y);
     if (sqrt(pow(mousePos.x - creaturePos.x, 2) +
              pow(mousePos.y - creaturePos.y, 2)) <=
-        20) {
+        creature.GetSize()+1) {
       return true;
     }
   }
@@ -353,6 +372,10 @@ std::string SimulationCanvas::formatCreatureInfo(const Creature& creature) {
   std::stringstream ss;
   ss << "Creature\n";
   ss << "Size: " << creature.GetSize()
+     << "\n";
+  ss << "Age: " << creature.GetAge()
+     << "\n";
+  ss << "Generation: " << creature.GetGeneration()
      << "\n";
   ss << "Health: " << creature.GetHealth()
      << "\n";
