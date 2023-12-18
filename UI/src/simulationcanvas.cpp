@@ -1,5 +1,4 @@
 #include "simulationcanvas.h"
-
 #include <QDebug>
 #include <QDir>
 #include <QFile>
@@ -71,8 +70,9 @@ void SimulationCanvas::OnUpdate() {
   simulation_->ProcessData(render_lambda_);
   RenderSimulation(simulation_->GetSimulationData());
 
+  // Display the info panel when the creature is clicked
   if (showInfoPanel && clickedCreaturePos) {
-    sf::Vector2f panelSize(200.f, 100.f);
+    sf::Vector2f panelSize(200.f, 130.f);
     sf::Vector2f panelPosition(clickedCreaturePos->first,
                                clickedCreaturePos->second);
 
@@ -100,8 +100,6 @@ void SimulationCanvas::OnUpdate() {
   } else if (showInfoPanel) {
     std::cout << "Info panel flag is set, but no creature position is recorded."
               << std::endl;
-  } else {
-    // Any other logic when the info panel is not shown
   }
 }
 
@@ -317,7 +315,7 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
     sf::Vector2f creaturePos(x, y);
     if (sqrt(pow(mousePos.x - creaturePos.x, 2) +
              pow(mousePos.y - creaturePos.y, 2)) <=
-        20) {  // Assuming a creature radius of 10
+        20) {
       showInfoPanel = true;
       clickedCreaturePos = std::make_pair(mousePos.x, mousePos.y);
       creatureInfo = QString::fromStdString(formatCreatureInfo(creature));
@@ -328,13 +326,14 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
   showInfoPanel = false;
 }
 
+// Functions checking if a creature has been clicked
 bool SimulationCanvas::isCreatureClicked(const sf::Vector2f& mousePos) {
   for (const auto& creature : simulation_->GetSimulationData()->creatures_) {
     auto [x, y] = creature.GetCoordinates();
     sf::Vector2f creaturePos(x, y);
     if (sqrt(pow(mousePos.x - creaturePos.x, 2) +
              pow(mousePos.y - creaturePos.y, 2)) <=
-        20) {  // Assuming a creature radius of 10
+        20) {
       return true;
     }
   }
@@ -349,14 +348,17 @@ void SimulationCanvas::displayInfoPanel() {
   }
 }
 
+// Structure of the info panel (appearing when a creature is clicked)
 std::string SimulationCanvas::formatCreatureInfo(const Creature& creature) {
   std::stringstream ss;
   ss << "Creature\n";
   ss << "Size: " << creature.GetSize()
-     << "\n";  // Assuming Creature class has GetSize method
+     << "\n";
   ss << "Health: " << creature.GetHealth()
-     << "\n";  // Assuming Creature class has GetHealth method
+     << "\n";
   ss << "Energy Level: " << creature.GetEnergy()
-     << "\n";  // Assuming Creature class has GetEnergyLevel method
+     << "\n\n";
+  auto [x, y] = creature.GetCoordinates();
+  ss << "(x=" << x << ", y=" << y << ")\n";
   return ss.str();
 }
