@@ -20,7 +20,7 @@ class Food : public Entity {
   int GetLifespan() const;
 
  protected:
-  double nutritional_value_; /*!< Nutritional value of the Food. */
+  double nutritional_value_; /*!< Nutritional value per size unit of the Food. (depends on food type) */
   int lifespan_; /*!< Lifespan of the Food in simulation time units. */
 };
 

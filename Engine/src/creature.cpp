@@ -264,6 +264,7 @@ void Creature::SetAge(double age) {
  * @param nutritional_value The nutritional value of the consumed food.
  */
 void Creature::Eats(double nutritional_value) {
+  velocity_ = 0;
   SetEnergy(GetEnergy() + nutritional_value);
   if (GetEnergy() > max_energy_) {
     BalanceHealthEnergy();
