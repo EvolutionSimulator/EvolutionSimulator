@@ -7,6 +7,12 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui_(new Ui::MainWindow) {
   ui_->setupUi(this);
+  // Calculate total size needed for the window based on canvas size and additional widgets/controls
+  int totalWidth = settings::environment::kMapWidth;
+  int totalHeight = settings::environment::kMapHeight + 300; // add extra height for other controls if needed
+
+  // Resize the main window to fit the canvas and other controls
+  resize(totalWidth, totalHeight);
   ui_->densityFood->setMinimum(1);
   ui_->densityFood->setMaximum(1000);
   connect(ui_->runButton, &QPushButton::clicked, this,

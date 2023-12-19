@@ -1,6 +1,10 @@
 #include "qsfmlcanvas.h"
+#include "config.h"
 
 QSFMLCanvas::QSFMLCanvas(QWidget* Parent) : QWidget(Parent) {
+  setFixedSize(settings::environment::kMapWidth, settings::environment::kMapHeight);
+
+
   // Setup some states to allow direct rendering into the widget
   setAttribute(Qt::WA_PaintOnScreen);
   setAttribute(Qt::WA_OpaquePaintEvent);
