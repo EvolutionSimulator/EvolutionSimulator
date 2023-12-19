@@ -36,6 +36,7 @@ add_library(Engine STATIC
   include/collisions.h
   src/collisions.cpp
   include/config.h
+  include/dataaccessor.h
 
 )
 

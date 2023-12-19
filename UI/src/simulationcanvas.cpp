@@ -15,10 +15,6 @@
 
 SimulationCanvas::SimulationCanvas(QWidget* Parent)
     : QSFMLCanvas(Parent), showInfoPanel(false) {
-  render_lambda_ = [this](SimulationData* data) {
-    this->RenderSimulation(data);
-  };
-
   QFile resourceFile(":/font.ttf");
   if (!resourceFile.open(QIODevice::ReadOnly)) {
     qDebug() << "Failed to open font resource!";
@@ -68,7 +64,6 @@ Simulation* SimulationCanvas::GetSimulation() { return simulation_; }
 void SimulationCanvas::OnInit() { clear(sf::Color(0, 255, 0)); }
 
 void SimulationCanvas::OnUpdate() {
-  simulation_->ProcessData(render_lambda_);
   RenderSimulation(simulation_->GetSimulationData());
 
   if (showInfoPanel && clickedCreaturePos) {
@@ -134,7 +129,7 @@ sf::VertexArray createGradientCircle(float radius, const sf::Color& centerColor,
 }
 
 // use this to process the simulation data and render it on the screen
-void SimulationCanvas::RenderSimulation(SimulationData* data) {
+void SimulationCanvas::RenderSimulation(DataAccessor<SimulationData> data) {
   clear(sf::Color(9, 109, 6));
 
   // Iterate through food and create a gradient circle shape for each
@@ -312,7 +307,9 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
   sf::Vector2f mousePos =
       mapPixelToCoords(sf::Vector2i(event->pos().x(), event->pos().y()));
 
-  for (const auto& creature : simulation_->GetSimulationData()->creatures_) {
+  auto data = simulation_->GetSimulationData();
+
+  for (const auto& creature : data->creatures_) {
     auto [x, y] = creature.GetCoordinates();
     sf::Vector2f creaturePos(x, y);
     if (sqrt(pow(mousePos.x - creaturePos.x, 2) +
@@ -329,7 +326,9 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
 }
 
 bool SimulationCanvas::isCreatureClicked(const sf::Vector2f& mousePos) {
-  for (const auto& creature : simulation_->GetSimulationData()->creatures_) {
+  auto data = simulation_->GetSimulationData();
+
+  for (const auto& creature : data->creatures_) {
     auto [x, y] = creature.GetCoordinates();
     sf::Vector2f creaturePos(x, y);
     if (sqrt(pow(mousePos.x - creaturePos.x, 2) +

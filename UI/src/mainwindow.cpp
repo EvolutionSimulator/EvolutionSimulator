@@ -117,9 +117,9 @@ void MainWindow::DisplayGraph() {
 
     graphWindow.clear(sf::Color::White);
 
+    auto data = engine_->GetSimulation()->GetSimulationData();
     // Pass relevant information to the drawing function directly
-    ui_->canvas->DrawCreatureCountOverTime(
-        graphWindow, engine_->GetSimulation()->GetSimulationData()->creatures_);
+    ui_->canvas->DrawCreatureCountOverTime(graphWindow, data->creatures_);
 
     graphWindow.display();
   }

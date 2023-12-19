@@ -3,6 +3,7 @@
 #include <functional>
 #include <mutex>
 
+#include "dataaccessor.h"
 #include "environment.h"  // Include the Environment header
 #include "simulationdata.h"
 
@@ -12,7 +13,7 @@ class Simulation {
       myEnvironment::Environment&
           environment);  // New constructor accepting Environment reference
   ~Simulation();
-  SimulationData* GetSimulationData();
+  DataAccessor<SimulationData> GetSimulationData();
   void Start();
   void Update(double deltaTime);
   void FixedUpdate(double deltaTime);

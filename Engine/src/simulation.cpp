@@ -28,15 +28,9 @@ void Simulation::FixedUpdate(double deltaTime) {
   data_->world_time_ += deltaTime;
 }
 
-// Facilitates data processing with external functions in a thread-safe manner
-void Simulation::ProcessData(std::function<void(SimulationData*)> processFunc) {
-  if (!data_) return;
-
-  std::lock_guard<std::mutex> lock(data_mutex_);
-  processFunc(data_);
+DataAccessor<SimulationData> Simulation::GetSimulationData() {
+  return DataAccessor<SimulationData>(*data_, data_mutex_);
 }
-
-SimulationData* Simulation::GetSimulationData() { return data_; }
 
 // Function to stop the simulation
 

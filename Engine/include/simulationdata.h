@@ -7,7 +7,7 @@
 #include "environment.h"
 #include "food.h"
 
-struct SimulationData {
+class SimulationData {
  public:
   explicit SimulationData(myEnvironment::Environment& env)
       : environment_(env), creatures_(), food_entities_() {

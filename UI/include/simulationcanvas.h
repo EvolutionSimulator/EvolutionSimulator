@@ -37,12 +37,9 @@ class SimulationCanvas : public QSFMLCanvas {
   QString creatureInfo;
   QRectF panelRect;
 
-  void RenderSimulation(SimulationData* data);
+  void RenderSimulation(DataAccessor<SimulationData> data);
 
   Simulation* simulation_ = nullptr;
-  std::function<void(SimulationData*)>
-      render_lambda_;  // we will pass this to the ProcessData method of
-                       // Simulation
 
   bool isCreatureClicked(const sf::Vector2f& mousePos);
 
