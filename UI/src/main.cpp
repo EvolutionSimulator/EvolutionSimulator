@@ -11,10 +11,8 @@
 int main(int argc, char *argv[]) {
   QApplication app(argc, argv);
 
-  Engine mainEngine;
-
   MainWindow window;
-  window.SetEngine(&mainEngine);
+  window.InitializeEngine();
   window.show();
 
   int result = app.exec();

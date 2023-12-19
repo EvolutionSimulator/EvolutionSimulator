@@ -5,20 +5,24 @@
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), ui_(new Ui::MainWindow) {
+    : QMainWindow(parent), ui_(new Ui::MainWindow), engine_(nullptr) {
   ui_->setupUi(this);
-  ui_->densityFood->setMinimum(1);
-  ui_->densityFood->setMaximum(1000);
+
+  InitializeEngine();
+
+  //  connect(ui_->densityFood, SIGNAL(valueChanged(int)), this,
+  //          SLOT(ChangeFoodDensity(int)));
+  //  connect(ui_->densityCreature, SIGNAL(valueChanged(int)), this,
+  //          SLOT(ChangeCreatureDensity(int)));
+
   connect(ui_->runButton, &QPushButton::clicked, this,
           &MainWindow::RunSimulation);
-  connect(ui_->densityFood, SIGNAL(valueChanged(int)), this,
-          SLOT(ChangeFoodDensity(int)));
-  connect(ui_->densityCreature, SIGNAL(valueChanged(int)), this,
-          SLOT(ChangeCreatureDensity(int)));
-  connect(ui_->pauseButton, &QPushButton::clicked, this,
-          &MainWindow::PauseSimulation);
   connect(ui_->restartButton, &QPushButton::clicked, this,
           &MainWindow::RestartSimulation);
+  connect(ui_->pauseButton, &QPushButton::clicked, this,
+          &MainWindow::PauseSimulation);
+  connect(ui_->resumeButton, &QPushButton::clicked, this,
+          &MainWindow::ResumeSimulation);
   connect(ui_->graphButton, &QPushButton::clicked, this,
           &MainWindow::DisplayGraph);
   connect(ui_->testerButton, &QPushButton::clicked, this,
@@ -34,11 +38,6 @@ MainWindow::~MainWindow() {
   delete ui_;
 }
 
-void MainWindow::SetEngine(Engine *engine) {
-  engine_ = engine;
-  ui_->canvas->SetSimulation(engine_->GetSimulation());
-}
-
 void MainWindow::ChangeFoodDensity(int value) {
   food_density = static_cast<double>(value) / 1000.0;      // Convert to density
   engine_->GetEnvironment().SetFoodDensity(food_density);  // Update the density
@@ -51,28 +50,56 @@ void MainWindow::ChangeCreatureDensity(int value) {
   RestartSimulation();  // restart simulation with new creature density
 }
 
+void MainWindow::InitializeEngine() {
+  if (!engine_) {
+    std::cout << "Creating new engine..." << std::endl;
+    engine_ = new Engine();
+    ui_->canvas->SetSimulation(engine_->GetSimulation());
+  }
+}
+
 void MainWindow::RunSimulation() {
-  if (!engine_thread_.joinable()) {
+  if (engine_ && !engine_thread_.joinable()) {
+    std::cout << "Starting engine on a separate thread..." << std::endl;
     engine_thread_ = std::thread(&Engine::Run, engine_);
   }
 }
 
+void MainWindow::RestartSimulation() {
+  KillEngine();
+
+  InitializeEngine();
+
+  RunSimulation();
+}
+
 void MainWindow::PauseSimulation() {
-  if (engine_thread_.joinable()) {
-    engine_->Stop();
-    engine_thread_.join();
+  if (engine_) {
+    engine_->Pause();
   }
 }
 
-void MainWindow::RestartSimulation() {
-  if (engine_thread_.joinable()) {
+void MainWindow::ResumeSimulation() {
+  if (engine_) {
+    engine_->Resume();
+  }
+}
+
+void MainWindow::KillEngine() {
+  if (engine_) {
+    std::cout << "Stopping engine..." << std::endl;
     engine_->Stop();
+  }
+
+  if (engine_thread_.joinable()) {
+    std::cout << "Joining engine thread..." << std::endl;
     engine_thread_.join();
   }
-  // Create a new instance of the Engine and set it in the UI
-  Engine *newEngine = new Engine(food_density, creature_density);
-  SetEngine(newEngine);
-  engine_thread_ = std::thread(&Engine::Run, engine_);
+
+  std::cout << "Deleting engine..." << std::endl;
+  delete engine_;
+  std::cout << "Engine deleted." << std::endl;
+  engine_ = nullptr;
 }
 
 double ExampleGraphFunction(double x) { return x * x; }

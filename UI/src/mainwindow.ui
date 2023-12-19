@@ -24,19 +24,6 @@
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="runButton">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>360</y>
-      <width>80</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>RUN</string>
-    </property>
-   </widget>
    <widget class="QSpinBox" name="densityFood">
     <property name="geometry">
      <rect>
@@ -45,6 +32,12 @@
       <width>42</width>
       <height>22</height>
      </rect>
+    </property>
+    <property name="minimum">
+     <number>1</number>
+    </property>
+    <property name="maximum">
+     <number>1000</number>
     </property>
    </widget>
    <widget class="QPushButton" name="pauseButton">
@@ -63,7 +56,7 @@
    <widget class="QPushButton" name="restartButton">
     <property name="geometry">
      <rect>
-      <x>190</x>
+      <x>280</x>
       <y>360</y>
       <width>80</width>
       <height>24</height>
@@ -90,7 +83,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>380</y>
+      <y>390</y>
       <width>80</width>
       <height>24</height>
      </rect>
@@ -103,7 +96,7 @@
     <property name="geometry">
      <rect>
       <x>100</x>
-      <y>380</y>
+      <y>390</y>
       <width>80</width>
       <height>24</height>
      </rect>
@@ -135,6 +128,32 @@
      <string>Density of Creature:</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="resumeButton">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>360</y>
+      <width>80</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>RESUME</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="runButton">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>360</y>
+      <width>80</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>RUN</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -142,7 +161,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>36</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

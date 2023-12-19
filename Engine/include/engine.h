@@ -15,6 +15,8 @@ class Engine {
 
   void Run();
   void Stop();
+  void Pause();
+  void Resume();
   void UpdateEnvironment();
 
   Simulation* GetSimulation();
@@ -27,6 +29,7 @@ class Engine {
                                                // called
   Simulation* simulation_;
   bool running_ = false;
+  bool paused_ = false;
 
   typedef std::chrono::system_clock timer;
   timer::time_point engine_start_time_;
