@@ -91,7 +91,7 @@ void MovableEntity::SetAccelerationAngle(double angle) {
  * @param rotational_acceleration The new rotational acceleration value.
  */
 void MovableEntity::SetRotationalAcceleration(double rotational_acceleration) {
-  rotational_acceleration = rotational_acceleration;
+  rotational_acceleration_ = rotational_acceleration;
 }
 
 /*!
@@ -153,7 +153,7 @@ double MovableEntity::GetEffectiveForwardAcceleration() const {
   double acceleration = GetAcceleration();
   double friction = GetForwardFriction();
   // return the acceleration magnitude using the cosine formula
-  double effective_acceleration = sqrt(pow(acceleration, 2) + pow(friction, 2) +
+  double effective_acceleration = sqrt(pow(acceleration, 2) + pow(friction, 2) -
                                 2 * acceleration * friction *
                                     cos(acceleration_angle_ - GetVelocityAngle()));
   return effective_acceleration;
@@ -192,9 +192,9 @@ void MovableEntity::UpdateVelocities(double deltaTime) {
       GetVelocity() * sin(GetOrientation() + GetVelocityAngle());
   // update absolute x and y components of velocity
   velocity_x += GetEffectiveForwardAcceleration() *
-                cos(GetEffectiveAccelerationAngle()) * deltaTime;
+                cos(GetOrientation() + GetEffectiveAccelerationAngle()) * deltaTime;
   velocity_y += GetEffectiveForwardAcceleration() *
-                sin(GetEffectiveAccelerationAngle()) * deltaTime;
+                sin(GetOrientation() + GetEffectiveAccelerationAngle()) * deltaTime;
   // update velocity
   SetVelocity(sqrt(pow(velocity_x, 2) + pow(velocity_y, 2)));
   // update velocity angle

@@ -44,7 +44,7 @@ constexpr double kMaxNutritionalValue = 5;
 constexpr double kDefaultLifespan = 30;
 constexpr double kPhotosynthesisFactor = 0.1;
 constexpr double kFrictionalCoefficient =
-    10;  // 0.5 seems to provide a good balance at the beginning  then goes to
+    0.5;  // 0.5 seems to provide a good balance at the beginning  then goes to
           // shit
 }  // namespace environment
 
