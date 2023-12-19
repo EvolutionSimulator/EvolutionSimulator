@@ -396,6 +396,11 @@ void Creature::ProcessVisionFood(
     std::vector<std::vector<std::vector<Entity *>>> &grid,
     double GridCellSize) {
   Food *food = this->GetClosestFood(grid, GridCellSize);
+  if (food == nullptr) { //temporary fix that shouldn't be necessary after the new vision system is implemented
+      distance_food_ = 1000;
+      orientation_food_ = 0;
+      return;
+  }
   distance_food_ = this->GetDistance(*food, settings::environment::kMapWidth,
                                      settings::environment::kMapHeight);
   orientation_food_ = this->GetRelativeOrientation(*food);
