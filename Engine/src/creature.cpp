@@ -326,8 +326,16 @@ void Creature::OnCollision(Entity &other_entity, double const kMapWidth,
                            double const kMapHeight) {
   if (Food *food = dynamic_cast<Food *>(&other_entity)) {
     if (food->GetState() == Entity::Alive) {
-      Eats(food->GetNutritionalValue() * food->GetSize());
-      food->Eat();
+      double max_nutrition = food->GetNutritionalValue() * food->GetSize();
+      double hunger = GetMaxEnergy()-GetEnergy();
+      if (max_nutrition > hunger){
+        Eats(hunger);
+        food->SetSize(((max_nutrition-hunger)/max_nutrition)*food->GetSize());
+      }
+      else{
+        Eats(max_nutrition);
+        food->Eat();
+      }
     }
   } else {
     MovableEntity::OnCollision(other_entity, kMapWidth, kMapHeight);
