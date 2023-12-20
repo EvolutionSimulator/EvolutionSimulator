@@ -140,3 +140,52 @@ bool CollisionCircleLine(const double& tolerance,
   return (ShortestDistancePointLineSegment(center, linePoint1, linePoint2) <
           radius + tolerance);
 }
+
+/*!
+ * @brief Generates a list of grid cells that a line passes through.
+ *
+ * @details This function implements Bresenham's line algorithm.
+ * It calculates the grid cells that a line between two points
+ * (x0, y0) and (x1, y1) passes through on a grid.
+ *
+ * @param x0 The x-coordinate of the starting point of the line.
+ * @param y0 The y-coordinate of the starting point of the line.
+ * @param x1 The x-coordinate of the ending point of the line.
+ * @param y1 The y-coordinate of the ending point of the line.
+ *
+ * @return A vector of pairs of integers, each representing a grid cell (x, y) that the line intersects.
+ */
+std::vector<std::pair<int, int>> BresenhamLine(int x0, int y0, int x1, int y1) {
+  std::vector<std::pair<int, int>> line;
+  bool steep = std::abs(y1 - y0) > std::abs(x1 - x0);
+  if (steep) {
+    std::swap(x0, y0);
+    std::swap(x1, y1);
+  }
+  if (x0 > x1) {
+    std::swap(x0, x1);
+    std::swap(y0, y1);
+  }
+
+  const int dx = x1 - x0;
+  const int dy = std::abs(y1 - y0);
+
+  int error = dx / 2;
+  const int ystep = (y0 < y1) ? 1 : -1;
+  int y = y0;
+
+  for (int x = x0; x <= x1; x++) {
+    if (steep) {
+      line.push_back({y, x});
+    } else {
+      line.push_back({x, y});
+    }
+    error -= dy;
+    if (error < 0) {
+      y += ystep;
+      error += dx;
+    }
+  }
+
+  return line;
+}

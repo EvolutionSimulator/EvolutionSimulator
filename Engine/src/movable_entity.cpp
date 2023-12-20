@@ -24,12 +24,12 @@
 MovableEntity::MovableEntity()
     : Entity(),
       acceleration_(0),
-      acceleration_angle(0),
-      rotational_acceleration(0),
+      acceleration_angle_(0),
+      rotational_acceleration_(0),
       velocity_(0),
       velocity_angle_(0),
       rotational_velocity_(0),
-      strafing_difficulty(0.5) {}
+      strafing_difficulty_(0.5) {}
 
 /*!
  * @brief Returns the linear acceleration.
@@ -40,14 +40,14 @@ double MovableEntity::GetAcceleration() const { return acceleration_; }
  * @brief Returns the angle of acceleration.
  */
 double MovableEntity::GetAccelerationAngle() const {
-  return acceleration_angle;
+  return acceleration_angle_;
 }
 
 /*!
  * @brief Returns the rotational acceleration.
  */
 double MovableEntity::GetRotationalAcceleration() const {
-  return rotational_acceleration;
+  return rotational_acceleration_;
 }
 
 /*!
@@ -82,7 +82,7 @@ void MovableEntity::SetAcceleration(double acceleration) {
  * @param angle The new angle for the linear acceleration, measured in radians.
  */
 void MovableEntity::SetAccelerationAngle(double angle) {
-  acceleration_angle = angle;
+  acceleration_angle_ = angle;
 }
 
 /*!
@@ -125,7 +125,7 @@ void MovableEntity::SetRotationalVelocity(double rotational_velocity) {
 double MovableEntity::GetForwardFriction() const {
   return GetVelocity() * sqrt(GetSize()) *
          settings::environment::kFrictionalCoefficient *
-         (1 + strafing_difficulty * fabs(sin(GetVelocityAngle())));
+         (1 + strafing_difficulty_ * fabs(sin(GetVelocityAngle())));
 }
 
 /*!
@@ -154,7 +154,7 @@ double MovableEntity::GetEffectiveForwardAcceleration() const {
   // return the acceleration magnitude using the cosine formula
   return sqrt(pow(acceleration, 2) + pow(friction, 2) +
               2 * acceleration * friction *
-                  cos(acceleration_angle - GetVelocityAngle()));
+                  cos(acceleration_angle_ - GetVelocityAngle()));
 }
 
 /*!
@@ -173,7 +173,7 @@ double MovableEntity::GetRotationalFriction() const {
  * @return The effective rotational acceleration.
  */
 double MovableEntity::GetEffectiveRotationalAcceleration() const {
-  return rotational_acceleration - GetRotationalFriction();
+  return rotational_acceleration_ - GetRotationalFriction();
 }
 
 /*!
