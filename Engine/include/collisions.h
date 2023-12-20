@@ -41,4 +41,6 @@ bool CollisionRectangleRectangle(const double tolerance,
                                  const std::pair<double, double> rect2_vertex3,
                                  const std::pair<double, double> rect2_vertex4);
 
+std::vector<std::pair<int, int>> BresenhamLine(int x0, int y0, int x1, int y1);
+
 #endif  // COLLISIONS_H
