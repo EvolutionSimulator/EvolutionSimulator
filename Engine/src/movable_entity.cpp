@@ -1,6 +1,6 @@
 #include "movable_entity.h"
 
-#include "config.h"
+#include "settings.h"
 #include "math.h"
 
 /*!
@@ -124,7 +124,7 @@ void MovableEntity::SetRotationalVelocity(double rotational_velocity) {
  */
 double MovableEntity::GetForwardFriction() const {
   return GetVelocity() * sqrt(GetSize()) *
-         settings::environment::kFrictionalCoefficient *
+         SETTINGS.environment.frictional_coefficient *
          (1 + strafing_difficulty * fabs(sin(GetVelocityAngle())));
 }
 
@@ -164,7 +164,7 @@ double MovableEntity::GetEffectiveForwardAcceleration() const {
  */
 double MovableEntity::GetRotationalFriction() const {
   return GetRotationalVelocity() * GetSize() *
-         settings::environment::kFrictionalCoefficient;
+         SETTINGS.environment.frictional_coefficient;
 }
 
 /*!

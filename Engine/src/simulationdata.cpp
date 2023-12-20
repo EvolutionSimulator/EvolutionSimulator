@@ -7,8 +7,8 @@
 #include <vector>
 
 #include "collisions.h"
-#include "config.h"
 #include "food.h"
+#include "settings.h"
 
 /*!
  * @brief Adds a creature to the simulation.
@@ -81,8 +81,8 @@ void SimulationData::ModifyAllCreatures(double delta_x, double delta_y) {
     coordinates.first = coordinates.first + delta_x;
     coordinates.second = coordinates.second + delta_y;
     creature.SetCoordinates(coordinates.first, coordinates.second,
-                            settings::environment::kMapWidth,
-                            settings::environment::kMapHeight);
+                            SETTINGS.environment.map_width,
+                            SETTINGS.environment.map_height);
   }
 }
 
@@ -95,9 +95,9 @@ void SimulationData::ModifyAllCreatures(double delta_x, double delta_y) {
 
 void SimulationData::UpdateAllCreatures(double deltaTime) {
   for (Creature& creature : creatures_) {
-    creature.Update(deltaTime, settings::environment::kMapWidth,
-                    settings::environment::kMapHeight, grid_,
-                    settings::environment::kGridCellSize);
+    creature.Update(deltaTime, SETTINGS.environment.map_width,
+                    SETTINGS.environment.map_height, grid_,
+                    SETTINGS.environment.grid_cell_size);
     if (creature.Fit()) {
       reproduce_.push(creature);
     }
@@ -111,14 +111,14 @@ void SimulationData::UpdateAllCreatures(double deltaTime) {
 void SimulationData::GenerateMoreFood() {
   double size = food_entities_.size();
   double max_number = environment_.GetFoodDensity() *
-                      settings::environment::kMapHeight *
-                      settings::environment::kMapWidth / 100;
+                      SETTINGS.environment.map_height *
+                      SETTINGS.environment.map_width / 100;
   while (size < max_number) {
     Food new_food = Food();
-    new_food.RandomInitialization(settings::environment::kMapWidth,
-                                  settings::environment::kMapHeight,
-                                  settings::environment::kMaxFoodSize,
-                                  settings::environment::kMinCreatureSize);
+    new_food.RandomInitialization(SETTINGS.environment.map_width,
+                                  SETTINGS.environment.map_height,
+                                  SETTINGS.environment.max_food_size,
+                                  SETTINGS.environment.min_creature_size);
     food_entities_.emplace_back(new_food);
     size++;
   }
@@ -131,10 +131,11 @@ void SimulationData::GenerateMoreFood() {
  * with crossed-over genomes.
  */
 void SimulationData::ReproduceCreatures() {
-  double world_width = settings::environment::kMapWidth;
-  double world_height = settings::environment::kMapHeight;
-  double max_creature_size = settings::environment::kMaxCreatureSize;
-  double min_creature_size = settings::environment::kMinCreatureSize;
+  double world_width = SETTINGS.environment.map_width;
+  double world_height = SETTINGS.environment.map_height;
+  double max_creature_size = SETTINGS.environment.max_creature_size;
+  double min_creature_size = SETTINGS.environment.min_creature_size;
+
   while (reproduce_.size() > 2) {
     Creature creature1 = reproduce_.front();
     reproduce_.pop();
@@ -174,19 +175,19 @@ void SimulationData::ReproduceCreatures() {
  */
 void SimulationData::InitializeCreatures() {
   // Retrieve information from the environment
-  double world_width = settings::environment::kMapWidth;
-  double world_height = settings::environment::kMapHeight;
-  double creature_density = settings::environment::kCreatureDensity;
-  double max_creature_size = settings::environment::kMaxCreatureSize;
-  double min_creature_size = settings::environment::kMinCreatureSize;
+  double world_width = SETTINGS.environment.map_width;
+  double world_height = SETTINGS.environment.map_height;
+  double creature_density = SETTINGS.environment.creature_density;
+  double max_creature_size = SETTINGS.environment.max_creature_size;
+  double min_creature_size = SETTINGS.environment.min_creature_size;
 
   creatures_.clear();
 
   for (double x = 0; x < world_width; x += 2.0) {
     for (double y = 0; y < world_height; y += 2.0) {
       if (std::rand() / (RAND_MAX + 1.0) < creature_density) {
-        neat::Genome genome(settings::environment::kInputNeurons,
-                            settings::environment::kOutputNeurons);
+        neat::Genome genome(SETTINGS.environment.input_neurons,
+                            SETTINGS.environment.output_neurons);
         for (int i = 0; i < 40; i++) {
           genome.Mutate();
         }
@@ -207,8 +208,8 @@ void SimulationData::InitializeFood() {
   food_entities_.clear();
 
   // Populate the vector with food entities based on the current food density
-  for (double x = 0; x < settings::environment::kMapWidth; x += 10.0) {
-    for (double y = 0; y < settings::environment::kMapHeight; y += 10.0) {
+  for (double x = 0; x < SETTINGS.environment.map_width; x += 10.0) {
+    for (double y = 0; y < SETTINGS.environment.map_height; y += 10.0) {
       if (std::rand() / (RAND_MAX + 1.0) < kFoodDensity) {
         food_entities_.emplace_back(Food(x, y));
       }
@@ -222,12 +223,12 @@ void SimulationData::InitializeFood() {
 void SimulationData::InitializeGrid() {
   // Number of grid cells
   int num_cells_x = static_cast<int>(std::ceil(
-                        static_cast<double>(settings::environment::kMapWidth) /
-                        settings::environment::kGridCellSize)) +
+                        static_cast<double>(SETTINGS.environment.map_width) /
+                        SETTINGS.environment.grid_cell_size)) +
                     1;
   int num_cells_y = static_cast<int>(std::ceil(
-                        static_cast<double>(settings::environment::kMapHeight) /
-                        settings::environment::kGridCellSize)) +
+                        static_cast<double>(SETTINGS.environment.map_height) /
+                        SETTINGS.environment.grid_cell_size)) +
                     1;
   // Resize the grid to the specified dimensions
   grid_.assign(num_cells_x, std::vector<std::vector<Entity*>>(num_cells_y));
@@ -305,9 +306,9 @@ void UpdateQueue(std::queue<Creature>& reproduce) {
 void SimulationData::UpdateGrid() {
   ClearGrid();
   UpdateGridTemplate<Creature>(creatures_, grid_,
-                               settings::environment::kGridCellSize);
+                               SETTINGS.environment.grid_cell_size);
   UpdateGridTemplate<Food>(food_entities_, grid_,
-                           settings::environment::kGridCellSize);
+                           SETTINGS.environment.grid_cell_size);
   UpdateQueue(reproduce_);
 }
 
@@ -344,29 +345,30 @@ std::vector<std::pair<int, int>> GetNeighbours(
  * different entities.
  */
 void SimulationData::CheckCollisions() {
-  double tolerance = settings::environment::kTolerance;
+  double tolerance = SETTINGS.environment.tolerance;
   int num_rows = static_cast<int>(std::ceil(
-                     static_cast<double>(settings::environment::kMapWidth) /
-                     settings::environment::kGridCellSize)) +
+                     static_cast<double>(SETTINGS.environment.map_width) /
+                     SETTINGS.environment.grid_cell_size)) +
                  1;
   int num_cols = static_cast<int>(std::ceil(
-                     static_cast<double>(settings::environment::kMapHeight) /
-                     settings::environment::kGridCellSize)) +
+                     static_cast<double>(SETTINGS.environment.map_height) /
+                     SETTINGS.environment.grid_cell_size)) +
                  1;
+
   for (int row = 0; row < num_rows; row++) {
     for (int col = 0; col < num_cols; col++) {
       for (Entity* entity1 : grid_[row][col]) {
         const int layer_number =
             2 *
-            ceil((entity1->GetSize() / settings::environment::kGridCellSize));
+            ceil((entity1->GetSize() / SETTINGS.environment.grid_cell_size));
         std::vector<std::pair<int, int>> neighbours =
             GetNeighbours(num_rows, num_cols, {row, col}, layer_number);
         for (const std::pair<int, int> neighbour : neighbours) {
           for (Entity* entity2 : grid_[neighbour.first][neighbour.second]) {
             if (entity1->CheckCollisionWithEntity(tolerance, *entity2)) {
               if (entity1 != entity2) {
-                entity1->OnCollision(*entity2, settings::environment::kMapWidth,
-                                     settings::environment::kMapHeight);
+                entity1->OnCollision(*entity2, SETTINGS.environment.map_width,
+                                     SETTINGS.environment.map_height);
               }
             }
           }

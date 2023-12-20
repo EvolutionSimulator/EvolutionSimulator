@@ -528,13 +528,13 @@ TEST(SimulationDataTest, GridInitialization) {
 
   int expectedNumCellsX =
       static_cast<int>(
-          std::ceil(static_cast<double>(settings::environment::kMapWidth) /
-                    settings::environment::kGridCellSize)) +
+          std::ceil(static_cast<double>(SETTINGS.environment.map_width) /
+                    SETTINGS.environment.grid_cell_size)) +
       1;
   int expectedNumCellsY =
       static_cast<int>(
-          std::ceil(static_cast<double>(settings::environment::kMapHeight) /
-                    settings::environment::kGridCellSize)) +
+          std::ceil(static_cast<double>(SETTINGS.environment.map_height) /
+                    SETTINGS.environment.grid_cell_size)) +
       1;
 
   EXPECT_EQ(simData.GetGrid().size(), expectedNumCellsX);
@@ -600,14 +600,14 @@ TEST(SimulationDataTest, CorrectEntityPlacementInGrid) {
   simData.ClearGrid();
 
   Creature creature_1(neat::Genome(2, 3));
-  creature_1.SetCoordinates(200.1, 300.4, settings::environment::kMapWidth,
-                            settings::environment::kMapHeight);
+  creature_1.SetCoordinates(200.1, 300.4, SETTINGS.environment.map_width,
+                            SETTINGS.environment.map_height);
   creature_1.SetSize(10.0);
   simData.creatures_.push_back(creature_1);
 
   Creature creature_2(neat::Genome(2, 3));
-  creature_2.SetCoordinates(100.1, 350.4, settings::environment::kMapWidth,
-                            settings::environment::kMapHeight);
+  creature_2.SetCoordinates(100.1, 350.4, SETTINGS.environment.map_width,
+                            SETTINGS.environment.map_height);
   creature_2.SetSize(10.0);
   creature_2.SetState(Entity::Dead);
   simData.creatures_.push_back(creature_2);
@@ -624,15 +624,15 @@ TEST(SimulationDataTest, CorrectEntityPlacementInGrid) {
 
   auto creatureCoordinates = creature_1.GetCoordinates();
   int creatureGridX = static_cast<int>(creatureCoordinates.first /
-                                       settings::environment::kGridCellSize);
+                                       SETTINGS.environment.grid_cell_size);
   int creatureGridY = static_cast<int>(creatureCoordinates.second /
-                                       settings::environment::kGridCellSize);
+                                       SETTINGS.environment.grid_cell_size);
 
   auto foodCoordinates = food_1.GetCoordinates();
   int foodGridX = static_cast<int>(foodCoordinates.first /
-                                   settings::environment::kGridCellSize);
+                                   SETTINGS.environment.grid_cell_size);
   int foodGridY = static_cast<int>(foodCoordinates.second /
-                                   settings::environment::kGridCellSize);
+                                   SETTINGS.environment.grid_cell_size);
 
   EXPECT_NE(simData.GetGrid()[creatureGridX][creatureGridY].empty(), true);
   EXPECT_NE(simData.GetGrid()[foodGridX][foodGridY].empty(), true);

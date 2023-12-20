@@ -9,9 +9,8 @@
  * value.
  */
 Food::Food()
-    : Entity(std::rand() % settings::environment::kMaxFoodSize),
-      nutritional_value_(size_ *
-                         settings::environment::kPlantNutritionalValue) {
+    : Entity(std::rand() % SETTINGS.environment.max_food_size),
+      nutritional_value_(size_ * SETTINGS.environment.plant_nutritional_value) {
   // Constructor implementation
 }
 
@@ -23,9 +22,9 @@ Food::Food()
  */
 Food::Food(const double x_coord, const double y_coord)
     : Entity(x_coord, y_coord,
-             std::rand() % settings::environment::kMaxFoodSize),
-      nutritional_value_(size_ *
-                         settings::environment::kPlantNutritionalValue) {}
+             std::rand() % SETTINGS.environment.max_food_size),
+      nutritional_value_(size_ * SETTINGS.environment.plant_nutritional_value) {
+}
 
 /*!
  * @brief Constructor for Food with specified coordinates and size.
@@ -36,8 +35,9 @@ Food::Food(const double x_coord, const double y_coord)
  */
 Food::Food(const double x_coord, const double y_coord, const double size)
     : Entity(x_coord, y_coord, size),
-      nutritional_value_(size_ *
-                         settings::environment::kPlantNutritionalValue) {}
+      nutritional_value_(size_ * SETTINGS.environment.plant_nutritional_value) {
+
+}
 
 /*!
  * @brief Simulates the consumption of the Food, setting its state to Dead.
@@ -71,9 +71,8 @@ double Food::GetNutritionalValue() const { return nutritional_value_; }
  */
 void Plant::Grow(double deltaTime) {
   double updated_nutritional_value =
-      GetNutritionalValue() + settings::environment::kPhotosynthesisFactor;
-  if (updated_nutritional_value <=
-      settings::environment::kMaxNutritionalValue) {
+      GetNutritionalValue() + SETTINGS.environment.photosynthesis_factor;
+  if (updated_nutritional_value <= SETTINGS.environment.max_nutritional_value) {
     SetNutritionalValue(updated_nutritional_value);
   }
 
@@ -97,7 +96,7 @@ void Plant::Grow(double deltaTime) {
  */
 void Meat::Rot() {
   double updated_nutritional_value =
-      GetNutritionalValue() - settings::environment::kRotFactor;
+      GetNutritionalValue() - SETTINGS.environment.rot_factor;
   if (updated_nutritional_value < 0) {
     SetState(Entity::Dead);
     return;

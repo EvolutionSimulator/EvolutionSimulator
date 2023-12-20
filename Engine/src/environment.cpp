@@ -6,5 +6,5 @@
 
 // Constructor implementation
 myEnvironment::Environment::Environment()
-    : food_density_(settings::environment::kDefaultFoodDensity),
-      creature_density_(settings::environment::kDefaultCreatureDensity) {}
+    : food_density_(SETTINGS.environment.default_food_density),
+      creature_density_(SETTINGS.environment.default_creature_density) {}

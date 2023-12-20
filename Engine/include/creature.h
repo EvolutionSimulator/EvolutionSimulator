@@ -3,7 +3,7 @@
 
 #include <unordered_map>
 
-#include "config.h"
+#include "settings.h"
 #include "food.h"
 #include "movable_entity.h"
 #include "neat/neat-neural-network.h"

@@ -25,8 +25,8 @@ class Engine {
  private:
   myEnvironment::Environment environment_;
   const double kFixedUpdateInterval =
-      settings::engine::kFixedUpdateInterval;  // how often FixedUpdate is
-                                               // called
+      SETTINGS.engine.fixed_update_interval;  // how often FixedUpdate is
+                                              // called
   Simulation* simulation_;
   volatile bool running_ = false;
   volatile bool paused_ = false;

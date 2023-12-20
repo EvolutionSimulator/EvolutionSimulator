@@ -31,8 +31,8 @@ Creature::Creature(neat::Genome genome)
       energy_(100),
       brain_(neat::NeuralNetwork(genome)),
       genome_(genome),
-      neuron_data_(settings::environment::kInputNeurons, 0),
-      reproduction_cooldown_(settings::environment::kReproductionCooldown),
+      neuron_data_(SETTINGS.environment.input_neurons, 0),
+      reproduction_cooldown_(SETTINGS.environment.reproduction_cooldown),
       age_(0) {}
 
 /*!
@@ -98,11 +98,11 @@ void Creature::BalanceHealthEnergy() {
     SetHealth(GetHealth() + (GetEnergy() - GetMaxEnergy()));
     SetEnergy(GetMaxEnergy());
   } else if (GetHealth() > GetEnergy() &&
-             GetEnergy() <= settings::environment::kHealthToEnergy) {
+             GetEnergy() <= SETTINGS.environment.health_to_energy) {
     SetEnergy(GetEnergy() + 5);
     SetHealth(GetHealth() - 5);
   } else if (GetHealth() < GetEnergy() &&
-             GetEnergy() >= settings::environment::kEnergyToHealth) {
+             GetEnergy() >= SETTINGS.environment.energy_to_health) {
     SetEnergy(GetEnergy() - 5);
     SetHealth(GetHealth() + 5);
   }
@@ -183,7 +183,7 @@ void Creature::UpdateEnergy(double deltaTime) {
  * @return true if the creature is fit for reproduction, false otherwise.
  */
 bool Creature::Fit() {
-  if (energy_ > settings::environment::kReproductionThreshold * max_energy_ &&
+  if (energy_ > SETTINGS.environment.reproduction_threshold * max_energy_ &&
       reproduction_cooldown_ == 0.0) {
     return true;
   }
@@ -198,7 +198,7 @@ bool Creature::Fit() {
  */
 void Creature::Reproduced() {
   SetEnergy(GetEnergy() - 0.75 * max_energy_);
-  reproduction_cooldown_ = settings::environment::kReproductionCooldown;
+  reproduction_cooldown_ = SETTINGS.environment.reproduction_cooldown;
 }
 
 /*!
@@ -396,8 +396,8 @@ void Creature::ProcessVisionFood(
     std::vector<std::vector<std::vector<Entity *>>> &grid,
     double GridCellSize) {
   Food *food = this->GetClosestFood(grid, GridCellSize);
-  distance_food_ = this->GetDistance(*food, settings::environment::kMapWidth,
-                                     settings::environment::kMapHeight);
+  distance_food_ = this->GetDistance(*food, SETTINGS.environment.map_width,
+                                     SETTINGS.environment.map_height);
   orientation_food_ = this->GetRelativeOrientation(*food);
 }
 
@@ -474,11 +474,11 @@ Food *Creature::GetClosestFood(
 
   Food *closest_food = closest_food_entities.front();
   double smallest_distance =
-      GetDistance(*closest_food, settings::environment::kMapWidth,
-                  settings::environment::kMapHeight);
+      GetDistance(*closest_food, SETTINGS.environment.map_width,
+                  SETTINGS.environment.map_height);
   for (Food *&food : closest_food_entities) {
-    double distance = GetDistance(*food, settings::environment::kMapWidth,
-                                  settings::environment::kMapHeight);
+    double distance = GetDistance(*food, SETTINGS.environment.map_width,
+                                  SETTINGS.environment.map_height);
     if (distance < smallest_distance) {
       closest_food = food;
       smallest_distance = distance;

@@ -3,7 +3,7 @@
 #include <iostream>
 #include <vector>
 
-#include "config.h"
+#include "settings.h"
 
 namespace myEnvironment {
 class Environment {
