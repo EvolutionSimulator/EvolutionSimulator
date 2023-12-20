@@ -15,14 +15,13 @@ MainWindow::MainWindow(QWidget *parent)
   //  connect(ui_->densityCreature, SIGNAL(valueChanged(int)), this,
   //          SLOT(ChangeCreatureDensity(int)));
 
-  connect(ui_->runButton, &QPushButton::clicked, this,
-          &MainWindow::RunSimulation);
+  connect(ui_->runButton, &QPushButton::clicked, this, &MainWindow::RunEngine);
   connect(ui_->restartButton, &QPushButton::clicked, this,
-          &MainWindow::RestartSimulation);
+          &MainWindow::RestartEngine);
   connect(ui_->pauseButton, &QPushButton::clicked, this,
-          &MainWindow::PauseSimulation);
+          &MainWindow::PauseEngine);
   connect(ui_->resumeButton, &QPushButton::clicked, this,
-          &MainWindow::ResumeSimulation);
+          &MainWindow::ResumeEngine);
   connect(ui_->graphButton, &QPushButton::clicked, this,
           &MainWindow::DisplayGraph);
   connect(ui_->testerButton, &QPushButton::clicked, this,
@@ -47,7 +46,7 @@ void MainWindow::ChangeFoodDensity(int value) {
 void MainWindow::ChangeCreatureDensity(int value) {
   creature_density =
       static_cast<double>(value) / 10000.0;  // Convert to density
-  RestartSimulation();  // restart simulation with new creature density
+  RestartEngine();  // restart simulation with new creature density
 }
 
 void MainWindow::InitializeEngine() {
@@ -58,28 +57,28 @@ void MainWindow::InitializeEngine() {
   }
 }
 
-void MainWindow::RunSimulation() {
+void MainWindow::RunEngine() {
   if (engine_ && !engine_thread_.joinable()) {
     std::cout << "Starting engine on a separate thread..." << std::endl;
     engine_thread_ = std::thread(&Engine::Run, engine_);
   }
 }
 
-void MainWindow::RestartSimulation() {
+void MainWindow::RestartEngine() {
   KillEngine();
 
   InitializeEngine();
 
-  RunSimulation();
+  RunEngine();
 }
 
-void MainWindow::PauseSimulation() {
+void MainWindow::PauseEngine() {
   if (engine_) {
     engine_->Pause();
   }
 }
 
-void MainWindow::ResumeSimulation() {
+void MainWindow::ResumeEngine() {
   if (engine_) {
     engine_->Resume();
   }

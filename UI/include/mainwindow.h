@@ -24,11 +24,11 @@ QT_END_NAMESPACE  //
   void ChangeFoodDensity(
       int value);  // Make sure this is under 'private slots:'
   void ChangeCreatureDensity(int value);
-  void RunSimulation();
-  void PauseSimulation();
-  void ResumeSimulation();
+  void RunEngine();
+  void PauseEngine();
+  void ResumeEngine();
   void KillEngine();
-  void RestartSimulation();
+  void RestartEngine();
   void DisplayGraph();
   void GraphExampleFunction();
 
