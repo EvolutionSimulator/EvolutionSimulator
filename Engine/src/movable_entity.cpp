@@ -161,6 +161,7 @@ double MovableEntity::GetEffectiveForwardAcceleration() const {
       return 0;
   }
   return sqrt(acceleration_squared);
+
 }
 
 /*!
