@@ -1,12 +1,17 @@
 #pragma once
 
-struct Settings {
+#include <fstream>
+#include <iostream>
+
+class Settings {
  public:
   // Singleton access method
   static Settings& GetInstance() {
     static Settings instance;
     return instance;
   }
+
+  void LoadFromFile(const std::string& filename);
 
   // Delete copy constructor and assignment operator
   Settings(const Settings&) = delete;

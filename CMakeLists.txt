@@ -41,5 +41,3 @@ FetchContent_MakeAvailable(googletest)
 
 # Enable testing
 enable_testing()
-
-

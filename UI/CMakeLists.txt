@@ -89,3 +89,16 @@ install(TARGETS UI
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(UI)
 endif()
+
+# Define the source and destination of the configuration file
+set(CONFIG_FILE "${CMAKE_SOURCE_DIR}/settings.json")
+set(CONFIG_DEST "${CMAKE_BINARY_DIR}/UI")
+
+# Copy the file as a pre-build step
+add_custom_command(
+    TARGET UI PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+        ${CONFIG_FILE}
+        ${CONFIG_DEST}
+    COMMENT "Copying settings.json to build directory"
+)

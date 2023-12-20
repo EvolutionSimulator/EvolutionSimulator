@@ -6,10 +6,11 @@
 #include <thread>
 
 #include "mainwindow.h"
-#include "qsfmlcanvas.h"
 
 int main(int argc, char *argv[]) {
   QApplication app(argc, argv);
+
+  SETTINGS.LoadFromFile("./settings.json");
 
   MainWindow window;
   window.InitializeEngine();
