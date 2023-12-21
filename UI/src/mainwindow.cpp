@@ -2,9 +2,11 @@
 
 #include <iostream>
 
-#include <QtCharts/QChart>
+#include <QtWidgets/QDialog>
 #include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
+#include <QtCharts/QChart>
+#include <QVBoxLayout>
 
 #include "ui_mainwindow.h"
 
@@ -101,7 +103,14 @@ void MainWindow::DisplayGraph() {
   QChartView *chartView = new QChartView(chart);
   chartView->setRenderHint(QPainter::Antialiasing);
 
-  setCentralWidget(chartView);
+  QDialog *dialog = new QDialog(this); // 'this' sets MainWindow as the parent
+  dialog->setWindowTitle("Graph Display");
+  QVBoxLayout *layout = new QVBoxLayout(dialog);
+  layout->addWidget(chartView);
+  dialog->setLayout(layout);
+  dialog->resize(800, 600);
+
+  dialog->show();
 }
 
 void MainWindow::GraphExampleFunction() {
