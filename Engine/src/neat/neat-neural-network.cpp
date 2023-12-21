@@ -78,6 +78,7 @@ std::vector<double> NeuralNetwork::Activate(
 
       if (std::find(output_ids_.begin(), output_ids_.end(), ffneuron.id) ==
           output_ids_.end()) {
+        //value=activation_function(n, value);
         value = activation_function(value);
       }
 
@@ -158,9 +159,27 @@ std::vector<std::vector<Neuron> > get_layers(const Genome &genom) {
 /*!
  * @brief Activation function used in the neural network.
  *
- * @param x The input value to the activation function.
+ * @param n the neuron to be activated, x The input value to the activation function.
  *
  * @return The output of the activation function.
  */
+//double activation_function(Neuron& n, double x) {
+//    switch (n.GetActivation()) {
+//        case ActivationType::sigmoid:
+//            return 1/(1+exp(-x));
+//        case ActivationType::tanh:
+//            return (exp(x)-exp(-x))/(exp(x)+exp(-x));
+//        case ActivationType::relu:
+//            return std::max(0.0,x);
+//        case ActivationType::leakyRelu:
+//            return std::max(0.1*x, x);
+//        case ActivationType::binary:
+//            return (x >= 0.0) ? 1.0 : 0.0;
+//        case ActivationType::linear:
+//            return x;
+//        default:
+//            return x;
+//    }
+//}
 double activation_function(double x) { return 1 / (1 + exp(-x)); }
 }  // end of namespace neat

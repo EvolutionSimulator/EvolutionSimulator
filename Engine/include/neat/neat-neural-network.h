@@ -4,6 +4,7 @@
 #endif  // NEATNEURALNETWORK_H
 
 #include "neat/neat-genome.h"
+#include "neat/neat-neuron.h"
 
 namespace neat {
 
@@ -62,6 +63,7 @@ std::vector<std::vector<Neuron> > get_layers(
     const Genome
         &genom);  // organize neurons from a Genome into layers (by neurons ids)
 
+//double activation_function(Neuron& n, double x);
 double activation_function(double x);
 
 }  // end of namespace neat

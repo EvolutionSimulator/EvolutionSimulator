@@ -45,6 +45,7 @@ class Genome {
   void MutateRemoveLink();
   void MutateChangeWeight();
   void MutateChangeBias();
+  void MutateActivationFunction();
 
   bool DetectLoops(const Neuron& n);
 
