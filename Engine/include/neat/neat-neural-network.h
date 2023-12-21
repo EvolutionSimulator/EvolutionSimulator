@@ -53,6 +53,7 @@ class NeuralNetwork {
   std::vector<double> Activate(const std::vector<double> &input_values) const;
 
  private:
+  //const Genome& genom;
   std::vector<int> input_ids_;  /*!< IDs of input neurons. */
   std::vector<int> output_ids_; /*!< IDs of output neurons. */
   std::vector<FeedForwardNeuron>
@@ -63,7 +64,7 @@ std::vector<std::vector<Neuron> > get_layers(
     const Genome
         &genom);  // organize neurons from a Genome into layers (by neurons ids)
 
-//double activation_function(Neuron& n, double x);
 double activation_function(double x);
+//double activation_function(Neuron& n, double x);
 
 }  // end of namespace neat

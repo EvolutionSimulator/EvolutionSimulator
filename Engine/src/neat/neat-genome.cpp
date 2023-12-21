@@ -577,4 +577,14 @@ void Genome::MutateActivationFunction() {
     int randomIndex = distribution(generator);
     neurons_[indexRandomNeuronHidden].SetActivation(activationTypes[randomIndex]);
 }
+
+bool Genome::FindNeuronById(int targetId, Neuron& foundNeuron) const{
+    for (const Neuron& neuron : neurons_) {
+        if (neuron.GetId() == targetId) {
+            foundNeuron = neuron;  // Assign the found neuron to the reference parameter
+            return true;  // Return true if the neuron is found
+        }
+    }
+    return false;  // Return false if neuron isnt found
+}
 }  // namespace neat

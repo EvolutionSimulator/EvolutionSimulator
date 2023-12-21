@@ -47,6 +47,8 @@ class Genome {
   void MutateChangeBias();
   void MutateActivationFunction();
 
+  bool FindNeuronById(int targetId, Neuron& foundNeuron) const;
+
   bool DetectLoops(const Neuron& n);
 
   bool HasLink(const int& in_id, const int& ou_id);

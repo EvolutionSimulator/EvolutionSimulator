@@ -1,4 +1,7 @@
 #include "neat/neat-neural-network.h"
+//#include "neat/neat-neuron.h"
+#include "neat/neat-genome.h"
+
 /*!
  * @file neat-neural-network.h
  *
@@ -78,7 +81,13 @@ std::vector<double> NeuralNetwork::Activate(
 
       if (std::find(output_ids_.begin(), output_ids_.end(), ffneuron.id) ==
           output_ids_.end()) {
-        //value=activation_function(n, value);
+//        Neuron tempN = Neuron(NeuronType::kHidden,0.0);
+//        if (genom.FindNeuronById(ffneuron.id, tempN)){
+//            value=activation_function(tempN, value);
+//        }
+//        else{
+//            value=0;
+//        }
         value = activation_function(value);
       }
 
