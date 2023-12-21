@@ -10,7 +10,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Charts)
+
 
 if(WIN32)
     set(ENGINE_LIB_EXT ".lib")
@@ -40,7 +41,7 @@ qt_add_executable(UI
     ${RESOURCES}
 )
 
-target_link_libraries(UI PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(UI PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Charts)
 
 # SFML Integration
 include(FetchContent)

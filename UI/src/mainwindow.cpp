@@ -2,6 +2,10 @@
 
 #include <iostream>
 
+#include <QtCharts/QChart>
+#include <QtCharts/QChartView>
+#include <QtCharts/QLineSeries>
+
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
@@ -40,15 +44,14 @@ void MainWindow::SetEngine(Engine *engine) {
 }
 
 void MainWindow::ChangeFoodDensity(int value) {
-  food_density = static_cast<double>(value) / 1000.0;      // Convert to density
-  engine_->GetEnvironment().SetFoodDensity(food_density);  // Update the density
-  engine_->UpdateEnvironment();  // Apply the updated density
+  food_density = static_cast<double>(value) / 1000.0;     // Convert to density
+  engine_->GetEnvironment().SetFoodDensity(food_density); // Update the density
+  engine_->UpdateEnvironment(); // Apply the updated density
 }
 
 void MainWindow::ChangeCreatureDensity(int value) {
-  creature_density =
-      static_cast<double>(value) / 10000.0;  // Convert to density
-  RestartSimulation();  // restart simulation with new creature density
+  creature_density = static_cast<double>(value) / 10000.0; // Convert to density
+  RestartSimulation(); // restart simulation with new creature density
 }
 
 void MainWindow::RunSimulation() {
@@ -77,25 +80,28 @@ void MainWindow::RestartSimulation() {
 
 double ExampleGraphFunction(double x) { return x * x; }
 
+// This function is not complete, it is just an example of how to display a
+// graph
 void MainWindow::DisplayGraph() {
-  sf::RenderWindow graphWindow(sf::VideoMode(480, 360), "Graph Window");
+  // Create a new line series
+  QLineSeries *series = new QLineSeries();
 
-  while (graphWindow.isOpen()) {
-    sf::Event event;
-    while (graphWindow.pollEvent(event)) {
-      if (event.type == sf::Event::Closed) {
-        graphWindow.close();
-      }
-    }
-
-    graphWindow.clear(sf::Color::White);
-
-    // Pass relevant information to the drawing function directly
-    ui_->canvas->DrawCreatureCountOverTime(
-        graphWindow, engine_->GetSimulation()->GetSimulationData()->creatures_);
-
-    graphWindow.display();
+  // Add data points to the series
+  for (double x = 0.0; x <= 10.0; x += 1.0) {
+    double y = ExampleGraphFunction(x);
+    series->append(x, y);
   }
+
+  // Create a chart and add the series to it
+  QChart *chart = new QChart();
+  chart->addSeries(series);
+  chart->createDefaultAxes();
+
+  // Create a chart view with the chart
+  QChartView *chartView = new QChartView(chart);
+  chartView->setRenderHint(QPainter::Antialiasing);
+
+  setCentralWidget(chartView);
 }
 
 void MainWindow::GraphExampleFunction() {
