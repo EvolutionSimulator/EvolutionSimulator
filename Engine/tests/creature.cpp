@@ -172,3 +172,31 @@ TEST(CreatureTests, SetHealth) {
 //    EXPECT_EQ(creature.GetEnergy(), 93);
 //    EXPECT_EQ(creature.GetHealth(), 100);
 //}
+
+
+
+TEST(CreatureTests, GetCellsInSight) {
+  neat::Genome genome(3, 4);
+  Creature creature(genome);
+
+  std::vector<std::vector<std::vector<Entity *>>> testGrid;
+  double gridCellSize = 1.0;
+  testGrid.assign(10, std::vector<std::vector<Entity *>>(10));
+
+  creature.SetCoordinates(5,5,10,10);
+  creature.SetOrientation(0.0);
+  creature.SetVision(3.0, M_PI / 2);
+
+  auto cells_in_sight = creature.GetGridCellsInSight(testGrid, gridCellSize);
+
+  std::set<std::pair<int, int>> expected_cells = {
+      {5, 4}, {5, 5}, {5, 6},
+      {6, 3}, {6, 4}, {6, 5}, {6,6}, {6,7},
+      {7, 3}, {7, 4}, {7, 5}, {7,6}, {7,7},
+      {8,5}
+  };
+
+  std::set<std::pair<int, int>> actual_cells(cells_in_sight.begin(), cells_in_sight.end());
+
+  ASSERT_EQ(actual_cells, expected_cells);
+}
