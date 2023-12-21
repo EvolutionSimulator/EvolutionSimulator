@@ -18,9 +18,6 @@ SimulationCanvas::SimulationCanvas(QWidget *Parent)
     , showInfoPanel(false)
 {
     render_lambda_ = [this](SimulationData *data) { this->RenderSimulation(data); };
-sf::RenderWindow& SimulationCanvas::GetRenderWindow() {
-    return renderWindow_; // Use the correct member variable name
-}
 
 
 

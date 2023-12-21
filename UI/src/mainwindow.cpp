@@ -12,7 +12,6 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui_(new Ui::MainWindow), friction_coefficient(0.0) {
-
   ui_->setupUi(this);
   // Calculate total size needed for the window based on canvas size and additional widgets/controls
   int totalWidth = settings::environment::kMapWidth + 30;
@@ -47,7 +46,6 @@ void MainWindow::ChangeFriction(int value) {
 
   // Update the QLabel to display the current value
   ui_->frictionLabel->setText(QString::number(friction_coefficient, 'f', 2));  // Display with 2 decimal places
-
 }
 
 MainWindow::~MainWindow() {
