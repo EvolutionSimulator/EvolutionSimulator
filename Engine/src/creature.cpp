@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cassert>
 #include "collisions.h"
+#include <set>
 
 /*!
  * @brief Construct a new Creature object.
@@ -576,6 +577,22 @@ std::vector<Food *> get_food_at_distance(
 }
 
 
+void Creature::SetVision(double radius, double angle)
+{
+  vision_radius_ = radius;
+  vision_angle_ = angle;
+}
+
+double Creature::GetVisionRadius() const
+{
+  return vision_radius_;
+}
+
+double Creature::GetVisionAngle() const
+{
+  return vision_angle_;
+}
+
 /*!
  * @brief Computes the grid cells within a creature's line of sight.
  *
@@ -599,13 +616,14 @@ std::vector<std::pair<int, int>> Creature::GetGridCellsInSight(
     std::vector<std::vector<std::vector<Entity *> > > &grid,
     double GridCellSize) const
 {
+  std::set<std::pair<int, int>> unique_cells;
   std::vector<std::pair<int, int>> cells_in_sight;
 
   int creature_i = static_cast<int>(x_coord_/ GridCellSize);
   int creature_j = static_cast<int>(y_coord_/ GridCellSize);
 
-  double angle_start = acceleration_angle_ - vision_angle_ / 2;
-  double angle_end = acceleration_angle_ + vision_angle_ / 2;
+  double angle_start = orientation_ - vision_angle_ / 2;
+  double angle_end = orientation_ + vision_angle_ / 2;
   double angle_increment = vision_angle_/10;
 
   int grid_width = grid.size();
@@ -618,10 +636,11 @@ std::vector<std::pair<int, int>> Creature::GetGridCellsInSight(
     end_i = std::max(0, std::min(end_i, grid_width - 1));
     end_j = std::max(0, std::min(end_j, grid_height - 1));
 
-    std::vector<std::pair<int, int>> line = BresenhamLine(creature_i, creature_j, end_i, end_j);
-    cells_in_sight.insert(cells_in_sight.end(), line.begin(), line.end());
+    std::vector<std::pair<int, int>> line = SupercoverBresenhamLine(creature_i, creature_j, end_i, end_j);
+    unique_cells.insert(line.begin(), line.end());
   }
 
+  cells_in_sight.assign(unique_cells.begin(), unique_cells.end());
   return cells_in_sight;
 }
 
@@ -663,17 +682,27 @@ std::pair<Meat *, Plant *> Creature::GetClosestFoodInSight(
       Meat *meat = dynamic_cast<Meat *>(entity);
       Plant *plant = dynamic_cast<Plant *>(entity);
 
-      double distance = GetDistance(*entity, settings::environment::kMapWidth,
-                                    settings::environment::kMapHeight);
+      if (meat || plant) {
 
-      if (meat && distance < smallest_distance_meat) {
-        smallest_distance_meat = distance;
-        closest_meat = meat;
-      }
+        double distance = GetDistance(*entity, settings::environment::kMapWidth,
+                                      settings::environment::kMapHeight);
+        double relative_orientation = GetRelativeOrientation(*entity);
 
-      if (plant && distance < smallest_distance_plant) {
-        smallest_distance_plant = distance;
-        closest_plant = plant;
+        bool is_in_field_of_view = relative_orientation >= (orientation_ - vision_angle_ / 2) &&
+                                   relative_orientation <= (orientation_ + vision_angle_ / 2);
+        bool is_within_vision_radius = distance <= vision_radius_;
+
+        if (is_in_field_of_view && is_within_vision_radius) {
+          if (meat && distance < smallest_distance_meat) {
+            smallest_distance_meat = distance;
+            closest_meat = meat;
+          }
+
+          if (plant && distance < smallest_distance_plant) {
+            smallest_distance_plant = distance;
+            closest_plant = plant;
+          }
+        }
       }
     }
   }
