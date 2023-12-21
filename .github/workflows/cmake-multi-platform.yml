@@ -64,7 +64,7 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v3
       with:
-        version: '6'
+        version: '6.6.1'
 
     - name: Install dependencies
       run: sudo apt-get update && sudo apt-get install -y libsfml-dev libudev-dev libopenal-dev libvorbis-dev libflac-dev xorg-dev
