@@ -6,12 +6,13 @@
 #include "environment.h"
 
 class Food : public Entity {
- public:
-  Food();
-  Food(const double x_coord, const double y_coord);
-  Food(const double x_coord, const double y_coord, const double size);
-  Food(const double size);
+ protected:
+  Food(const double nutritional_value);
+  Food(const double x_coord, const double y_coord, const double nutritional_value);
+  Food(const double x_coord, const double y_coord, const double size, const double nutritional_value);
+  Food(const double size, const double nutritional_value);
 
+ public:
   void Eat();
   void SetNutritionalValue(double value);
   double GetNutritionalValue() const;
@@ -26,6 +27,10 @@ class Food : public Entity {
 
 class Plant : public Food {
  public:
+  Plant() : Food(settings::environment::kPlantNutritionalValue){};
+  Plant(const double x_coord, const double y_coord) : Food(x_coord, y_coord, settings::environment::kPlantNutritionalValue){};
+  Plant(const double x_coord, const double y_coord, const double size) : Food(x_coord, y_coord, size, settings::environment::kPlantNutritionalValue){};
+  Plant(const double size) : Food(size, settings::environment::kPlantNutritionalValue){};
   void Grow(double deltaTime);
 
  protected:
@@ -34,6 +39,10 @@ class Plant : public Food {
 
 class Meat : public Food {
  public:
+  Meat() : Food(settings::environment::kMeatNutritionalValue){};
+  Meat(const double x_coord, const double y_coord) : Food(x_coord, y_coord, settings::environment::kMeatNutritionalValue){};
+  Meat(const double x_coord, const double y_coord, const double size) : Food(x_coord, y_coord, size, settings::environment::kMeatNutritionalValue){};
+  Meat(const double size) : Food(size, settings::environment::kMeatNutritionalValue){};
   void Rot();
 };
 
