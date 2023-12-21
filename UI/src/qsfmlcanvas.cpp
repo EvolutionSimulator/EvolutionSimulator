@@ -2,8 +2,14 @@
 #include "config.h"
 
 QSFMLCanvas::QSFMLCanvas(QWidget* Parent) : QWidget(Parent) {
-  setFixedSize(settings::environment::kMapWidth, settings::environment::kMapHeight);
+  float scaleFactor = this->devicePixelRatioF(); // Get the device pixel ratio
 
+  // Scale the map width and height according to the pixel ratio
+  int scaledWidth = static_cast<int>(settings::environment::kMapWidth/scaleFactor);
+  int scaledHeight = static_cast<int>(settings::environment::kMapHeight/scaleFactor);
+
+  // Set the fixed size with the scaled dimensions
+  setFixedSize(scaledWidth, scaledHeight);
 
   // Setup some states to allow direct rendering into the widget
   setAttribute(Qt::WA_PaintOnScreen);

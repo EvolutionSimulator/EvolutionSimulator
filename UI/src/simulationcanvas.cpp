@@ -353,7 +353,15 @@ void SimulationCanvas::DrawCreatureCountOverTime(
 }
 
 void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
-  sf::Vector2f mousePos = mapPixelToCoords(sf::Vector2i(event->pos().x(), event->pos().y()));
+  // Adjust coordinates for screen scaling
+  float scaleFactor = this->devicePixelRatioF(); // Get the device pixel ratio from the QWidget
+
+  // Convert QPoint to sf::Vector2i and adjust for the scaling factor
+  sf::Vector2i scaledPos(static_cast<int>(event->pos().x() * scaleFactor),
+                         static_cast<int>(event->pos().y() * scaleFactor));
+
+  // Map the scaled pixel coordinates to world coordinates
+  sf::Vector2f mousePos = mapPixelToCoords(scaledPos);
 
   for (const auto& creature : simulation_->GetSimulationData()->creatures_) {
     auto [creatureX, creatureY] = creature.GetCoordinates();
