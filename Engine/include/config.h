@@ -33,6 +33,7 @@ constexpr double kHealthToEnergy = 10.0;
 constexpr double kDefaultCreatureDensity = 0.0001;
 constexpr double kPlantNutritionalValue = 2.0;
 constexpr double kMeatNutritionalValue = 3.0;
+constexpr double kPlantProportion = 0.5; /* PlantProportion + MeatProportion = 1 */
 constexpr double kRotFactor = 1.0;
 constexpr double kGridCellSize = 50.0;
 constexpr int kMinCreatureSize = 2;

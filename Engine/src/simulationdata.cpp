@@ -114,12 +114,26 @@ void SimulationData::GenerateMoreFood() {
                       settings::environment::kMapHeight *
                       settings::environment::kMapWidth / 100;
   while (size < max_number) {
-    Food new_food = Food();
-    new_food.RandomInitialization(settings::environment::kMapWidth,
-                                  settings::environment::kMapHeight,
-                                  settings::environment::kMaxFoodSize,
-                                  settings::environment::kMinCreatureSize);
-    food_entities_.emplace_back(new_food);
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<double> dis(0.0, 1.0); // Define a distribution for double values between 0 and 1
+    double randomValue = dis(gen);
+    if (randomValue<settings::environment::kPlantProportion){
+      Food new_food = Plant();
+      new_food.RandomInitialization(settings::environment::kMapWidth,
+                                    settings::environment::kMapHeight,
+                                    settings::environment::kMaxFoodSize,
+                                    settings::environment::kMinCreatureSize);
+      food_entities_.emplace_back(new_food);
+    }
+    else{
+      Food new_food = Meat();
+      new_food.RandomInitialization(settings::environment::kMapWidth,
+                                    settings::environment::kMapHeight,
+                                    settings::environment::kMaxFoodSize,
+                                    settings::environment::kMinCreatureSize);
+      food_entities_.emplace_back(new_food);
+    }
     size++;
   }
 }
@@ -210,7 +224,17 @@ void SimulationData::InitializeFood() {
   for (double x = 0; x < settings::environment::kMapWidth; x += 10.0) {
     for (double y = 0; y < settings::environment::kMapHeight; y += 10.0) {
       if (std::rand() / (RAND_MAX + 1.0) < kFoodDensity) {
-        food_entities_.emplace_back(Food(x, y));
+        // Get a random double between 0 and 1
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_real_distribution<double> dis(0.0, 1.0); // Define a distribution for double values between 0 and 1
+        double randomValue = dis(gen);
+        if (randomValue<settings::environment::kPlantProportion){
+           food_entities_.emplace_back(Plant(x, y));
+        }
+        else{
+           food_entities_.emplace_back(Meat(x, y));
+        }
       }
     }
   }
