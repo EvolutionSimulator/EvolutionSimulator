@@ -60,6 +60,10 @@ class Creature : public MovableEntity {
   double GetAge() const;
   void SetAge(double age);
 
+  void SetVision(double radius, double angle);
+  double GetVisionRadius() const;
+  double GetVisionAngle() const;
+
   void BalanceHealthEnergy();
 
   Food *GetClosestFood(std::vector<std::vector<std::vector<Entity *> > > &grid,
