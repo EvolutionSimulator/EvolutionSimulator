@@ -153,10 +153,13 @@ double MovableEntity::GetEffectiveForwardAcceleration() const {
   double acceleration = GetAcceleration();
   double friction = GetForwardFriction();
   // return the acceleration magnitude using the cosine formula
-  double effective_acceleration = sqrt(pow(acceleration, 2) + pow(friction, 2) -
+  double acceleration_squared = pow(acceleration, 2) + pow(friction, 2) -
                                 2 * acceleration * friction *
-                                    cos(acceleration_angle_ - GetVelocityAngle()));
-  return effective_acceleration;
+                                    cos(acceleration_angle_ - GetVelocityAngle());
+  if (acceleration_squared < 0){
+      return 0;
+  }
+  return sqrt(acceleration_squared);
 }
 
 /*!
