@@ -1,6 +1,9 @@
 #include "collisions.h"
 
 #include <cmath>
+
+#include "config.h"
+#include "geometry_primitives.h"
 /*!
  * @file collision_utils.cpp
  * @brief Collision Detection and Distance Calculation Utilities.
@@ -141,94 +144,24 @@ bool CollisionCircleLine(const double& tolerance,
           radius + tolerance);
 }
 
-/*!
- * @brief Generates a list of grid cells that a line passes through.
- *
- * @details This function implements Bresenham's line algorithm.
- * It calculates the grid cells that a line between two points
- * (x0, y0) and (x1, y1) passes through on a grid.
- *
- * @param x0 The x-coordinate of the starting point of the line.
- * @param y0 The y-coordinate of the starting point of the line.
- * @param x1 The x-coordinate of the ending point of the line.
- * @param y1 The y-coordinate of the ending point of the line.
- *
- * @return A vector of pairs of integers, each representing a grid cell (x, y) that the line intersects.
- */
-std::vector<std::pair<int, int>> BresenhamLine(int x0, int y0, int x1, int y1) {
-  std::vector<std::pair<int, int>> line;
-  bool steep = std::abs(y1 - y0) > std::abs(x1 - x0);
-  if (steep) {
-    std::swap(x0, y0);
-    std::swap(x1, y1);
+bool IsGridCellPotentiallyInsideCone(Point grid_point, double grid_cell_size,
+                                     Point cone_center, double cone_radius,
+                                     OrientedAngle cone_left_boundary,
+                                     OrientedAngle cone_right_boundary) {
+  auto EPS = settings::engine::EPS;
+  double distance = grid_point.dist(cone_center);
+  if (distance < EPS) {
+    return true;
   }
-  if (x0 > x1) {
-    std::swap(x0, x1);
-    std::swap(y0, y1);
+  double max_distance_in_cell = sqrt(2) * grid_cell_size;
+  if (distance > cone_radius + max_distance_in_cell + EPS) {
+    return false;
   }
-
-  const int dx = x1 - x0;
-  const int dy = std::abs(y1 - y0);
-
-  int error = dx / 2;
-  const int ystep = (y0 < y1) ? 1 : -1;
-  int y = y0;
-
-  for (int x = x0; x <= x1; x++) {
-    if (steep) {
-      line.push_back({y, x});
-    } else {
-      line.push_back({x, y});
-    }
-    error -= dy;
-    if (error < 0) {
-      y += ystep;
-      error += dx;
-    }
+  OrientedAngle cell_relative_angle(cone_center, grid_point);
+  double angle_distance = cell_relative_angle.AngleDistanceToCone(
+      cone_left_boundary, cone_right_boundary);
+  if (angle_distance > max_distance_in_cell / distance + EPS) {
+    return false;
   }
-
-  return line;
-}
-
-/*!
- * @brief Generates a supercover of grid cells that a line passes through.
- *
- * @details This function implements a variant of Bresenham's line algorithm.
- * It calculates a supercover of the grid cells that a line between two points
- * (x0, y0) and (x1, y1) passes through on a grid.
- *
- * @param x0 The x-coordinate of the starting point of the line.
- * @param y0 The y-coordinate of the starting point of the line.
- * @param x1 The x-coordinate of the ending point of the line.
- * @param y1 The y-coordinate of the ending point of the line.
- *
- * @return A vector of pairs of integers, each representing a grid cell (x, y) that the line intersects.
- */
-std::vector<std::pair<int, int>> SupercoverBresenhamLine(int x0, int y0, int x1, int y1) {
-  std::vector<std::pair<int, int>> line;
-
-  int dx = x1 - x0;
-  int dy = y1 - y0;
-  int nx = std::abs(dx);
-  int ny = std::abs(dy);
-  int sign_x = dx > 0 ? 1 : -1;
-  int sign_y = dy > 0 ? 1 : -1;
-
-  int x = x0;
-  int y = y0;
-
-  line.push_back({x, y});
-
-  for (int ix = 0, iy = 0; ix < nx || iy < ny;) {
-    if ((0.5 + ix) / nx < (0.5 + iy) / ny) {
-      x += sign_x;
-      ix++;
-    } else {
-      y += sign_y;
-      iy++;
-    }
-    line.push_back({x, y});
-  }
-
-  return line;
+  return true;
 }

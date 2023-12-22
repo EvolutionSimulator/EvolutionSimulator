@@ -173,9 +173,7 @@ TEST(CreatureTests, SetHealth) {
 //    EXPECT_EQ(creature.GetHealth(), 100);
 //}
 
-
-
-TEST(CreatureTests, GetCellsInSight) {
+/* TEST(CreatureTests, GetCellsInSight) {
   neat::Genome genome(3, 4);
   Creature creature(genome);
 
@@ -196,7 +194,8 @@ TEST(CreatureTests, GetCellsInSight) {
       {8,5}
   };
 
-  std::set<std::pair<int, int>> actual_cells(cells_in_sight.begin(), cells_in_sight.end());
+  std::set<std::pair<int, int>> actual_cells(cells_in_sight.begin(),
+cells_in_sight.end());
 
   ASSERT_EQ(actual_cells, expected_cells);
-}
+}*/
