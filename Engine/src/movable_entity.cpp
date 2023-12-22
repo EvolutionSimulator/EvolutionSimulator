@@ -91,7 +91,7 @@ void MovableEntity::SetAccelerationAngle(double angle) {
  * @param rotational_acceleration The new rotational acceleration value.
  */
 void MovableEntity::SetRotationalAcceleration(double rotational_acceleration) {
-  rotational_acceleration = rotational_acceleration;
+  rotational_acceleration_ = rotational_acceleration;
 }
 
 /*!

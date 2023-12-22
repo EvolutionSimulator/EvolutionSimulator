@@ -44,8 +44,8 @@ constexpr int kOutputNeurons = 3;
 constexpr double kMaxNutritionalValue = 5;
 constexpr double kDefaultLifespan = 30;
 constexpr double kPhotosynthesisFactor = 0.1;
-constexpr double kVisionRadius = 40;
-constexpr double kVisionAngle = M_PI/3;
+constexpr double kVisionRadius = 500;
+constexpr double kVisionAngle = M_PI / 3;
 constexpr double kFrictionalCoefficient =
     0.5;  // 0.5 seems to provide a good balance at the beginning  then goes to
           // shit
@@ -53,7 +53,9 @@ constexpr double kFrictionalCoefficient =
 
 namespace engine {
 constexpr double kFixedUpdateInterval = 0.05;
-}
+constexpr double EPS = 1e-7;
+constexpr size_t kMaxCellsToFindFood = 30;
+}  // namespace engine
 }  // namespace settings
 
 #endif  // CONFIG_H

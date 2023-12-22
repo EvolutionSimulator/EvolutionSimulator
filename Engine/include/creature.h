@@ -42,7 +42,7 @@ class Creature : public MovableEntity {
   void SetEnergy(double energy);
   neat::Genome GetGenome();
   void Update(double deltaTime, double const kMapWidth, double const kMapHeight,
-              std::vector<std::vector<std::vector<Entity *> > > &grid,
+              std::vector<std::vector<std::vector<Entity *>>> &grid,
               double GridCellSize);
 
   double GetHealth() const;
@@ -66,11 +66,11 @@ class Creature : public MovableEntity {
 
   void BalanceHealthEnergy();
 
-  Food *GetClosestFood(std::vector<std::vector<std::vector<Entity *> > > &grid,
+  Food *GetClosestFood(std::vector<std::vector<std::vector<Entity *>>> &grid,
                        double GridCellSize) const;
-  std::pair<Meat *, Plant *> GetClosestFoodInSight(
+  Food *GetClosestFoodInSight(
       std::vector<std::vector<std::vector<Entity *>>> &grid,
-      double GridCellSize) const;
+      double grid_cell_size) const;
 
   void SetGrowthFactor(double growth_factor);
   double GetGrowthFactor();
@@ -78,15 +78,10 @@ class Creature : public MovableEntity {
   double GetMaxSize();
 
   void Grow(double energy);
-  void Think(std::vector<std::vector<std::vector<Entity *> > > &grid,
+  void Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
              double GridCellSize);
-  void ProcessVisionFood(
-      std::vector<std::vector<std::vector<Entity *> > > &grid,
-      double GridCellSize);
-
-  std::vector<std::pair<int, int>> GetGridCellsInSight(
-      std::vector<std::vector<std::vector<Entity *> > > &grid,
-      double GridCellSize) const;
+  void ProcessVisionFood(std::vector<std::vector<std::vector<Entity *>>> &grid,
+                         double grid_cell_size);
 
   int GetGeneration() const;
   void SetGeneration(int generation);
@@ -113,12 +108,13 @@ class Creature : public MovableEntity {
   int generation_ = 0;           /*!< Generation count of the creature. */
   double reproduction_cooldown_; /*!< Cooldown period before the creature can
                                     reproduce again. */
-  double vision_radius_; /*!< The radius within which the creature can detect other entities. */
-  double vision_angle_; /*!< The angle of vision for the creature, representing the field of view. */
-
+  double vision_radius_; /*!< The radius within which the creature can detect
+                            other entities. */
+  double vision_angle_;  /*!< The angle of vision for the creature, representing
+                            the field of view. */
 };
 
 std::vector<Food *> get_food_at_distance(
-    std::vector<std::vector<std::vector<Entity *> > > &grid, int i_creature,
+    std::vector<std::vector<std::vector<Entity *>>> &grid, int i_creature,
     int j_creature, int grid_distance);
 #endif  // CREATURE_HPP
