@@ -89,6 +89,7 @@ class Creature : public MovableEntity {
   double max_energy_ =
       300; /*!< The maximum energy level the creature can attain. */
   double max_size_ = 10;      /*!< The maximum size the creature can grow to. */
+  double max_force_ = 10;
   neat::NeuralNetwork brain_; /*!< Neural network for processing environmental
                                  stimuli and decision making. */
   neat::Genome genome_;       /*!< Genetic makeup of the creature. */
