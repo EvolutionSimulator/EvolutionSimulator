@@ -102,6 +102,13 @@ void SimulationData::UpdateAllCreatures(double deltaTime) {
       reproduce_.push(creature);
     }
   }
+  world_time_ += deltaTime;
+
+  // Store the creature count when the time increases by a second
+  if (static_cast<int>(world_time_) > static_cast<int>(lastRecordedTime_)) {
+    lastRecordedTime_ = world_time_;
+    creatureCountOverTime_.push_back(creatures_.size());
+  }
 }
 
 /*!
@@ -374,4 +381,8 @@ void SimulationData::CheckCollisions() {
       }
     }
   }
+}
+
+std::vector<int> SimulationData::GetCreatureCountOverTime() const {
+  return creatureCountOverTime_;
 }

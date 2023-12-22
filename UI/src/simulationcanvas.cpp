@@ -13,6 +13,10 @@
 #include <iostream>
 #include <sstream>
 
+sf::RenderWindow& SimulationCanvas::GetRenderWindow() {
+    return renderWindow_; // Use the correct member variable name
+}
+
 SimulationCanvas::SimulationCanvas(QWidget* Parent)
     : QSFMLCanvas(Parent), showInfoPanel(false) {
   render_lambda_ = [this](SimulationData* data) {

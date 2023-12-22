@@ -3,6 +3,7 @@
 #include <QMainWindow>
 #include <thread>
 
+#include "QtCharts/qlineseries.h"
 #include "engine.h"
 
 QT_BEGIN_NAMESPACE  //
@@ -28,7 +29,7 @@ QT_END_NAMESPACE  //
   void PauseSimulation();
   void RestartSimulation();
   void DisplayGraph();
-  void GraphExampleFunction();
+  void DrawCreaturesOverTimeGraph();
 
  private:
   double creature_density = 0.001;
@@ -38,4 +39,8 @@ QT_END_NAMESPACE  //
   Engine* engine_;  // Pointer to the simulation engine
 
   std::thread engine_thread_;  // Thread for running the simulation engine
+
+  double lastRecordedTime_;
+  QTimer *updateTimer;
+
 };

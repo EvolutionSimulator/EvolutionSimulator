@@ -11,6 +11,9 @@ class SimulationCanvas : public QSFMLCanvas {
   Q_OBJECT
 
  public:
+
+  sf::RenderWindow& GetRenderWindow();
+
   SimulationCanvas(QWidget* Parent);
 
   void SetSimulation(Simulation* simulation);
@@ -29,6 +32,8 @@ class SimulationCanvas : public QSFMLCanvas {
  private:
   virtual void OnInit() override;
   virtual void OnUpdate() override;
+
+  sf::RenderWindow renderWindow_;
 
   sf::Font font_;
 
