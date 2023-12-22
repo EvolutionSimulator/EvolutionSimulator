@@ -2,8 +2,11 @@
 
 #include <algorithm>
 #include <cassert>
-#include "collisions.h"
+#include <queue>
 #include <set>
+
+#include "collisions.h"
+#include "config.h"
 
 /*!
  * @brief Construct a new Creature object.
@@ -37,7 +40,7 @@ Creature::Creature(neat::Genome genome)
       reproduction_cooldown_(settings::environment::kReproductionCooldown),
       age_(0),
       vision_radius_(settings::environment::kVisionRadius),
-      vision_angle_(settings::environment::kVisionAngle){}
+      vision_angle_(settings::environment::kVisionAngle) {}
 
 /*!
  * @brief Retrieves the generation of the creature.
@@ -400,15 +403,15 @@ void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
 void Creature::ProcessVisionFood(
     std::vector<std::vector<std::vector<Entity *>>> &grid,
     double GridCellSize) {
-  Food *food = this->GetClosestFood(grid, GridCellSize);
-  if (food == nullptr) { //temporary fix that shouldn't be necessary after the new vision system is implemented
-      distance_food_ = 1000;
-      orientation_food_ = 0;
-      return;
+  Food *food = GetClosestFoodInSight(grid, GridCellSize);
+  if (food) {
+    distance_food_ = this->GetDistance(*food, settings::environment::kMapWidth,
+                                       settings::environment::kMapHeight);
+    orientation_food_ = this->GetRelativeOrientation(*food);
+  } else {
+    distance_food_ = 0;
+    orientation_food_ = 0;
   }
-  distance_food_ = this->GetDistance(*food, settings::environment::kMapWidth,
-                                     settings::environment::kMapHeight);
-  orientation_food_ = this->GetRelativeOrientation(*food);
 }
 
 /*!
@@ -582,136 +585,109 @@ std::vector<Food *> get_food_at_distance(
   return food;
 }
 
-
-void Creature::SetVision(double radius, double angle)
-{
+void Creature::SetVision(double radius, double angle) {
   vision_radius_ = radius;
   vision_angle_ = angle;
 }
 
-double Creature::GetVisionRadius() const
-{
-  return vision_radius_;
-}
+double Creature::GetVisionRadius() const { return vision_radius_; }
 
-double Creature::GetVisionAngle() const
-{
-  return vision_angle_;
-}
+double Creature::GetVisionAngle() const { return vision_angle_; }
 
 /*!
- * @brief Computes the grid cells within a creature's line of sight.
+ * @brief Finds the closest meat and plant entities within the creature's line
+ * of sight.
  *
- * @details This function determines the grid cells that fall within
- * the line of sight of a creature located at a specific point on a grid.
- * It uses the BresenhamLine algorithm to compute the line of sight for
- * various angles within the creature's vision range. The function accounts
- * for the creature's vision radius and angle.
- *
- * @param grid_width The width of the grid.
- * @param grid_height The height of the grid.
- * @param coordinates_creature A pair of doubles representing the X and Y coordinates of the creature.
- * @param vision_radius The radius within which the creature can perceive its environment.
- * @param vision_angle The angle representing the creature's field of view.
- * @param facing_direction The direction in which the creature is facing.
- * @param GridCellSize The size of each cell in the grid.
- *
- * @return A vector of pairs of integers, each representing a grid cell (i, j) that falls within the creature's field of view.
- */
-std::vector<std::pair<int, int>> Creature::GetGridCellsInSight(
-    std::vector<std::vector<std::vector<Entity *> > > &grid,
-    double GridCellSize) const
-{
-  std::set<std::pair<int, int>> unique_cells;
-  std::vector<std::pair<int, int>> cells_in_sight;
-
-  int creature_i = static_cast<int>(x_coord_/ GridCellSize);
-  int creature_j = static_cast<int>(y_coord_/ GridCellSize);
-
-  double angle_start = orientation_ - vision_angle_ / 2;
-  double angle_end = orientation_ + vision_angle_ / 2;
-  double angle_increment = vision_angle_/10;
-
-  int grid_width = grid.size();
-  int grid_height = grid[0].size();
-
-  for (double angle = angle_start; angle <= angle_end; angle += angle_increment) {
-    int end_i = creature_i + static_cast<int>(vision_radius_ * cos(angle) / GridCellSize);
-    int end_j = creature_j + static_cast<int>(vision_radius_ * sin(angle) / GridCellSize);
-
-    end_i = std::max(0, std::min(end_i, grid_width - 1));
-    end_j = std::max(0, std::min(end_j, grid_height - 1));
-
-    std::vector<std::pair<int, int>> line = SupercoverBresenhamLine(creature_i, creature_j, end_i, end_j);
-    unique_cells.insert(line.begin(), line.end());
-  }
-
-  cells_in_sight.assign(unique_cells.begin(), unique_cells.end());
-  return cells_in_sight;
-}
-
-
-/*!
- * @brief Finds the closest meat and plant entities within the creature's line of sight.
- *
- * @details Uses the GetGridCellsInSight function to determine the grid cells within
- * the creature's field of view. Scans these cells for meat and plant entities and
- * returns pointers to the closest of each. If no meat or plant is found within the
- * line of sight, the respective pointer in the pair is set to nullptr.
+ * @details Uses the GetGridCellsInSight function to determine the grid cells
+ * within the creature's field of view. Scans these cells for meat and plant
+ * entities and returns pointers to the closest of each. If no meat or plant is
+ * found within the line of sight, the respective pointer in the pair is set to
+ * nullptr.
  *
  * @param grid The environmental grid.
  * @param GridCellSize Size of each cell in the grid.
  *
- * @return A pair of pointers, the first to the closest meat entity and the second to
- * the closest plant entity within the line of sight. If none is found, the respective
- * pointer is nullptr.
+ * @return A pair of pointers, the first to the closest meat entity and the
+ * second to the closest plant entity within the line of sight. If none is
+ * found, the respective pointer is nullptr.
  */
 
-std::pair<Meat *, Plant *> Creature::GetClosestFoodInSight(
+Food *Creature::GetClosestFoodInSight(
     std::vector<std::vector<std::vector<Entity *>>> &grid,
-    double GridCellSize) const {
+    double grid_cell_size) const {
+  int grid_width = grid.size();
+  int grid_height = grid[0].size();
 
-  auto cells_in_sight = GetGridCellsInSight(grid, GridCellSize);
+  int x_grid = static_cast<int>(x_coord_ / grid_cell_size);
+  int y_grid = static_cast<int>(y_coord_ / grid_cell_size);
 
-  Meat *closest_meat = nullptr;
-  Plant *closest_plant = nullptr;
-  double smallest_distance_meat = std::numeric_limits<double>::max();
-  double smallest_distance_plant = std::numeric_limits<double>::max();
+  auto cone_center = Point(x_coord_, y_coord_);
+  auto cone_orientation = GetOrientation();
+  auto cone_left_boundary = OrientedAngle(cone_orientation - vision_angle_ / 2);
+  auto cone_right_boundary =
+      OrientedAngle(cone_orientation + vision_angle_ / 2);
 
-  for (const auto &cell : cells_in_sight) {
-    int i = cell.first;
-    int j = cell.second;
+  Food *closest_food = nullptr;
+  double smallest_distance_food = std::numeric_limits<double>::max();
 
-    if (i < 0 || i >= grid.size() || j < 0 || j >= grid[i].size()) continue;
+  std::queue<std::pair<int, int>> cells_queue;
+  std::set<std::pair<int, int>> visited_cells;
 
-    for (Entity *entity : grid[i][j]) {
-      Meat *meat = dynamic_cast<Meat *>(entity);
-      Plant *plant = dynamic_cast<Plant *>(entity);
+  cells_queue.push({x_grid, y_grid});
+  visited_cells.insert({x_grid, y_grid});
 
-      if (meat || plant) {
+  size_t processed_cells = 0;
 
-        double distance = GetDistance(*entity, settings::environment::kMapWidth,
-                                      settings::environment::kMapHeight);
-        double relative_orientation = GetRelativeOrientation(*entity);
+  while (!cells_queue.empty()) {
+    auto [x, y] = cells_queue.front();
+    cells_queue.pop();
+    ++processed_cells;
 
-        bool is_in_field_of_view = relative_orientation >= (orientation_ - vision_angle_ / 2) &&
-                                   relative_orientation <= (orientation_ + vision_angle_ / 2);
-        bool is_within_vision_radius = distance <= vision_radius_;
+    for (Entity *entity : grid[x][y]) {
+      Food *food = dynamic_cast<Food *>(entity);
+
+      if (food) {
+        auto food_point = Point(entity->GetCoordinates());
+
+        auto food_direction = OrientedAngle(cone_center, food_point);
+
+        bool is_in_field_of_view = food_direction.IsInsideCone(
+            cone_left_boundary, cone_right_boundary);
+
+        double distance = food_point.dist(cone_center);
+
+        bool is_within_vision_radius =
+            distance <= vision_radius_ + settings::engine::EPS;
 
         if (is_in_field_of_view && is_within_vision_radius) {
-          if (meat && distance < smallest_distance_meat) {
-            smallest_distance_meat = distance;
-            closest_meat = meat;
+          if (distance < smallest_distance_food) {
+            smallest_distance_food = distance;
+            closest_food = food;
+            break;
           }
-
-          if (plant && distance < smallest_distance_plant) {
-            smallest_distance_plant = distance;
-            closest_plant = plant;
+        }
+      }
+    }
+    if (closest_food ||
+        processed_cells > settings::engine::kMaxCellsToFindFood) {
+      break;
+    }
+    for (int dx = -1; dx <= 1; ++dx) {
+      for (int dy = -1; dy <= 1; ++dy) {
+        if (dx * dx + dy * dy != 1) continue;
+        int nx = x + dx, ny = y + dy;
+        if (0 <= nx && nx < grid_width && 0 <= ny && ny < grid_height &&
+            !visited_cells.count({nx, ny})) {
+          if (IsGridCellPotentiallyInsideCone(
+                  Point(nx * grid_cell_size, ny * grid_cell_size),
+                  grid_cell_size, cone_center, vision_radius_,
+                  cone_left_boundary, cone_right_boundary)) {
+            visited_cells.insert({nx, ny});
+            cells_queue.push({nx, ny});
           }
         }
       }
     }
   }
-
-  return {closest_meat, closest_plant};
+  return closest_food;
 }

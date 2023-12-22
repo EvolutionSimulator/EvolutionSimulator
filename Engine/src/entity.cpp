@@ -6,6 +6,7 @@
 #include <stdexcept>
 
 #include "environment.h"
+#include "geometry_primitives.h"
 
 int Entity::next_id_ = 0;
 
@@ -24,7 +25,12 @@ Entity::Entity() : x_coord_(0.0), y_coord_(0.0), size_(0.0), state_(Alive), id_(
  * @param size Size of the entity.
  */
 Entity::Entity(const double x_coord, const double y_coord, const double size)
-    : x_coord_(x_coord), y_coord_(y_coord), size_(size), state_(Alive), id_(next_id_++) {}
+    : x_coord_(x_coord),
+      y_coord_(y_coord),
+      size_(size),
+      orientation_(0),
+      state_(Alive),
+      id_(next_id_++) {}
 
 /*!
  * @brief Constructor to initialize an Entity with a specified size at the
@@ -32,7 +38,12 @@ Entity::Entity(const double x_coord, const double y_coord, const double size)
  * @param size Size of the entity.
  */
 Entity::Entity(const double size)
-    : x_coord_(0.0), y_coord_(0.0), size_(size), state_(Alive), id_(next_id_++) {}
+    : x_coord_(0.0),
+      y_coord_(0.0),
+      size_(size),
+      orientation_(0),
+      state_(Alive),
+      id_(next_id_++) {}
 
 /*!
  * @brief Destructor sets the state of the entity to Dead.
@@ -155,11 +166,11 @@ double Entity::GetDistance(const Entity &other_entity, const double kMapWidth,
  * @return The relative orientation angle in radians.
  */
 double Entity::GetRelativeOrientation(const Entity &other_entity) const {
-  std::pair<double, double> other_coordinates = other_entity.GetCoordinates();
   // assumes orientation = 0 is the x axis
-  double angle = std::atan((y_coord_ - other_coordinates.second) /
-                           (x_coord_ - other_coordinates.first));
-  return angle - orientation_;
+  return (OrientedAngle(Point(GetCoordinates()),
+                        Point(other_entity.GetCoordinates())) -
+          OrientedAngle(orientation_))
+      .GetAngle();
 }
 
 /*!
