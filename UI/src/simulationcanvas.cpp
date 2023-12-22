@@ -13,11 +13,12 @@
 #include <iostream>
 #include <sstream>
 
-SimulationCanvas::SimulationCanvas(QWidget *Parent)
-    : QSFMLCanvas(Parent)
-    , showInfoPanel(false)
-{
-    render_lambda_ = [this](SimulationData *data) { this->RenderSimulation(data); };
+
+SimulationCanvas::SimulationCanvas(QWidget* Parent)
+    : QSFMLCanvas(Parent), showInfoPanel(false) {
+  render_lambda_ = [this](SimulationData* data) {
+    this->RenderSimulation(data);
+  };
 
 
 

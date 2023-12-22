@@ -44,6 +44,8 @@ class SimulationCanvas : public QSFMLCanvas {
   std::optional<CreatureInfo> selectedCreatureInfo;
 
 
+  sf::RenderWindow renderWindow_;
+
   sf::Font font_;
 
   bool showInfoPanel;

@@ -112,8 +112,8 @@
    <widget class="QSlider" name="frictionCoefficientSpinBox">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>450</y>
+      <x>10</x>
+      <y>520</y>
       <width>160</width>
       <height>25</height>
      </rect>
@@ -131,8 +131,8 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>470</y>
+      <x>60</x>
+      <y>540</y>
       <width>91</width>
       <height>16</height>
      </rect>
@@ -145,7 +145,7 @@
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>450</y>
+      <y>530</y>
       <width>58</width>
       <height>16</height>
      </rect>

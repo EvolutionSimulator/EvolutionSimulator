@@ -11,7 +11,7 @@
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), ui_(new Ui::MainWindow), friction_coefficient(0.0) {
+    : QMainWindow(parent), ui_(new Ui::MainWindow), friction_coefficient(0.0), lastRecordedTime_(0.0) {
   ui_->setupUi(this);
   // Calculate total size needed for the window based on canvas size and additional widgets/controls
   int totalWidth = settings::environment::kMapWidth + 30;
@@ -33,7 +33,10 @@ MainWindow::MainWindow(QWidget *parent)
   connect(ui_->restartButton, &QPushButton::clicked, this,
           &MainWindow::RestartSimulation);
   connect(ui_->graphButton, &QPushButton::clicked, this,
-          &MainWindow::DisplayGraph);
+          &MainWindow::DrawCreaturesOverTimeGraph);
+  updateTimer = new QTimer(this);
+  connect(updateTimer, SIGNAL(timeout()), this, SLOT(recordCreatureCount()));
+  updateTimer->start(1000);  // Set the interval to 1000 milliseconds (1 second)
   connect(ui_->frictionCoefficientSpinBox, SIGNAL(valueChanged(double)), this,
           SLOT(ChangeFrictionCoefficient(double)));
   connect(ui_->frictionCoefficientSpinBox, &QSlider::valueChanged, this, &MainWindow::ChangeFriction);

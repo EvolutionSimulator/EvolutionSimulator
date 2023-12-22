@@ -29,7 +29,6 @@ QT_END_NAMESPACE  //
   void ToggleSimulation();
   void RestartSimulation();
   void DisplayGraph();
-  void GraphExampleFunction();
   void ChangeFriction(int value);
   void DrawCreaturesOverTimeGraph();
 
