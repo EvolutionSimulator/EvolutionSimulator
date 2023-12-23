@@ -22,26 +22,33 @@ NeuralNetwork::NeuralNetwork(const Genome &genom) {
   std::vector<std::vector<Neuron> > layers = get_layers(genom);
   // std::vector<Neuron> neurons = genom.GetNeurons();
   std::vector<FeedForwardNeuron> ffneurons;
-  std::vector<int> input_ids;
+  // std::vector<int> input_ids;
   for (const Neuron &neuron : layers.front()) {
-    input_ids.push_back(neuron.GetId());
+    input_ids_.push_back(neuron.GetId());
   }
-  input_ids_ = input_ids;
-  std::vector<int> output_ids;
+  // input_ids_ = input_ids;
+  // std::vector<int> output_ids;
   for (const Neuron &neuron : layers.back()) {
-    output_ids.push_back(neuron.GetId());
+    output_ids_.push_back(neuron.GetId());
   }
-  output_ids_ = output_ids;
+  // output_ids_ = output_ids;
+
   for (const std::vector<Neuron> &layer : layers) {
     for (const Neuron &neuron : layer) {
       std::vector<NeuronInput> inputs;
+      std::vector<NeuronInput> inputs_from_cycles;
       for (const Link &link : genom.GetLinks()) {
         if (link.GetOutId() == neuron.GetId()) {
           NeuronInput input = {link.GetInId(), link.GetWeight()};
-          inputs.push_back(input);
+          if (link.IsCyclic()) {
+            inputs_from_cycles.push_back(input);
+          } else {
+            inputs.push_back(input);
+          }
         }
       }
-      FeedForwardNeuron ffneuron = {neuron.GetId(), neuron.GetBias(), inputs};
+      FeedForwardNeuron ffneuron = {neuron.GetId(), neuron.GetBias(), 0.0,
+                                    inputs, inputs_from_cycles};
       ffneurons.push_back(ffneuron);
     }
   }
@@ -66,7 +73,7 @@ std::vector<double> NeuralNetwork::Activate(
   for (const FeedForwardNeuron &ffneuron : ffneurons_) {
     if (values.find(ffneuron.id) ==
         values.end()) {  // if ffneuron is not already activated
-      double value = 0;
+      double value = ffneuron.value;
       for (const NeuronInput &input : ffneuron.inputs) {
         // assert(values.find(input.input_id) != values.end()); //previous
         // neurons have to be activated
@@ -82,6 +89,14 @@ std::vector<double> NeuralNetwork::Activate(
       }
 
       values[ffneuron.id] = value;
+    }
+  }
+
+  // update values of ffneurons which are at the end of a cycle
+  for (const FeedForwardNeuron &ffneuron : ffneurons_) {
+    ffneuron.value = 0;
+    for (const NeuronInput &neuron_input : ffneuron.inputs_from_cycles) {
+      ffneuron.value += neuron_input.weight * values[neuron_input.input_id];
     }
   }
   std::vector<double> result;
@@ -133,7 +148,8 @@ std::vector<std::vector<Neuron> > get_layers(const Genome &genom) {
               active.end()) {
         bool is_active = true;
         for (const Link &link : links) {
-          if (link.IsActive() && link.GetOutId() == neuron.GetId() &&
+          if (link.IsActive() && !link.IsCyclic() &&
+              link.GetOutId() == neuron.GetId() &&
               std::find(active.begin(), active.end(), link.GetInId()) ==
                   active.end()) {
             is_active = false;

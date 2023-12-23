@@ -30,12 +30,17 @@ struct NeuronInput {
  * constructed from a NEAT genome. It includes the neuron's ID, its bias, and
  * its input connections.
  */
-struct FeedForwardNeuron {  // Functional units of the NeuralNetowork, obtained
-                            // from Neurons and Links
-  int id;                   /*!< The ID of the neuron. */
-  double bias;              /*!< The bias of the neuron. */
+struct FeedForwardNeuron {
+  int id;       /*!< The ID of the neuron. */
+  double bias;  /*!< The bias of the neuron. */
+  double value; /*!< The value of the neuron. Important for the neurons which
+                   are at the end of a cycle.*/
   std::vector<NeuronInput> inputs; /*!< A vector of NeuronInput representing the
                                       inputs to this neuron. */
+  std::vector<NeuronInput>
+      inputs_from_cycles; /*!< A vector of NeuronInput representing the
+                 inputs from the previous neurons in the cycles. Note that one
+                 neuron can be at the ends of multiple cycles*/
 };
 
 /*!
