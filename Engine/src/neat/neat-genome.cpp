@@ -390,6 +390,10 @@ bool Genome::DFS(const Neuron& currentNeuron, std::unordered_set<int>& visited,
   visiting.insert(currentId);
 
   for (const auto& link : links_) {
+    if (link.IsCyclic()) {
+      continue;
+    }
+    //link is not cyclic
     if (link.GetInId() == currentId) {
       int neighborId = link.GetOutId();
       auto neighborIt = std::find_if(
@@ -427,8 +431,9 @@ bool Genome::DetectLoops(const Neuron& startNeuron) {
 /*!
  * @brief Mutates the Genome by adding a new link between neurons.
  *
- * @details Adds a new link between two randomly chosen neurons, ensuring no
- * cycles are formed.
+ * @details Adds a new link between two randomly chosen neurons.
+ * If this creates a cycle, the added link is characterized as cyclic
+ * and its parameter cyclic_ is set to true.
  */
 void Genome::MutateAddLink() {
   std::random_device rd;
@@ -452,9 +457,9 @@ void Genome::MutateAddLink() {
 
   // Check if cycle exists:
   AddLink(Link(n1, n2, 1));
-  Link newl = links_.back();
   if (DetectLoops(neurons_[indexRandomNeuron1])) {
-    RemoveLink(newl.GetId());
+    //RemoveLink(newl.GetId());
+    links_.back().SetCyclic();
     return;
   }
 }
@@ -463,7 +468,9 @@ void Genome::MutateAddLink() {
  * @brief Mutates the Genome by adding a new neuron.
  *
  * @details Adds a new neuron by splitting an existing link and connecting the
- * new neuron in between.
+ * new neuron in between. It never splits a cyclic link, it chooses a random
+ * link until it gets a non-cyclic one. Since most links are non-cyclic, this is
+ * ok.
  */
 void Genome::MutateAddNeuron() {
   if (links_.size() == 0) {
@@ -474,6 +481,11 @@ void Genome::MutateAddNeuron() {
   std::uniform_int_distribution<size_t> dist(0, links_.size() - 1);
   size_t randIndex = dist(gen);
   Link RandomLink = links_[randIndex];
+  while (RandomLink.IsCyclic()) {
+    std::mt19937 gen(rd());
+    randIndex = dist(gen);
+    RandomLink = links_[randIndex];
+  }
   DisableLink(RandomLink.GetId());  // test
 
   AddNeuron(Neuron(NeuronType::kHidden, 0.0));
