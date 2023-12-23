@@ -5,6 +5,7 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QUuid>
+#include "creaturetracker.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/Text.hpp>
@@ -12,49 +13,55 @@
 #include <iostream>
 #include <sstream>
 
-SimulationCanvas::SimulationCanvas(QWidget* Parent)
-    : QSFMLCanvas(Parent), showInfoPanel(false) {
-  render_lambda_ = [this](SimulationData* data) {
-    this->RenderSimulation(data);
-  };
+SimulationCanvas::SimulationCanvas(QWidget *Parent)
+    : QSFMLCanvas(Parent)
+    , showInfoPanel(false)
+{
+    render_lambda_ = [this](SimulationData *data) { this->RenderSimulation(data); };
 
-  QFile resourceFile(":/font.ttf");
-  if (!resourceFile.open(QIODevice::ReadOnly)) {
-    qDebug() << "Failed to open font resource!";
-    return;
-  }
-
-  // Generate a unique temporary filename
-  QString tempFileName = "temp_font_" +
-                         QUuid::createUuid().toString(QUuid::WithoutBraces) +
-                         ".ttf";
-  QString tempFilePath = QDir::temp().absoluteFilePath(tempFileName);
-  qDebug() << "Temporary file path:" << tempFilePath;
-
-  QFile tempFile(tempFilePath);
-  if (tempFile.exists()) {
-    qDebug() << "Temporary file already exists. Deleting...";
-    if (!tempFile.remove()) {
-      qDebug() << "Failed to remove existing temporary file.";
-      return;
+    QFile resourceFile(":/font.ttf");
+    if (!resourceFile.open(QIODevice::ReadOnly)) {
+        qDebug() << "Failed to open font resource!";
+        return;
     }
-  }
 
-  if (!resourceFile.copy(tempFilePath)) {
-    qDebug() << "Failed to copy font to temporary file!";
-    qDebug() << "Error:" << resourceFile.errorString();
-    return;
-  }
-  resourceFile.close();
+    // Generate a unique temporary filename
+    QString tempFileName = "temp_font_" + QUuid::createUuid().toString(QUuid::WithoutBraces)
+                           + ".ttf";
+    QString tempFilePath = QDir::temp().absoluteFilePath(tempFileName);
+    qDebug() << "Temporary file path:" << tempFilePath;
 
-  if (!font_.loadFromFile(tempFilePath.toStdString())) {
-    qDebug() << "Failed to load font from file!";
+    QFile tempFile(tempFilePath);
+    if (tempFile.exists()) {
+        qDebug() << "Temporary file already exists. Deleting...";
+        if (!tempFile.remove()) {
+            qDebug() << "Failed to remove existing temporary file.";
+            return;
+        }
+    }
+
+    if (!resourceFile.copy(tempFilePath)) {
+        qDebug() << "Failed to copy font to temporary file!";
+        qDebug() << "Error:" << resourceFile.errorString();
+        return;
+    }
+    resourceFile.close();
+
+    if (!font_.loadFromFile(tempFilePath.toStdString())) {
+        qDebug() << "Failed to load font from file!";
+        QFile::remove(tempFilePath);
+        return;
+    }
+
+    trackButton_.setSize(sf::Vector2f(100, 30));         // Example size
+    trackButton_.setFillColor(sf::Color(100, 100, 200)); // Example color
+    trackButtonText_.setFont(font_);                     // Assuming you've already loaded a font
+    trackButtonText_.setString("Track");
+    trackButtonText_.setCharacterSize(15);
+    trackButtonText_.setFillColor(sf::Color::White);
+
+    // Clean up the temporary file after use
     QFile::remove(tempFilePath);
-    return;
-  }
-
-  // Clean up the temporary file after use
-  QFile::remove(tempFilePath);
 }
 
 void SimulationCanvas::SetSimulation(Simulation* simulation) {
@@ -64,12 +71,15 @@ void SimulationCanvas::SetSimulation(Simulation* simulation) {
 Simulation* SimulationCanvas::GetSimulation() { return simulation_; }
 
 // called when the widget is first rendered
-void SimulationCanvas::OnInit() { clear(sf::Color(0, 255, 0)); }
+void SimulationCanvas::OnInit()
+{
+  clear(sf::Color(0, 255, 0));
+}
 
-void SimulationCanvas::OnUpdate() {
+void SimulationCanvas::OnUpdate()
+{
   simulation_->ProcessData(render_lambda_);
   RenderSimulation(simulation_->GetSimulationData());
-
 
   // Check if a creature is selected and draw the red border if true
   if (showInfoPanel && selectedCreatureInfo) {
@@ -82,6 +92,15 @@ void SimulationCanvas::OnUpdate() {
     panel.setFillColor(sf::Color(50, 50, 20, 205));  // Semi-transparent
     panel.setPosition(panelPosition);
     draw(panel);
+
+    trackButton_.setPosition(panelPosition.x + 10, panelPosition.y + panelSize.y - 40);
+    trackButtonText_.setPosition(trackButton_.getPosition().x + 10, trackButton_.getPosition().y + 5);
+
+    // Draw the track button
+
+    draw(trackButton_);
+    draw(trackButtonText_);
+
 
     const auto& creatures = simulation_->GetSimulationData()->creatures_;
     auto creature_it = std::find_if(creatures.begin(), creatures.end(),
@@ -363,25 +382,47 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
   // Map the scaled pixel coordinates to world coordinates
   sf::Vector2f mousePos = mapPixelToCoords(scaledPos);
 
+  qDebug() << "Mouse Pressed at: " << mousePos.x << ", " << mousePos.y;
+
+  if (showInfoPanel) {
+    auto bounds = trackButton_.getGlobalBounds();
+    qDebug() << "Track Button Bounds: " << bounds.left << ", " << bounds.top << ", " << bounds.width << ", " << bounds.height;
+  }
+
+  if (showInfoPanel && trackButton_.getGlobalBounds().contains(mousePos)) {
+    qDebug() << "Track Button Clicked";
+    if (selectedCreatureInfo) {
+      const auto& creatures = simulation_->GetSimulationData()->creatures_;
+      auto it = std::find_if(creatures.begin(), creatures.end(), [this](const Creature& c) {
+          return c.GetID() == selectedCreatureInfo->id;
+      });
+
+      if (it != creatures.end()) {
+          const Creature& selectedCreature = *it;
+          CreatureTracker tracker(selectedCreature);
+          tracker.Show();
+      }
+    }
+  }
+
   for (const auto& creature : simulation_->GetSimulationData()->creatures_) {
     auto [creatureX, creatureY] = creature.GetCoordinates();
     float creatureSize = creature.GetSize();
     sf::Vector2f creaturePos(creatureX, creatureY);
+
     if (sqrt(pow(mousePos.x - creaturePos.x, 2) + pow(mousePos.y - creaturePos.y, 2)) <= creatureSize) {
+      qDebug() << "Creature Clicked: ID" << creature.GetID();
       showInfoPanel = true;
-      selectedCreatureInfo = CreatureInfo{
-          creature.GetID(),              // Store the ID
-          creatureX,                     // X coordinate
-          creatureY,                     // Y coordinate
-          creatureSize                   // Size
-      };
-      // No need to set creatureInfo here, it will be set in OnUpdate.
+      selectedCreatureInfo = CreatureInfo{creature.GetID(), creatureX, creatureY, creatureSize};
       repaint();
       return;
     }
   }
+
+  qDebug() << "Click Outside, closing panel";
   showInfoPanel = false;
   selectedCreatureInfo.reset();
+  repaint();
 }
 
 

@@ -11,6 +11,7 @@ QSFMLCanvas::QSFMLCanvas(QWidget* Parent) : QWidget(Parent) {
   // Set the fixed size with the scaled dimensions
   setFixedSize(scaledWidth, scaledHeight);
 
+
   // Setup some states to allow direct rendering into the widget
   setAttribute(Qt::WA_PaintOnScreen);
   setAttribute(Qt::WA_OpaquePaintEvent);
