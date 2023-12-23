@@ -28,7 +28,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>360</y>
+      <y>490</y>
       <width>80</width>
       <height>24</height>
      </rect>
@@ -40,18 +40,31 @@
    <widget class="QSpinBox" name="densityFood">
     <property name="geometry">
      <rect>
-      <x>510</x>
-      <y>390</y>
+      <x>480</x>
+      <y>500</y>
       <width>42</width>
       <height>22</height>
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="restartButton">
+   <widget class="QPushButton" name="pauseButton">
     <property name="geometry">
      <rect>
       <x>100</x>
-      <y>360</y>
+      <y>490</y>
+      <width>80</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>PAUSE</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="restartButton">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>490</y>
       <width>80</width>
       <height>24</height>
      </rect>
@@ -63,8 +76,8 @@
    <widget class="QLineEdit" name="lineEdit">
     <property name="geometry">
      <rect>
-      <x>510</x>
-      <y>370</y>
+      <x>480</x>
+      <y>480</y>
       <width>113</width>
       <height>21</height>
      </rect>
@@ -76,8 +89,8 @@
    <widget class="QPushButton" name="graphButton">
     <property name="geometry">
      <rect>
-      <x>190</x>
-      <y>360</y>
+      <x>10</x>
+      <y>510</y>
       <width>80</width>
       <height>24</height>
      </rect>
@@ -86,11 +99,24 @@
      <string>GRAPH</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="testerButton">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>510</y>
+      <width>80</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TESTER</string>
+    </property>
+   </widget>
    <widget class="QSpinBox" name="densityCreature">
     <property name="geometry">
      <rect>
-      <x>510</x>
-      <y>440</y>
+      <x>610</x>
+      <y>500</y>
       <width>42</width>
       <height>22</height>
      </rect>
@@ -99,59 +125,14 @@
    <widget class="QLineEdit" name="lineEdit_2">
     <property name="geometry">
      <rect>
-      <x>510</x>
-      <y>420</y>
+      <x>610</x>
+      <y>480</y>
       <width>113</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
      <string>Density of Creature:</string>
-    </property>
-   </widget>
-   <widget class="QSlider" name="frictionCoefficientSpinBox">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>450</y>
-      <width>160</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="minimum">
-     <number>5</number>
-    </property>
-    <property name="maximum">
-     <number>100</number>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Horizontal</enum>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>470</y>
-      <width>91</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Friction Slider</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="frictionLabel">
-    <property name="geometry">
-     <rect>
-      <x>190</x>
-      <y>450</y>
-      <width>58</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
     </property>
    </widget>
   </widget>
@@ -161,7 +142,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>36</height>
+     <height>24</height>
     </rect>
    </property>
   </widget>
