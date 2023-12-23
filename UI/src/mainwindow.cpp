@@ -2,10 +2,17 @@
 
 #include <iostream>
 
+#include <QtWidgets/QDialog>
+#include <QtCharts/QChartView>
+#include <QtCharts/QLineSeries>
+#include <QtCharts/QChart>
+#include <QVBoxLayout>
+
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui_(new Ui::MainWindow), friction_coefficient(0.0) {
+
   ui_->setupUi(this);
   // Calculate total size needed for the window based on canvas size and additional widgets/controls
   int totalWidth = settings::environment::kMapWidth + 30;
@@ -40,6 +47,7 @@ void MainWindow::ChangeFriction(int value) {
 
   // Update the QLabel to display the current value
   ui_->frictionLabel->setText(QString::number(friction_coefficient, 'f', 2));  // Display with 2 decimal places
+
 }
 
 MainWindow::~MainWindow() {
@@ -57,15 +65,14 @@ void MainWindow::SetEngine(Engine *engine) {
 }
 
 void MainWindow::ChangeFoodDensity(int value) {
-  food_density = static_cast<double>(value) / 1000.0;      // Convert to density
-  engine_->GetEnvironment().SetFoodDensity(food_density);  // Update the density
-  engine_->UpdateEnvironment();  // Apply the updated density
+  food_density = static_cast<double>(value) / 1000.0;     // Convert to density
+  engine_->GetEnvironment().SetFoodDensity(food_density); // Update the density
+  engine_->UpdateEnvironment(); // Apply the updated density
 }
 
 void MainWindow::ChangeCreatureDensity(int value) {
-  creature_density =
-      static_cast<double>(value) / 10000.0;  // Convert to density
-  RestartSimulation();  // restart simulation with new creature density
+  creature_density = static_cast<double>(value) / 10000.0; // Convert to density
+  RestartSimulation(); // restart simulation with new creature density
 }
 
 void MainWindow::RunSimulation() {
@@ -96,33 +103,76 @@ void MainWindow::RestartSimulation() {
 
 double ExampleGraphFunction(double x) { return x * x; }
 
+// This function is not complete, it is just an example of how to display a
+// graph
 void MainWindow::DisplayGraph() {
-  sf::RenderWindow graphWindow(sf::VideoMode(480, 360), "Graph Window");
+  // Create a new line series
+  QLineSeries *series = new QLineSeries();
 
-  while (graphWindow.isOpen()) {
-    sf::Event event;
-    while (graphWindow.pollEvent(event)) {
-      if (event.type == sf::Event::Closed) {
-        graphWindow.close();
-      }
-    }
-
-    graphWindow.clear(sf::Color::White);
-
-    // Pass relevant information to the drawing function directly
-    ui_->canvas->DrawCreatureCountOverTime(
-        graphWindow, engine_->GetSimulation()->GetSimulationData()->creatures_);
-
-    graphWindow.display();
+  // Add data points to the series
+  for (double x = 0.0; x <= 10.0; x += 1.0) {
+    double y = ExampleGraphFunction(x);
+    series->append(x, y);
   }
+
+  // Create a chart and add the series to it
+  QChart *chart = new QChart();
+  chart->addSeries(series);
+  chart->createDefaultAxes();
+
+  // Create a chart view with the chart
+  QChartView *chartView = new QChartView(chart);
+  chartView->setRenderHint(QPainter::Antialiasing);
+
+  QDialog *dialog = new QDialog(this); // 'this' sets MainWindow as the parent
+  dialog->setWindowTitle("Graph Display");
+  QVBoxLayout *layout = new QVBoxLayout(dialog);
+  layout->addWidget(chartView);
+  dialog->setLayout(layout);
+  dialog->resize(800, 600);
+
+  dialog->show();
 }
 
-void MainWindow::GraphExampleFunction() {
-  // Code to graph the ExampleGraphFunction(x)
-  // You can use a plotting library or custom code to draw the graph
-  // For simplicity, let's print the values to the console for now
-  for (double x = 0.0; x <= 10.0; x += 1.0) {
-    double result = ExampleGraphFunction(x);
-    std::cout << "x: " << x << ", f(x): " << result << std::endl;
+
+void MainWindow::DrawCreaturesOverTimeGraph() {
+  if (engine_->GetSimulation()) {
+    // Get the creature count over time from the simulation data
+    std::vector<int> creatureCountOverTime = engine_->GetSimulation()->GetSimulationData()->GetCreatureCountOverTime();
+
+    // Check if there's any data to display
+    if (creatureCountOverTime.empty()) {
+        qDebug() << "No data to display.";
+        return;
+    }
+
+    // Create a new line series
+    QLineSeries *series = new QLineSeries();
+
+    // Add data points to the series
+    for (size_t i = 0; i < creatureCountOverTime.size(); ++i) {
+        series->append(i, creatureCountOverTime[i]);
+    }
+
+    // Create a chart and add the series to it
+    QChart *chart = new QChart();
+    chart->addSeries(series);
+    chart->createDefaultAxes();
+
+    // Create a chart view with the chart
+    QChartView *chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+
+    // Create a dialog to display the graph
+    QDialog *dialog = new QDialog(this);
+    dialog->setWindowTitle("Creature Count Over Time");
+    QVBoxLayout *layout = new QVBoxLayout(dialog);
+    layout->addWidget(chartView);
+    dialog->setLayout(layout);
+    dialog->resize(800, 600);
+
+    // Show the dialog modally and connect it to delete later
+    connect(dialog, &QDialog::finished, dialog, &QObject::deleteLater);
+    dialog->exec();
   }
 }

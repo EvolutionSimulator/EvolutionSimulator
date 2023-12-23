@@ -22,6 +22,8 @@ class SimulationCanvas : public QSFMLCanvas {
      // You might want to add other properties like health, age, etc., if necessary
  };
 
+  sf::RenderWindow& GetRenderWindow();
+
   SimulationCanvas(QWidget* Parent);
 
   void SetSimulation(Simulation* simulation);
@@ -40,6 +42,7 @@ class SimulationCanvas : public QSFMLCanvas {
   virtual void OnInit() override;
   virtual void OnUpdate() override;
   std::optional<CreatureInfo> selectedCreatureInfo;
+
 
   sf::Font font_;
 

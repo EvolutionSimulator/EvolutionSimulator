@@ -120,6 +120,7 @@ void Entity::RandomInitialization(const double world_width,
   y_coord_ = GetRandomFloat(world_height);
   size_ =
       GetRandomFloat(max_creature_size - min_creature_size) + min_creature_size;
+  orientation_ = GetRandomFloat(2*M_PI);
 }
 
 /*!

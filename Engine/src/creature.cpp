@@ -377,7 +377,7 @@ void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
   neuron_data_.at(4) = orientation_food_;
   neuron_data_.at(5) = distance_food_;
   std::vector<double> output = brain_.Activate(neuron_data_);
-  SetAcceleration(output.at(0));
+  SetAcceleration(std::tanh(output.at(0))*max_force_);
   SetAccelerationAngle(output.at(1));
   SetRotationalAcceleration(output.at(2));
 }
@@ -396,6 +396,11 @@ void Creature::ProcessVisionFood(
     std::vector<std::vector<std::vector<Entity *>>> &grid,
     double GridCellSize) {
   Food *food = this->GetClosestFood(grid, GridCellSize);
+  if (food == nullptr) { //temporary fix that shouldn't be necessary after the new vision system is implemented
+      distance_food_ = 1000;
+      orientation_food_ = 0;
+      return;
+  }
   distance_food_ = this->GetDistance(*food, settings::environment::kMapWidth,
                                      settings::environment::kMapHeight);
   orientation_food_ = this->GetRelativeOrientation(*food);

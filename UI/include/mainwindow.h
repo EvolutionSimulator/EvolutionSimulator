@@ -3,6 +3,7 @@
 #include <QMainWindow>
 #include <thread>
 
+#include "QtCharts/qlineseries.h"
 #include "engine.h"
 
 QT_BEGIN_NAMESPACE  //
@@ -30,6 +31,7 @@ QT_END_NAMESPACE  //
   void DisplayGraph();
   void GraphExampleFunction();
   void ChangeFriction(int value);
+  void DrawCreaturesOverTimeGraph();
 
  private:
   double friction_coefficient;
@@ -40,4 +42,8 @@ QT_END_NAMESPACE  //
   Engine* engine_;  // Pointer to the simulation engine
 
   std::thread engine_thread_;  // Thread for running the simulation engine
+
+  double lastRecordedTime_;
+  QTimer *updateTimer;
+
 };
