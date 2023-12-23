@@ -46,9 +46,15 @@ class Entity {
   }
   double GetRelativeOrientation(const Entity &otherEntity) const;
 
+  int GetID() const;
+
  protected:
   double x_coord_, y_coord_, orientation_, size_;
   states state_;
+
+ private:
+  static int next_id_;
+  int id_;
 };
 
 #endif  // ENTITY_H

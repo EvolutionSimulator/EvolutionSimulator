@@ -26,12 +26,14 @@ QT_END_NAMESPACE  //
   void ChangeFoodDensity(
       int value);  // Make sure this is under 'private slots:'
   void ChangeCreatureDensity(int value);
-  void PauseSimulation();
+  void ToggleSimulation();
   void RestartSimulation();
   void DisplayGraph();
+  void ChangeFriction(int value);
   void DrawCreaturesOverTimeGraph();
 
  private:
+  double friction_coefficient;
   double creature_density = 0.001;
   double food_density = 0.001;
   Ui::MainWindow* ui_;  // Pointer to all UI widgets

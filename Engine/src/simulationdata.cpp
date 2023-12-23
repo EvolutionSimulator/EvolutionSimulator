@@ -97,7 +97,8 @@ void SimulationData::UpdateAllCreatures(double deltaTime) {
   for (Creature& creature : creatures_) {
     creature.Update(deltaTime, settings::environment::kMapWidth,
                     settings::environment::kMapHeight, grid_,
-                    settings::environment::kGridCellSize);
+                    settings::environment::kGridCellSize,
+                    environment_.GetFrictionalCoefficient());
     if (creature.Fit()) {
       reproduce_.push(creature);
     }

@@ -7,11 +7,13 @@
 
 #include "environment.h"
 
+int Entity::next_id_ = 0;
+
 /*!
  * @brief Default constructor initializing an Entity at the origin with zero
  * size.
  */
-Entity::Entity() : x_coord_(0.0), y_coord_(0.0), size_(0.0), state_(Alive) {}
+Entity::Entity() : x_coord_(0.0), y_coord_(0.0), size_(0.0), state_(Alive), id_(next_id_++) {}
 
 /*!
  * @brief Parameterized constructor to initialize an Entity with specified
@@ -22,7 +24,7 @@ Entity::Entity() : x_coord_(0.0), y_coord_(0.0), size_(0.0), state_(Alive) {}
  * @param size Size of the entity.
  */
 Entity::Entity(const double x_coord, const double y_coord, const double size)
-    : x_coord_(x_coord), y_coord_(y_coord), size_(size), state_(Alive) {}
+    : x_coord_(x_coord), y_coord_(y_coord), size_(size), state_(Alive), id_(next_id_++) {}
 
 /*!
  * @brief Constructor to initialize an Entity with a specified size at the
@@ -30,7 +32,7 @@ Entity::Entity(const double x_coord, const double y_coord, const double size)
  * @param size Size of the entity.
  */
 Entity::Entity(const double size)
-    : x_coord_(0.0), y_coord_(0.0), size_(size), state_(Alive) {}
+    : x_coord_(0.0), y_coord_(0.0), size_(size), state_(Alive), id_(next_id_++) {}
 
 /*!
  * @brief Destructor sets the state of the entity to Dead.
@@ -234,4 +236,8 @@ void Entity::OnCollision(Entity &other_entity, double const kMapWidth,
   // Assert that the entities are no longer overlapping
   // assert(size_ + other_size - GetDistance(other_entity, kMapWidth,
   // kMapHeight) < 0.0001);
+}
+
+int Entity::GetID() const {
+  return id_;
 }

@@ -43,7 +43,7 @@ class Creature : public MovableEntity {
   neat::Genome GetGenome();
   void Update(double deltaTime, double const kMapWidth, double const kMapHeight,
               std::vector<std::vector<std::vector<Entity *> > > &grid,
-              double GridCellSize);
+              double GridCellSize, double frictional_coefficient);
 
   double GetHealth() const;
   void SetHealth(double health);
