@@ -1,5 +1,6 @@
 #include <creature.h>
 #include <gtest/gtest.h>
+#include "geometry_primitives.h"
 
 /*!
  * @file creature.cpp
@@ -173,29 +174,61 @@ TEST(CreatureTests, SetHealth) {
 //    EXPECT_EQ(creature.GetHealth(), 100);
 //}
 
-/* TEST(CreatureTests, GetCellsInSight) {
+TEST(CreatureTests, IsGridCellPotentiallyInsideCone) {
+  double grid_cell_size = 1.0;
+
+  auto grid_in_sight_1 = IsGridCellPotentiallyInsideCone(Point(5,5), grid_cell_size,
+                                                                 Point(5,5), 3.0,
+                                                                 OrientedAngle(-M_PI/4),
+                                                                 OrientedAngle(M_PI/4));
+
+  auto grid_in_sight_2 = IsGridCellPotentiallyInsideCone(Point(6,4), grid_cell_size,
+                                                       Point(5,5), 3.0,
+                                                       OrientedAngle(-M_PI/4),
+                                                       OrientedAngle(M_PI/4));
+
+  auto grid_in_sight_3 = IsGridCellPotentiallyInsideCone(Point(7,6), grid_cell_size,
+                                                         Point(5,5), 3.0,
+                                                         OrientedAngle(-M_PI/4),
+                                                         OrientedAngle(M_PI/4));
+
+  auto grid_out_of_sight = IsGridCellPotentiallyInsideCone(Point(8,9), grid_cell_size,
+                                                         Point(5,5), 3.0,
+                                                         OrientedAngle(-M_PI/4),
+                                                         OrientedAngle(M_PI/4));
+
+  EXPECT_TRUE(grid_in_sight_1);
+  EXPECT_TRUE(grid_in_sight_2);
+  EXPECT_TRUE(grid_in_sight_3);
+  EXPECT_FALSE(grid_out_of_sight);
+
+}
+
+TEST(CreatureTests, GetClosestFoodInSight_MultipleFoods) {
   neat::Genome genome(3, 4);
   Creature creature(genome);
 
-  std::vector<std::vector<std::vector<Entity *>>> testGrid;
+  std::vector<std::vector<std::vector<Entity*> > > grid;
   double gridCellSize = 1.0;
-  testGrid.assign(10, std::vector<std::vector<Entity *>>(10));
+  grid.assign(10, std::vector<std::vector<Entity*> >(10));
 
-  creature.SetCoordinates(5,5,10,10);
-  creature.SetOrientation(0.0);
-  creature.SetVision(3.0, M_PI / 2);
+  Meat meat_1, meat_2, meat_3;
+  meat_1.SetCoordinates(3.79138, 2.77046, 10, 10); // distance = 0.95
+  grid[3][2].push_back(&meat_1);
+  meat_2.SetCoordinates(2.93273, 2.87064, 10, 10); // distance = 1.52
+  grid[2][2].push_back(&meat_2);
+  meat_3.SetCoordinates(3.87724,2.52718, 10, 10); // distance = 1.14
+  grid[3][2].push_back(&meat_3);
 
-  auto cells_in_sight = creature.GetGridCellsInSight(testGrid, gridCellSize);
 
-  std::set<std::pair<int, int>> expected_cells = {
-      {5, 4}, {5, 5}, {5, 6},
-      {6, 3}, {6, 4}, {6, 5}, {6,6}, {6,7},
-      {7, 3}, {7, 4}, {7, 5}, {7,6}, {7,7},
-      {8,5}
-  };
+  double creature_x = 4.26364, creature_y = 3.60048;
+  creature.SetCoordinates(creature_x, creature_y, 10, 10);
+  double target_x = 2.84687, target_y = 2.26958;
+  creature.SetOrientation(OrientedAngle(Point(creature_x,creature_y),Point(target_x,target_y)).GetAngle());
+  creature.SetVision(2.0, M_PI/3);
 
-  std::set<std::pair<int, int>> actual_cells(cells_in_sight.begin(),
-cells_in_sight.end());
+  auto closest_food = creature.GetClosestFoodInSight(grid, gridCellSize);
 
-  ASSERT_EQ(actual_cells, expected_cells);
-}*/
+  ASSERT_EQ(closest_food, &meat_1);
+}
+
