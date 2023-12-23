@@ -183,7 +183,7 @@ void SimulationData::InitializeCreatures() {
   // Retrieve information from the environment
   double world_width = settings::environment::kMapWidth;
   double world_height = settings::environment::kMapHeight;
-  double creature_density = settings::environment::kCreatureDensity;
+  double creature_density = environment_.GetCreatureDensity();
   double max_creature_size = settings::environment::kMaxCreatureSize;
   double min_creature_size = settings::environment::kMinCreatureSize;
 
