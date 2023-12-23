@@ -10,6 +10,8 @@
 #include "food.h"
 #include "simulationdata.h"
 
+#include "geometry_primitives.h"
+
 /*!
  * @file collisions.cpp
  *
@@ -712,3 +714,86 @@ TEST(GetNeighboursTest, CenterOutsideGrid) {
       {0, 0}, {0, 1}, {0, 2}, {1, 0}, {1, 1}, {1, 2}, {2, 0}, {2, 1}, {2, 2}};
   EXPECT_EQ(neighbours, expected);
 }
+
+
+TEST(OrientedAngleTest, Normalize) {
+  OrientedAngle angle1(3 * M_PI);
+  EXPECT_NEAR(angle1.GetAngle(), -M_PI, settings::engine::EPS);
+
+  OrientedAngle angle2(-4 * M_PI);
+  EXPECT_NEAR(angle2.GetAngle(), 0.0, settings::engine::EPS);
+
+  OrientedAngle angle3(7 * M_PI / 4);
+  EXPECT_NEAR(angle3.GetAngle(), -M_PI/4, settings::engine::EPS);
+
+  OrientedAngle angle4(-11 * M_PI / 6);
+  EXPECT_NEAR(angle4.GetAngle(), M_PI/6, settings::engine::EPS);
+}
+
+TEST(OrientedAngleTest, IsInsideCone_1) {
+  OrientedAngle left_boundary(0);
+  OrientedAngle right_boundary(M_PI / 2);
+
+  OrientedAngle insideAngle(M_PI / 4);
+  EXPECT_TRUE(insideAngle.IsInsideCone(left_boundary, right_boundary));
+
+  OrientedAngle onBoundary(M_PI / 2);
+  EXPECT_TRUE(onBoundary.IsInsideCone(left_boundary, right_boundary));
+
+  OrientedAngle outsideAngle(M_PI);
+  EXPECT_FALSE(outsideAngle.IsInsideCone(left_boundary, right_boundary));
+}
+
+TEST(OrientedAngleTest, IsInsideCone_2) {
+  OrientedAngle left_boundary(3 * M_PI / 2);
+  OrientedAngle right_boundary(M_PI / 2);
+
+  EXPECT_NEAR(left_boundary.GetAngle(), -M_PI/2, settings::engine::EPS);
+  EXPECT_NEAR(right_boundary.GetAngle(), M_PI/2, settings::engine::EPS);
+
+  OrientedAngle insideAngle1(0);
+  EXPECT_TRUE(insideAngle1.IsInsideCone(left_boundary, right_boundary));
+
+  OrientedAngle insideAngle2(7 * M_PI / 4);
+  EXPECT_TRUE(insideAngle2.IsInsideCone(left_boundary, right_boundary));
+
+  OrientedAngle onLeftBoundary(3 * M_PI / 2);
+  EXPECT_TRUE(onLeftBoundary.IsInsideCone(left_boundary, right_boundary));
+
+  OrientedAngle onRightBoundary(M_PI / 2);
+  EXPECT_TRUE(onRightBoundary.IsInsideCone(left_boundary, right_boundary));
+
+  OrientedAngle outsideAngle1(M_PI);
+  EXPECT_FALSE(outsideAngle1.IsInsideCone(left_boundary, right_boundary));
+
+  OrientedAngle outsideAngle2(5 * M_PI / 4);
+  EXPECT_NEAR(outsideAngle2.GetAngle(), -3*M_PI/4, settings::engine::EPS);
+  EXPECT_NEAR(outsideAngle2.AngleDistanceToCone(left_boundary, right_boundary), M_PI/4, settings::engine::EPS);
+  EXPECT_FALSE(outsideAngle2.IsInsideCone(left_boundary, right_boundary));
+}
+
+TEST(OrientedAngleTest, IsInsideCone_3) {
+  OrientedAngle left_boundary(M_PI / 2);
+  OrientedAngle right_boundary(- M_PI / 2);
+
+  OrientedAngle outsideAngle1(0);
+  EXPECT_FALSE(outsideAngle1.IsInsideCone(left_boundary, right_boundary));
+
+  OrientedAngle outsideAngle2(7 * M_PI / 4);
+  EXPECT_FALSE(outsideAngle2.IsInsideCone(left_boundary, right_boundary));
+  EXPECT_NEAR(outsideAngle2.AngleDistanceToCone(left_boundary, right_boundary), M_PI/4, settings::engine::EPS);
+
+  OrientedAngle onLeftBoundary(M_PI / 2);
+  EXPECT_TRUE(onLeftBoundary.IsInsideCone(left_boundary, right_boundary));
+
+  OrientedAngle onRightBoundary(3 * M_PI / 2);
+  EXPECT_TRUE(onRightBoundary.IsInsideCone(left_boundary, right_boundary));
+
+  OrientedAngle insideAngle1(M_PI);
+  EXPECT_TRUE(insideAngle1.IsInsideCone(left_boundary, right_boundary));
+
+  OrientedAngle insideAngle2(5 * M_PI / 4);
+  EXPECT_TRUE(insideAngle2.IsInsideCone(left_boundary, right_boundary));
+}
+
+

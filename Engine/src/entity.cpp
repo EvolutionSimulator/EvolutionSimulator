@@ -12,7 +12,7 @@
  * @brief Default constructor initializing an Entity at the origin with zero
  * size.
  */
-Entity::Entity() : x_coord_(0.0), y_coord_(0.0), size_(0.0), state_(Alive) {}
+Entity::Entity() : x_coord_(0.0), y_coord_(0.0), size_(0.0), state_(Alive), orientation_(0) {}
 
 /*!
  * @brief Parameterized constructor to initialize an Entity with specified
@@ -127,6 +127,7 @@ void Entity::RandomInitialization(const double world_width,
   y_coord_ = GetRandomFloat(world_height);
   size_ =
       GetRandomFloat(max_creature_size - min_creature_size) + min_creature_size;
+  orientation_ = GetRandomFloat(2*M_PI) - M_PI;
 }
 
 /*!
@@ -158,7 +159,7 @@ double Entity::GetDistance(const Entity &other_entity, const double kMapWidth,
  *
  * @param other_entity The other entity to calculate orientation towards.
  *
- * @return The relative orientation angle in radians.
+ * @return The relative orientation angle in radians between [-pi,pi].
  */
 double Entity::GetRelativeOrientation(const Entity &other_entity) const {
   // assumes orientation = 0 is the x axis

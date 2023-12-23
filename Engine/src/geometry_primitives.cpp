@@ -45,6 +45,7 @@ double OrientedAngle::AngleDistanceToCone(
     const OrientedAngle &right_boundary) const {
   double left_boundary_angle = left_boundary.GetAngle();
   double right_boundary_angle = right_boundary.GetAngle();
+
   if (left_boundary_angle < right_boundary_angle &&
       (left_boundary_angle <= angle_ && angle_ <= right_boundary_angle)) {
     return 0.0;
@@ -54,11 +55,11 @@ double OrientedAngle::AngleDistanceToCone(
     return 0.0;
   }
 
-  double distance_to_left_boundary = abs(angle_ - left_boundary_angle);
+  double distance_to_left_boundary = std::abs(angle_ - left_boundary_angle);
   distance_to_left_boundary =
       std::min(distance_to_left_boundary, 2 * M_PI - distance_to_left_boundary);
 
-  double distance_to_right_boundary = abs(angle_ - right_boundary_angle);
+  double distance_to_right_boundary = std::abs(angle_ - right_boundary_angle);
   distance_to_right_boundary = std::min(distance_to_right_boundary,
                                         2 * M_PI - distance_to_right_boundary);
 
