@@ -144,6 +144,22 @@ bool CollisionCircleLine(const double& tolerance,
           radius + tolerance);
 }
 
+/*!
+ * @brief Determines if a grid cell might intersect with or lie inside a specified cone.
+ *
+ * @details This function evaluates whether a grid cell, represented by a point and its size,
+ * could potentially be inside a cone defined by a center point, radius,
+ * and angular boundaries. It accounts for edge cases and uses a small epsilon value for
+ * precision considerations.
+ *
+ * @param grid_point The representative point of the grid cell, typically its center.
+ * @param grid_cell_size The length of the side of the square grid cell.
+ * @param cone_center The center point of the cone.
+ * @param cone_radius The radius of the cone from the center point.
+ * @param cone_left_boundary The left boundary angle of the cone.
+ * @param cone_right_boundary The right boundary angle of the cone.
+ * @return True if the grid cell is potentially inside the cone, otherwise false.
+ */
 bool IsGridCellPotentiallyInsideCone(Point grid_point, double grid_cell_size,
                                      Point cone_center, double cone_radius,
                                      OrientedAngle cone_left_boundary,

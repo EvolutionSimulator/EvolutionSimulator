@@ -585,6 +585,18 @@ std::vector<Food *> get_food_at_distance(
   return food;
 }
 
+/*!
+ * @brief Sets the vision parameters for the creature.
+ *
+ * @details This function sets the creature's vision radius and angle.
+ * The vision radius determines how far the creature can see,
+ * while the vision angle specifies the total angle at which it sees,
+ * which will be centered at its orientation (so at most angle/2 to the
+ * left and angle/2 to the right of its orientation).
+ *
+ * @param radius The radius of the vision, representing how far the creature can see.
+ * @param angle The angle of the vision, representing the full angle of the visual field.
+ */
 void Creature::SetVision(double radius, double angle) {
   vision_radius_ = radius;
   vision_angle_ = angle;
@@ -594,24 +606,22 @@ double Creature::GetVisionRadius() const { return vision_radius_; }
 
 double Creature::GetVisionAngle() const { return vision_angle_; }
 
-/*!
- * @brief Finds the closest meat and plant entities within the creature's line
- * of sight.
- *
- * @details Uses the GetGridCellsInSight function to determine the grid cells
- * within the creature's field of view. Scans these cells for meat and plant
- * entities and returns pointers to the closest of each. If no meat or plant is
- * found within the line of sight, the respective pointer in the pair is set to
- * nullptr.
- *
- * @param grid The environmental grid.
- * @param GridCellSize Size of each cell in the grid.
- *
- * @return A pair of pointers, the first to the closest meat entity and the
- * second to the closest plant entity within the line of sight. If none is
- * found, the respective pointer is nullptr.
- */
 
+/*!
+ * @brief Finds the closest food entity (meat or plant) within the creature's line of sight.
+ *
+ * @details Performs a breadth-first search (BFS) on the grid cells within the creature's
+ * field of view to locate the closest food entity. It utilizes IsGridCellPotentiallyInsideCone
+ * functions to efficiently narrow down the search area to relevant cells. The function iterates over
+ * entities within these cells, dynamically casting them to Food* to check if they are edible.
+ * It then determines if they are within the creature's field of view and closer than any previously found food.
+ * The search continues until the closest food is found or a predefined number of cells have been processed.
+ *
+ * @param grid A 3-dimensional vector representing the environmental grid where each cell contains entities.
+ * @param grid_cell_size The size of each square cell in the grid.
+ *
+ * @return A pointer to the closest food entity within the line of sight; nullptr if no food is found.
+ */
 Food *Creature::GetClosestFoodInSight(
     std::vector<std::vector<std::vector<Entity *>>> &grid,
     double grid_cell_size) const {
