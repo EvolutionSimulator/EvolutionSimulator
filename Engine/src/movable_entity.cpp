@@ -2,6 +2,7 @@
 
 #include "config.h"
 #include "math.h"
+#include "geometry_primitives.h"
 
 /*!
  * @file movable_entity.h
@@ -240,9 +241,9 @@ void MovableEntity::Move(double deltaTime, const double kMapWidth,
  * @param deltaTime The time interval over which to update the orientation.
  */
 void MovableEntity::Rotate(double deltaTime) {
-  double new_orientation =
-      GetOrientation() + (GetRotationalVelocity() * deltaTime);
-  SetOrientation(new_orientation);
+  OrientedAngle new_orientation =
+      OrientedAngle(GetOrientation() + (GetRotationalVelocity() * deltaTime));
+  SetOrientation(new_orientation.GetAngle());
 }
 
 /*!
