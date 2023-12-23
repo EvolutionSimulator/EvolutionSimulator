@@ -287,7 +287,8 @@ void Creature::Eats(double nutritional_value) {
 void Creature::Update(double deltaTime, double const kMapWidth,
                       double const kMapHeight,
                       std::vector<std::vector<std::vector<Entity *>>> &grid,
-                      double GridCellSize) {
+                      double GridCellSize, double frictional_coefficient) {
+  this->frictional_coefficient_ = frictional_coefficient;
   this->UpdateEnergy(deltaTime);
   this->UpdateVelocities(deltaTime);
   this->Move(deltaTime, kMapWidth, kMapHeight);
