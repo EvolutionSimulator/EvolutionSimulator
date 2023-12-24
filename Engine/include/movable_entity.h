@@ -41,7 +41,6 @@ class MovableEntity : public Entity {
   double acceleration_, acceleration_angle_, rotational_acceleration_;
   double velocity_, velocity_angle_, rotational_velocity_;
   double strafing_difficulty_;
-  double strafing_difficulty;
   double frictional_coefficient_;
 };
 
