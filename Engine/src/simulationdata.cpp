@@ -151,11 +151,16 @@ void SimulationData::ReproduceCreatures() {
     double energy1 = creature1.GetEnergy();
     double energy2 = creature2.GetEnergy();
     if (energy1 > energy2) {
+
       neat::Genome new_genome =
           neat::Crossover(creature1.GetGenome(), creature2.GetGenome());
       new_genome.Mutate();
       new_genome.Mutate();
-      Creature new_creature(new_genome);
+      Mutable new_mutable =
+          Mutables::Crossover(creature1.GetMutable(), creature2.GetMutable());
+      new_mutable.Mutate();
+      new_mutable.Mutate();
+      Creature new_creature(new_genome, new_mutable);
       new_creature.RandomInitialization(world_width, world_height,
                                         max_creature_size, min_creature_size);
       new_creature.SetGeneration(creature1.GetGeneration() + 1);
@@ -165,7 +170,11 @@ void SimulationData::ReproduceCreatures() {
           neat::Crossover(creature2.GetGenome(), creature1.GetGenome());
       new_genome.Mutate();
       new_genome.Mutate();
-      Creature new_creature(new_genome);
+      Mutable new_mutable =
+          Mutables::Crossover(creature2.GetMutable(), creature1.GetMutable());
+      new_mutable.Mutate();
+      new_mutable.Mutate();
+      Creature new_creature(new_genome, new_mutable);
       new_creature.RandomInitialization(world_width, world_height,
                                         max_creature_size, min_creature_size);
       new_creature.SetGeneration(creature2.GetGeneration() + 1);
@@ -195,10 +204,12 @@ void SimulationData::InitializeCreatures() {
       if (std::rand() / (RAND_MAX + 1.0) < creature_density) {
         neat::Genome genome(settings::environment::kInputNeurons,
                             settings::environment::kOutputNeurons);
+        Mutable mutables;
         for (int i = 0; i < 40; i++) {
           genome.Mutate();
+          mutables.Mutate();
         }
-        Creature new_creature(genome);
+        Creature new_creature(genome, mutables);
         new_creature.RandomInitialization(world_width, world_height,
                                           max_creature_size, min_creature_size);
         creatures_.emplace_back(new_creature);
