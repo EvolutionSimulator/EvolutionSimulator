@@ -54,7 +54,8 @@ struct FeedForwardNeuron {
 class NeuralNetwork {
  public:
   NeuralNetwork(const Genome &genom);
-  std::vector<double> Activate(const std::vector<double> &input_values) const;
+  std::vector<double> Activate(const std::vector<double> &input_values);
+  std::vector<FeedForwardNeuron> GetNeurons() const;
 
  private:
   std::vector<int> input_ids_;  /*!< IDs of input neurons. */

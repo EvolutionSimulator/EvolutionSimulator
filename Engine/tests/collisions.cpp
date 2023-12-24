@@ -522,7 +522,6 @@ TEST_F(CreatureTest, GetClosestFoodTest2) {
  * cells based on the simulation settings.
  */
 
-/*
 TEST(SimulationDataTest, GridInitialization) {
   myEnvironment::Environment environment;
   SimulationData simData(environment);
@@ -543,7 +542,7 @@ TEST(SimulationDataTest, GridInitialization) {
   for (const auto& row : simData.GetGrid()) {
     EXPECT_EQ(row.size(), expectedNumCellsY);
   }
-}*/
+}
 
 /*!
  * @brief Tests for updating the grid with alive entities.
@@ -551,7 +550,7 @@ TEST(SimulationDataTest, GridInitialization) {
  * @details Validates that the grid correctly places alive entities and ignores
  * dead ones.
  */
-/*
+
 TEST(SimulationDataTest, UpdateGridWithAliveEntities) {
   myEnvironment::Environment environment;
   SimulationData simData(environment);
@@ -586,7 +585,7 @@ TEST(SimulationDataTest, UpdateGridWithAliveEntities) {
       }
     }
   }
-}*/
+}
 
 /*!
  * @brief Tests for correct placement of entities in the grid.
@@ -595,7 +594,6 @@ TEST(SimulationDataTest, UpdateGridWithAliveEntities) {
  *          their coordinates are outside the nominal bounds of the map.
  */
 
-/*
 TEST(SimulationDataTest, CorrectEntityPlacementInGrid) {
   myEnvironment::Environment environment;
   SimulationData simData(environment);
@@ -641,7 +639,7 @@ TEST(SimulationDataTest, CorrectEntityPlacementInGrid) {
 
   EXPECT_NE(simData.GetGrid()[creatureGridX][creatureGridY].empty(), true);
   EXPECT_NE(simData.GetGrid()[foodGridX][foodGridY].empty(), true);
-}*/
+}
 
 /*!
  * @brief Tests for calculating neighboring cells in a grid.

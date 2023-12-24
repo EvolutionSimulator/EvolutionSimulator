@@ -206,14 +206,14 @@ void Genome::Mutate() {
   if (uniform(gen) < settings::neat::kAddLinkMutationRate) {
     MutateAddLink();
   }
+  /* cycles aren't supported with remove mutations
+    if (uniform(gen) < settings::neat::kRemoveNeuronMutationRate) {
+      MutateRemoveNeuron();
+    }/*
 
-  if (uniform(gen) < settings::neat::kRemoveNeuronMutationRate) {
-    MutateRemoveNeuron();
-  }
-
-  if (uniform(gen) < settings::neat::kRemoveLinkMutationRate) {
-    MutateRemoveLink();
-  }
+  /*  if (uniform(gen) < settings::neat::kRemoveLinkMutationRate) {
+      MutateRemoveLink();
+    }*/
 
   if (uniform(gen) < settings::neat::kChangeWeightMutationRate) {
     MutateChangeWeight();
