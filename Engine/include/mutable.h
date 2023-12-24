@@ -6,7 +6,6 @@ class Mutable
 {
 public:
   Mutable();
-  Mutable Crossover(Mutable &other_mutable) const;
   void Mutate();
   double Distance(Mutable &other_mutable) const;
   double Complexity();
@@ -36,6 +35,7 @@ public:
   void SetMaturityAge(double value);
 
 private:
+  //Any values added here need to be included in the complexity, mutation, and crossover functions
   double energy_density_;
   double energy_loss_;
   double strafing_difficulty_; //value in movable entity so we'll need to treat it a lil bit different
@@ -47,4 +47,5 @@ private:
   double maturity_age_;
 };
 
+Mutable Crossover(const Mutable &dominant, const Mutable &recessive);
 #endif // MUTABLE_H
