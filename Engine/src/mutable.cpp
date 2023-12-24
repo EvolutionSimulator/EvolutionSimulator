@@ -5,6 +5,7 @@
 Mutable::Mutable()
   : energy_density_(settings::physical_constraints::kDEnergyDensity),
     energy_loss_(settings::physical_constraints::kDEnergyLoss),
+    integrity_(settings::physical_constraints::kDIntegrity),
     strafing_difficulty_(settings::physical_constraints::kDStrafingDifficulty),
     max_size_(settings::physical_constraints::kDMaxSize),
     baby_size_(settings::physical_constraints::kDBabySize),
@@ -23,6 +24,7 @@ double Mutable::Complexity() {
   //values to tweak in order to achieve ideal conditions
   double complexity = (energy_density_*10
                        + 5/energy_loss_
+                       + integrity_ * 20
                        + 5/(1+strafing_difficulty_)
                        + max_force_ * 2
                        + 5/growth_factor_) * baby_size_;
@@ -57,6 +59,18 @@ void Mutable::Mutate() {
         energy_loss_ = settings::physical_constraints::kMinEnergyLoss;
     }
   }
+
+  //Integrity
+  if (uniform(gen) < settings::physical_constraints::kMutationRate){
+    std::normal_distribution<> dis(0.0,
+            settings::physical_constraints::kDEnergyDensity/10);
+    double delta = dis(gen);
+    integrity_ += delta;
+    if (integrity_ < 0) {
+        integrity_ = 0;
+    }
+  }
+
 
   //Strafing Difficulty
   if (uniform(gen) < settings::physical_constraints::kMutationRate){
@@ -119,6 +133,7 @@ void Mutable::Mutate() {
 // Getters
 double Mutable::GetEnergyDensity() const { return energy_density_; }
 double Mutable::GetEnergyLoss() const { return energy_loss_; }
+double Mutable::GetIntegrity() const { return integrity_; }
 double Mutable::GetStrafingDifficulty() const { return strafing_difficulty_; }
 double Mutable::GetMaxSize() const { return max_size_; }
 double Mutable::GetBabySize() const { return baby_size_; }
@@ -130,6 +145,7 @@ double Mutable::GetMaturityAge() const { return maturity_age_; }
 // Setters
 void Mutable::SetEnergyDensity(double value) { energy_density_ = value; }
 void Mutable::SetEnergyLoss(double value) { energy_loss_ = value; }
+void Mutable::SetIntegrity(double value) { integrity_ = value; }
 void Mutable::SetStrafingDifficulty(double value) { strafing_difficulty_ = value; }
 void Mutable::SetMaxSize(double value) { max_size_ = value; }
 void Mutable::SetBabySize(double value) { baby_size_ = value; }
@@ -144,6 +160,8 @@ Mutable Crossover(Mutable &dominant, Mutable &recessive) {
                               + recessive.GetEnergyDensity())/3);
   crossover.SetEnergyLoss((2*dominant.GetEnergyLoss() +
                            recessive.GetEnergyLoss() )/3);
+  crossover.SetIntegrity((2*dominant.GetIntegrity() +
+                          recessive.GetIntegrity() )/3);
   crossover.SetStrafingDifficulty((2*dominant.GetStrafingDifficulty() +
                                    recessive.GetStrafingDifficulty() )/3);
   crossover.SetMaxSize((2*dominant.GetMaxSize() +

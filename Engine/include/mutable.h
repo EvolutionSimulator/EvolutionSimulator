@@ -15,6 +15,7 @@ public:
   // Getters
   double GetEnergyDensity() const;
   double GetEnergyLoss() const;
+  double GetIntegrity() const;
   double GetStrafingDifficulty() const;
   double GetMaxSize() const;
   double GetBabySize() const;
@@ -26,6 +27,7 @@ public:
   // Setters
   void SetEnergyDensity(double value);
   void SetEnergyLoss(double value);
+  void SetIntegrity(double value);
   void SetStrafingDifficulty(double value);
   void SetMaxSize(double value);
   void SetBabySize(double value);
@@ -38,6 +40,7 @@ private:
   //Any values added here need to be included in the complexity, mutation, and crossover functions
   double energy_density_;
   double energy_loss_;
+  double integrity_;
   double strafing_difficulty_; //value in movable entity so we'll need to treat it a lil bit different
   double max_size_;
   double baby_size_;
