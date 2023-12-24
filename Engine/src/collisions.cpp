@@ -181,3 +181,49 @@ bool IsGridCellPotentiallyInsideCone(Point grid_point, double grid_cell_size,
   }
   return true;
 }
+
+
+
+
+/*!
+ * @brief Generates a supercover of grid cells that a line passes through.
+ *
+ * @details This function implements a variant of Bresenham's line algorithm.
+ * It calculates a supercover of the grid cells that a line between two points
+ * (x0, y0) and (x1, y1) passes through on a grid.
+ *
+ * @param x0 The x-coordinate of the starting point of the line.
+ * @param y0 The y-coordinate of the starting point of the line.
+ * @param x1 The x-coordinate of the ending point of the line.
+ * @param y1 The y-coordinate of the ending point of the line.
+ *
+ * @return A vector of pairs of integers, each representing a grid cell (x, y) that the line intersects.
+ */
+std::vector<std::pair<int, int>> SupercoverBresenhamLine(int x0, int y0, int x1, int y1) {
+  std::vector<std::pair<int, int>> line;
+
+  int dx = x1 - x0;
+  int dy = y1 - y0;
+  int nx = std::abs(dx);
+  int ny = std::abs(dy);
+  int sign_x = dx > 0 ? 1 : -1;
+  int sign_y = dy > 0 ? 1 : -1;
+
+  int x = x0;
+  int y = y0;
+
+  line.push_back({x, y});
+
+  for (int ix = 0, iy = 0; ix < nx || iy < ny;) {
+    if ((0.5 + ix) / nx < (0.5 + iy) / ny) {
+      x += sign_x;
+      ix++;
+    } else {
+      y += sign_y;
+      iy++;
+    }
+    line.push_back({x, y});
+  }
+
+  return line;
+}

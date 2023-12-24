@@ -232,3 +232,33 @@ TEST(CreatureTests, GetClosestFoodInSight_MultipleFoods) {
   ASSERT_EQ(closest_food, &meat_1);
 }
 
+TEST(CreatureTests, GetClosestFoodInSight_NoFoodInSight) {
+  neat::Genome genome(3, 4);
+  Creature creature(genome);
+
+  std::vector<std::vector<std::vector<Entity*> > > grid;
+  double gridCellSize = 1.0;
+  grid.assign(10, std::vector<std::vector<Entity*> >(10));
+
+  Meat meat_1, meat_2, meat_3;
+  meat_1.SetCoordinates(4.82, 3.06, 10, 10); // distance = 0.78, angle = 90
+  grid[3][2].push_back(&meat_1);
+  meat_2.SetCoordinates(2.93273, 2.87064, 10, 10); // distance = 1.52
+  grid[2][2].push_back(&meat_2);
+  meat_3.SetCoordinates(3.87724,2.52718, 10, 10); // distance = 1.14
+  grid[3][2].push_back(&meat_3);
+
+
+  double creature_x = 4.26364, creature_y = 3.60048;
+  creature.SetCoordinates(creature_x, creature_y, 10, 10);
+  double target_x = 2.84687, target_y = 2.26958;
+  creature.SetOrientation(OrientedAngle(Point(creature_x,creature_y),Point(target_x,target_y)).GetAngle());
+  creature.SetVision(1, M_PI/3);
+
+  auto closest_food = creature.GetClosestFoodInSight(grid, gridCellSize);
+
+  ASSERT_EQ(closest_food, nullptr);
+}
+
+
+

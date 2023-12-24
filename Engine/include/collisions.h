@@ -47,4 +47,6 @@ bool IsGridCellPotentiallyInsideCone(Point grid_point, double grid_cell_size,
                                      Point cone_center, double cone_radius,
                                      OrientedAngle cone_left_boundary,
                                      OrientedAngle cone_right_boundary);
+
+std::vector<std::pair<int, int>> SupercoverBresenhamLine(int x0, int y0, int x1, int y1);
 #endif  // COLLISIONS_H
