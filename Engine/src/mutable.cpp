@@ -137,3 +137,23 @@ void Mutable::SetMaxForce(double value) { max_force_ = value; }
 void Mutable::SetGrowthFactor(double value) { growth_factor_ = value; }
 void Mutable::SetReproductionCooldown(double value) { reproduction_cooldown_ = value; }
 void Mutable::SetMaturityAge(double value) { maturity_age_ = value; }
+
+Mutable Crossover(Mutable &dominant, Mutable &recessive) {
+  Mutable crossover;
+  crossover.SetEnergyDensity((2*dominant.GetEnergyDensity()
+                              + recessive.GetEnergyDensity())/3);
+  crossover.SetEnergyLoss((2*dominant.GetEnergyLoss() +
+                           recessive.GetEnergyLoss() )/3);
+  crossover.SetStrafingDifficulty((2*dominant.GetStrafingDifficulty() +
+                                   recessive.GetStrafingDifficulty() )/3);
+  crossover.SetMaxSize((2*dominant.GetMaxSize() +
+                        recessive.GetMaxSize() )/3);
+  crossover.SetBabySize((2*dominant.GetBabySize() +
+                         recessive.GetBabySize() )/3);
+  crossover.SetMaxForce((2*dominant.GetMaxForce() +
+                         recessive.GetMaxForce() )/3);
+  crossover.SetGrowthFactor((2*dominant.GetGrowthFactor() +
+                             recessive.GetGrowthFactor() )/3);
+  crossover.UpdateReproduction();
+  return crossover;
+}
