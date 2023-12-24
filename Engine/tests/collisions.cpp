@@ -268,7 +268,8 @@ TEST(CollisionTests, OnCollisionWithFood) {
 
   // Create a Creature and Food for testing
   neat::Genome genome(2, 3);
-  Creature creature(genome);
+  Mutable mutables;
+  Creature creature(genome, mutables);
   Food food;
   food.SetSize(1.0);
 
@@ -372,7 +373,8 @@ class CreatureTest : public ::testing::Test {
 
 TEST_F(CreatureTest, GetClosestFood_EmptyGrid) {
   // Create a Creature with a mock genome
-  Creature creature(neat::Genome(2, 3));
+  Mutable mutables;
+  Creature creature(neat::Genome(2, 3), mutables);
 
   // Set up an empty grid
   std::vector<std::vector<std::vector<Entity*>>> grid;
@@ -394,7 +396,8 @@ TEST_F(CreatureTest, GetClosestFood_EmptyGrid) {
  */
 TEST_F(CreatureTest, GetClosestFood_NoFoodInGrid) {
   // Create a Creature with a mock genome
-  Creature creature(neat::Genome(2, 3));
+  Mutable mutables;
+  Creature creature(neat::Genome(2, 3), mutables);
   creature.SetCoordinates(0, 0, 10, 10);
 
   // Set up a grid with creatures but no food
@@ -419,9 +422,10 @@ TEST_F(CreatureTest, GetClosestFood_NoFoodInGrid) {
  */
 TEST_F(CreatureTest, GetClosestFoodTest) {
   // Create a Creature with a mock genome
-  Creature creature1(neat::Genome(2, 2));
-  Creature creature2(neat::Genome(3, 4));
-  Creature creature3(neat::Genome(5, 6));
+  Mutable mutables;
+  Creature creature1(neat::Genome(2, 2), mutables);
+  Creature creature2(neat::Genome(3, 4), mutables);
+  Creature creature3(neat::Genome(5, 6), mutables);
 
   // Set creature coordinates and sizes
   creature1.SetCoordinates(3.5, 4.5, 100.0, 100.0);
@@ -495,7 +499,8 @@ TEST_F(CreatureTest, GetClosestFoodTest2) {
   grid.assign(100, std::vector<std::vector<Entity*>>(100));
 
   double grid_cell_size = 1;
-  Creature* cr = new Creature(neat::Genome(2, 2));
+  Mutable mutables;
+  Creature* cr = new Creature(neat::Genome(2, 2), mutables);
   cr->SetCoordinates(1.6, 1.1, 100.0, 100.0);
   Food* f1 = new Food(2.5, 0.5);
   Food* f2 = new Food(2.2, 0.9);
@@ -559,12 +564,13 @@ TEST(SimulationDataTest, UpdateGridWithAliveEntities) {
   simData.food_entities_.clear();
   simData.ClearGrid();
 
-  Creature creature_1(neat::Genome(2, 3));
+  Mutable mutables;
+  Creature creature_1(neat::Genome(2, 3), mutables);
   creature_1.SetCoordinates(2.1, 3.4, 100.0, 100.0);
   creature_1.SetSize(10.0);
   simData.creatures_.push_back(creature_1);
 
-  Creature creature_2(neat::Genome(2, 3));
+  Creature creature_2(neat::Genome(2, 3), mutables);
   creature_2.SetCoordinates(1.1, 2.4, 100.0, 100.0);
   creature_2.SetSize(10.0);
   creature_2.SetState(Entity::Dead);
@@ -601,13 +607,14 @@ TEST(SimulationDataTest, CorrectEntityPlacementInGrid) {
   simData.food_entities_.clear();
   simData.ClearGrid();
 
-  Creature creature_1(neat::Genome(2, 3));
+  Mutable mutables;
+  Creature creature_1(neat::Genome(2, 3), mutables);
   creature_1.SetCoordinates(200.1, 300.4, settings::environment::kMapWidth,
                             settings::environment::kMapHeight);
   creature_1.SetSize(10.0);
   simData.creatures_.push_back(creature_1);
 
-  Creature creature_2(neat::Genome(2, 3));
+  Creature creature_2(neat::Genome(2, 3), mutables);
   creature_2.SetCoordinates(100.1, 350.4, settings::environment::kMapWidth,
                             settings::environment::kMapHeight);
   creature_2.SetSize(10.0);

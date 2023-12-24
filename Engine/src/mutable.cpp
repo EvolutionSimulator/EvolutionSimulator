@@ -154,7 +154,7 @@ void Mutable::SetGrowthFactor(double value) { growth_factor_ = value; }
 void Mutable::SetReproductionCooldown(double value) { reproduction_cooldown_ = value; }
 void Mutable::SetMaturityAge(double value) { maturity_age_ = value; }
 
-Mutable Crossover(Mutable &dominant, Mutable &recessive) {
+Mutable MutableCrossover(Mutable &dominant, Mutable &recessive) {
   Mutable crossover;
   crossover.SetEnergyDensity((2*dominant.GetEnergyDensity()
                               + recessive.GetEnergyDensity())/3);

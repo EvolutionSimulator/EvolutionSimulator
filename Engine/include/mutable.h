@@ -45,10 +45,14 @@ private:
   double max_size_;
   double baby_size_;
   double max_force_;
-  double growth_factor_;
-  double reproduction_cooldown_;
+  double growth_factor_; /*!< Determines how the creature grows in relation to
+                            energy intake. */
+  double reproduction_cooldown_; /*!< Cooldown period before the creature can
+                                    reproduce again. */
   double maturity_age_;
 };
+namespace Mutables {
+Mutable Crossover(const Mutable& dominant, const Mutable& recessive);
+}
 
-Mutable Crossover(const Mutable &dominant, const Mutable &recessive);
 #endif // MUTABLE_H
