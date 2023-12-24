@@ -27,20 +27,20 @@ struct NeuronInput {
  * @brief Represents a neuron in a feed-forward neural network.
  *
  * @details This structure is used to represent a neuron in the neural network
- * constructed from a NEAT genome. It includes the neuron's ID, its bias, and
- * its input connections.
+ * constructed from a NEAT genome. It includes the neuron's ID, its bias, the
+ * value it stores and its input connections.
  */
 struct FeedForwardNeuron {
   int id;       /*!< The ID of the neuron. */
   double bias;  /*!< The bias of the neuron. */
   double value; /*!< The value of the neuron. Important for the neurons which
-                   are at the end of a cycle.*/
+                   start a cycle.*/
   std::vector<NeuronInput> inputs; /*!< A vector of NeuronInput representing the
                                       inputs to this neuron. */
   std::vector<NeuronInput>
       inputs_from_cycles; /*!< A vector of NeuronInput representing the
                  inputs from the previous neurons in the cycles. Note that one
-                 neuron can be at the ends of multiple cycles*/
+                 neuron can be at the starts of multiple cycles*/
 };
 
 /*!

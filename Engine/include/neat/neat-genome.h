@@ -55,10 +55,7 @@ class Genome {
                                    neurons in the Genome. */
   std::vector<Link> links_;     /*!< A vector of Link objects representing the
                                    connections between neurons in the Genome.
-                                   These connections do not induce cycles on their own */
- /* std::vector<Link> cycle_links_; /*!< A vector of Link objects representing the connections
-                                      that introduce cycles. They are separated from other links
-                                        because they are usually considered in different scenarios. */
+                                    */
   bool DFS(const Neuron& currentNeuron, std::unordered_set<int>& visited,
            std::unordered_set<int>& visiting) const;
 };

@@ -100,7 +100,7 @@ std::vector<double> NeuralNetwork::Activate(
     }
   }
 
-  // update values of ffneurons which are at the end of a cycle
+  // update values of ffneurons. this affects those neurons which start a cycle
   for (FeedForwardNeuron &ffneuron : ffneurons_) {
     ffneuron.value = 0;
     for (const NeuronInput &neuron_input : ffneuron.inputs_from_cycles) {
