@@ -55,6 +55,12 @@ constexpr double kFixedUpdateInterval = 0.05;
 constexpr double EPS = 1e-7;
 constexpr size_t kMaxCellsToFindFood = 30;
 }  // namespace engine
+
+namespace physical_constraints {
+constexpr double kMaxEnergyDensity = 1.0;
+constexpr double kMinEnergyLoss = 0.1;
+
+} //namespace physical_constraints
 }  // namespace settings
 
 #endif  // CONFIG_H
