@@ -62,6 +62,7 @@ constexpr double kMaxEnergyDensity = 1.0;
 constexpr double kMinEnergyLoss = 0.1;
 constexpr double kDEnergyDensity = 0.5;
 constexpr double kDEnergyLoss = 0.5;
+constexpr double kDIntegrity = 0.2;
 constexpr double kDStrafingDifficulty = 0.5;
 constexpr double kDMaxSize = 10;
 constexpr double kDBabySize = 2;

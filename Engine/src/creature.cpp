@@ -30,8 +30,9 @@
  * `settings::environment::kReproductionCooldown`.
  * - Age: 0
  */
-Creature::Creature(neat::Genome genome)
+Creature::Creature(neat::Genome genome, Mutable mutable_)
     : MovableEntity(),
+
       health_(100),
       energy_(100),
       brain_(neat::NeuralNetwork(genome)),
