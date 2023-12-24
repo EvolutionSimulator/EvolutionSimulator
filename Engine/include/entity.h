@@ -21,6 +21,8 @@ class Entity {
                             const double max_creature_size,
                             const double min_creature_size);
 
+  void RandomInitialization(const double world_width, const double world_height);
+
   double GetSize() const;
   void SetSize(double size);
 

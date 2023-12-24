@@ -40,7 +40,7 @@ constexpr int kMinCreatureSize = 2;
 constexpr double kReproductionThreshold = 0.90;
 constexpr double kReproductionCooldown = 10;
 constexpr int kInputNeurons = 6;
-constexpr int kOutputNeurons = 3;
+constexpr int kOutputNeurons = 4;
 constexpr double kMaxNutritionalValue = 5;
 constexpr double kDefaultLifespan = 30;
 constexpr double kPhotosynthesisFactor = 0.1;
@@ -58,11 +58,11 @@ constexpr size_t kMaxCellsToFindFood = 30;
 
 namespace physical_constraints {
 constexpr double kMutationRate = 0.2;
-constexpr double kMaxEnergyDensity = 1.0;
+constexpr double kMaxEnergyDensity = 10.0;
 constexpr double kMinEnergyLoss = 0.1;
-constexpr double kDEnergyDensity = 0.5;
+constexpr double kDEnergyDensity = 5.0;
 constexpr double kDEnergyLoss = 0.5;
-constexpr double kDIntegrity = 0.2;
+constexpr double kDIntegrity = 3.0;
 constexpr double kDStrafingDifficulty = 0.5;
 constexpr double kDMaxSize = 10;
 constexpr double kDBabySize = 2;

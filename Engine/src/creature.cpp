@@ -33,15 +33,17 @@
 Creature::Creature(neat::Genome genome, Mutable mutables)
     : MovableEntity(),
       mutable_(mutables),
-      health_(mutables.GetIntegrity() * pow(size_, 3)),
-      energy_(mutables.GetEnergyDensity() * pow(size_, 3)),
       brain_(neat::NeuralNetwork(genome)),
       genome_(genome),
       neuron_data_(settings::environment::kInputNeurons, 0),
       vision_radius_(settings::environment::kVisionRadius),
       vision_angle_(settings::environment::kVisionAngle),
       age_(0),
-      reproduction_cooldown_ (mutables.GetMaturityAge()) {}
+      reproduction_cooldown_ (mutables.GetMaturityAge()) {
+    size_ = mutables.GetBabySize();
+    health_ = mutables.GetIntegrity() * pow(size_, 3);
+    energy_ = mutables.GetEnergyDensity() * pow(size_, 3);
+}
 
 
 /*!
@@ -85,12 +87,12 @@ double Creature::GetEnergy() const { return energy_; }
  * their current values and predefined thresholds.
  */
 void Creature::BalanceHealthEnergy() {
-  if (GetEnergy() < 0) {
-    SetHealth(GetHealth() + GetEnergy() - 0.1);
-    SetEnergy(0.1);
-    if (GetHealth() >= (GetEnergy() - 0.1)) {
-      SetHealth(GetHealth() + (GetEnergy() - 0.1));
-      SetEnergy(0.1);
+  if (GetEnergy() < 1) {
+    SetHealth(GetHealth() + GetEnergy() - 1);
+    SetEnergy(1);
+    if (GetHealth() >= (GetEnergy() - 1)) {
+      SetHealth(GetHealth() + (GetEnergy() - 1));
+      SetEnergy(1);
     } else {
       SetHealth((GetHealth() + GetEnergy()) / 2);
       SetEnergy(GetHealth());
@@ -107,11 +109,11 @@ void Creature::BalanceHealthEnergy() {
     SetHealth(GetHealth() + (GetEnergy() - max_energy_));
     SetEnergy(max_energy_);
   } else if (GetHealth() > GetEnergy() &&
-             GetEnergy() <= settings::environment::kHealthToEnergy) {
+             GetEnergy() <= 0) {
     SetEnergy(GetEnergy() + 0.1);
     SetHealth(GetHealth() - 0.1);
   } else if (GetHealth() < GetEnergy() &&
-             GetEnergy() >= settings::environment::kEnergyToHealth) {
+             GetEnergy() >= 0.1*max_energy_) {
     SetEnergy(GetEnergy() - 0.1);
     SetHealth(GetHealth() + 0.1);
   }
@@ -133,8 +135,8 @@ double Creature::GetHealth() const { return health_; }
  * @param health The new health level to be set, capped at 100.
  */
 void Creature::SetHealth(double health) {
-  if (health > mutable_.GetIntegrity() * pow(size_, 2)) {
-    health_ = mutable_.GetIntegrity() * pow(size_, 2);
+  if (health > mutable_.GetIntegrity() * pow(size_, 3)) {
+    health_ = mutable_.GetIntegrity() * pow(size_, 3);
   } else {
     health_ = health;
   }
@@ -155,8 +157,8 @@ void Creature::Dies() { SetState(Dead); }
  * maximum energy.
  */
 void Creature::SetEnergy(double energy) {
-  if (energy > mutable_.GetEnergyDensity() * pow(size_, 2)) {
-    energy_ = mutable_.GetEnergyDensity() * pow(size_, 2);
+  if (energy > mutable_.GetEnergyDensity() * pow(size_, 3)) {
+    energy_ = mutable_.GetEnergyDensity() * pow(size_, 3);
   } else {
     energy_ = energy;
   }
@@ -172,10 +174,10 @@ void Creature::SetEnergy(double energy) {
  * calculated.
  */
 void Creature::UpdateEnergy(double deltaTime) {
-  SetEnergy(GetEnergy() -
-            (fabs(GetAcceleration()) + fabs(GetRotationalAcceleration()) + 50) *
-                GetSize() * deltaTime / 100);
+  double movement_energy = (fabs(GetAcceleration()) + fabs(GetRotationalAcceleration())) * GetSize() * deltaTime/200;
+  double heat_loss = mutable_.GetEnergyLoss() * pow(size_, 2) * deltaTime/100;
 
+  SetEnergy(GetEnergy() - movement_energy - heat_loss);
   BalanceHealthEnergy();
 
   if (GetHealth() <= 0) {
@@ -192,7 +194,7 @@ void Creature::UpdateEnergy(double deltaTime) {
  * @return true if the creature is fit for reproduction, false otherwise.
  */
 bool Creature::Fit() {
-  if (energy_ > settings::environment::kReproductionThreshold * mutable_.GetEnergyDensity() * pow(size_, 2) &&
+  if (energy_ > settings::environment::kReproductionThreshold * mutable_.GetEnergyDensity() * pow(size_, 3) &&
       reproduction_cooldown_ == 0.0) {
     return true;
   }
@@ -206,7 +208,7 @@ bool Creature::Fit() {
  * the cooldown period.
  */
 void Creature::Reproduced() {
-  SetEnergy(GetEnergy() - 0.75 * mutable_.GetEnergyDensity() * pow(size_, 2));
+  SetEnergy(GetEnergy() - 0.75 * mutable_.GetEnergyDensity() * pow(size_, 3));
   reproduction_cooldown_ = mutable_.GetReproductionCooldown();
 }
 
@@ -228,7 +230,7 @@ void Creature::Reproduced() {
  * @param max_energy The desired maximum energy level.
  */
 void Creature::UpdateMaxEnergy() {
-  max_energy_ = mutable_.GetEnergyDensity() * pow(size_, 2) - age_;
+  max_energy_ = mutable_.GetEnergyDensity() * pow(size_, 3) - age_/50;
 }
 
 /*!
@@ -290,7 +292,7 @@ void Creature::Update(double deltaTime, double const kMapWidth,
   this->UpdateVelocities(deltaTime);
   this->Move(deltaTime, kMapWidth, kMapHeight);
   this->Rotate(deltaTime);
-  this->Think(grid, GridCellSize);
+  this->Think(grid, GridCellSize, deltaTime);
   age_ += 0.05;
 
   if (reproduction_cooldown_ <= 0) {
@@ -354,7 +356,7 @@ void Creature::OnCollision(Entity &other_entity, double const kMapWidth,
  * @param GridCellSize Size of each cell in the grid.
  */
 void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
-                     double GridCellSize) {
+                     double GridCellSize, double deltaTime) {
   // Not pretty but we'll figure out a better way in the future
   ProcessVisionFood(grid, GridCellSize);
   neuron_data_.at(0) = energy_;
@@ -365,8 +367,9 @@ void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
   neuron_data_.at(5) = distance_food_;
   std::vector<double> output = brain_.Activate(neuron_data_);
   SetAcceleration(std::tanh(output.at(0))*mutable_.GetMaxForce());
-  SetAccelerationAngle(output.at(1));
-  SetRotationalAcceleration(output.at(2)*mutable_.GetMaxForce());
+  SetAccelerationAngle(std::tanh(output.at(1)) * M_PI);
+  SetRotationalAcceleration(std::tanh(output.at(2))*mutable_.GetMaxForce());
+  Grow(std::max(std::tanh(output.at(3)) * deltaTime, 0.0));
 }
 
 /*!

@@ -135,6 +135,13 @@ void Entity::RandomInitialization(const double world_width,
   orientation_ = GetRandomFloat(2*M_PI) - M_PI;
 }
 
+void Entity::RandomInitialization(const double world_width,
+                                  const double world_height) {
+  x_coord_ = GetRandomFloat(world_width);
+  y_coord_ = GetRandomFloat(world_height);
+  orientation_ = GetRandomFloat(2*M_PI);
+}
+
 /*!
  * @brief Calculates the distance between this entity and another entity,
  * considering world wrap-around.

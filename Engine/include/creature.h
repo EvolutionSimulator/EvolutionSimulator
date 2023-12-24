@@ -76,10 +76,12 @@ class Creature : public MovableEntity {
       double grid_cell_size) const;
 
   void Grow(double energy);
-  void Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
-             double GridCellSize);
-  void ProcessVisionFood(std::vector<std::vector<std::vector<Entity *>>> &grid,
-                         double grid_cell_size);
+
+  void Think(std::vector<std::vector<std::vector<Entity *> > > &grid,
+             double GridCellSize, double deltaTime);
+  void ProcessVisionFood(
+      std::vector<std::vector<std::vector<Entity *> > > &grid,
+      double GridCellSize);
 
   int GetGeneration() const;
   void SetGeneration(int generation);
