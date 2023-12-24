@@ -51,8 +51,8 @@ private:
                                     reproduce again. */
   double maturity_age_;
 };
-namespace Mutables {
-Mutable Crossover(const Mutable& dominant, const Mutable& recessive);
-}
+
+Mutable MutableCrossover(const Mutable& dominant, const Mutable& recessive);
+
 
 #endif // MUTABLE_H

@@ -7,6 +7,7 @@
 #include "environment.h"
 #include "food.h"
 
+
 struct SimulationData {
  public:
   std::vector<int> GetCreatureCountOverTime() const;

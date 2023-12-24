@@ -27,7 +27,7 @@ double Mutable::Complexity() {
                        + integrity_ * 20
                        + 5/(1+strafing_difficulty_)
                        + max_force_ * 2
-                       + 5/growth_factor_) * baby_size_;
+                       + 5/growth_factor_) * baby_size_/10;
   return complexity;
 }
 
@@ -39,7 +39,7 @@ void Mutable::Mutate() {
   //Energy Density
   if (uniform(gen) < settings::physical_constraints::kMutationRate){
     std::normal_distribution<> dis(0.0,
-            settings::physical_constraints::kDEnergyDensity/10);
+            settings::physical_constraints::kDEnergyDensity/20);
     double delta = dis(gen);
     energy_density_ += delta;
     if (energy_density_ > settings::physical_constraints::kMaxEnergyDensity) {
@@ -52,7 +52,7 @@ void Mutable::Mutate() {
   //Energy Loss
   if (uniform(gen) < settings::physical_constraints::kMutationRate){
     std::normal_distribution<> dis(0.0,
-            settings::physical_constraints::kDEnergyLoss/10);
+            settings::physical_constraints::kDEnergyLoss/20);
     double delta = dis(gen);
     energy_loss_ += delta;
     if (energy_loss_ < settings::physical_constraints::kMinEnergyLoss) {
@@ -63,7 +63,7 @@ void Mutable::Mutate() {
   //Integrity
   if (uniform(gen) < settings::physical_constraints::kMutationRate){
     std::normal_distribution<> dis(0.0,
-            settings::physical_constraints::kDEnergyDensity/10);
+            settings::physical_constraints::kDEnergyDensity/20);
     double delta = dis(gen);
     integrity_ += delta;
     if (integrity_ < 0) {
@@ -75,7 +75,7 @@ void Mutable::Mutate() {
   //Strafing Difficulty
   if (uniform(gen) < settings::physical_constraints::kMutationRate){
     std::normal_distribution<> dis(0.0,
-            settings::physical_constraints::kDStrafingDifficulty/10);
+            settings::physical_constraints::kDStrafingDifficulty/20);
     double delta = dis(gen);
     strafing_difficulty_ += delta;
     if (strafing_difficulty_ < 0) {
@@ -86,7 +86,7 @@ void Mutable::Mutate() {
   //Max Size
   if (uniform(gen) < settings::physical_constraints::kMutationRate){
     std::normal_distribution<> dis(0.0,
-            settings::physical_constraints::kDMaxSize/10);
+            settings::physical_constraints::kDMaxSize/20);
     double delta = dis(gen);
     max_size_ += delta;
     if (max_size_ < settings::environment::kMinCreatureSize) {
@@ -97,7 +97,7 @@ void Mutable::Mutate() {
   //Baby Size
   if (uniform(gen) < settings::physical_constraints::kMutationRate){
     std::normal_distribution<> dis(0.0,
-            settings::physical_constraints::kDBabySize/10);
+            settings::physical_constraints::kDBabySize/20);
     double delta = dis(gen);
     baby_size_ += delta;
     if (baby_size_ < settings::environment::kMinCreatureSize) {
@@ -110,7 +110,7 @@ void Mutable::Mutate() {
   //Max Force
   if (uniform(gen) < settings::physical_constraints::kMutationRate){
     std::normal_distribution<> dis(0.0,
-            settings::physical_constraints::kDMaxForce/10);
+            settings::physical_constraints::kDMaxForce/20);
     double delta = dis(gen);
     max_force_ += delta;
     if (max_force_ < 0) {
@@ -121,7 +121,7 @@ void Mutable::Mutate() {
   //Growth Factor
   if (uniform(gen) < settings::physical_constraints::kMutationRate){
     std::normal_distribution<> dis(0.0,
-            settings::physical_constraints::kDMaxForce/10);
+            settings::physical_constraints::kDMaxForce/20);
     double delta = dis(gen);
     growth_factor_ += delta;
     if (growth_factor_ < 0) {
@@ -154,7 +154,7 @@ void Mutable::SetGrowthFactor(double value) { growth_factor_ = value; }
 void Mutable::SetReproductionCooldown(double value) { reproduction_cooldown_ = value; }
 void Mutable::SetMaturityAge(double value) { maturity_age_ = value; }
 
-Mutable MutableCrossover(Mutable &dominant, Mutable &recessive) {
+Mutable MutableCrossover(const Mutable &dominant, const Mutable &recessive) {
   Mutable crossover;
   crossover.SetEnergyDensity((2*dominant.GetEnergyDensity()
                               + recessive.GetEnergyDensity())/3);

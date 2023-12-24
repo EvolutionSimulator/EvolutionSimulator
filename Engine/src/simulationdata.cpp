@@ -101,6 +101,7 @@ void SimulationData::UpdateAllCreatures(double deltaTime) {
                     environment_.GetFrictionalCoefficient());
     if (creature.Fit()) {
       reproduce_.push(creature);
+      creature.Reproduced();
     }
   }
   world_time_ += deltaTime;
@@ -143,7 +144,7 @@ void SimulationData::ReproduceCreatures() {
   double world_height = settings::environment::kMapHeight;
   double max_creature_size = settings::environment::kMaxCreatureSize;
   double min_creature_size = settings::environment::kMinCreatureSize;
-  while (reproduce_.size() > 2) {
+  while (reproduce_.size() >= 2) {
     Creature creature1 = reproduce_.front();
     reproduce_.pop();
     Creature creature2 = reproduce_.front();
@@ -157,12 +158,11 @@ void SimulationData::ReproduceCreatures() {
       new_genome.Mutate();
       new_genome.Mutate();
       Mutable new_mutable =
-          Mutables::Crossover(creature1.GetMutable(), creature2.GetMutable());
+          MutableCrossover(creature1.GetMutable(), creature2.GetMutable());
       new_mutable.Mutate();
       new_mutable.Mutate();
       Creature new_creature(new_genome, new_mutable);
-      new_creature.RandomInitialization(world_width, world_height,
-                                        max_creature_size, min_creature_size);
+      new_creature.RandomInitialization(world_width, world_height);
       new_creature.SetGeneration(creature1.GetGeneration() + 1);
       AddCreature(new_creature);
     } else {
@@ -171,17 +171,14 @@ void SimulationData::ReproduceCreatures() {
       new_genome.Mutate();
       new_genome.Mutate();
       Mutable new_mutable =
-          Mutables::Crossover(creature2.GetMutable(), creature1.GetMutable());
+          MutableCrossover(creature2.GetMutable(), creature1.GetMutable());
       new_mutable.Mutate();
       new_mutable.Mutate();
       Creature new_creature(new_genome, new_mutable);
-      new_creature.RandomInitialization(world_width, world_height,
-                                        max_creature_size, min_creature_size);
+      new_creature.RandomInitialization(world_width, world_height);
       new_creature.SetGeneration(creature2.GetGeneration() + 1);
       AddCreature(new_creature);
     }
-    creature1.Reproduced();
-    creature2.Reproduced();
   }
 }
 
@@ -210,8 +207,7 @@ void SimulationData::InitializeCreatures() {
           mutables.Mutate();
         }
         Creature new_creature(genome, mutables);
-        new_creature.RandomInitialization(world_width, world_height,
-                                          max_creature_size, min_creature_size);
+        new_creature.RandomInitialization(world_width, world_height);
         creatures_.emplace_back(new_creature);
       }
     }
