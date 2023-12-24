@@ -34,6 +34,7 @@ class SimulationCanvas : public QSFMLCanvas {
 
   // New function declaration for drawing the number of creatures over time
   void DrawCreatureCountOverTime(sf::RenderWindow &window, const std::vector<Creature> &creatures);
+  void DrawVisionCone(sf::RenderTarget& target, const Creature& creature);
 
   protected:
   void mousePressEvent(QMouseEvent *event) override;

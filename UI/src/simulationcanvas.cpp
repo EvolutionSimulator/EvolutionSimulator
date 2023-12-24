@@ -119,6 +119,7 @@ void SimulationCanvas::OnUpdate()
       creatureInfo = QString::fromStdString(formatCreatureInfo(creature));
 
       if (selectedCreatureInfo && creature.GetID() == selectedCreatureInfo->id) {
+
           sf::CircleShape redCircle(creature.GetSize()); // Adjust as needed
           redCircle.setOutlineColor(sf::Color::Red);
           redCircle.setOutlineThickness(2); // Adjust thickness as needed
@@ -126,6 +127,8 @@ void SimulationCanvas::OnUpdate()
           redCircle.setPosition(creature.GetCoordinates().first - creature.GetSize(),
                                 creature.GetCoordinates().second - creature.GetSize());
           draw(redCircle);
+
+          DrawVisionCone(*this, creature);
 
           // Check if the creature's health is 0 and display the message
           if (creature.GetHealth() == 0) {
@@ -465,3 +468,37 @@ std::string SimulationCanvas::formatCreatureInfo(const Creature& creature) {
   ss << "(x=" << x << ", y=" << y << ")\n";
   return ss.str();
 }
+
+
+void SimulationCanvas::DrawVisionCone(sf::RenderTarget& target, const Creature& creature) {
+
+  double visionRadius = creature.GetVisionRadius();
+  double visionAngle = creature.GetVisionAngle();
+
+  double creatureOrientation = creature.GetOrientation();
+
+  double leftRad = creatureOrientation - visionAngle / 2.0;
+  double rightRad = creatureOrientation + visionAngle / 2.0;
+
+  auto [creatureX, creatureY] = creature.GetCoordinates();
+
+  std::vector<sf::Vertex> triangleFan;
+  triangleFan.push_back(sf::Vertex(sf::Vector2f(creatureX, creatureY), sf::Color::Transparent));
+
+  int numPoints = 30;
+  for (int i = 0; i <= numPoints; ++i) {
+    double angle = leftRad + (i * (rightRad - leftRad) / numPoints);
+    double x = creatureX + visionRadius * cos(angle);
+    double y = creatureY + visionRadius * sin(angle);
+    triangleFan.push_back(sf::Vertex(sf::Vector2f(x, y), sf::Color(255, 255, 255, 150)));
+  }
+
+  for (size_t i = 1; i < triangleFan.size() - 1; ++i) {
+    sf::VertexArray triangle(sf::Triangles, 3);
+    triangle[0] = triangleFan[0];
+    triangle[1] = triangleFan[i];
+    triangle[2] = triangleFan[i + 1];
+    target.draw(triangle);
+  }
+}
+
