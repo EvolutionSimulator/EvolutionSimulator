@@ -57,8 +57,16 @@ constexpr size_t kMaxCellsToFindFood = 30;
 }  // namespace engine
 
 namespace physical_constraints {
+constexpr double kMutationRate = 0.2;
 constexpr double kMaxEnergyDensity = 1.0;
 constexpr double kMinEnergyLoss = 0.1;
+constexpr double kDEnergyDensity = 0.5;
+constexpr double kDEnergyLoss = 0.5;
+constexpr double kDStrafingDifficulty = 0.5;
+constexpr double kDMaxSize = 10;
+constexpr double kDBabySize = 2;
+constexpr double kDMaxForce = 10;
+constexpr double kDGrowthFactor = 5;
 
 } //namespace physical_constraints
 }  // namespace settings
