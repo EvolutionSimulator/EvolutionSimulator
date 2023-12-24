@@ -10,6 +10,10 @@ Mutable::Mutable()
     baby_size_(settings::physical_constraints::kDBabySize),
     max_force_(settings::physical_constraints::kDMaxForce),
     growth_factor_(settings::physical_constraints::kDGrowthFactor) {
+  UpdateReproduction();
+}
+
+void Mutable::UpdateReproduction() {
   double complexity  = Complexity();
   maturity_age_ = complexity * (1 + max_size_ - baby_size_) * 0.2;
   reproduction_cooldown_ = complexity * 0.5;
@@ -18,8 +22,10 @@ Mutable::Mutable()
 double Mutable::Complexity() {
   //values to tweak in order to achieve ideal conditions
   double complexity = (energy_density_*10
-          + 5/energy_loss_ + 5/(1+strafing_difficulty_)
-          + max_force_ * 2 + 5/growth_factor_) * baby_size_;
+                       + 5/energy_loss_
+                       + 5/(1+strafing_difficulty_)
+                       + max_force_ * 2
+                       + 5/growth_factor_) * baby_size_;
   return complexity;
 }
 
@@ -87,7 +93,27 @@ void Mutable::Mutate() {
     }
   }
 
+  //Max Force
+  if (uniform(gen) < settings::physical_constraints::kMutationRate){
+    std::normal_distribution<> dis(0.0,
+            settings::physical_constraints::kDMaxForce/10);
+    double delta = dis(gen);
+    max_force_ += delta;
+    if (max_force_ < 0) {
+        max_force_ = 0;
+    }
+  }
 
+  //Growth Factor
+  if (uniform(gen) < settings::physical_constraints::kMutationRate){
+    std::normal_distribution<> dis(0.0,
+            settings::physical_constraints::kDMaxForce/10);
+    double delta = dis(gen);
+    growth_factor_ += delta;
+    if (growth_factor_ < 0) {
+        growth_factor_ = 0;
+    }
+  }
 }
 
 // Getters

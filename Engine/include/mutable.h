@@ -10,6 +10,8 @@ public:
   void Mutate();
   double Distance(Mutable &other_mutable) const;
   double Complexity();
+  void UpdateReproduction();
+
 
   // Getters
   double GetEnergyDensity() const;
