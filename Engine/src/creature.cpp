@@ -391,11 +391,32 @@ void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
 }
 
 /*!
+ * @brief Generates a random floating-point number within a given range.
+ *
+ * @details This function uses a uniform distribution to ensure an even spread
+ * of values.
+ *
+ * @param max_value The upper limit of the random number range.
+ *
+ * @return A random floating-point number between 0 and max_value.
+ */
+double GetRandomFloat(double min_value, double max_value) {
+  std::random_device rd;
+  std::mt19937 gen(rd());
+
+  std::uniform_real_distribution<double> dis(min_value, max_value);
+  return dis(gen);
+}
+
+
+/*!
  * @brief Processes the creature's vision to locate food.
  *
  * @details Determines the closest food entity based on the creature's position
  * and updates the creature's orientation and distance metrics towards the
- * located food.
+ * located food. If there is no food in sight, it assumes the distance to food is
+ * the vision radius (so far away), and the orientation is something random
+ * in its field of view.
  *
  * @param grid The environmental grid.
  * @param GridCellSize Size of each cell in the grid.
@@ -406,11 +427,11 @@ void Creature::ProcessVisionFood(
   Food *food = GetClosestFoodInSight(grid, GridCellSize);
   if (food) {
     distance_food_ = this->GetDistance(*food, settings::environment::kMapWidth,
-                                       settings::environment::kMapHeight);
+                                       settings::environment::kMapHeight) - (*food).GetSize();
     orientation_food_ = this->GetRelativeOrientation(*food);
   } else {
-    distance_food_ = 0;
-    orientation_food_ = 0;
+    distance_food_ = vision_radius_;
+    orientation_food_ = remainder(GetRandomFloat(orientation_- vision_angle_/2, orientation_+ vision_angle_/2), 2*M_PI);
   }
 }
 
@@ -631,6 +652,8 @@ Food *Creature::GetClosestFoodInSight(
   int x_grid = static_cast<int>(x_coord_ / grid_cell_size);
   int y_grid = static_cast<int>(y_coord_ / grid_cell_size);
 
+  int max_cells_to_find_food = M_PI * (vision_radius_ + grid_cell_size) * (vision_radius_ + grid_cell_size) / (grid_cell_size * grid_cell_size);
+
   auto cone_center = Point(x_coord_, y_coord_);
   auto cone_orientation = GetOrientation();
   auto cone_left_boundary = OrientedAngle(cone_orientation - vision_angle_ / 2);
@@ -678,10 +701,12 @@ Food *Creature::GetClosestFoodInSight(
         }
       }
     }
-    if (closest_food ||
-        processed_cells > settings::engine::kMaxCellsToFindFood) {
+    if (closest_food) {
       break;
     }
+
+    assert(processed_cells <= max_cells_to_find_food && "processed_cells exceeded max_cells_to_find_food in GetClosestFoodInSight");
+
     for (int dx = -1; dx <= 1; ++dx) {
       for (int dy = -1; dy <= 1; ++dy) {
         if (dx * dx + dy * dy != 1) continue;
