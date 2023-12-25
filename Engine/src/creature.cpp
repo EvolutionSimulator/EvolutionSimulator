@@ -36,13 +36,14 @@ Creature::Creature(neat::Genome genome, Mutable mutables)
       brain_(neat::NeuralNetwork(genome)),
       genome_(genome),
       neuron_data_(settings::environment::kInputNeurons, 0),
-      vision_radius_(settings::environment::kVisionRadius),
-      vision_angle_(settings::environment::kVisionAngle),
+      vision_radius_(mutables.GetVisionFactor()),
+      vision_angle_(settings::physical_constraints::kVisionARratio
+                    / mutables.GetVisionFactor()),
       age_(0),
       reproduction_cooldown_ (mutables.GetMaturityAge()) {
     size_ = mutables.GetBabySize();
-    health_ = mutables.GetIntegrity() * pow(size_, 3);
-    energy_ = mutables.GetEnergyDensity() * pow(size_, 3);
+    health_ = mutables.GetIntegrity() * pow(size_, 2);
+    energy_ = mutables.GetEnergyDensity() * pow(size_, 2);
 }
 
 
@@ -135,8 +136,8 @@ double Creature::GetHealth() const { return health_; }
  * @param health The new health level to be set, capped at 100.
  */
 void Creature::SetHealth(double health) {
-  if (health > mutable_.GetIntegrity() * pow(size_, 3)) {
-    health_ = mutable_.GetIntegrity() * pow(size_, 3);
+  if (health > mutable_.GetIntegrity() * pow(size_, 2)) {
+    health_ = mutable_.GetIntegrity() * pow(size_, 2);
   } else {
     health_ = health;
   }
@@ -175,7 +176,7 @@ void Creature::SetEnergy(double energy) {
  */
 void Creature::UpdateEnergy(double deltaTime) {
   double movement_energy = (fabs(GetAcceleration()) + fabs(GetRotationalAcceleration())) * GetSize() * deltaTime/200;
-  double heat_loss = mutable_.GetEnergyLoss() * pow(size_, 2) * deltaTime/100;
+  double heat_loss = mutable_.GetEnergyLoss() * pow(size_, 1) * deltaTime/100;
 
   SetEnergy(GetEnergy() - movement_energy - heat_loss);
   BalanceHealthEnergy();
@@ -194,8 +195,8 @@ void Creature::UpdateEnergy(double deltaTime) {
  * @return true if the creature is fit for reproduction, false otherwise.
  */
 bool Creature::Fit() {
-  if (energy_ > settings::environment::kReproductionThreshold * mutable_.GetEnergyDensity() * pow(size_, 3) &&
-      reproduction_cooldown_ == 0.0) {
+  if (energy_ > settings::environment::kReproductionThreshold * max_energy_ &&
+      reproduction_cooldown_ == 0.0 && age_ < 700) {
     return true;
   }
   return false;
@@ -208,7 +209,7 @@ bool Creature::Fit() {
  * the cooldown period.
  */
 void Creature::Reproduced() {
-  SetEnergy(GetEnergy() - 0.75 * mutable_.GetEnergyDensity() * pow(size_, 3));
+  SetEnergy(GetEnergy() - 0.75 * mutable_.GetEnergyDensity() * pow(size_, 2));
   reproduction_cooldown_ = mutable_.GetReproductionCooldown();
 }
 
@@ -230,7 +231,7 @@ void Creature::Reproduced() {
  * @param max_energy The desired maximum energy level.
  */
 void Creature::UpdateMaxEnergy() {
-  max_energy_ = mutable_.GetEnergyDensity() * pow(size_, 3) - age_/10;
+  max_energy_ = mutable_.GetEnergyDensity() * pow(size_, 2) * (1 - age_/1000);
 }
 
 /*!
@@ -612,8 +613,8 @@ Food *Creature::GetClosestFoodInSight(
 
   int x_grid = static_cast<int>(x_coord_ / grid_cell_size);
   int y_grid = static_cast<int>(y_coord_ / grid_cell_size);
-
-  int max_cells_to_find_food = M_PI * (vision_radius_ + grid_cell_size) * (vision_radius_ + grid_cell_size) / (grid_cell_size * grid_cell_size);
+  //multiplied by 4 as a temporal fix
+  int max_cells_to_find_food = 4 * M_PI * (vision_radius_ + grid_cell_size) * (vision_radius_ + grid_cell_size) / (grid_cell_size * grid_cell_size);
 
   auto cone_center = Point(x_coord_, y_coord_);
   auto cone_orientation = GetOrientation();

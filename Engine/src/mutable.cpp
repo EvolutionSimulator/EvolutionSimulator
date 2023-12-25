@@ -128,6 +128,17 @@ void Mutable::Mutate() {
         growth_factor_ = 0;
     }
   }
+
+  //Vision Factor
+  if (uniform(gen) < settings::physical_constraints::kMutationRate){
+    std::normal_distribution<> dis(0.0,
+            settings::physical_constraints::kDVisionFactor/20);
+    double delta = dis(gen);
+    vision_factor_ += delta;
+    if (vision_factor_ < 0.1) {
+        vision_factor_ = 0.1;
+    }
+  }
 }
 
 // Getters
@@ -139,6 +150,7 @@ double Mutable::GetMaxSize() const { return max_size_; }
 double Mutable::GetBabySize() const { return baby_size_; }
 double Mutable::GetMaxForce() const { return max_force_; }
 double Mutable::GetGrowthFactor() const { return growth_factor_; }
+double Mutable::GetVisionFactor() const { return vision_factor_; }
 double Mutable::GetReproductionCooldown() const { return reproduction_cooldown_; }
 double Mutable::GetMaturityAge() const { return maturity_age_; }
 
@@ -151,6 +163,7 @@ void Mutable::SetMaxSize(double value) { max_size_ = value; }
 void Mutable::SetBabySize(double value) { baby_size_ = value; }
 void Mutable::SetMaxForce(double value) { max_force_ = value; }
 void Mutable::SetGrowthFactor(double value) { growth_factor_ = value; }
+void Mutable::SetVisionFactor(double value) { vision_factor_ = value; }
 void Mutable::SetReproductionCooldown(double value) { reproduction_cooldown_ = value; }
 void Mutable::SetMaturityAge(double value) { maturity_age_ = value; }
 
@@ -172,6 +185,8 @@ Mutable MutableCrossover(const Mutable &dominant, const Mutable &recessive) {
                          recessive.GetMaxForce() )/3);
   crossover.SetGrowthFactor((2*dominant.GetGrowthFactor() +
                              recessive.GetGrowthFactor() )/3);
+  crossover.SetVisionFactor((2*dominant.GetVisionFactor() +
+                             recessive.GetVisionFactor() )/3);
   crossover.UpdateReproduction();
   return crossover;
 }
