@@ -436,11 +436,20 @@ void Creature::ProcessVisionFood(
     distance_food_ = this->GetDistance(*food, settings::environment::kMapWidth,
                                        settings::environment::kMapHeight) - (*food).GetSize();
     orientation_food_ = this->GetRelativeOrientation(*food);
+    closest_food_id_ = food->GetID();
   } else {
     distance_food_ = vision_radius_;
     orientation_food_ = remainder(GetRandomFloat(orientation_- vision_angle_/2, orientation_+ vision_angle_/2), 2*M_PI);
+    closest_food_id_ = -1;
   }
 }
+
+/*!
+ * @brief Retrieves the id of the closest food.
+ *
+ * @return The id of the closest food or -1 if there is no food in vision.
+ */
+int Creature::GetFoodID() const { return closest_food_id_; }
 
 /*!
  * @brief Manages the creature's growth based on energy consumption.

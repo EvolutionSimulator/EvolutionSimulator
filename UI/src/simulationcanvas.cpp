@@ -104,7 +104,7 @@ void SimulationCanvas::OnUpdate()
     draw(trackButton_);
     draw(trackButtonText_);
 
-
+    //Get the selected creature and draw the red border
     const auto& creatures = simulation_->GetSimulationData()->creatures_;
     auto creature_it = std::find_if(creatures.begin(), creatures.end(),
                                     [this](const Creature& c) {
@@ -138,7 +138,30 @@ void SimulationCanvas::OnUpdate()
               creatureInfo = QString::fromStdString(formatCreatureInfo(creature));
           }
       }
+      //Get the closest food for the creature and draw a blue circle around it
+      const auto& food_entities = simulation_->GetSimulationData()->food_entities_;
+      auto food_it = std::find_if(food_entities.begin(), food_entities.end(),
+                                      [this, creature](const Food& c) {
+                                          return c.GetID() == creature.GetFoodID();
+                                      });
+      auto it = std::find_if(food_entities.begin(), food_entities.end(), [this, creature](const Food& c) {
+          return c.GetID() == creature.GetFoodID();
+      });
 
+      if (food_it != food_entities.end()) {
+        const Food& food = *it;
+
+        if (selectedCreatureInfo && food.GetID() == creature.GetFoodID()) {
+
+            sf::CircleShape blueCircle(food.GetSize()); // Adjust as needed
+            blueCircle.setOutlineColor(sf::Color::Blue);
+            blueCircle.setOutlineThickness(2); // Adjust thickness as needed
+            blueCircle.setFillColor(sf::Color::Transparent);
+            blueCircle.setPosition(food.GetCoordinates().first - food.GetSize(),
+                                   food.GetCoordinates().second - food.GetSize());
+            draw(blueCircle);
+        }
+      }
       // Prepare and draw the creature info text inside the panel
       sf::Text infoText;
       infoText.setFont(font_);
@@ -425,7 +448,7 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
     if (sqrt(pow(mousePos.x - creaturePos.x, 2) + pow(mousePos.y - creaturePos.y, 2)) <= creatureSize) {
       qDebug() << "Creature Clicked: ID" << creature.GetID();
       showInfoPanel = true;
-      selectedCreatureInfo = CreatureInfo{creature.GetID(), creatureX, creatureY, creatureSize};
+      selectedCreatureInfo = CreatureInfo{creature.GetID(), creatureX, creatureY, creatureSize, creature.GetFoodID()};
       repaint();
       return;
     }
