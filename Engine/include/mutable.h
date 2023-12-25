@@ -21,6 +21,7 @@ public:
   double GetBabySize() const;
   double GetMaxForce() const;
   double GetGrowthFactor() const;
+  double GetVisionFactor()  const;
   double GetReproductionCooldown() const;
   double GetMaturityAge() const;
 
@@ -33,6 +34,7 @@ public:
   void SetBabySize(double value);
   void SetMaxForce(double value);
   void SetGrowthFactor(double value);
+  void SetVisionFactor(double value);
   void SetReproductionCooldown(double value);
   void SetMaturityAge(double value);
 
@@ -47,6 +49,7 @@ private:
   double max_force_;
   double growth_factor_; /*!< Determines how the creature grows in relation to
                             energy intake. */
+  double vision_factor_;
   double reproduction_cooldown_; /*!< Cooldown period before the creature can
                                     reproduce again. */
   double maturity_age_;

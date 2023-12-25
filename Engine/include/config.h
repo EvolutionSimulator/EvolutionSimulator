@@ -37,15 +37,13 @@ constexpr double kMeatNutritionalValue = 3.0;
 constexpr double kRotFactor = 1.0;
 constexpr double kGridCellSize = 50.0;
 constexpr int kMinCreatureSize = 2;
-constexpr double kReproductionThreshold = 0.90;
+constexpr double kReproductionThreshold = 0.80;
 constexpr double kReproductionCooldown = 10;
 constexpr int kInputNeurons = 6;
 constexpr int kOutputNeurons = 4;
 constexpr double kMaxNutritionalValue = 5;
 constexpr double kDefaultLifespan = 30;
 constexpr double kPhotosynthesisFactor = 0.1;
-constexpr double kVisionRadius = 200;
-constexpr double kVisionAngle = M_PI / 3;
 constexpr double kFrictionalCoefficient =
     0.5;  // Needs to be less than 1
 }  // namespace environment
@@ -67,7 +65,11 @@ constexpr double kDStrafingDifficulty = 0.5;
 constexpr double kDMaxSize = 10;
 constexpr double kDBabySize = 2;
 constexpr double kDMaxForce = 10;
-constexpr double kDGrowthFactor = 5;
+constexpr double kDGrowthFactor = 10;
+constexpr double kDVisionFactor = 200;
+constexpr double kVisionRadius = 200;
+constexpr double kVisionAngle = M_PI / 3;
+constexpr double kVisionARratio = 200 * M_PI / 3;
 
 } //namespace physical_constraints
 }  // namespace settings
