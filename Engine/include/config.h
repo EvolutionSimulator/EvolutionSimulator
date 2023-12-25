@@ -22,8 +22,8 @@ constexpr double kAdjustmentProbability = 0.8;
 }  // namespace neat
 
 namespace environment {
-constexpr double kMapWidth = 1000.0;
-constexpr double kMapHeight = 450.0;
+constexpr double kMapWidth = 1900.0;
+constexpr double kMapHeight = 880.0;
 constexpr double kCreatureDensity = 0.0005;
 constexpr int kMaxFoodSize = 15;
 constexpr int kMaxCreatureSize = 15;

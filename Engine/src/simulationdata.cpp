@@ -122,6 +122,9 @@ void SimulationData::GenerateMoreFood() {
   double max_number = environment_.GetFoodDensity() *
                       settings::environment::kMapHeight *
                       settings::environment::kMapWidth / 100;
+  if (creatures_.size() > 300) {//temporary fix so that an abnormal number of creatures can't abuse the food generation system
+      return ;
+  }
   while (size < max_number) {
     Food new_food = Food();
     new_food.RandomInitialization(settings::environment::kMapWidth,
