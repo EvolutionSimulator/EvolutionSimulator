@@ -157,8 +157,8 @@ void Creature::Dies() { SetState(Dead); }
  * maximum energy.
  */
 void Creature::SetEnergy(double energy) {
-  if (energy > mutable_.GetEnergyDensity() * pow(size_, 3)) {
-    energy_ = mutable_.GetEnergyDensity() * pow(size_, 3);
+  if (energy > max_energy_) {
+    energy_ = max_energy_;
   } else {
     energy_ = energy;
   }
@@ -230,7 +230,7 @@ void Creature::Reproduced() {
  * @param max_energy The desired maximum energy level.
  */
 void Creature::UpdateMaxEnergy() {
-  max_energy_ = mutable_.GetEnergyDensity() * pow(size_, 3) - age_/50;
+  max_energy_ = mutable_.GetEnergyDensity() * pow(size_, 3) - age_/10;
 }
 
 /*!
