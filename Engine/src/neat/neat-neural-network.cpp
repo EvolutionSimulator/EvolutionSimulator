@@ -21,7 +21,7 @@ namespace neat {
  *
  * @param genome The Genome to construct the NeuralNetwork from.
  */
-NeuralNetwork::NeuralNetwork(const Genome &genom) {
+NeuralNetwork::NeuralNetwork(const Genome &genom){
   std::vector<std::vector<Neuron> > layers = get_layers(genom);
   // std::vector<Neuron> neurons = genom.GetNeurons();
   std::vector<FeedForwardNeuron> ffneurons;
@@ -81,14 +81,20 @@ std::vector<double> NeuralNetwork::Activate(
 
       if (std::find(output_ids_.begin(), output_ids_.end(), ffneuron.id) ==
           output_ids_.end()) {
-//        Neuron tempN = Neuron(NeuronType::kHidden,0.0);
-//        if (genom.FindNeuronById(ffneuron.id, tempN)){
-//            value=activation_function(tempN, value);
-//        }
-//        else{
-//            value=0;
-//        }
-        value = activation_function(value);
+        //Need a way to determine what the appropriate activation function is (i.e. that of the neuron)
+        Neuron tempN = Neuron(NeuronType::kHidden, 0.0);
+        if (genome_ != nullptr){ //if our genome is null we default to sigmoid
+            bool specificActivation = genome_->FindNeuronById(ffneuron.id, tempN); //find the corresponding neuron
+            if (specificActivation){ //if successfuly found, use specific activation function to neuron
+                value=activation_function(tempN, value);
+            }
+            else{ //all other cases sigmoid
+                value=1/(1+exp(-value));
+            }
+        }
+        else{
+            value=1/(1+exp(-value));
+        }
       }
 
       values[ffneuron.id] = value;
@@ -172,23 +178,23 @@ std::vector<std::vector<Neuron> > get_layers(const Genome &genom) {
  *
  * @return The output of the activation function.
  */
-//double activation_function(Neuron& n, double x) {
-//    switch (n.GetActivation()) {
-//        case ActivationType::sigmoid:
-//            return 1/(1+exp(-x));
-//        case ActivationType::tanh:
-//            return (exp(x)-exp(-x))/(exp(x)+exp(-x));
-//        case ActivationType::relu:
-//            return std::max(0.0,x);
-//        case ActivationType::leakyRelu:
-//            return std::max(0.1*x, x);
-//        case ActivationType::binary:
-//            return (x >= 0.0) ? 1.0 : 0.0;
-//        case ActivationType::linear:
-//            return x;
-//        default:
-//            return x;
-//    }
-//}
-double activation_function(double x) { return 1 / (1 + exp(-x)); }
+double activation_function(Neuron& n, double x) {
+    switch (n.GetActivation()) {
+        case ActivationType::sigmoid:
+            return 1/(1+exp(-x));
+        case ActivationType::tanh:
+            return (exp(x)-exp(-x))/(exp(x)+exp(-x));
+        case ActivationType::relu:
+            return std::max(0.0,x);
+        case ActivationType::leakyRelu:
+            return std::max(0.1*x, x);
+        case ActivationType::binary:
+            return (x >= 0.0) ? 1.0 : 0.0;
+        case ActivationType::linear:
+            return x;
+        default:
+            return x;
+    }
+}
+//double activation_function(double x) { return 1 / (1 + exp(-x)); }
 }  // end of namespace neat

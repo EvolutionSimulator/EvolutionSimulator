@@ -5,6 +5,7 @@
 
 #include "neat/neat-genome.h"
 #include "neat/neat-neuron.h"
+#include <memory>
 
 namespace neat {
 
@@ -37,6 +38,7 @@ struct FeedForwardNeuron {  // Functional units of the NeuralNetowork, obtained
   double bias;              /*!< The bias of the neuron. */
   std::vector<NeuronInput> inputs; /*!< A vector of NeuronInput representing the
                                       inputs to this neuron. */
+  ActivationType activation = ActivationType::sigmoid; /*!< Activation function of the neuron. */
 };
 
 /*!
@@ -53,7 +55,7 @@ class NeuralNetwork {
   std::vector<double> Activate(const std::vector<double> &input_values) const;
 
  private:
-  //const Genome& genom;
+  std::shared_ptr<const Genome> genome_;
   std::vector<int> input_ids_;  /*!< IDs of input neurons. */
   std::vector<int> output_ids_; /*!< IDs of output neurons. */
   std::vector<FeedForwardNeuron>
@@ -64,7 +66,7 @@ std::vector<std::vector<Neuron> > get_layers(
     const Genome
         &genom);  // organize neurons from a Genome into layers (by neurons ids)
 
-double activation_function(double x);
-//double activation_function(Neuron& n, double x);
+//double activation_function(double x);
+double activation_function(Neuron& n, double x);
 
 }  // end of namespace neat
