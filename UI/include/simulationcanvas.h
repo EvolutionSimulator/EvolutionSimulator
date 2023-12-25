@@ -19,6 +19,7 @@ class SimulationCanvas : public QSFMLCanvas {
      double x = 0.0;
      double y = 0.0;
      float size = 0.0f;
+     int food_id = -1;
      // You might want to add other properties like health, age, etc., if necessary
  };
 

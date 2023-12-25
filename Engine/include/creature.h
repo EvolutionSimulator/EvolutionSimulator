@@ -79,12 +79,11 @@ class Creature : public MovableEntity {
       double grid_cell_size) const;
 
   void Grow(double energy);
-
-  void Think(std::vector<std::vector<std::vector<Entity *> > > &grid,
+  void Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
              double GridCellSize, double deltaTime);
-  void ProcessVisionFood(
-      std::vector<std::vector<std::vector<Entity *> > > &grid,
-      double GridCellSize);
+  void ProcessVisionFood(std::vector<std::vector<std::vector<Entity *>>> &grid,
+                         double grid_cell_size);
+  int GetFoodID() const;
 
   int GetGeneration() const;
   void SetGeneration(int generation);
@@ -105,6 +104,7 @@ class Creature : public MovableEntity {
   double distance_food_;      /*!< Distance to the nearest food source. */
   double orientation_food_;   /*!< Orientation relative to the nearest food
                                  source. */
+  int closest_food_id_;       /*! Id of the closest food to show in the UI */
   std::vector<double>
       neuron_data_; /*!< Neuron data used in the neural network. */
   bool fit_; /*!< Indicates whether the creature is fit in the evolutionary
