@@ -455,8 +455,9 @@ void Genome::MutateAddLink() {
     return;  // IF WE END UP USING ENABLED/DISABLE LINKS, THEN ENABLE LINK
   }
 
-  // Check if cycle exists:
   AddLink(Link(n1, n2, 1));
+  // Check if cycle exists:
+
   if (DetectLoops(neurons_[indexRandomNeuron1])) {
     //RemoveLink(newl.GetId());
     links_.back().SetCyclic();
@@ -468,9 +469,7 @@ void Genome::MutateAddLink() {
  * @brief Mutates the Genome by adding a new neuron.
  *
  * @details Adds a new neuron by splitting an existing link and connecting the
- * new neuron in between. It never splits a cyclic link, it chooses a random
- * link until it gets a non-cyclic one. Since most links are non-cyclic, this is
- * ok.
+ * new neuron in between.
  */
 void Genome::MutateAddNeuron() {
   if (links_.size() == 0) {
@@ -481,18 +480,19 @@ void Genome::MutateAddNeuron() {
   std::uniform_int_distribution<size_t> dist(0, links_.size() - 1);
   size_t randIndex = dist(gen);
   Link RandomLink = links_[randIndex];
-  while (RandomLink.IsCyclic()) {
-    std::mt19937 gen(rd());
-    randIndex = dist(gen);
-    RandomLink = links_[randIndex];
-  }
+
   DisableLink(RandomLink.GetId());  // test
 
   AddNeuron(Neuron(NeuronType::kHidden, 0.0));
   // disable the initial link between the inId and outId
   int newNeuronId = neurons_.back().GetId();
-  AddLink(Link(RandomLink.GetInId(), newNeuronId, 1));
-  AddLink(Link(newNeuronId, RandomLink.GetOutId(), RandomLink.GetWeight()));
+  Link newlink1(RandomLink.GetInId(), newNeuronId, 1);
+  Link newlink2(newNeuronId, RandomLink.GetOutId(), RandomLink.GetWeight());
+  if (RandomLink.IsCyclic()) {
+    newlink2.SetCyclic();
+  }
+  AddLink(newlink1);
+  AddLink(newlink2);
 }
 
 /*!
