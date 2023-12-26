@@ -521,6 +521,7 @@ TEST_F(CreatureTest, GetClosestFoodTest2) {
  * @details Ensures that the grid is initialized with the expected number of
  * cells based on the simulation settings.
  */
+
 TEST(SimulationDataTest, GridInitialization) {
   myEnvironment::Environment environment;
   SimulationData simData(environment);
@@ -549,6 +550,7 @@ TEST(SimulationDataTest, GridInitialization) {
  * @details Validates that the grid correctly places alive entities and ignores
  * dead ones.
  */
+
 TEST(SimulationDataTest, UpdateGridWithAliveEntities) {
   myEnvironment::Environment environment;
   SimulationData simData(environment);
@@ -591,6 +593,7 @@ TEST(SimulationDataTest, UpdateGridWithAliveEntities) {
  * @details Ensures that entities are placed in the correct grid cells even when
  *          their coordinates are outside the nominal bounds of the map.
  */
+
 TEST(SimulationDataTest, CorrectEntityPlacementInGrid) {
   myEnvironment::Environment environment;
   SimulationData simData(environment);

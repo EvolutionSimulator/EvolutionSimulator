@@ -17,49 +17,66 @@
 namespace neat {
 
 /*!
- * @brief Constructs a NeuralNetwork from a given Genome.
+ * @brief  Constructs a NeuralNetwork object
+ from a genome object, assuming the genome
+ represents a valid neural network (ie the cyclic
+ links are labeled as such etc.)
  *
  * @param genome The Genome to construct the NeuralNetwork from.
  */
 NeuralNetwork::NeuralNetwork(const Genome &genom){
   std::vector<std::vector<Neuron> > layers = get_layers(genom);
-  // std::vector<Neuron> neurons = genom.GetNeurons();
   std::vector<FeedForwardNeuron> ffneurons;
-  std::vector<int> input_ids;
+
   for (const Neuron &neuron : layers.front()) {
-    input_ids.push_back(neuron.GetId());
+    input_ids_.push_back(neuron.GetId());
   }
-  input_ids_ = input_ids;
-  std::vector<int> output_ids;
   for (const Neuron &neuron : layers.back()) {
-    output_ids.push_back(neuron.GetId());
+    output_ids_.push_back(neuron.GetId());
   }
-  output_ids_ = output_ids;
+
   for (const std::vector<Neuron> &layer : layers) {
     for (const Neuron &neuron : layer) {
       std::vector<NeuronInput> inputs;
+      std::vector<NeuronInput> inputs_from_cycles;
       for (const Link &link : genom.GetLinks()) {
         if (link.GetOutId() == neuron.GetId()) {
           NeuronInput input = {link.GetInId(), link.GetWeight()};
-          inputs.push_back(input);
+          if (link.IsCyclic()) {
+            inputs_from_cycles.push_back(input);
+          } else {
+            inputs.push_back(input);
+          }
         }
       }
-      FeedForwardNeuron ffneuron = {neuron.GetId(), neuron.GetBias(), inputs, neuron.GetActivation()};
+      FeedForwardNeuron ffneuron = {
+          neuron.GetId(), neuron.GetBias(),   0.0,
+          inputs,         inputs_from_cycles, neuron.GetActivation()};
+
       ffneurons.push_back(ffneuron);
     }
   }
   ffneurons_ = ffneurons;
 }
 
+std::vector<FeedForwardNeuron> NeuralNetwork::GetNeurons() const {
+  return ffneurons_;
+}
+
 /*!
- * @brief Activates the neural network with a given set of input values.
+ * @brief Produces an output of the
+                                neural network based on the values of input
+                             neurons (input_values vector) and the values of
+                             neurons involved in cycles (stored inside each
+                             ffneuron). Also updates the values of neurons
+                             involved in cycles.
  *
  * @param input_values The input values to feed into the network.
  *
  * @return A vector of output values after network activation.
  */
 std::vector<double> NeuralNetwork::Activate(
-    const std::vector<double> &input_values) const {
+    const std::vector<double> &input_values) {
   assert(input_values.size() == input_ids_.size());
   std::unordered_map<int, double> values;
   for (int i = 0; i < input_values.size(); i++) {
@@ -69,7 +86,7 @@ std::vector<double> NeuralNetwork::Activate(
   for (const FeedForwardNeuron &ffneuron : ffneurons_) {
     if (values.find(ffneuron.id) ==
         values.end()) {  // if ffneuron is not already activated
-      double value = 0;
+      double value = ffneuron.value;
       for (const NeuronInput &input : ffneuron.inputs) {
         // assert(values.find(input.input_id) != values.end()); //previous
         // neurons have to be activated
@@ -85,6 +102,15 @@ std::vector<double> NeuralNetwork::Activate(
       }
 
       values[ffneuron.id] = value;
+    }
+  }
+
+  // update values stored by ffneurons. this affects those neurons which start a
+  // cycle
+  for (FeedForwardNeuron &ffneuron : ffneurons_) {
+    // ffneuron.value = 0;
+    for (const NeuronInput &neuron_input : ffneuron.inputs_from_cycles) {
+      ffneuron.value += neuron_input.weight * values[neuron_input.input_id];
     }
   }
   std::vector<double> result;
@@ -121,7 +147,6 @@ std::vector<std::vector<Neuron> > get_layers(const Genome &genom) {
     }
   }
   layers.push_back(input_layer);
-
   for (const Neuron &neuron : neurons) {
     if (neuron.GetType() == NeuronType::kOutput) {
       output_layer.push_back(neuron);
@@ -136,7 +161,8 @@ std::vector<std::vector<Neuron> > get_layers(const Genome &genom) {
               active.end()) {
         bool is_active = true;
         for (const Link &link : links) {
-          if (link.IsActive() && link.GetOutId() == neuron.GetId() &&
+          if (link.IsActive() && !link.IsCyclic() &&
+              link.GetOutId() == neuron.GetId() &&
               std::find(active.begin(), active.end(), link.GetInId()) ==
                   active.end()) {
             is_active = false;
@@ -161,7 +187,8 @@ std::vector<std::vector<Neuron> > get_layers(const Genome &genom) {
 /*!
  * @brief Activation function used in the neural network.
  *
- * @param n the neuron to be activated, x The input value to the activation function.
+ * @param n indicates which function to apply, x The input value to the
+ * activation function.
  *
  * @return The output of the activation function.
  */
