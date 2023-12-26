@@ -41,7 +41,6 @@ class Creature : public MovableEntity {
   void UpdateEnergy(double deltaTime);
   double GetEnergy() const;
   void SetEnergy(double energy);
-  double GetMaxEnergy() const;
   void SetMaxEnergy(double max_energy);
   neat::Genome GetGenome() const;
   Mutable GetMutable() const;
@@ -60,7 +59,8 @@ class Creature : public MovableEntity {
   bool Fit();
   void Reproduced();
 
-  double GetMaxEnergy();
+
+  double GetMaxEnergy() const;
   void UpdateMaxEnergy();
 
   double GetAge() const;

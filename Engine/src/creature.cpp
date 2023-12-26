@@ -213,7 +213,8 @@ bool Creature::Compatible(const Creature& other_creature){
  *
  * @return double The maximum energy level of the creature.
  */
-double Creature::GetMaxEnergy(){ return max_energy_; }
+double Creature::GetMaxEnergy() const { return max_energy_; }
+
 
 /*!
  * @brief Updates the maximum energy level of the creature.

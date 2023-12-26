@@ -118,6 +118,42 @@ void SimulationCanvas::OnUpdate()
       const Creature& creature = *it;
       creatureInfo = QString::fromStdString(formatCreatureInfo(creature));
 
+      // Draw the energy bar
+      float maxBarWidth = 80.0f;  // Width of the full energy bar
+      float barHeight = 10.0f;    // Height of the energy bar
+
+      float energyRatio = static_cast<float>(creature.GetEnergy()) / static_cast<float>(creature.GetMaxEnergy());
+      if (energyRatio < 0) {
+          energyRatio = 0;
+      }
+      float energyBarWidth = maxBarWidth * energyRatio;  // Width based on current energy
+      sf::RectangleShape energyBarOutline(sf::Vector2f(maxBarWidth, barHeight));
+      sf::RectangleShape energyBar(sf::Vector2f(energyBarWidth, barHeight));
+      energyBar.setFillColor(sf::Color::Green);  // Color of the energy bar
+      energyBarOutline.setFillColor(sf::Color::Black);
+      // Position the energy bar - adjust as needed
+      energyBarOutline.setPosition(panelPosition.x + 65, 123);
+      energyBar.setPosition(panelPosition.x + 65, 123);
+      draw(energyBarOutline);
+      draw(energyBar);
+
+      // Draw the energy bar
+
+      float healthRatio = static_cast<float>(creature.GetHealth()) / static_cast<float>(creature.GetMutable().GetIntegrity() * pow(creature.GetSize(), 2));
+      if (healthRatio < 0 ) {
+          healthRatio = 0;
+      }
+      float healthBarWidth = maxBarWidth * healthRatio;  // Width based on current energy
+      sf::RectangleShape healthBarOutline(sf::Vector2f(maxBarWidth, barHeight));
+      sf::RectangleShape healthBar(sf::Vector2f(healthBarWidth, barHeight));
+      healthBar.setFillColor(sf::Color::Red);  // Color of the energy bar
+      healthBarOutline.setFillColor(sf::Color::Black);
+      // Position the energy bar - adjust as needed
+      healthBarOutline.setPosition(panelPosition.x + 65, 105);
+      healthBar.setPosition(panelPosition.x + 65, 105);
+      draw(healthBarOutline);
+      draw(healthBar);
+
       if (selectedCreatureInfo && creature.GetID() == selectedCreatureInfo->id) {
 
           sf::CircleShape redCircle(creature.GetSize()); // Adjust as needed
@@ -483,20 +519,38 @@ void SimulationCanvas::displayInfoPanel() {
   }
 }
 
+double round_double(double number, int decimal_places) {
+    const double multiplier = std::pow(10.0, decimal_places);
+    return std::round(number * multiplier) / multiplier;
+}
+
 // Structure of the info panel (appearing when a creature is clicked)
 std::string SimulationCanvas::formatCreatureInfo(const Creature& creature) {
+  Mutable mutables = creature.GetMutable();
   std::stringstream ss;
   ss << "Creature ID: " << creature.GetID() << "\n\n";
   ss << "Size: " << creature.GetSize() << "\n";
   ss << "Age: " << creature.GetAge() << "\n";
   ss << "Generation: " << creature.GetGeneration() << "\n";
-  ss << "Health: " << creature.GetHealth() << "\n";
-  ss << "Energy Level: " << creature.GetEnergy() << "\n";
-  ss << "Velocity: " << creature.GetVelocity() << "\n\n";
+  ss << "Health: " <<"\n";
+  ss << "Energy: " << "\n";
+  ss << "Velocity: " << round_double(creature.GetVelocity(), 2) << "\n";
+  ss << "Rot. Velocity: " << round_double(creature.GetRotationalVelocity(), 2) << "\n\n";
   auto [x, y] = creature.GetCoordinates();
-  ss << "(x=" << x << ", y=" << y << ")\n";
+  ss << "(x=" << x << ", y=" << y << ")\n \n";
+  ss << "Mutables information: \n";
+  ss << "Energy density: " << mutables.GetEnergyDensity() << "\n";
+  ss << "Energy loss: " << mutables.GetEnergyLoss() << "\n";
+  ss << "Strafing diff.: " << mutables.GetStrafingDifficulty() << "\n";
+  ss << "Integrity: " << mutables.GetIntegrity() << "\n";
+  ss << "Max force: " << mutables.GetMaxForce() << "\n";
+  ss << "Max size: " << mutables.GetMaxSize() << "\n";
+  ss << "Baby size: " << mutables.GetBabySize() << "\n";
+  ss << "Rep. cooldown: " << mutables.GetReproductionCooldown() << "\n";
+  ss << "Maturity age: " << mutables.GetMaturityAge() << "\n";
   return ss.str();
 }
+
 
 
 void SimulationCanvas::DrawVisionCone(sf::RenderTarget& target, const Creature& creature) {
