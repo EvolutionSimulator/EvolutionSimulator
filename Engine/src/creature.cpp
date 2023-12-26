@@ -646,8 +646,8 @@ Food *Creature::GetClosestFoodInSight(
 
   int x_grid = static_cast<int>(x_coord_ / grid_cell_size);
   int y_grid = static_cast<int>(y_coord_ / grid_cell_size);
-  //multiplied by 4 as a temporal fix
-  int max_cells_to_find_food = 4 * M_PI * (vision_radius_ + grid_cell_size) * (vision_radius_ + grid_cell_size) / (grid_cell_size * grid_cell_size);
+
+  int max_cells_to_find_food = M_PI * (vision_radius_ + sqrt(2) * grid_cell_size + settings::environment::kMaxFoodSize) * (vision_radius_ + sqrt(2) * grid_cell_size + settings::environment::kMaxCreatureSize) / (grid_cell_size * grid_cell_size);
 
   auto cone_center = Point(x_coord_, y_coord_);
   auto cone_orientation = GetOrientation();
@@ -679,16 +679,27 @@ Food *Creature::GetClosestFoodInSight(
 
         auto food_direction = OrientedAngle(cone_center, food_point);
 
-        bool is_in_field_of_view = food_direction.IsInsideCone(
-            cone_left_boundary, cone_right_boundary);
-
         double distance = food_point.dist(cone_center);
 
-        bool is_within_vision_radius =
-            distance <= vision_radius_ + settings::engine::EPS;
+        bool is_in_field_of_view = (food_direction.IsInsideCone(
+            cone_left_boundary, cone_right_boundary));
 
-        if (is_in_field_of_view && is_within_vision_radius) {
-          if (distance < smallest_distance_food) {
+        bool is_on_edge = (food_direction.AngleDistanceToCone(cone_left_boundary, cone_right_boundary) <= M_PI/2) && (distance * sin(food_direction.AngleDistanceToCone(cone_left_boundary, cone_right_boundary)) <= food->GetSize() + settings::engine::EPS);
+
+        if (is_in_field_of_view) {
+          bool is_within_vision_radius =
+              distance <= vision_radius_ + food->GetSize() + settings::engine::EPS;
+          if (is_within_vision_radius && distance < smallest_distance_food) {
+            smallest_distance_food = distance;
+            closest_food = food;
+            break;
+          }
+        }
+
+        if (is_on_edge) {
+          bool is_within_vision_radius =
+              (distance * cos(food_direction.AngleDistanceToCone(cone_left_boundary, cone_right_boundary)) <= vision_radius_ + settings::engine::EPS);
+          if (is_within_vision_radius && distance < smallest_distance_food) {
             smallest_distance_food = distance;
             closest_food = food;
             break;

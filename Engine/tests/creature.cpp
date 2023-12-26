@@ -197,8 +197,8 @@ TEST(CreatureTests, IsGridCellPotentiallyInsideCone) {
                                                          OrientedAngle(-M_PI/4),
                                                          OrientedAngle(M_PI/4));
 
-  auto grid_out_of_sight = IsGridCellPotentiallyInsideCone(Point(8,9), grid_cell_size,
-                                                         Point(5,5), 3.0,
+  auto grid_out_of_sight = IsGridCellPotentiallyInsideCone(Point(15,19), grid_cell_size,
+                                                         Point(1,1), 3.0,
                                                          OrientedAngle(-M_PI/4),
                                                          OrientedAngle(M_PI/4));
 
@@ -248,10 +248,13 @@ TEST(CreatureTests, GetClosestFoodInSight_NoFoodInSight) {
   grid.assign(10, std::vector<std::vector<Entity*> >(10));
 
   Meat meat_1, meat_2, meat_3;
+  meat_1.SetSize(0.02);
   meat_1.SetCoordinates(4.82, 3.06, 10, 10); // distance = 0.78, angle = 90
   grid[3][2].push_back(&meat_1);
+  meat_2.SetSize(0.02);
   meat_2.SetCoordinates(2.93273, 2.87064, 10, 10); // distance = 1.52
   grid[2][2].push_back(&meat_2);
+  meat_3.SetSize(0.02);
   meat_3.SetCoordinates(3.87724,2.52718, 10, 10); // distance = 1.14
   grid[3][2].push_back(&meat_3);
 

@@ -170,13 +170,13 @@ bool IsGridCellPotentiallyInsideCone(Point grid_point, double grid_cell_size,
     return true;
   }
   double max_distance_in_cell = sqrt(2) * grid_cell_size;
-  if (distance > cone_radius + max_distance_in_cell + EPS) {
+  if (distance > cone_radius + max_distance_in_cell + settings::environment::kMaxFoodSize + EPS) {
     return false;
   }
   OrientedAngle cell_relative_angle(cone_center, grid_point);
   double angle_distance = cell_relative_angle.AngleDistanceToCone(
       cone_left_boundary, cone_right_boundary);
-  if (angle_distance > max_distance_in_cell / distance + EPS) {
+  if (sin(angle_distance) > (max_distance_in_cell+ settings::environment::kMaxFoodSize) / distance + EPS) {
     return false;
   }
   return true;
