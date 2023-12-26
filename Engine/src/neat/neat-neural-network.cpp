@@ -1,4 +1,7 @@
 #include "neat/neat-neural-network.h"
+//#include "neat/neat-neuron.h"
+#include "neat/neat-genome.h"
+
 /*!
  * @file neat-neural-network.h
  *
@@ -21,7 +24,7 @@ namespace neat {
  *
  * @param genome The Genome to construct the NeuralNetwork from.
  */
-NeuralNetwork::NeuralNetwork(const Genome &genom) {
+NeuralNetwork::NeuralNetwork(const Genome &genom){
   std::vector<std::vector<Neuron> > layers = get_layers(genom);
   std::vector<FeedForwardNeuron> ffneurons;
 
@@ -46,8 +49,10 @@ NeuralNetwork::NeuralNetwork(const Genome &genom) {
           }
         }
       }
-      FeedForwardNeuron ffneuron = {neuron.GetId(), neuron.GetBias(), 0.0,
-                                    inputs, inputs_from_cycles};
+      FeedForwardNeuron ffneuron = {
+          neuron.GetId(), neuron.GetBias(),   0.0,
+          inputs,         inputs_from_cycles, neuron.GetActivation()};
+
       ffneurons.push_back(ffneuron);
     }
   }
@@ -93,7 +98,7 @@ std::vector<double> NeuralNetwork::Activate(
 
       if (std::find(output_ids_.begin(), output_ids_.end(), ffneuron.id) ==
           output_ids_.end()) {
-        value = activation_function(value);
+        value=activation_function(ffneuron.activation, value);
       }
 
       values[ffneuron.id] = value;
@@ -181,9 +186,27 @@ std::vector<std::vector<Neuron> > get_layers(const Genome &genom) {
 /*!
  * @brief Activation function used in the neural network.
  *
- * @param x The input value to the activation function.
+ * @param n the neuron to be activated, x The input value to the activation function.
  *
  * @return The output of the activation function.
  */
-double activation_function(double x) { return 1 / (1 + exp(-x)); }
+double activation_function(ActivationType n, double x) {
+    switch (n) {
+        case ActivationType::sigmoid:
+            return 1/(1+exp(-x));
+        case ActivationType::tanh:
+            return (exp(x)-exp(-x))/(exp(x)+exp(-x));
+        case ActivationType::relu:
+            return std::max(0.0,x);
+        case ActivationType::leakyRelu:
+            return std::max(0.1*x, x);
+        case ActivationType::binary:
+            return (x >= 0.0) ? 1.0 : 0.0;
+        case ActivationType::linear:
+            return x;
+        default:
+            return x;
+    }
+}
+//double activation_function(double x) { return 1 / (1 + exp(-x)); }
 }  // end of namespace neat

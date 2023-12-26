@@ -4,6 +4,8 @@
 #endif  // NEATNEURALNETWORK_H
 
 #include "neat/neat-genome.h"
+#include "neat/neat-neuron.h"
+#include <memory>
 
 namespace neat {
 
@@ -41,6 +43,7 @@ struct FeedForwardNeuron {
       inputs_from_cycles; /*!< A vector of NeuronInput representing the
                  inputs from the previous neurons in the cycles. Note that one
                  neuron can be at the starts of multiple cycles*/
+  ActivationType activation; /*!< Activation function of the neuron. */
 };
 
 /*!
@@ -58,6 +61,7 @@ class NeuralNetwork {
   std::vector<FeedForwardNeuron> GetNeurons() const;
 
  private:
+  std::shared_ptr<const Genome> genome_;
   std::vector<int> input_ids_;  /*!< IDs of input neurons. */
   std::vector<int> output_ids_; /*!< IDs of output neurons. */
   std::vector<FeedForwardNeuron>
@@ -68,6 +72,7 @@ std::vector<std::vector<Neuron> > get_layers(
     const Genome
         &genom);  // organize neurons from a Genome into layers (by neurons ids)
 
-double activation_function(double x);
+//double activation_function(double x);
+double activation_function(ActivationType n, double x);
 
 }  // end of namespace neat
