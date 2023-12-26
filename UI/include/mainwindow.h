@@ -20,6 +20,7 @@ QT_END_NAMESPACE  //
   ~MainWindow();
 
   void SetEngine(Engine* engine);
+  void keyPressEvent(QKeyEvent *event) override; // Add this line
 
  private slots:  // Slots should be placed under this section
   void RunSimulation();
