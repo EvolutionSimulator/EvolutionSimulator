@@ -105,9 +105,10 @@ std::vector<double> NeuralNetwork::Activate(
     }
   }
 
-  // update values of ffneurons. this affects those neurons which start a cycle
+  // update values stored by ffneurons. this affects those neurons which start a
+  // cycle
   for (FeedForwardNeuron &ffneuron : ffneurons_) {
-    ffneuron.value = 0;
+    // ffneuron.value = 0;
     for (const NeuronInput &neuron_input : ffneuron.inputs_from_cycles) {
       ffneuron.value += neuron_input.weight * values[neuron_input.input_id];
     }
@@ -186,7 +187,8 @@ std::vector<std::vector<Neuron> > get_layers(const Genome &genom) {
 /*!
  * @brief Activation function used in the neural network.
  *
- * @param n the neuron to be activated, x The input value to the activation function.
+ * @param n indicates which function to apply, x The input value to the
+ * activation function.
  *
  * @return The output of the activation function.
  */

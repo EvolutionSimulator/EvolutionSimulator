@@ -61,7 +61,6 @@ class NeuralNetwork {
   std::vector<FeedForwardNeuron> GetNeurons() const;
 
  private:
-  std::shared_ptr<const Genome> genome_;
   std::vector<int> input_ids_;  /*!< IDs of input neurons. */
   std::vector<int> output_ids_; /*!< IDs of output neurons. */
   std::vector<FeedForwardNeuron>
