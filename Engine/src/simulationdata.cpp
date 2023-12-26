@@ -291,7 +291,7 @@ void UpdateGridTemplate(
     entities.erase(std::remove_if(entities.begin(), entities.end(),
                                   [&food](const Creature& entity) {
                                       if (entity.GetState() == Entity::Dead) {
-                                      food.emplace_back(Plant(entity.GetCoordinates().first, entity.GetCoordinates().second, entity.GetSize()));
+                                      food.emplace_back(Meat(entity.GetCoordinates().first, entity.GetCoordinates().second, entity.GetSize()));
                                       }
                                       return entity.GetState() != Entity::Alive;
                                   }),

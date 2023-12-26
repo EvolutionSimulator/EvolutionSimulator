@@ -68,6 +68,25 @@ void Food::SetNutritionalValue(double value) { nutritional_value_ = value; }
  */
 double Food::GetNutritionalValue() const { return nutritional_value_; }
 
+Food::type Food::GetType() const { return type_;}
+
+Plant::Plant()
+    : Food(settings::environment::kPlantNutritionalValue) {
+    type_ = plant;
+}
+Plant::Plant(double x_coord, double y_coord)
+    : Food(x_coord, y_coord, settings::environment::kPlantNutritionalValue) {
+    type_ = plant;
+}
+Plant::Plant(double x_coord, double y_coord, double size)
+    : Food(x_coord, y_coord, size, settings::environment::kPlantNutritionalValue){
+    type_ = plant;
+}
+Plant::Plant(double size)
+    : Food(size, settings::environment::kPlantNutritionalValue){
+    type_ = plant;
+}
+
 /*!
  * @brief Simulates the growth of the Plant over a period of time.
  *
@@ -95,6 +114,23 @@ void Plant::Grow(double deltaTime) {
   } else {
     SetState(Entity::Dead);
   }
+}
+
+Meat::Meat()
+    : Food(settings::environment::kPlantNutritionalValue) {
+    type_ = meat;
+}
+Meat::Meat(double x_coord, double y_coord)
+    : Food(x_coord, y_coord, settings::environment::kPlantNutritionalValue) {
+    type_ = meat;
+}
+Meat::Meat(double x_coord, double y_coord, double size)
+    : Food(x_coord, y_coord, size, settings::environment::kPlantNutritionalValue){
+    type_ = meat;
+}
+Meat::Meat(double size)
+    : Food(size, settings::environment::kPlantNutritionalValue){
+    type_ = meat;
 }
 
 /*!

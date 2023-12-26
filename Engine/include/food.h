@@ -5,7 +5,7 @@
 
 #include "environment.h"
 
-class Food : public Entity {
+class Food : public Entity {  
  protected:
   Food(const double nutritional_value);
   Food(const double x_coord, const double y_coord, const double nutritional_value);
@@ -13,24 +13,27 @@ class Food : public Entity {
   Food(const double size, const double nutritional_value);
 
  public:
+  enum type { meat, plant };
   void Eat();
   void SetNutritionalValue(double value);
   double GetNutritionalValue() const;
 
   void SetLifespan(int lifespan);
   int GetLifespan() const;
+  type GetType() const;
 
  protected:
+  Food::type type_;
   double nutritional_value_; /*!< Nutritional value per size unit of the Food. (depends on food type) */
   int lifespan_; /*!< Lifespan of the Food in simulation time units. */
 };
 
 class Plant : public Food {
  public:
-  Plant() : Food(settings::environment::kPlantNutritionalValue){};
-  Plant(const double x_coord, const double y_coord) : Food(x_coord, y_coord, settings::environment::kPlantNutritionalValue){};
-  Plant(const double x_coord, const double y_coord, const double size) : Food(x_coord, y_coord, size, settings::environment::kPlantNutritionalValue){};
-  Plant(const double size) : Food(size, settings::environment::kPlantNutritionalValue){};
+  Plant();
+  Plant(const double x_coord, const double y_coord);
+  Plant(const double x_coord, const double y_coord, const double size);
+  Plant(const double size);
   void Grow(double deltaTime);
 
  protected:
@@ -39,10 +42,10 @@ class Plant : public Food {
 
 class Meat : public Food {
  public:
-  Meat() : Food(settings::environment::kMeatNutritionalValue){};
-  Meat(const double x_coord, const double y_coord) : Food(x_coord, y_coord, settings::environment::kMeatNutritionalValue){};
-  Meat(const double x_coord, const double y_coord, const double size) : Food(x_coord, y_coord, size, settings::environment::kMeatNutritionalValue){};
-  Meat(const double size) : Food(size, settings::environment::kMeatNutritionalValue){};
+  Meat();
+  Meat(const double x_coord, const double y_coord);
+  Meat(const double x_coord, const double y_coord, const double size);
+  Meat(const double size);
   void Rot();
 };
 
