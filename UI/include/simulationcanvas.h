@@ -37,8 +37,11 @@ class SimulationCanvas : public QSFMLCanvas {
   void DrawCreatureCountOverTime(sf::RenderWindow &window, const std::vector<Creature> &creatures);
   void DrawVisionCone(sf::RenderTarget& target, const Creature& creature);
 
+  void zoom(float factor, sf::Vector2f& zoomPoint);
+
   protected:
   void mousePressEvent(QMouseEvent *event) override;
+  void wheelEvent(QWheelEvent *event) override;
 
   private:
   virtual void OnInit() override;
@@ -66,4 +69,8 @@ class SimulationCanvas : public QSFMLCanvas {
 
   void displayInfoPanel();
   std::string formatCreatureInfo(const Creature &creature);
+
+  float zoomFactor = 1.0f;
+  sf::Vector2f initialViewSize;
+  sf::Vector2f initialViewCenter;
 };
