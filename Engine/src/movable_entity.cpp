@@ -2,6 +2,7 @@
 
 #include "config.h"
 #include "math.h"
+#include <cmath>
 
 /*!
  * @file movable_entity.h

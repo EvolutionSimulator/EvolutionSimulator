@@ -1,4 +1,5 @@
 #include "neat/neat-genome.h"
+#include "neat/neat-neuron.h"
 /*!
  * @file neat-genome.h
  *
@@ -222,6 +223,10 @@ void Genome::Mutate() {
   if (uniform(gen) < settings::neat::kChangeBiasMutationRate) {
     MutateChangeBias();
   }
+
+  if (uniform(gen) < settings::neat::kActivationFunctionMutationRate) {
+      MutateActivationFunction();
+    }
 }
 
 /*!
@@ -544,5 +549,42 @@ Genome Crossover(const Genome& dominant, const Genome& recessive) {
 
   // Return the new Genome that is a combination of both parents.
   return offspring;
+}
+
+
+void Genome::MutateActivationFunction() {
+    if (GetInputCount()+GetOutputCount()==neurons_.size()){
+        return ;
+    }
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<size_t> dist(0, neurons_.size() - 1);
+    size_t indexRandomNeuronHidden = dist(gen);
+    while (neurons_[indexRandomNeuronHidden].GetType() != NeuronType::kHidden) {
+      indexRandomNeuronHidden = dist(gen);
+    }
+    std::vector<ActivationType> activationTypes = {
+            ActivationType::sigmoid,
+            ActivationType::tanh,
+            ActivationType::relu,
+            ActivationType::elu,
+            ActivationType::leakyRelu,
+            ActivationType::binary,
+            ActivationType::linear
+        };
+    std::mt19937 generator(rd());
+    std::uniform_int_distribution<int> distribution(0, activationTypes.size() - 1);
+    int randomIndex = distribution(generator);
+    neurons_[indexRandomNeuronHidden].SetActivation(activationTypes[randomIndex]);
+}
+
+bool Genome::FindNeuronById(int targetId, Neuron& foundNeuron) const{
+    for (const Neuron& neuron : neurons_) {
+        if (neuron.GetId() == targetId) {
+            foundNeuron = neuron;  // Assign the found neuron to the reference parameter
+            return true;  // Return true if the neuron is found
+        }
+    }
+    return false;  // Return false if neuron isnt found
 }
 }  // namespace neat
