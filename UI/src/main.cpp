@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
 
   MainWindow window;
   window.SetEngine(&mainEngine);
-  window.show();
+  window.showMaximized();
 
   int result = app.exec();
 

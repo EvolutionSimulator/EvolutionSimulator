@@ -106,7 +106,9 @@ class Creature : public MovableEntity {
   double distance_food_;      /*!< Distance to the nearest food source. */
   double orientation_food_;   /*!< Orientation relative to the nearest food
                                  source. */
+  double food_size_;          /*! Size of the closest food*/
   int closest_food_id_;       /*! Id of the closest food to show in the UI */
+
   std::vector<double>
       neuron_data_; /*!< Neuron data used in the neural network. */
   bool fit_; /*!< Indicates whether the creature is fit in the evolutionary
