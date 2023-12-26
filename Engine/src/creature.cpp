@@ -88,31 +88,9 @@ double Creature::GetEnergy() const { return energy_; }
  * their current values and predefined thresholds.
  */
 void Creature::BalanceHealthEnergy() {
-  if (GetEnergy() < 1) {
-    SetHealth(GetHealth() + GetEnergy() - 1);
-    SetEnergy(1);
-    if (GetHealth() >= (GetEnergy() - 1)) {
-      SetHealth(GetHealth() + (GetEnergy() - 1));
-      SetEnergy(1);
-    } else {
-      SetHealth((GetHealth() + GetEnergy()) / 2);
-      SetEnergy(GetHealth());
-    }
-  } else if (GetHealth() < 0) {
-    if (GetEnergy() >= (GetHealth() - 0.1)) {
-      SetEnergy(GetEnergy() - GetHealth() - 0.1);
-      SetHealth(0.1);
-    } else {
-      SetHealth((GetHealth() + GetEnergy()) / 2);
-      SetEnergy(GetHealth());
-    }
-  } else if (GetEnergy() > max_energy_) {
-    SetHealth(GetHealth() + (GetEnergy() - max_energy_));
-    SetEnergy(max_energy_);
-  } else if (GetHealth() > GetEnergy() &&
-             GetEnergy() <= 0) {
-    SetEnergy(GetEnergy() + 0.1);
-    SetHealth(GetHealth() - 0.1);
+  if (GetEnergy() < 0) {
+    SetHealth(GetHealth() + GetEnergy() - 0.1);
+    SetEnergy(0.1);
   } else if (GetHealth() < GetEnergy() &&
              GetEnergy() >= 0.1*max_energy_) {
     SetEnergy(GetEnergy() - 0.1);
@@ -209,7 +187,7 @@ bool Creature::Fit() {
  * the cooldown period.
  */
 void Creature::Reproduced() {
-  SetEnergy(GetEnergy() - 0.75 * mutable_.GetEnergyDensity() * pow(size_, 2));
+  SetEnergy(GetEnergy() - 0.7 * max_energy_);
   reproduction_cooldown_ = mutable_.GetReproductionCooldown();
 }
 
@@ -376,6 +354,7 @@ void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
   neuron_data_.at(3) = GetRotationalVelocity();
   neuron_data_.at(4) = orientation_food_;
   neuron_data_.at(5) = distance_food_;
+  neuron_data_.at(6) = food_size_;
   std::vector<double> output = brain_.Activate(neuron_data_);
   SetAcceleration(std::tanh(output.at(0))*mutable_.GetMaxForce());
   SetAccelerationAngle(std::tanh(output.at(1)) * M_PI);
@@ -423,9 +402,11 @@ void Creature::ProcessVisionFood(
                                        settings::environment::kMapHeight) - (*food).GetSize();
     orientation_food_ = this->GetRelativeOrientation(*food);
     closest_food_id_ = food->GetID();
+    food_size_ = food->GetSize();
   } else {
     distance_food_ = vision_radius_;
     orientation_food_ = remainder(GetRandomFloat(orientation_- vision_angle_/2, orientation_+ vision_angle_/2), 2*M_PI);
+    food_size_ = 0;
     closest_food_id_ = -1;
   }
 }
