@@ -18,7 +18,7 @@
  */
 
 void SimulationData::AddCreature(const Creature& creature) {
-  creatures_.push_back(creature);
+    creatures_.push_back(creature);
 }
 
 /*!
@@ -26,7 +26,7 @@ void SimulationData::AddCreature(const Creature& creature) {
  *
  * @param creature The Creature object to be removed from the simulation's
  * creature list.
- */
+
 
 void SimulationData::RemoveCreature(const Creature& creature) {
   // Use std::remove_if with a lambda function as the predicate
@@ -36,7 +36,7 @@ void SimulationData::RemoveCreature(const Creature& creature) {
                                   }),
                    creatures_.end());
 }
-
+*/
 /*!
  * @brief Retrieves the current environment of the simulation.
  *
@@ -96,7 +96,7 @@ void SimulationData::ModifyAllCreatures(double delta_x, double delta_y) {
 void SimulationData::UpdateAllCreatures(double deltaTime) {
   for (Creature& creature : creatures_) {
     creature.Update(deltaTime, settings::environment::kMapWidth,
-                    settings::environment::kMapHeight, grid_,
+                      settings::environment::kMapHeight, grid_,
                     settings::environment::kGridCellSize);
     if (creature.Fit()) {
       reproduce_.push(creature);
@@ -143,7 +143,7 @@ void SimulationData::ReproduceCreatures() {
     double energy1 = creature1.GetEnergy();
     double energy2 = creature2.GetEnergy();
     if (energy1 > energy2) {
-      neat::Genome new_genome =
+    neat::Genome new_genome =
           neat::Crossover(creature1.GetGenome(), creature2.GetGenome());
       new_genome.Mutate();
       new_genome.Mutate();
@@ -254,9 +254,9 @@ void SimulationData::ClearGrid() {
  * @param entityGrid 3D vector of entities.
  * @param cellSize Size of the grid cells.
  */
-template <typename EntityType>
-void UpdateGridTemplate(
-    std::vector<EntityType>& entities,
+
+template <typename EntityType> void UpdateGridTemplate(
+    std::vector<Food>& entities,
     std::vector<std::vector<std::vector<Entity*>>>& entityGrid,
     double cellSize) {
   entities.erase(std::remove_if(entities.begin(), entities.end(),
@@ -273,6 +273,38 @@ void UpdateGridTemplate(
     entityGrid[gridX][gridY].push_back(&entity);
   }
 }
+
+
+/*!
+ * @brief Template function that erases the dead entities from their
+ * corresponding vectors and fills the grid with the remaining entities.
+ *
+ * @tparam entities Vector of EntityType.
+ * @param entityGrid 3D vector of entities.
+ * @param cellSize Size of the grid cells.
+ */
+
+void UpdateGridTemplate(
+    std::vector<Creature>& entities,
+    std::vector<std::vector<std::vector<Entity*>>>& entityGrid,
+    double cellSize, std::vector<Food>& food) {
+    entities.erase(std::remove_if(entities.begin(), entities.end(),
+                                  [&food](const Creature& entity) {
+                                      if (entity.GetState() == Entity::Dead) {
+                                      food.emplace_back(Plant(entity.GetCoordinates().first, entity.GetCoordinates().second, entity.GetSize()));
+                                      }
+                                      return entity.GetState() != Entity::Alive;
+                                  }),
+                   entities.end());
+    for (Creature& entity : entities) {
+        std::pair<double, double> coordinates = entity.GetCoordinates();
+        int gridX = static_cast<int>(coordinates.first / cellSize);
+        int gridY = static_cast<int>(coordinates.second / cellSize);
+
+        entityGrid[gridX][gridY].push_back(&entity);
+    }
+}
+
 
 /*!
  * @brief Removes creatures with a state of 'Dead' from a given queue.
@@ -304,8 +336,8 @@ void UpdateQueue(std::queue<Creature>& reproduce) {
  */
 void SimulationData::UpdateGrid() {
   ClearGrid();
-  UpdateGridTemplate<Creature>(creatures_, grid_,
-                               settings::environment::kGridCellSize);
+    UpdateGridTemplate(creatures_, grid_,
+                               settings::environment::kGridCellSize, food_entities_);
   UpdateGridTemplate<Food>(food_entities_, grid_,
                            settings::environment::kGridCellSize);
   UpdateQueue(reproduce_);
