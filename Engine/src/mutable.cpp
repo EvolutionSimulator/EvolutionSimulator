@@ -157,8 +157,8 @@ void Mutable::Mutate() {
             settings::physical_constraints::kDVisionFactor/20);
     double delta = dis(gen);
     vision_factor_ += delta;
-    if (vision_factor_ < 0.1) {
-        vision_factor_ = 0.1;
+    if (settings::physical_constraints::kVisionARratio/vision_factor_ > 2* M_PI) {
+        vision_factor_ = settings::physical_constraints::kVisionARratio/(2* M_PI);
     }
   }
 }
