@@ -13,6 +13,8 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui_(new Ui::MainWindow), friction_coefficient(0.0), lastRecordedTime_(0.0) {
   ui_->setupUi(this);
+
+  setCentralWidget(ui_->canvas);
   // Calculate total size needed for the window based on canvas size and additional widgets/controls
   int totalWidth = settings::environment::kMapWidth;
   int totalHeight = settings::environment::kMapHeight; // add extra height for other controls if needed

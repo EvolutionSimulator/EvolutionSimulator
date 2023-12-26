@@ -59,6 +59,7 @@ QPaintEngine* QSFMLCanvas::paintEngine() const { return nullptr; }
 // called when the widget is repainted
 void QSFMLCanvas::paintEvent(QPaintEvent*) {
   OnUpdate();
-
   display();
 }
+
+
