@@ -23,6 +23,17 @@ MainWindow::MainWindow(QWidget *parent)
 
   // Resize the main window to fit the canvas and other controls
   resize(scaledWidth, scaledHeight);
+  this->setStyleSheet("QPushButton {"
+                      "  background-color: blue;"
+                      "  color: white;"
+                      "  border: 2px solid red;"
+                      "}"
+                      "QPushButton:hover {"
+                      "  background-color: lightblue;"
+                      "}"
+                      "QPushButton:pressed {"
+                      "  background-color: darkblue;"
+                      "}");
   ui_->densityFood->setMinimum(1);
   ui_->densityFood->setMaximum(1000);
   connect(ui_->runButton, &QPushButton::clicked, this, &MainWindow::ToggleSimulation);
