@@ -2,6 +2,12 @@
 #include "config.h"
 #include <random>
 
+/*!
+ * @brief Constructs a new Mutable object.
+ *
+ * @details Initializes the Mutable object with predefined values from the
+ *          settings::physical_constraints namespace.
+ */
 Mutable::Mutable()
   : energy_density_(settings::physical_constraints::kDEnergyDensity),
     energy_loss_(settings::physical_constraints::kDEnergyLoss),
@@ -14,12 +20,23 @@ Mutable::Mutable()
   UpdateReproduction();
 }
 
+/*!
+ * @brief Updates the reproduction characteristics of the entity.
+ * @details Calculates and sets the maturity age and reproduction cooldown
+ * based on the entity's complexity and size.
+ */
 void Mutable::UpdateReproduction() {
   double complexity  = Complexity();
   maturity_age_ = complexity * (1 + max_size_ - baby_size_) * 0.2;
   reproduction_cooldown_ = complexity * 0.5;
 }
 
+/*!
+ * @brief Calculates the complexity of the entity.
+ * @return The calculated complexity as a double.
+ * @details The complexity is calculated based on various properties
+ * like energy density, integrity, size, etc.
+ */
 double Mutable::Complexity() {
   //values to tweak in order to achieve ideal conditions
   double complexity = (energy_density_*10
@@ -31,6 +48,11 @@ double Mutable::Complexity() {
   return complexity;
 }
 
+/*!
+ * @brief Mutates various properties of the entity randomly.
+ * @details Applies random mutations to properties like energy density, integrity,
+ * and size within certain constraints.
+ */
 void Mutable::Mutate() {
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -167,6 +189,13 @@ void Mutable::SetVisionFactor(double value) { vision_factor_ = value; }
 void Mutable::SetReproductionCooldown(double value) { reproduction_cooldown_ = value; }
 void Mutable::SetMaturityAge(double value) { maturity_age_ = value; }
 
+/*!
+ * @brief Creates a new Mutable entity as a crossover of two existing entities.
+ * @param dominant The Mutable entity considered as dominant in the crossover.
+ * @param recessive The Mutable entity considered as recessive in the crossover.
+ * @return A new Mutable entity as a result of the crossover.
+ * @details The crossover combines properties of two entities, favoring the dominant one.
+ */
 Mutable MutableCrossover(const Mutable &dominant, const Mutable &recessive) {
   Mutable crossover;
   crossover.SetEnergyDensity((2*dominant.GetEnergyDensity()
