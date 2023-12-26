@@ -44,7 +44,7 @@ NeuralNetwork::NeuralNetwork(const Genome &genom){
           inputs.push_back(input);
         }
       }
-      FeedForwardNeuron ffneuron = {neuron.GetId(), neuron.GetBias(), inputs};
+      FeedForwardNeuron ffneuron = {neuron.GetId(), neuron.GetBias(), inputs, neuron.GetActivation()};
       ffneurons.push_back(ffneuron);
     }
   }
@@ -81,20 +81,7 @@ std::vector<double> NeuralNetwork::Activate(
 
       if (std::find(output_ids_.begin(), output_ids_.end(), ffneuron.id) ==
           output_ids_.end()) {
-        //Need a way to determine what the appropriate activation function is (i.e. that of the neuron)
-        Neuron tempN = Neuron(NeuronType::kHidden, 0.0);
-        if (genome_ != nullptr){ //if our genome is null we default to sigmoid
-            bool specificActivation = genome_->FindNeuronById(ffneuron.id, tempN); //find the corresponding neuron
-            if (specificActivation){ //if successfuly found, use specific activation function to neuron
-                value=activation_function(tempN, value);
-            }
-            else{ //all other cases sigmoid
-                value=1/(1+exp(-value));
-            }
-        }
-        else{
-            value=1/(1+exp(-value));
-        }
+        value=activation_function(ffneuron.activation, value);
       }
 
       values[ffneuron.id] = value;
@@ -178,8 +165,8 @@ std::vector<std::vector<Neuron> > get_layers(const Genome &genom) {
  *
  * @return The output of the activation function.
  */
-double activation_function(Neuron& n, double x) {
-    switch (n.GetActivation()) {
+double activation_function(ActivationType n, double x) {
+    switch (n) {
         case ActivationType::sigmoid:
             return 1/(1+exp(-x));
         case ActivationType::tanh:

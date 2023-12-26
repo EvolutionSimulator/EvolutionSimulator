@@ -38,7 +38,7 @@ struct FeedForwardNeuron {  // Functional units of the NeuralNetowork, obtained
   double bias;              /*!< The bias of the neuron. */
   std::vector<NeuronInput> inputs; /*!< A vector of NeuronInput representing the
                                       inputs to this neuron. */
-  ActivationType activation = ActivationType::sigmoid; /*!< Activation function of the neuron. */
+  ActivationType activation; /*!< Activation function of the neuron. */
 };
 
 /*!
@@ -67,6 +67,6 @@ std::vector<std::vector<Neuron> > get_layers(
         &genom);  // organize neurons from a Genome into layers (by neurons ids)
 
 //double activation_function(double x);
-double activation_function(Neuron& n, double x);
+double activation_function(ActivationType n, double x);
 
 }  // end of namespace neat

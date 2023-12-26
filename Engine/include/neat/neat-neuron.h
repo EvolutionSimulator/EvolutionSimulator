@@ -29,7 +29,7 @@ class Neuron {
   void SetActive();
   void SetInactive();
 
-  ActivationType GetActivation();
+  ActivationType GetActivation() const;
   void SetActivation(ActivationType a);
 
  private:

@@ -66,7 +66,7 @@ void Neuron::SetActivation(ActivationType a) {activation_=a;}
 /*!
  * @brief Sets the activation function of the neuron.
  */
-ActivationType Neuron::GetActivation() {return activation_;}
+ActivationType Neuron::GetActivation() const {return activation_;}
 
 /*!
  * @brief Sets the neuron to be active.
