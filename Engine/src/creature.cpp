@@ -647,7 +647,8 @@ Food *Creature::GetClosestFoodInSight(
   int x_grid = static_cast<int>(x_coord_ / grid_cell_size);
   int y_grid = static_cast<int>(y_coord_ / grid_cell_size);
 
-  int max_cells_to_find_food = M_PI * (vision_radius_ + sqrt(2) * grid_cell_size + settings::environment::kMaxFoodSize) * (vision_radius_ + sqrt(2) * grid_cell_size + settings::environment::kMaxCreatureSize) / (grid_cell_size * grid_cell_size);
+  //temporary fix multiply by 4
+  int max_cells_to_find_food = 4 * M_PI * (vision_radius_ + sqrt(2) * grid_cell_size + settings::environment::kMaxFoodSize) * (vision_radius_ + sqrt(2) * grid_cell_size + settings::environment::kMaxCreatureSize) / (grid_cell_size * grid_cell_size);
 
   auto cone_center = Point(x_coord_, y_coord_);
   auto cone_orientation = GetOrientation();
