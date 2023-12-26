@@ -35,7 +35,7 @@ namespace environment {
 constexpr double kMapWidth = 1900.0;
 constexpr double kMapHeight = 880.0;
 constexpr double kCreatureDensity = 0.0005;
-constexpr int kMaxFoodSize = 15;
+constexpr int kMaxFoodSize = 15; // Influences vision
 constexpr int kMaxCreatureSize = 15;
 constexpr double kTolerance = 1e-3;
 constexpr double kDefaultFoodDensity = 0.005;
