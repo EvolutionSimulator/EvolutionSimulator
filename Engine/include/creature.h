@@ -41,10 +41,9 @@ class Creature : public MovableEntity {
   void UpdateEnergy(double deltaTime);
   double GetEnergy() const;
   void SetEnergy(double energy);
-  double GetMaxEnergy() const;
   void SetMaxEnergy(double max_energy);
-  neat::Genome GetGenome();
-  Mutable GetMutable();
+  neat::Genome GetGenome() const;
+  Mutable GetMutable() const;
 
   void Update(double deltaTime, double const kMapWidth, double const kMapHeight,
               std::vector<std::vector<std::vector<Entity *> > > &grid,
@@ -60,7 +59,8 @@ class Creature : public MovableEntity {
   bool Fit();
   void Reproduced();
 
-  double GetMaxEnergy();
+
+  double GetMaxEnergy() const;
   void UpdateMaxEnergy();
 
   double GetAge() const;

@@ -199,7 +199,8 @@ void Creature::Reproduced() {
  *
  * @return double The maximum energy level of the creature.
  */
-double Creature::GetMaxEnergy(){ return max_energy_; }
+double Creature::GetMaxEnergy() const { return max_energy_; }
+
 
 /*!
  * @brief Updates the maximum energy level of the creature.
@@ -291,7 +292,7 @@ void Creature::Update(double deltaTime, double const kMapWidth,
  *
  * @return The genome of the creature.
  */
-neat::Genome Creature::GetGenome() { return genome_; }
+neat::Genome Creature::GetGenome() const { return genome_; }
 
 /*!
  * @brief Retrieves the creature's mutables
@@ -301,7 +302,7 @@ neat::Genome Creature::GetGenome() { return genome_; }
  *
  * @return The mutables of the creature.
  */
-Mutable Creature::GetMutable() {return mutable_;}
+Mutable Creature::GetMutable() const {return mutable_;}
 
 /*!
  * @brief Handles the collision of the creature with another entity.
