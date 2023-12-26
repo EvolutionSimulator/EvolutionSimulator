@@ -14,28 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui_(new Ui::MainWindow), friction_coefficient(0.0), lastRecordedTime_(0.0) {
   ui_->setupUi(this);
 
-  setCentralWidget(ui_->canvas);
-  // Calculate total size needed for the window based on canvas size and additional widgets/controls
-  int totalWidth = settings::environment::kMapWidth;
-  int totalHeight = settings::environment::kMapHeight; // add extra height for other controls if needed
 
-  float scaleFactor = this->devicePixelRatioF(); // Get the device pixel ratio
-  int scaledWidth = static_cast<int>(totalWidth/scaleFactor);
-  int scaledHeight = static_cast<int>(totalHeight/scaleFactor);
-
-  // Resize the main window to fit the canvas and other controls
-  resize(scaledWidth, scaledHeight);
-  this->setStyleSheet("QPushButton {"
-                      "  background-color: rgba (255, 0, 0, 0);"
-                      "  color: rgba (0, 0, 0, 0);"
-                      "  border: 2px solid red;"
-                      "}"
-                      "QPushButton:hover {"
-                      "  background-color: lightblue;"
-                      "}"
-                      "QPushButton:pressed {"
-                      "  background-color: darkblue;"
-                      "}");
   ui_->densityFood->setMinimum(1);
   ui_->densityFood->setMaximum(1000);
   connect(ui_->runButton, &QPushButton::clicked, this, &MainWindow::ToggleSimulation);

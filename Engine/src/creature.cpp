@@ -607,8 +607,8 @@ double Creature::GetVisionAngle() const { return vision_angle_; }
  * @return A pointer to the closest food entity within the line of sight; nullptr if no food is found.
  */
 Food *Creature::GetClosestFoodInSight(
-    std::vector<std::vector<std::vector<Entity *>>> &grid,
-    double grid_cell_size) const {
+  std::vector<std::vector<std::vector<Entity *>>> &grid,
+  double grid_cell_size) const {
   int grid_width = grid.size();
   int grid_height = grid[0].size();
 
