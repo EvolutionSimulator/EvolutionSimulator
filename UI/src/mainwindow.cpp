@@ -14,8 +14,8 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui_(new Ui::MainWindow), friction_coefficient(0.0), lastRecordedTime_(0.0) {
   ui_->setupUi(this);
   // Calculate total size needed for the window based on canvas size and additional widgets/controls
-  int totalWidth = settings::environment::kMapWidth + 30;
-  int totalHeight = settings::environment::kMapHeight + 300; // add extra height for other controls if needed
+  int totalWidth = settings::environment::kMapWidth;
+  int totalHeight = settings::environment::kMapHeight; // add extra height for other controls if needed
 
   float scaleFactor = this->devicePixelRatioF(); // Get the device pixel ratio
   int scaledWidth = static_cast<int>(totalWidth/scaleFactor);
@@ -24,8 +24,8 @@ MainWindow::MainWindow(QWidget *parent)
   // Resize the main window to fit the canvas and other controls
   resize(scaledWidth, scaledHeight);
   this->setStyleSheet("QPushButton {"
-                      "  background-color: blue;"
-                      "  color: white;"
+                      "  background-color: rgba (255, 0, 0, 0);"
+                      "  color: rgba (0, 0, 0, 0);"
                       "  border: 2px solid red;"
                       "}"
                       "QPushButton:hover {"
@@ -187,4 +187,16 @@ void MainWindow::DrawCreaturesOverTimeGraph() {
     connect(dialog, &QDialog::finished, dialog, &QObject::deleteLater);
     dialog->exec();
   }
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event) {
+    if (event->key() == Qt::Key_Escape) {
+        if (isFullScreen()) {
+            showMaximized();  // Switch to maximized mode
+        } else {
+            showFullScreen(); // Optionally, toggle back to full screen
+        }
+    } else {
+        QMainWindow::keyPressEvent(event); // Pass other events to the base class
+    }
 }

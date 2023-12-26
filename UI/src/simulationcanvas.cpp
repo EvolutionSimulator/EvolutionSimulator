@@ -21,7 +21,6 @@ SimulationCanvas::SimulationCanvas(QWidget* Parent)
   };
 
 
-
     QFile resourceFile(":/font.ttf");
     if (!resourceFile.open(QIODevice::ReadOnly)) {
         qDebug() << "Failed to open font resource!";
