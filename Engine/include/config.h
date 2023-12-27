@@ -1,5 +1,6 @@
 #ifndef CONFIG_H
 #define CONFIG_H
+#include <cmath>
 
 namespace settings {
 
@@ -22,8 +23,8 @@ constexpr double kActivationFunctionMutationRate = 0.02;
 }  // namespace neat
 
 namespace environment {
-constexpr double kMapWidth = 1000.0;
-constexpr double kMapHeight = 450.0;
+constexpr double kMapWidth = 1900.0;
+constexpr double kMapHeight = 880.0;
 constexpr double kCreatureDensity = 0.0005;
 constexpr int kMaxFoodSize = 15;
 constexpr int kMaxCreatureSize = 15;
@@ -37,21 +38,41 @@ constexpr double kMeatNutritionalValue = 3.0;
 constexpr double kRotFactor = 1.0;
 constexpr double kGridCellSize = 50.0;
 constexpr int kMinCreatureSize = 2;
-constexpr double kReproductionThreshold = 0.90;
+constexpr double kReproductionThreshold = 0.80;
 constexpr double kReproductionCooldown = 10;
 constexpr int kInputNeurons = 6;
-constexpr int kOutputNeurons = 3;
+constexpr int kOutputNeurons = 4;
 constexpr double kMaxNutritionalValue = 5;
 constexpr double kDefaultLifespan = 30;
 constexpr double kPhotosynthesisFactor = 0.1;
 constexpr double kFrictionalCoefficient =
-    0.5;  // 0.5 seems to provide a good balance at the beginning  then goes to
-          // shit
+    0.5;  // Needs to be less than 1
 }  // namespace environment
 
 namespace engine {
 constexpr double kFixedUpdateInterval = 0.05;
-}
+constexpr double EPS = 1e-7;
+constexpr size_t kMaxCellsToFindFood = 30;
+}  // namespace engine
+
+namespace physical_constraints {
+constexpr double kMutationRate = 0.2;
+constexpr double kMaxEnergyDensity = 10.0;
+constexpr double kMinEnergyLoss = 0.1;
+constexpr double kDEnergyDensity = 5.0;
+constexpr double kDEnergyLoss = 0.5;
+constexpr double kDIntegrity = 3.0;
+constexpr double kDStrafingDifficulty = 0.5;
+constexpr double kDMaxSize = 10;
+constexpr double kDBabySize = 2;
+constexpr double kDMaxForce = 10;
+constexpr double kDGrowthFactor = 10;
+constexpr double kDVisionFactor = 200;
+constexpr double kVisionRadius = 200;
+constexpr double kVisionAngle = M_PI / 3;
+constexpr double kVisionARratio = 200 * M_PI / 3;
+
+} //namespace physical_constraints
 }  // namespace settings
 
 #endif  // CONFIG_H

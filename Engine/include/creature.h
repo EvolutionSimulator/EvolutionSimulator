@@ -7,6 +7,7 @@
 #include "food.h"
 #include "movable_entity.h"
 #include "neat/neat-neural-network.h"
+#include "mutable.h"
 
 /*!
  * @file creature.h
@@ -33,7 +34,7 @@
  */
 class Creature : public MovableEntity {
  public:
-  Creature(neat::Genome genome);
+  Creature(neat::Genome genome, Mutable mutable_);
 
   void Dies();
   void Eats(double nutritional_value);
@@ -41,9 +42,12 @@ class Creature : public MovableEntity {
   double GetEnergy() const;
   void SetEnergy(double energy);
   neat::Genome GetGenome();
+  Mutable GetMutable();
+
   void Update(double deltaTime, double const kMapWidth, double const kMapHeight,
               std::vector<std::vector<std::vector<Entity *> > > &grid,
-              double GridCellSize);
+              double GridCellSize, double frictional_coefficient);
+
 
   double GetHealth() const;
   void SetHealth(double health);
@@ -54,25 +58,27 @@ class Creature : public MovableEntity {
   bool Fit();
   void Reproduced();
 
-  double GetMaxEnergy() const;
-  void SetMaxEnergy(double max_energy);
+  void UpdateMaxEnergy();
 
   double GetAge() const;
   void SetAge(double age);
 
+  void SetVision(double radius, double angle);
+  double GetVisionRadius() const;
+  double GetVisionAngle() const;
+
   void BalanceHealthEnergy();
 
-  Food *GetClosestFood(std::vector<std::vector<std::vector<Entity *> > > &grid,
+  Food *GetClosestFood(std::vector<std::vector<std::vector<Entity *>>> &grid,
                        double GridCellSize) const;
-
-  void SetGrowthFactor(double growth_factor);
-  double GetGrowthFactor();
-  void SetMaxSize(double max_size);
-  double GetMaxSize();
+  Food *GetClosestFoodInSight(
+      std::vector<std::vector<std::vector<Entity *>>> &grid,
+      double grid_cell_size) const;
 
   void Grow(double energy);
+
   void Think(std::vector<std::vector<std::vector<Entity *> > > &grid,
-             double GridCellSize);
+             double GridCellSize, double deltaTime);
   void ProcessVisionFood(
       std::vector<std::vector<std::vector<Entity *> > > &grid,
       double GridCellSize);
@@ -81,14 +87,15 @@ class Creature : public MovableEntity {
   void SetGeneration(int generation);
 
  protected:
+  double max_energy_;
   double energy_; /*!< Stores the current energy level of the creature. */
-  double growth_factor_; /*!< Determines how the creature grows in relation to
-                            energy intake. */
+
   double health_; /*!< Represents the current health status of the creature. */
+
   double age_;    /*!< Tracks the age of the creature. */
-  double max_energy_ =
-      300; /*!< The maximum energy level the creature can attain. */
-  double max_size_ = 10;      /*!< The maximum size the creature can grow to. */
+
+  Mutable mutable_;
+
   neat::NeuralNetwork brain_; /*!< Neural network for processing environmental
                                  stimuli and decision making. */
   neat::Genome genome_;       /*!< Genetic makeup of the creature. */
@@ -102,9 +109,13 @@ class Creature : public MovableEntity {
   int generation_ = 0;           /*!< Generation count of the creature. */
   double reproduction_cooldown_; /*!< Cooldown period before the creature can
                                     reproduce again. */
+  double vision_radius_; /*!< The radius within which the creature can detect
+                            other entities. */
+  double vision_angle_;  /*!< The angle of vision for the creature, representing
+                            the field of view. */
 };
 
 std::vector<Food *> get_food_at_distance(
-    std::vector<std::vector<std::vector<Entity *> > > &grid, int i_creature,
+    std::vector<std::vector<std::vector<Entity *>>> &grid, int i_creature,
     int j_creature, int grid_distance);
 #endif  // CREATURE_HPP

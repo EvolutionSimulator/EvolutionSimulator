@@ -10,6 +10,8 @@
 #include "food.h"
 #include "simulationdata.h"
 
+#include "geometry_primitives.h"
+
 /*!
  * @file collisions.cpp
  *
@@ -266,7 +268,8 @@ TEST(CollisionTests, OnCollisionWithFood) {
 
   // Create a Creature and Food for testing
   neat::Genome genome(2, 3);
-  Creature creature(genome);
+  Mutable mutables;
+  Creature creature(genome, mutables);
   Food food;
   food.SetSize(1.0);
 
@@ -370,7 +373,8 @@ class CreatureTest : public ::testing::Test {
 
 TEST_F(CreatureTest, GetClosestFood_EmptyGrid) {
   // Create a Creature with a mock genome
-  Creature creature(neat::Genome(2, 3));
+  Mutable mutables;
+  Creature creature(neat::Genome(2, 3), mutables);
 
   // Set up an empty grid
   std::vector<std::vector<std::vector<Entity*>>> grid;
@@ -392,7 +396,8 @@ TEST_F(CreatureTest, GetClosestFood_EmptyGrid) {
  */
 TEST_F(CreatureTest, GetClosestFood_NoFoodInGrid) {
   // Create a Creature with a mock genome
-  Creature creature(neat::Genome(2, 3));
+  Mutable mutables;
+  Creature creature(neat::Genome(2, 3), mutables);
   creature.SetCoordinates(0, 0, 10, 10);
 
   // Set up a grid with creatures but no food
@@ -417,9 +422,10 @@ TEST_F(CreatureTest, GetClosestFood_NoFoodInGrid) {
  */
 TEST_F(CreatureTest, GetClosestFoodTest) {
   // Create a Creature with a mock genome
-  Creature creature1(neat::Genome(2, 2));
-  Creature creature2(neat::Genome(3, 4));
-  Creature creature3(neat::Genome(5, 6));
+  Mutable mutables;
+  Creature creature1(neat::Genome(2, 2), mutables);
+  Creature creature2(neat::Genome(3, 4), mutables);
+  Creature creature3(neat::Genome(5, 6), mutables);
 
   // Set creature coordinates and sizes
   creature1.SetCoordinates(3.5, 4.5, 100.0, 100.0);
@@ -493,7 +499,8 @@ TEST_F(CreatureTest, GetClosestFoodTest2) {
   grid.assign(100, std::vector<std::vector<Entity*>>(100));
 
   double grid_cell_size = 1;
-  Creature* cr = new Creature(neat::Genome(2, 2));
+  Mutable mutables;
+  Creature* cr = new Creature(neat::Genome(2, 2), mutables);
   cr->SetCoordinates(1.6, 1.1, 100.0, 100.0);
   Food* f1 = new Food(2.5, 0.5);
   Food* f2 = new Food(2.2, 0.9);
@@ -559,12 +566,13 @@ TEST(SimulationDataTest, UpdateGridWithAliveEntities) {
   simData.food_entities_.clear();
   simData.ClearGrid();
 
-  Creature creature_1(neat::Genome(2, 3));
+  Mutable mutables;
+  Creature creature_1(neat::Genome(2, 3), mutables);
   creature_1.SetCoordinates(2.1, 3.4, 100.0, 100.0);
   creature_1.SetSize(10.0);
   simData.creatures_.push_back(creature_1);
 
-  Creature creature_2(neat::Genome(2, 3));
+  Creature creature_2(neat::Genome(2, 3), mutables);
   creature_2.SetCoordinates(1.1, 2.4, 100.0, 100.0);
   creature_2.SetSize(10.0);
   creature_2.SetState(Entity::Dead);
@@ -602,13 +610,14 @@ TEST(SimulationDataTest, CorrectEntityPlacementInGrid) {
   simData.food_entities_.clear();
   simData.ClearGrid();
 
-  Creature creature_1(neat::Genome(2, 3));
+  Mutable mutables;
+  Creature creature_1(neat::Genome(2, 3), mutables);
   creature_1.SetCoordinates(200.1, 300.4, settings::environment::kMapWidth,
                             settings::environment::kMapHeight);
   creature_1.SetSize(10.0);
   simData.creatures_.push_back(creature_1);
 
-  Creature creature_2(neat::Genome(2, 3));
+  Creature creature_2(neat::Genome(2, 3), mutables);
   creature_2.SetCoordinates(100.1, 350.4, settings::environment::kMapWidth,
                             settings::environment::kMapHeight);
   creature_2.SetSize(10.0);
@@ -715,3 +724,86 @@ TEST(GetNeighboursTest, CenterOutsideGrid) {
       {0, 0}, {0, 1}, {0, 2}, {1, 0}, {1, 1}, {1, 2}, {2, 0}, {2, 1}, {2, 2}};
   EXPECT_EQ(neighbours, expected);
 }
+
+
+TEST(OrientedAngleTest, Normalize) {
+  OrientedAngle angle1(3 * M_PI);
+  EXPECT_NEAR(angle1.GetAngle(), -M_PI, settings::engine::EPS);
+
+  OrientedAngle angle2(-4 * M_PI);
+  EXPECT_NEAR(angle2.GetAngle(), 0.0, settings::engine::EPS);
+
+  OrientedAngle angle3(7 * M_PI / 4);
+  EXPECT_NEAR(angle3.GetAngle(), -M_PI/4, settings::engine::EPS);
+
+  OrientedAngle angle4(-11 * M_PI / 6);
+  EXPECT_NEAR(angle4.GetAngle(), M_PI/6, settings::engine::EPS);
+}
+
+TEST(OrientedAngleTest, IsInsideCone_1) {
+  OrientedAngle left_boundary(0);
+  OrientedAngle right_boundary(M_PI / 2);
+
+  OrientedAngle insideAngle(M_PI / 4);
+  EXPECT_TRUE(insideAngle.IsInsideCone(left_boundary, right_boundary));
+
+  OrientedAngle onBoundary(M_PI / 2);
+  EXPECT_TRUE(onBoundary.IsInsideCone(left_boundary, right_boundary));
+
+  OrientedAngle outsideAngle(M_PI);
+  EXPECT_FALSE(outsideAngle.IsInsideCone(left_boundary, right_boundary));
+}
+
+TEST(OrientedAngleTest, IsInsideCone_2) {
+  OrientedAngle left_boundary(3 * M_PI / 2);
+  OrientedAngle right_boundary(M_PI / 2);
+
+  EXPECT_NEAR(left_boundary.GetAngle(), -M_PI/2, settings::engine::EPS);
+  EXPECT_NEAR(right_boundary.GetAngle(), M_PI/2, settings::engine::EPS);
+
+  OrientedAngle insideAngle1(0);
+  EXPECT_TRUE(insideAngle1.IsInsideCone(left_boundary, right_boundary));
+
+  OrientedAngle insideAngle2(7 * M_PI / 4);
+  EXPECT_TRUE(insideAngle2.IsInsideCone(left_boundary, right_boundary));
+
+  OrientedAngle onLeftBoundary(3 * M_PI / 2);
+  EXPECT_TRUE(onLeftBoundary.IsInsideCone(left_boundary, right_boundary));
+
+  OrientedAngle onRightBoundary(M_PI / 2);
+  EXPECT_TRUE(onRightBoundary.IsInsideCone(left_boundary, right_boundary));
+
+  OrientedAngle outsideAngle1(M_PI);
+  EXPECT_FALSE(outsideAngle1.IsInsideCone(left_boundary, right_boundary));
+
+  OrientedAngle outsideAngle2(5 * M_PI / 4);
+  EXPECT_NEAR(outsideAngle2.GetAngle(), -3*M_PI/4, settings::engine::EPS);
+  EXPECT_NEAR(outsideAngle2.AngleDistanceToCone(left_boundary, right_boundary), M_PI/4, settings::engine::EPS);
+  EXPECT_FALSE(outsideAngle2.IsInsideCone(left_boundary, right_boundary));
+}
+
+TEST(OrientedAngleTest, IsInsideCone_3) {
+  OrientedAngle left_boundary(M_PI / 2);
+  OrientedAngle right_boundary(- M_PI / 2);
+
+  OrientedAngle outsideAngle1(0);
+  EXPECT_FALSE(outsideAngle1.IsInsideCone(left_boundary, right_boundary));
+
+  OrientedAngle outsideAngle2(7 * M_PI / 4);
+  EXPECT_FALSE(outsideAngle2.IsInsideCone(left_boundary, right_boundary));
+  EXPECT_NEAR(outsideAngle2.AngleDistanceToCone(left_boundary, right_boundary), M_PI/4, settings::engine::EPS);
+
+  OrientedAngle onLeftBoundary(M_PI / 2);
+  EXPECT_TRUE(onLeftBoundary.IsInsideCone(left_boundary, right_boundary));
+
+  OrientedAngle onRightBoundary(3 * M_PI / 2);
+  EXPECT_TRUE(onRightBoundary.IsInsideCone(left_boundary, right_boundary));
+
+  OrientedAngle insideAngle1(M_PI);
+  EXPECT_TRUE(insideAngle1.IsInsideCone(left_boundary, right_boundary));
+
+  OrientedAngle insideAngle2(5 * M_PI / 4);
+  EXPECT_TRUE(insideAngle2.IsInsideCone(left_boundary, right_boundary));
+}
+
+
