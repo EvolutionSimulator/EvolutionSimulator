@@ -247,25 +247,25 @@ void SimulationData::ClearGrid() {
 }
 
 /*!
- * @brief Template function that erases the dead entities from their
- * corresponding vectors and fills the grid with the remaining entities.
+ * @brief Function that erases the eaten food from their
+ * corresponding vectors and fills the grid with the remaining food.
  *
- * @tparam entities Vector of EntityType.
+ * @tparam food Vector of type Food.
  * @param entityGrid 3D vector of entities.
  * @param cellSize Size of the grid cells.
  */
 
-template <typename EntityType> void UpdateGridTemplate(
-    std::vector<EntityType>& entities,
+void UpdateGridFood(
+    std::vector<Food>& foods,
     std::vector<std::vector<std::vector<Entity*>>>& entityGrid,
     double cellSize) {
-  entities.erase(std::remove_if(entities.begin(), entities.end(),
-                                [](const EntityType& entity) {
-                                  return entity.GetState() != Entity::Alive;
+  foods.erase(std::remove_if(foods.begin(), foods.end(),
+                                [](const Food& food) {
+                                    return food.GetState() != Entity::Alive;
                                 }),
-                 entities.end());
+                 foods.end());
 
-  for (EntityType& entity : entities) {
+  for (Food& entity : foods) {
     std::pair<double, double> coordinates = entity.GetCoordinates();
     int gridX = static_cast<int>(coordinates.first / cellSize);
     int gridY = static_cast<int>(coordinates.second / cellSize);
@@ -276,7 +276,7 @@ template <typename EntityType> void UpdateGridTemplate(
 
 
 /*!
- * @brief Template function that erases the dead entities from their
+ * @brief Function that turns the dead creatures to meat from their
  * corresponding vectors and fills the grid with the remaining entities.
  *
  * @tparam entities Vector of EntityType.
@@ -284,24 +284,24 @@ template <typename EntityType> void UpdateGridTemplate(
  * @param cellSize Size of the grid cells.
  */
 
-void UpdateGridTemplate(
-    std::vector<Creature>& entities,
+void UpdateGridCreature(
+    std::vector<Creature>& creatures,
     std::vector<std::vector<std::vector<Entity*>>>& entityGrid,
     double cellSize, std::vector<Food>& food) {
-    entities.erase(std::remove_if(entities.begin(), entities.end(),
+    creatures.erase(std::remove_if(creatures.begin(), creatures.end(),
                                   [&food](const Creature& entity) {
                                       if (entity.GetState() == Entity::Dead) {
                                       food.emplace_back(Meat(entity.GetCoordinates().first, entity.GetCoordinates().second, entity.GetSize()));
                                       }
                                       return entity.GetState() != Entity::Alive;
                                   }),
-                   entities.end());
-    for (Creature& entity : entities) {
-        std::pair<double, double> coordinates = entity.GetCoordinates();
+                   creatures.end());
+    for (Creature& creature : creatures) {
+        std::pair<double, double> coordinates = creature.GetCoordinates();
         int gridX = static_cast<int>(coordinates.first / cellSize);
         int gridY = static_cast<int>(coordinates.second / cellSize);
 
-        entityGrid[gridX][gridY].push_back(&entity);
+        entityGrid[gridX][gridY].push_back(&creature);
     }
 }
 
@@ -336,9 +336,9 @@ void UpdateQueue(std::queue<Creature>& reproduce) {
  */
 void SimulationData::UpdateGrid() {
   ClearGrid();
-    UpdateGridTemplate(creatures_, grid_,
+    UpdateGridCreature(creatures_, grid_,
                                settings::environment::kGridCellSize, food_entities_);
-  UpdateGridTemplate<Food>(food_entities_, grid_,
+  UpdateGridFood(food_entities_, grid_,
                            settings::environment::kGridCellSize);
   UpdateQueue(reproduce_);
 }
