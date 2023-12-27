@@ -45,6 +45,9 @@ class Genome {
   void MutateRemoveLink();
   void MutateChangeWeight();
   void MutateChangeBias();
+  void MutateActivationFunction();
+
+  bool FindNeuronById(int targetId, Neuron& foundNeuron) const;
 
   bool DetectLoops(const Neuron& n);
 
@@ -54,7 +57,8 @@ class Genome {
   std::vector<Neuron> neurons_; /*!< A vector of Neuron objects representing the
                                    neurons in the Genome. */
   std::vector<Link> links_;     /*!< A vector of Link objects representing the
-                                   connections between neurons in the Genome. */
+                                   connections between neurons in the Genome.
+                                    */
   bool DFS(const Neuron& currentNeuron, std::unordered_set<int>& visited,
            std::unordered_set<int>& visiting) const;
 };

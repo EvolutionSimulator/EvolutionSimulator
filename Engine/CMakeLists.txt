@@ -19,6 +19,7 @@ add_library(Engine STATIC
   include/neat/neat-link.h src/neat/neat-link.cpp
   include/neat/neat-genome.h src/neat/neat-genome.cpp
 
+  include/geometry_primitives.h src/geometry_primitives.cpp
 
   include/neat/neat-neural-network.h
   src/neat/neat-neural-network.cpp
@@ -36,6 +37,7 @@ add_library(Engine STATIC
   include/collisions.h
   src/collisions.cpp
   include/config.h
+  include/mutable.h src/mutable.cpp
 
 )
 

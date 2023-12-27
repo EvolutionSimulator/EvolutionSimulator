@@ -96,11 +96,20 @@ void SimulationData::ModifyAllCreatures(double delta_x, double delta_y) {
 void SimulationData::UpdateAllCreatures(double deltaTime) {
   for (Creature& creature : creatures_) {
     creature.Update(deltaTime, settings::environment::kMapWidth,
-                      settings::environment::kMapHeight, grid_,
-                    settings::environment::kGridCellSize);
+                    settings::environment::kMapHeight, grid_,
+                    settings::environment::kGridCellSize,
+                    environment_.GetFrictionalCoefficient());
     if (creature.Fit()) {
       reproduce_.push(creature);
+      creature.Reproduced();
     }
+  }
+  world_time_ += deltaTime;
+
+  // Store the creature count when the time increases by a second
+  if (static_cast<int>(world_time_) > static_cast<int>(lastRecordedTime_)) {
+    lastRecordedTime_ = world_time_;
+    creatureCountOverTime_.push_back(creatures_.size());
   }
 }
 
@@ -113,6 +122,9 @@ void SimulationData::GenerateMoreFood() {
   double max_number = environment_.GetFoodDensity() *
                       settings::environment::kMapHeight *
                       settings::environment::kMapWidth / 100;
+  if (creatures_.size() > 300) {//temporary fix so that an abnormal number of creatures can't abuse the food generation system
+      return ;
+  }
   while (size < max_number) {
     Plant new_food = Plant();
     new_food.RandomInitialization(settings::environment::kMapWidth,
@@ -135,7 +147,7 @@ void SimulationData::ReproduceCreatures() {
   double world_height = settings::environment::kMapHeight;
   double max_creature_size = settings::environment::kMaxCreatureSize;
   double min_creature_size = settings::environment::kMinCreatureSize;
-  while (reproduce_.size() > 2) {
+  while (reproduce_.size() >= 2) {
     Creature creature1 = reproduce_.front();
     reproduce_.pop();
     Creature creature2 = reproduce_.front();
@@ -143,13 +155,16 @@ void SimulationData::ReproduceCreatures() {
     double energy1 = creature1.GetEnergy();
     double energy2 = creature2.GetEnergy();
     if (energy1 > energy2) {
-    neat::Genome new_genome =
+      neat::Genome new_genome =
           neat::Crossover(creature1.GetGenome(), creature2.GetGenome());
       new_genome.Mutate();
       new_genome.Mutate();
-      Creature new_creature(new_genome);
-      new_creature.RandomInitialization(world_width, world_height,
-                                        max_creature_size, min_creature_size);
+      Mutable new_mutable =
+          MutableCrossover(creature1.GetMutable(), creature2.GetMutable());
+      new_mutable.Mutate();
+      new_mutable.Mutate();
+      Creature new_creature(new_genome, new_mutable);
+      new_creature.RandomInitialization(world_width, world_height);
       new_creature.SetGeneration(creature1.GetGeneration() + 1);
       AddCreature(new_creature);
     } else {
@@ -157,14 +172,15 @@ void SimulationData::ReproduceCreatures() {
           neat::Crossover(creature2.GetGenome(), creature1.GetGenome());
       new_genome.Mutate();
       new_genome.Mutate();
-      Creature new_creature(new_genome);
-      new_creature.RandomInitialization(world_width, world_height,
-                                        max_creature_size, min_creature_size);
+      Mutable new_mutable =
+          MutableCrossover(creature2.GetMutable(), creature1.GetMutable());
+      new_mutable.Mutate();
+      new_mutable.Mutate();
+      Creature new_creature(new_genome, new_mutable);
+      new_creature.RandomInitialization(world_width, world_height);
       new_creature.SetGeneration(creature2.GetGeneration() + 1);
       AddCreature(new_creature);
     }
-    creature1.Reproduced();
-    creature2.Reproduced();
   }
 }
 
@@ -176,7 +192,7 @@ void SimulationData::InitializeCreatures() {
   // Retrieve information from the environment
   double world_width = settings::environment::kMapWidth;
   double world_height = settings::environment::kMapHeight;
-  double creature_density = settings::environment::kCreatureDensity;
+  double creature_density = environment_.GetCreatureDensity();
   double max_creature_size = settings::environment::kMaxCreatureSize;
   double min_creature_size = settings::environment::kMinCreatureSize;
 
@@ -187,12 +203,13 @@ void SimulationData::InitializeCreatures() {
       if (std::rand() / (RAND_MAX + 1.0) < creature_density) {
         neat::Genome genome(settings::environment::kInputNeurons,
                             settings::environment::kOutputNeurons);
+        Mutable mutables;
         for (int i = 0; i < 40; i++) {
           genome.Mutate();
+          mutables.Mutate();
         }
-        Creature new_creature(genome);
-        new_creature.RandomInitialization(world_width, world_height,
-                                          max_creature_size, min_creature_size);
+        Creature new_creature(genome, mutables);
+        new_creature.RandomInitialization(world_width, world_height);
         creatures_.emplace_back(new_creature);
       }
     }
@@ -408,4 +425,8 @@ void SimulationData::CheckCollisions() {
       }
     }
   }
+}
+
+std::vector<int> SimulationData::GetCreatureCountOverTime() const {
+  return creatureCountOverTime_;
 }

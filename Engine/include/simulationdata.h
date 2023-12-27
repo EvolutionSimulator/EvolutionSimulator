@@ -7,10 +7,12 @@
 #include "environment.h"
 #include "food.h"
 
+
 struct SimulationData {
  public:
+  std::vector<int> GetCreatureCountOverTime() const;
   explicit SimulationData(myEnvironment::Environment& env)
-      : environment_(env), creatures_(), food_entities_() {
+      : environment_(env), creatures_(), food_entities_(), lastRecordedTime_(0.0){
     InitializeFood();
     InitializeCreatures();
     InitializeGrid();
@@ -47,8 +49,10 @@ struct SimulationData {
   double world_time_ = 0;
 
  private:
+  double lastRecordedTime_;
   myEnvironment::Environment& environment_;
   std::vector<std::vector<std::vector<Entity*>>> grid_;
+  std::vector<int> creatureCountOverTime_;
 };
 
 std::vector<std::pair<int, int>> GetNeighbours(

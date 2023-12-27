@@ -7,4 +7,5 @@
 // Constructor implementation
 myEnvironment::Environment::Environment()
     : food_density_(settings::environment::kDefaultFoodDensity),
-      creature_density_(settings::environment::kDefaultCreatureDensity) {}
+      creature_density_(settings::environment::kDefaultCreatureDensity),
+      friction_coefficient_(settings::environment::kFrictionalCoefficient) {}
