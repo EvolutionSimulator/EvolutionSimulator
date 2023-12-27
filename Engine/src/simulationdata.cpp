@@ -256,7 +256,7 @@ void SimulationData::ClearGrid() {
  */
 
 template <typename EntityType> void UpdateGridTemplate(
-    std::vector<Food>& entities,
+    std::vector<EntityType>& entities,
     std::vector<std::vector<std::vector<Entity*>>>& entityGrid,
     double cellSize) {
   entities.erase(std::remove_if(entities.begin(), entities.end(),
