@@ -267,8 +267,7 @@ TEST(CollisionTests, OnCollisionWithFood) {
   // Create a Creature and Food for testing
   neat::Genome genome(2, 3);
   Creature creature(genome);
-  Plant food;
-  food.SetSize(1.0);
+  Plant food(1.0);
 
   // Case 1: Food is alive, and Creature collides with it
   food.SetState(Entity::Alive);
