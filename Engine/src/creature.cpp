@@ -2,6 +2,11 @@
 
 #include <algorithm>
 #include <cassert>
+#include <queue>
+#include <set>
+
+#include "collisions.h"
+#include "config.h"
 
 /*!
  * @brief Construct a new Creature object.
@@ -25,15 +30,22 @@
  * `settings::environment::kReproductionCooldown`.
  * - Age: 0
  */
-Creature::Creature(neat::Genome genome)
+Creature::Creature(neat::Genome genome, Mutable mutables)
     : MovableEntity(),
-      health_(100),
-      energy_(100),
+      mutable_(mutables),
       brain_(neat::NeuralNetwork(genome)),
       genome_(genome),
       neuron_data_(settings::environment::kInputNeurons, 0),
-      reproduction_cooldown_(settings::environment::kReproductionCooldown),
-      age_(0) {}
+      vision_radius_(mutables.GetVisionFactor()),
+      vision_angle_(settings::physical_constraints::kVisionARratio
+                    / mutables.GetVisionFactor()),
+      age_(0),
+      reproduction_cooldown_ (mutables.GetMaturityAge()) {
+    size_ = mutables.GetBabySize();
+    health_ = mutables.GetIntegrity() * pow(size_, 2);
+    energy_ = mutables.GetEnergyDensity() * pow(size_, 2);
+}
+
 
 /*!
  * @brief Retrieves the generation of the creature.
@@ -76,35 +88,35 @@ double Creature::GetEnergy() const { return energy_; }
  * their current values and predefined thresholds.
  */
 void Creature::BalanceHealthEnergy() {
-  if (GetEnergy() < 0) {
-    SetHealth(GetHealth() + GetEnergy() - 5);
-    SetEnergy(5);
-    if (GetHealth() >= (GetEnergy() - 5)) {
-      SetHealth(GetHealth() + (GetEnergy() - 5));
-      SetEnergy(5);
+  if (GetEnergy() < 1) {
+    SetHealth(GetHealth() + GetEnergy() - 1);
+    SetEnergy(1);
+    if (GetHealth() >= (GetEnergy() - 1)) {
+      SetHealth(GetHealth() + (GetEnergy() - 1));
+      SetEnergy(1);
     } else {
       SetHealth((GetHealth() + GetEnergy()) / 2);
       SetEnergy(GetHealth());
     }
   } else if (GetHealth() < 0) {
-    if (GetEnergy() >= (GetHealth() - 5)) {
-      SetEnergy(GetEnergy() - GetHealth() - 5);
-      SetHealth(5);
+    if (GetEnergy() >= (GetHealth() - 0.1)) {
+      SetEnergy(GetEnergy() - GetHealth() - 0.1);
+      SetHealth(0.1);
     } else {
       SetHealth((GetHealth() + GetEnergy()) / 2);
       SetEnergy(GetHealth());
     }
-  } else if (GetEnergy() > GetMaxEnergy()) {
-    SetHealth(GetHealth() + (GetEnergy() - GetMaxEnergy()));
-    SetEnergy(GetMaxEnergy());
+  } else if (GetEnergy() > max_energy_) {
+    SetHealth(GetHealth() + (GetEnergy() - max_energy_));
+    SetEnergy(max_energy_);
   } else if (GetHealth() > GetEnergy() &&
-             GetEnergy() <= settings::environment::kHealthToEnergy) {
-    SetEnergy(GetEnergy() + 5);
-    SetHealth(GetHealth() - 5);
+             GetEnergy() <= 0) {
+    SetEnergy(GetEnergy() + 0.1);
+    SetHealth(GetHealth() - 0.1);
   } else if (GetHealth() < GetEnergy() &&
-             GetEnergy() >= settings::environment::kEnergyToHealth) {
-    SetEnergy(GetEnergy() - 5);
-    SetHealth(GetHealth() + 5);
+             GetEnergy() >= 0.1*max_energy_) {
+    SetEnergy(GetEnergy() - 0.1);
+    SetHealth(GetHealth() + 0.1);
   }
 }
 
@@ -124,8 +136,8 @@ double Creature::GetHealth() const { return health_; }
  * @param health The new health level to be set, capped at 100.
  */
 void Creature::SetHealth(double health) {
-  if (health > 100) {
-    health_ = 100;
+  if (health > mutable_.GetIntegrity() * pow(size_, 2)) {
+    health_ = mutable_.GetIntegrity() * pow(size_, 2);
   } else {
     health_ = health;
   }
@@ -163,10 +175,10 @@ void Creature::SetEnergy(double energy) {
  * calculated.
  */
 void Creature::UpdateEnergy(double deltaTime) {
-  SetEnergy(GetEnergy() -
-            (fabs(GetAcceleration()) + fabs(GetRotationalAcceleration()) + 50) *
-                GetSize() * deltaTime / 100);
+  double movement_energy = (fabs(GetAcceleration()) + fabs(GetRotationalAcceleration())) * GetSize() * deltaTime/200;
+  double heat_loss = mutable_.GetEnergyLoss() * pow(size_, 1) * deltaTime/100;
 
+  SetEnergy(GetEnergy() - movement_energy - heat_loss);
   BalanceHealthEnergy();
 
   if (GetHealth() <= 0) {
@@ -184,7 +196,7 @@ void Creature::UpdateEnergy(double deltaTime) {
  */
 bool Creature::Fit() {
   if (energy_ > settings::environment::kReproductionThreshold * max_energy_ &&
-      reproduction_cooldown_ == 0.0) {
+      reproduction_cooldown_ == 0.0 && age_ < 700) {
     return true;
   }
   return false;
@@ -197,8 +209,8 @@ bool Creature::Fit() {
  * the cooldown period.
  */
 void Creature::Reproduced() {
-  SetEnergy(GetEnergy() - 0.75 * max_energy_);
-  reproduction_cooldown_ = settings::environment::kReproductionCooldown;
+  SetEnergy(GetEnergy() - 0.75 * mutable_.GetEnergyDensity() * pow(size_, 2));
+  reproduction_cooldown_ = mutable_.GetReproductionCooldown();
 }
 
 /*!
@@ -209,24 +221,17 @@ void Creature::Reproduced() {
  *
  * @return double The maximum energy level of the creature.
  */
-double Creature::GetMaxEnergy() const { return max_energy_; }
 
 /*!
- * @brief Sets the maximum energy level of the creature.
+ * @brief Updates the maximum energy level of the creature.
  *
- * @details This method ensures the maximum energy level is not set below a
- * minimum threshold, which is calculated as twice the creature's size. If the
- * provided max_energy is less than this threshold, the maximum energy is set to
- * the threshold value instead.
+ * @details This method takes into account the changes in the energy
+ *          level due to both the increased size and the age.
  *
  * @param max_energy The desired maximum energy level.
  */
-void Creature::SetMaxEnergy(double max_energy) {
-  if (max_energy < GetSize() * 2) {
-    max_energy_ = GetSize() * 2;
-  } else {
-    max_energy_ = max_energy;
-  }
+void Creature::UpdateMaxEnergy() {
+  max_energy_ = mutable_.GetEnergyDensity() * pow(size_, 2) * (1 - age_/1000);
 }
 
 /*!
@@ -242,15 +247,9 @@ double Creature::GetAge() const { return age_; }
 /*!
  * @brief Sets the age of the creature.
  *
- * @details Adjusts the maximum energy based on the difference in age and then
- * sets the new age. The maximum energy is reduced proportionally to the
- * decrease in age.
- *
  * @param age The new age to be set.
  */
 void Creature::SetAge(double age) {
-  SetMaxEnergy(GetMaxEnergy() - (GetAge() - age));
-
   age_ = age;
 }
 
@@ -288,13 +287,16 @@ void Creature::Eats(double nutritional_value) {
 void Creature::Update(double deltaTime, double const kMapWidth,
                       double const kMapHeight,
                       std::vector<std::vector<std::vector<Entity *>>> &grid,
-                      double GridCellSize) {
+                      double GridCellSize, double frictional_coefficient) {
+  this->frictional_coefficient_ = frictional_coefficient;
+  this->UpdateMaxEnergy();
   this->UpdateEnergy(deltaTime);
   this->UpdateVelocities(deltaTime);
   this->Move(deltaTime, kMapWidth, kMapHeight);
   this->Rotate(deltaTime);
-  this->Think(grid, GridCellSize);
+  this->Think(grid, GridCellSize, deltaTime);
   age_ += 0.05;
+
   if (reproduction_cooldown_ <= 0) {
     reproduction_cooldown_ = 0.0;
   } else {
@@ -311,6 +313,16 @@ void Creature::Update(double deltaTime, double const kMapWidth,
  * @return The genome of the creature.
  */
 neat::Genome Creature::GetGenome() { return genome_; }
+
+/*!
+ * @brief Retrieves the creature's mutables
+ *
+ * @details Return the mutables of the creature which is a representation of its
+ * characteristics
+ *
+ * @return The mutables of the creature.
+ */
+Mutable Creature::GetMutable() {return mutable_;}
 
 /*!
  * @brief Handles the collision of the creature with another entity.
@@ -344,28 +356,6 @@ void Creature::OnCollision(Entity &other_entity, double const kMapWidth,
 }
 
 /*!
- * @brief Sets the growth factor of the creature.
- *
- * @details The growth factor determines how much the creature grows in size
- * relative to the energy consumed.
- *
- * @param growth_factor The new growth factor.
- */
-void Creature::SetGrowthFactor(double growth_factor) {
-  growth_factor_ = growth_factor;
-}
-
-/*!
- * @brief Retrieves the growth factor of the creature.
- *
- * @details Returns the current growth factor, which affects the creature's size
- * increase relative to energy intake.
- *
- * @return The current growth factor of the creature.
- */
-double Creature::GetGrowthFactor() { return growth_factor_; }
-
-/*!
  * @brief Processes the creature's thinking logic.
  *
  * @details This method involves processing vision, updating neuron data based
@@ -376,7 +366,7 @@ double Creature::GetGrowthFactor() { return growth_factor_; }
  * @param GridCellSize Size of each cell in the grid.
  */
 void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
-                     double GridCellSize) {
+                     double GridCellSize, double deltaTime) {
   // Not pretty but we'll figure out a better way in the future
   ProcessVisionFood(grid, GridCellSize);
   neuron_data_.at(0) = energy_;
@@ -386,17 +376,39 @@ void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
   neuron_data_.at(4) = orientation_food_;
   neuron_data_.at(5) = distance_food_;
   std::vector<double> output = brain_.Activate(neuron_data_);
-  SetAcceleration(std::tanh(output.at(0))*max_force_);
-  SetAccelerationAngle(output.at(1));
-  SetRotationalAcceleration(output.at(2));
+  SetAcceleration(std::tanh(output.at(0))*mutable_.GetMaxForce());
+  SetAccelerationAngle(std::tanh(output.at(1)) * M_PI);
+  SetRotationalAcceleration(std::tanh(output.at(2))*mutable_.GetMaxForce());
+  Grow(std::max(std::tanh(output.at(3)) * deltaTime, 0.0));
 }
+
+/*!
+ * @brief Generates a random floating-point number within a given range.
+ *
+ * @details This function uses a uniform distribution to ensure an even spread
+ * of values.
+ *
+ * @param max_value The upper limit of the random number range.
+ *
+ * @return A random floating-point number between 0 and max_value.
+ */
+double GetRandomFloat(double min_value, double max_value) {
+  std::random_device rd;
+  std::mt19937 gen(rd());
+
+  std::uniform_real_distribution<double> dis(min_value, max_value);
+  return dis(gen);
+}
+
 
 /*!
  * @brief Processes the creature's vision to locate food.
  *
  * @details Determines the closest food entity based on the creature's position
  * and updates the creature's orientation and distance metrics towards the
- * located food.
+ * located food. If there is no food in sight, it assumes the distance to food is
+ * the vision radius (so far away), and the orientation is something random
+ * in its field of view.
  *
  * @param grid The environmental grid.
  * @param GridCellSize Size of each cell in the grid.
@@ -404,37 +416,16 @@ void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
 void Creature::ProcessVisionFood(
     std::vector<std::vector<std::vector<Entity *>>> &grid,
     double GridCellSize) {
-  Food *food = this->GetClosestFood(grid, GridCellSize);
-  if (food == nullptr) { //temporary fix that shouldn't be necessary after the new vision system is implemented
-      distance_food_ = 1000;
-      orientation_food_ = 0;
-      return;
+  Food *food = GetClosestFoodInSight(grid, GridCellSize);
+  if (food) {
+    distance_food_ = this->GetDistance(*food, settings::environment::kMapWidth,
+                                       settings::environment::kMapHeight) - (*food).GetSize();
+    orientation_food_ = this->GetRelativeOrientation(*food);
+  } else {
+    distance_food_ = vision_radius_;
+    orientation_food_ = remainder(GetRandomFloat(orientation_- vision_angle_/2, orientation_+ vision_angle_/2), 2*M_PI);
   }
-  distance_food_ = this->GetDistance(*food, settings::environment::kMapWidth,
-                                     settings::environment::kMapHeight);
-  orientation_food_ = this->GetRelativeOrientation(*food);
 }
-
-/*!
- * @brief Retrieves the maximum size the creature can grow to.
- *
- * @details Returns the maximum size limit for the creature, beyond which it
- * cannot grow regardless of energy intake.
- *
- * @return The maximum size of the creature.
- */
-double Creature::GetMaxSize() { return max_size_; }
-
-/*!
- * @brief Sets the maximum size the creature can grow to.
- *
- * @details This method establishes an upper limit for the creature's size. If
- * the creature grows beyond this limit, its size is capped at this maximum
- * value.
- *
- * @param max_size The new maximum size limit for the creature.
- */
-void Creature::SetMaxSize(double max_size) { max_size_ = max_size; }
 
 /*!
  * @brief Manages the creature's growth based on energy consumption.
@@ -446,8 +437,8 @@ void Creature::SetMaxSize(double max_size) { max_size_ = max_size; }
  * @param energy The amount of energy consumed for growth.
  */
 void Creature::Grow(double energy) {
-  double size = GetSize() + energy * GetGrowthFactor();
-  (size > GetMaxSize()) ? SetSize(GetMaxSize()) : SetSize(size);
+  double size = GetSize() + energy * mutable_.GetGrowthFactor();
+  (size > mutable_.GetMaxSize()) ? SetSize(mutable_.GetMaxSize()) : SetSize(size);
   SetEnergy(GetEnergy() - energy);
 }
 
@@ -584,4 +575,125 @@ std::vector<Food *> get_food_at_distance(
     }
   }
   return food;
+}
+
+/*!
+ * @brief Sets the vision parameters for the creature.
+ *
+ * @details This function sets the creature's vision radius and angle.
+ * The vision radius determines how far the creature can see,
+ * while the vision angle specifies the total angle at which it sees,
+ * which will be centered at its orientation (so at most angle/2 to the
+ * left and angle/2 to the right of its orientation).
+ *
+ * @param radius The radius of the vision, representing how far the creature can see.
+ * @param angle The angle of the vision, representing the full angle of the visual field.
+ */
+void Creature::SetVision(double radius, double angle) {
+  vision_radius_ = radius;
+  vision_angle_ = angle;
+}
+
+double Creature::GetVisionRadius() const { return vision_radius_; }
+
+double Creature::GetVisionAngle() const { return vision_angle_; }
+
+
+/*!
+ * @brief Finds the closest food entity (meat or plant) within the creature's line of sight.
+ *
+ * @details Performs a breadth-first search (BFS) on the grid cells within the creature's
+ * field of view to locate the closest food entity. It utilizes IsGridCellPotentiallyInsideCone
+ * functions to efficiently narrow down the search area to relevant cells. The function iterates over
+ * entities within these cells, dynamically casting them to Food* to check if they are edible.
+ * It then determines if they are within the creature's field of view and closer than any previously found food.
+ * The search continues until the closest food is found or a predefined number of cells have been processed.
+ *
+ * @param grid A 3-dimensional vector representing the environmental grid where each cell contains entities.
+ * @param grid_cell_size The size of each square cell in the grid.
+ *
+ * @return A pointer to the closest food entity within the line of sight; nullptr if no food is found.
+ */
+Food *Creature::GetClosestFoodInSight(
+    std::vector<std::vector<std::vector<Entity *>>> &grid,
+    double grid_cell_size) const {
+  int grid_width = grid.size();
+  int grid_height = grid[0].size();
+
+  int x_grid = static_cast<int>(x_coord_ / grid_cell_size);
+  int y_grid = static_cast<int>(y_coord_ / grid_cell_size);
+  //multiplied by 4 as a temporal fix
+  int max_cells_to_find_food = 4 * M_PI * (vision_radius_ + grid_cell_size) * (vision_radius_ + grid_cell_size) / (grid_cell_size * grid_cell_size);
+
+  auto cone_center = Point(x_coord_, y_coord_);
+  auto cone_orientation = GetOrientation();
+  auto cone_left_boundary = OrientedAngle(cone_orientation - vision_angle_ / 2);
+  auto cone_right_boundary =
+      OrientedAngle(cone_orientation + vision_angle_ / 2);
+
+  Food *closest_food = nullptr;
+  double smallest_distance_food = std::numeric_limits<double>::max();
+
+  std::queue<std::pair<int, int>> cells_queue;
+  std::set<std::pair<int, int>> visited_cells;
+
+  cells_queue.push({x_grid, y_grid});
+  visited_cells.insert({x_grid, y_grid});
+
+  size_t processed_cells = 0;
+
+  while (!cells_queue.empty()) {
+    auto [x, y] = cells_queue.front();
+    cells_queue.pop();
+    ++processed_cells;
+
+    for (Entity *entity : grid[x][y]) {
+      Food *food = dynamic_cast<Food *>(entity);
+
+      if (food) {
+        auto food_point = Point(entity->GetCoordinates());
+
+        auto food_direction = OrientedAngle(cone_center, food_point);
+
+        bool is_in_field_of_view = food_direction.IsInsideCone(
+            cone_left_boundary, cone_right_boundary);
+
+        double distance = food_point.dist(cone_center);
+
+        bool is_within_vision_radius =
+            distance <= vision_radius_ + settings::engine::EPS;
+
+        if (is_in_field_of_view && is_within_vision_radius) {
+          if (distance < smallest_distance_food) {
+            smallest_distance_food = distance;
+            closest_food = food;
+            break;
+          }
+        }
+      }
+    }
+    if (closest_food) {
+      break;
+    }
+
+    assert(processed_cells <= max_cells_to_find_food && "processed_cells exceeded max_cells_to_find_food in GetClosestFoodInSight");
+
+    for (int dx = -1; dx <= 1; ++dx) {
+      for (int dy = -1; dy <= 1; ++dy) {
+        if (dx * dx + dy * dy != 1) continue;
+        int nx = x + dx, ny = y + dy;
+        if (0 <= nx && nx < grid_width && 0 <= ny && ny < grid_height &&
+            !visited_cells.count({nx, ny})) {
+          if (IsGridCellPotentiallyInsideCone(
+                  Point(nx * grid_cell_size, ny * grid_cell_size),
+                  grid_cell_size, cone_center, vision_radius_,
+                  cone_left_boundary, cone_right_boundary)) {
+            visited_cells.insert({nx, ny});
+            cells_queue.push({nx, ny});
+          }
+        }
+      }
+    }
+  }
+  return closest_food;
 }

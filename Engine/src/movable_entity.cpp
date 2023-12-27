@@ -2,6 +2,7 @@
 
 #include "config.h"
 #include "math.h"
+#include "geometry_primitives.h"
 
 /*!
  * @file movable_entity.h
@@ -123,8 +124,8 @@ void MovableEntity::SetRotationalVelocity(double rotational_velocity) {
  * @return The calculated forward friction.
  */
 double MovableEntity::GetForwardFriction() const {
-  return GetVelocity() *
-         settings::environment::kFrictionalCoefficient *
+  return GetVelocity() * sqrt(GetSize()) *
+         frictional_coefficient_ *
          (1 + strafing_difficulty_ * fabs(sin(GetVelocityAngle())));
 }
 
@@ -153,6 +154,7 @@ double MovableEntity::GetEffectiveForwardAcceleration() const {
   double acceleration = GetAcceleration();
   double friction = GetForwardFriction();
   // return the acceleration magnitude using the cosine formula
+
   double acceleration_squared = pow(acceleration, 2) + pow(friction, 2) -
                                 2 * acceleration * friction *
                                     cos(acceleration_angle_ - GetVelocityAngle());
@@ -160,6 +162,7 @@ double MovableEntity::GetEffectiveForwardAcceleration() const {
       return 0;
   }
   return sqrt(acceleration_squared);
+
 }
 
 /*!
@@ -226,7 +229,7 @@ void MovableEntity::Move(double deltaTime, const double kMapWidth,
   auto [current_x, current_y] = GetCoordinates();
   double new_x = current_x + delta_x;
 
-  double new_y = std::fmod(current_y + delta_y, kMapHeight);
+  double new_y = fmod(current_y + delta_y, kMapHeight);
 
   SetCoordinates(new_x, new_y, kMapWidth, kMapHeight);
 }
@@ -238,9 +241,9 @@ void MovableEntity::Move(double deltaTime, const double kMapWidth,
  * @param deltaTime The time interval over which to update the orientation.
  */
 void MovableEntity::Rotate(double deltaTime) {
-  double new_orientation =
-      GetOrientation() + (GetRotationalVelocity() * deltaTime);
-  SetOrientation(new_orientation);
+  OrientedAngle new_orientation =
+      OrientedAngle(GetOrientation() + (GetRotationalVelocity() * deltaTime));
+  SetOrientation(new_orientation.GetAngle());
 }
 
 /*!

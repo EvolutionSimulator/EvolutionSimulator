@@ -21,6 +21,8 @@ class Entity {
                             const double max_creature_size,
                             const double min_creature_size);
 
+  void RandomInitialization(const double world_width, const double world_height);
+
   double GetSize() const;
   void SetSize(double size);
 
@@ -46,9 +48,15 @@ class Entity {
   }
   double GetRelativeOrientation(const Entity &otherEntity) const;
 
+  int GetID() const;
+
  protected:
   double x_coord_, y_coord_, orientation_, size_;
   states state_;
+
+ private:
+  static int next_id_;
+  int id_;
 };
 
 #endif  // ENTITY_H

@@ -6,12 +6,16 @@
 #include <stdexcept>
 
 #include "environment.h"
+#include "geometry_primitives.h"
+
+int Entity::next_id_ = 0;
 
 /*!
  * @brief Default constructor initializing an Entity at the origin with zero
  * size.
  */
-Entity::Entity() : x_coord_(0.0), y_coord_(0.0), size_(0.0), state_(Alive) {}
+Entity::Entity() : x_coord_(0.0), y_coord_(0.0), size_(0.0), state_(Alive), orientation_(0), id_(next_id_++) {}
+
 
 /*!
  * @brief Parameterized constructor to initialize an Entity with specified
@@ -22,7 +26,12 @@ Entity::Entity() : x_coord_(0.0), y_coord_(0.0), size_(0.0), state_(Alive) {}
  * @param size Size of the entity.
  */
 Entity::Entity(const double x_coord, const double y_coord, const double size)
-    : x_coord_(x_coord), y_coord_(y_coord), size_(size), state_(Alive) {}
+    : x_coord_(x_coord),
+      y_coord_(y_coord),
+      size_(size),
+      orientation_(0),
+      state_(Alive),
+      id_(next_id_++) {}
 
 /*!
  * @brief Constructor to initialize an Entity with a specified size at the
@@ -30,7 +39,12 @@ Entity::Entity(const double x_coord, const double y_coord, const double size)
  * @param size Size of the entity.
  */
 Entity::Entity(const double size)
-    : x_coord_(0.0), y_coord_(0.0), size_(size), state_(Alive) {}
+    : x_coord_(0.0),
+      y_coord_(0.0),
+      size_(size),
+      orientation_(0),
+      state_(Alive),
+      id_(next_id_++) {}
 
 /*!
  * @brief Destructor sets the state of the entity to Dead.
@@ -118,6 +132,13 @@ void Entity::RandomInitialization(const double world_width,
   y_coord_ = GetRandomFloat(world_height);
   size_ =
       GetRandomFloat(max_creature_size - min_creature_size) + min_creature_size;
+  orientation_ = GetRandomFloat(2*M_PI) - M_PI;
+}
+
+void Entity::RandomInitialization(const double world_width,
+                                  const double world_height) {
+  x_coord_ = GetRandomFloat(world_width);
+  y_coord_ = GetRandomFloat(world_height);
   orientation_ = GetRandomFloat(2*M_PI);
 }
 
@@ -150,14 +171,14 @@ double Entity::GetDistance(const Entity &other_entity, const double kMapWidth,
  *
  * @param other_entity The other entity to calculate orientation towards.
  *
- * @return The relative orientation angle in radians.
+ * @return The relative orientation angle in radians between [-pi,pi].
  */
 double Entity::GetRelativeOrientation(const Entity &other_entity) const {
-  std::pair<double, double> other_coordinates = other_entity.GetCoordinates();
   // assumes orientation = 0 is the x axis
-  double angle = std::atan((y_coord_ - other_coordinates.second) /
-                           (x_coord_ - other_coordinates.first));
-  return angle - orientation_;
+  return (OrientedAngle(Point(GetCoordinates()),
+                        Point(other_entity.GetCoordinates())) -
+          OrientedAngle(orientation_))
+      .GetAngle();
 }
 
 /*!
@@ -234,4 +255,8 @@ void Entity::OnCollision(Entity &other_entity, double const kMapWidth,
   // Assert that the entities are no longer overlapping
   // assert(size_ + other_size - GetDistance(other_entity, kMapWidth,
   // kMapHeight) < 0.0001);
+}
+
+int Entity::GetID() const {
+  return id_;
 }
