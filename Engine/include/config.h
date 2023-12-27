@@ -19,7 +19,6 @@ constexpr double kMaxBias = 0.1;
 constexpr double kMinBias = 0.0;
 constexpr double kChangeBiasMutationRate = 0.6;
 constexpr double kAdjustmentProbability = 0.8;
-constexpr double kActivationFunctionMutationRate = 0.02;
 }  // namespace neat
 
 namespace environment {
