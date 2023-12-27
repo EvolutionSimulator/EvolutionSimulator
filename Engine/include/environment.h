@@ -23,10 +23,17 @@ class Environment {
   void SetFrictionalCoefficient(double friction_coefficient) {friction_coefficient_ = friction_coefficient; }
   double GetFrictionalCoefficient() const { return friction_coefficient_; }
 
+  void SetMapHeight(double map_height) { map_height_ = map_height; }
+  double GetMapHeight() { return map_height_; }
+  void SetMapWidht(double map_widht) { map_widht_ = map_width; }
+  double GetMapWidth() { return map_width_; }
+
  private:
   double food_density_;  // Variable for creature density
   double creature_density_;
   double friction_coefficient_;
+  double map_width_;
+  double map_height_;
 };
 }  // namespace myEnvironment
 
