@@ -4,6 +4,7 @@
 #include "math.h"
 #include "geometry_primitives.h"
 
+
 /*!
  * @file movable_entity.h
  * @brief Defines the MovableEntity class.
