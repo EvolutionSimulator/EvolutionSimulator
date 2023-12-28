@@ -2,11 +2,13 @@
 #include "config.h"
 
 QSFMLCanvas::QSFMLCanvas(QWidget* Parent) : QWidget(Parent) {
+  int width = sf::VideoMode::getDesktopMode().width;
+  int height = sf::VideoMode::getDesktopMode().height;
   float scaleFactor = this->devicePixelRatioF(); // Get the device pixel ratio
 
   // Scale the map width and height according to the pixel ratio
-  int scaledWidth = static_cast<int>(settings::environment::kMapWidth/scaleFactor);
-  int scaledHeight = static_cast<int>(settings::environment::kMapHeight/scaleFactor);
+  int scaledWidth = static_cast<int>(width/scaleFactor);
+  int scaledHeight = static_cast<int>(height/scaleFactor);
 
   // Set the fixed size with the scaled dimensions
   setFixedSize(scaledWidth, scaledHeight);

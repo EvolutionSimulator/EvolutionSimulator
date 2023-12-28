@@ -80,9 +80,9 @@ class Creature : public MovableEntity {
 
   void Grow(double energy);
   void Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
-             double GridCellSize, double deltaTime);
+             double GridCellSize, double deltaTime, double width, double height);
   void ProcessVisionFood(std::vector<std::vector<std::vector<Entity *>>> &grid,
-                         double grid_cell_size);
+                         double grid_cell_size, double width, double height);
   int GetFoodID() const;
 
   int GetGeneration() const;

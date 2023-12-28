@@ -10,6 +10,7 @@ class Environment {
  public:
   // Constructor
   Environment();
+  Environment(double width, double height);
 
   // Getter and setter for food density
   void SetFoodDensity(double density) { food_density_ = density; }
@@ -23,10 +24,11 @@ class Environment {
   void SetFrictionalCoefficient(double friction_coefficient) {friction_coefficient_ = friction_coefficient; }
   double GetFrictionalCoefficient() const { return friction_coefficient_; }
 
+  void SetMapWidth(double map_width) { map_width_ = map_width; }
+  double GetMapWidth() const { return map_width_; }
+
   void SetMapHeight(double map_height) { map_height_ = map_height; }
-  double GetMapHeight() { return map_height_; }
-  void SetMapWidht(double map_width) { map_width_ = map_width; }
-  double GetMapWidth() { return map_width_; }
+  double GetMapHeight() const { return map_height_; }
 
  private:
   double food_density_;  // Variable for creature density

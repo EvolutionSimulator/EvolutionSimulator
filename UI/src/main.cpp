@@ -10,10 +10,12 @@
 
 int main(int argc, char *argv[]) {
   QApplication app(argc, argv);
-
-  Engine mainEngine;
+  int width = sf::VideoMode::getDesktopMode().width;
+  int height = sf::VideoMode::getDesktopMode().height;
+  Engine mainEngine(width, height);
 
   MainWindow window;
+
   window.SetEngine(&mainEngine);
   window.showFullScreen();
 

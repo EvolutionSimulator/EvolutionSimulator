@@ -4,9 +4,9 @@
 
 #include "simulation.h"
 
-Engine::Engine() : environment_(), simulation_(new Simulation(environment_)) {}
+Engine::Engine(double width, double height) : environment_(width, height), simulation_(new Simulation(environment_)) {}
 
-Engine::Engine(double food_density, double creature_density) : environment_() {
+Engine::Engine(double width, double height, double food_density, double creature_density) : environment_(width, height) {
   environment_.SetFoodDensity(food_density);
   environment_.SetCreatureDensity(creature_density);
   simulation_ = new Simulation(environment_);
