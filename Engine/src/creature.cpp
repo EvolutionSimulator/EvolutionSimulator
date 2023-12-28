@@ -221,6 +221,7 @@ void Creature::Reproduced() {
  *
  * @return double The maximum energy level of the creature.
  */
+double Creature::GetMaxEnergy(){ return max_energy_; }
 
 /*!
  * @brief Updates the maximum energy level of the creature.
@@ -263,6 +264,7 @@ void Creature::SetAge(double age) {
  * @param nutritional_value The nutritional value of the consumed food.
  */
 void Creature::Eats(double nutritional_value) {
+  velocity_ = 0;
   SetEnergy(GetEnergy() + nutritional_value);
   if (GetEnergy() > max_energy_) {
     BalanceHealthEnergy();
@@ -338,8 +340,16 @@ void Creature::OnCollision(Entity &other_entity, double const kMapWidth,
                            double const kMapHeight) {
   if (Food *food = dynamic_cast<Food *>(&other_entity)) {
     if (food->GetState() == Entity::Alive) {
-      Eats(food->GetNutritionalValue() * food->GetSize());
-      food->Eat();
+      double max_nutrition = food->GetNutritionalValue() * food->GetSize();
+      double hunger = GetMaxEnergy()-GetEnergy();
+      if (max_nutrition > hunger){
+        Eats(hunger);
+        food->SetSize(((max_nutrition-hunger)/max_nutrition)*food->GetSize());
+      }
+      else{
+        Eats(max_nutrition);
+        food->Eat();
+      }
     }
   } else {
     MovableEntity::OnCollision(other_entity, kMapWidth, kMapHeight);

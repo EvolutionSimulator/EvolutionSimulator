@@ -270,8 +270,7 @@ TEST(CollisionTests, OnCollisionWithFood) {
   neat::Genome genome(2, 3);
   Mutable mutables;
   Creature creature(genome, mutables);
-  Food food;
-  food.SetSize(1.0);
+  Plant food(1.0);
 
   // Case 1: Food is alive, and Creature collides with it
   food.SetState(Entity::Alive);
@@ -361,8 +360,8 @@ class CreatureTest : public ::testing::Test {
     std::vector<std::vector<std::vector<Entity*>>> grid;
     grid.assign(100, std::vector<std::vector<Entity*>>(100));
 
-    Food* food1 = new Food(3.6, 4.9, 5.0);
-    Food* food2 = new Food(9.2, 7.1, 8.0);
+    Food* food1 = new Plant(3.6, 4.9, 5.0);
+    Food* food2 = new Plant(9.2, 7.1, 8.0);
 
     grid[3][4].push_back(food1);
     grid[9][7].push_back(food2);
@@ -468,9 +467,9 @@ TEST_F(CreatureTest, GetFoodAtDistanceTest) {
   std::vector<std::vector<std::vector<Entity*>>> grid;
   grid.assign(100, std::vector<std::vector<Entity*>>(100));
 
-  Food* f1 = new Food();
-  Food* f2 = new Food();
-  Food* f3 = new Food();
+  Food* f1 = new Plant();
+  Food* f2 = new Plant();
+  Food* f3 = new Plant();
   Entity* e1 = new Entity();
   grid[3][1].push_back(f1);
   grid[3][3].push_back(f2);
@@ -502,9 +501,9 @@ TEST_F(CreatureTest, GetClosestFoodTest2) {
   Mutable mutables;
   Creature* cr = new Creature(neat::Genome(2, 2), mutables);
   cr->SetCoordinates(1.6, 1.1, 100.0, 100.0);
-  Food* f1 = new Food(2.5, 0.5);
-  Food* f2 = new Food(2.2, 0.9);
-  Food* f3 = new Food(2.9, 1.9);
+  Food* f1 = new Plant(2.5, 0.5);
+  Food* f2 = new Plant(2.2, 0.9);
+  Food* f3 = new Plant(2.9, 1.9);
   Entity* e1 = new Entity(1.5, 1.1, 0.5);
   grid[1][1].push_back(e1);
   grid[2][1].push_back(f3);
@@ -576,9 +575,9 @@ TEST(SimulationDataTest, UpdateGridWithAliveEntities) {
   creature_2.SetState(Entity::Dead);
   simData.creatures_.push_back(creature_2);
 
-  simData.food_entities_.push_back(Food(2.5, 3.4, 5.0));
-  simData.food_entities_.push_back(Food(2.7, 9, 5.0));
-  Food food(5.3, 6.7, 4.0);
+  simData.food_entities_.push_back(Plant(2.5, 3.4, 5.0));
+  simData.food_entities_.push_back(Plant(2.7, 9, 5.0));
+  Plant food(5.3, 6.7, 4.0);
   food.SetState(Entity::Dead);
   simData.food_entities_.push_back(food);
 
@@ -621,11 +620,11 @@ TEST(SimulationDataTest, CorrectEntityPlacementInGrid) {
   creature_2.SetState(Entity::Dead);
   simData.creatures_.push_back(creature_2);
 
-  Food food_1(200.5, 300.4, 5.0);
-  Food food_2(200.7, 200, 5.0);
+  Plant food_1(200.5, 300.4, 5.0);
+  Plant food_2(200.7, 200, 5.0);
   simData.food_entities_.push_back(food_1);
   simData.food_entities_.push_back(food_2);
-  Food food_3(50.3, 60.7, 4.0);
+  Plant food_3(50.3, 60.7, 4.0);
   food_3.SetState(Entity::Dead);
   simData.food_entities_.push_back(food_3);
 
