@@ -53,6 +53,7 @@ class Settings {
     int max_creature_size = 15;
     double tolerance = 1e-3;
     double default_food_density = 0.005;
+    double food_spawn_rate = 1e-4;
     double energy_to_health = 70.0;
     double health_to_energy = 10.0;
     double default_creature_density = 0.0001;
