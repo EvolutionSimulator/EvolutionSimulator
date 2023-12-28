@@ -34,7 +34,6 @@ void Engine::Run() {
   auto fixed_update_interval_duration = std::chrono::duration<double>(kFixedUpdateInterval);
 
   simulation_->Start();
-
   while (running_) {
     if (paused_)
       continue;

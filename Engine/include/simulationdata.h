@@ -25,7 +25,7 @@ struct SimulationData {
   void AddCreature(const Creature& entity);
   void RemoveCreature(const Creature& entity);
 
-  void GenerateMoreFood();
+  void GenerateMoreFood(double deltaTime);
   void UpdateGrid();
   void ClearGrid();
 
