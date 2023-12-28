@@ -9,8 +9,8 @@ class Simulation;
 
 class Engine {
  public:
-  Engine();
-  Engine(double food_density, double creature_density);
+  Engine(double width, double height);
+  Engine(double width, double height, double food_density, double creature_density);
   ~Engine();
 
   void Run();

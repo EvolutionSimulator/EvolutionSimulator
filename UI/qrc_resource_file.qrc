@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>font.ttf</file>
+	<file>Toggle_button_sprite.png</file>
     </qresource>
 </RCC>

@@ -9,15 +9,21 @@
 #include <QVBoxLayout>
 
 #include "ui_mainwindow.h"
+#include "custombutton.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui_(new Ui::MainWindow), friction_coefficient(0.0), lastRecordedTime_(0.0) {
   ui_->setupUi(this);
 
+  CustomButton* customRunButton = new CustomButton(this);
+
+  // Assuming you want to replace the 'runButton' from the UI file:
+  customRunButton = new CustomButton(this);
+  // Connect the custom button click signal to the appropriate slot
+  connect(customRunButton, &CustomButton::clicked, this, &MainWindow::ToggleSimulation);
 
   ui_->densityFood->setMinimum(1);
   ui_->densityFood->setMaximum(1000);
-  connect(ui_->runButton, &QPushButton::clicked, this, &MainWindow::ToggleSimulation);
   connect(ui_->densityFood, SIGNAL(valueChanged(int)), this,
           SLOT(ChangeFoodDensity(int)));
   connect(ui_->densityCreature, SIGNAL(valueChanged(int)), this,

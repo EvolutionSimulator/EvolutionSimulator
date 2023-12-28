@@ -41,6 +41,7 @@ qt_add_executable(UI
     ${RESOURCES}
     include/creaturetracker.h
     src/creaturetracker.cpp
+    include/custombutton.h src/custombutton.cpp
 )
 
 target_link_libraries(UI PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Charts)

@@ -81,8 +81,8 @@ void SimulationData::ModifyAllCreatures(double delta_x, double delta_y) {
     coordinates.first = coordinates.first + delta_x;
     coordinates.second = coordinates.second + delta_y;
     creature.SetCoordinates(coordinates.first, coordinates.second,
-                            settings::environment::kMapWidth,
-                            settings::environment::kMapHeight);
+                            environment_.GetMapWidth(),
+                            environment_.GetMapHeight());
   }
 }
 
@@ -95,8 +95,8 @@ void SimulationData::ModifyAllCreatures(double delta_x, double delta_y) {
 
 void SimulationData::UpdateAllCreatures(double deltaTime) {
   for (Creature& creature : creatures_) {
-    creature.Update(deltaTime, settings::environment::kMapWidth,
-                    settings::environment::kMapHeight, grid_,
+    creature.Update(deltaTime, environment_.GetMapWidth(),
+                    environment_.GetMapHeight(), grid_,
                     settings::environment::kGridCellSize,
                     environment_.GetFrictionalCoefficient());
     if (creature.Fit()) {
@@ -120,17 +120,17 @@ void SimulationData::UpdateAllCreatures(double deltaTime) {
 void SimulationData::GenerateMoreFood() {
   double size = food_entities_.size();
   double max_number = environment_.GetFoodDensity() *
-                      settings::environment::kMapHeight *
-                      settings::environment::kMapWidth / 100;
+                      environment_.GetMapHeight() *
+                      environment_.GetMapWidth() / 100;
   if (creatures_.size() > 300) {//temporary fix so that an abnormal number of creatures can't abuse the food generation system
       return ;
   }
   while (size < max_number) {
     Plant new_food = Plant();
-    new_food.RandomInitialization(settings::environment::kMapWidth,
-                                    settings::environment::kMapHeight,
-                                    settings::environment::kMaxFoodSize,
-                                    settings::environment::kMinCreatureSize);
+    new_food.RandomInitialization(environment_.GetMapWidth(),
+                                  environment_.GetMapHeight(),
+                                  settings::environment::kMaxFoodSize,
+                                  settings::environment::kMinCreatureSize);
     food_entities_.emplace_back(new_food);
     size++;
   }
@@ -143,8 +143,8 @@ void SimulationData::GenerateMoreFood() {
  * with crossed-over genomes.
  */
 void SimulationData::ReproduceCreatures() {
-  double world_width = settings::environment::kMapWidth;
-  double world_height = settings::environment::kMapHeight;
+  double world_width = environment_.GetMapWidth();
+  double world_height = environment_.GetMapHeight();
   double max_creature_size = settings::environment::kMaxCreatureSize;
   double min_creature_size = settings::environment::kMinCreatureSize;
 
@@ -220,8 +220,8 @@ void SimulationData::ReproduceCreatures() {
  */
 void SimulationData::InitializeCreatures() {
   // Retrieve information from the environment
-  double world_width = settings::environment::kMapWidth;
-  double world_height = settings::environment::kMapHeight;
+  double world_width = environment_.GetMapWidth();
+  double world_height = environment_.GetMapHeight();
   double creature_density = environment_.GetCreatureDensity();
   double max_creature_size = settings::environment::kMaxCreatureSize;
   double min_creature_size = settings::environment::kMinCreatureSize;
@@ -254,8 +254,8 @@ void SimulationData::InitializeFood() {
   food_entities_.clear();
 
   // Populate the vector with food entities based on the current food density
-  for (double x = 0; x < settings::environment::kMapWidth; x += 10.0) {
-    for (double y = 0; y < settings::environment::kMapHeight; y += 10.0) {
+  for (double x = 0; x < environment_.GetMapWidth(); x += 10.0) {
+    for (double y = 0; y < environment_.GetMapHeight(); y += 10.0) {
       if (std::rand() / (RAND_MAX + 1.0) < kFoodDensity) {
         food_entities_.emplace_back(Plant(x, y));
       }
@@ -269,11 +269,11 @@ void SimulationData::InitializeFood() {
 void SimulationData::InitializeGrid() {
   // Number of grid cells
   int num_cells_x = static_cast<int>(std::ceil(
-                        static_cast<double>(settings::environment::kMapWidth) /
+                        static_cast<double>(environment_.GetMapWidth()) /
                         settings::environment::kGridCellSize)) +
                     1;
   int num_cells_y = static_cast<int>(std::ceil(
-                        static_cast<double>(settings::environment::kMapHeight) /
+                        static_cast<double>(environment_.GetMapHeight()) /
                         settings::environment::kGridCellSize)) +
                     1;
   // Resize the grid to the specified dimensions
@@ -427,11 +427,11 @@ std::vector<std::pair<int, int>> GetNeighbours(
 void SimulationData::CheckCollisions() {
   double tolerance = settings::environment::kTolerance;
   int num_rows = static_cast<int>(std::ceil(
-                     static_cast<double>(settings::environment::kMapWidth) /
+                     static_cast<double>(environment_.GetMapWidth()) /
                      settings::environment::kGridCellSize)) +
                  1;
   int num_cols = static_cast<int>(std::ceil(
-                     static_cast<double>(settings::environment::kMapHeight) /
+                     static_cast<double>(environment_.GetMapHeight()) /
                      settings::environment::kGridCellSize)) +
                  1;
   for (int row = 0; row < num_rows; row++) {
@@ -446,8 +446,8 @@ void SimulationData::CheckCollisions() {
           for (Entity* entity2 : grid_[neighbour.first][neighbour.second]) {
             if (entity1->CheckCollisionWithEntity(tolerance, *entity2)) {
               if (entity1 != entity2) {
-                entity1->OnCollision(*entity2, settings::environment::kMapWidth,
-                                     settings::environment::kMapHeight);
+                entity1->OnCollision(*entity2, environment_.GetMapWidth(),
+                                     environment_.GetMapHeight());
               }
             }
           }

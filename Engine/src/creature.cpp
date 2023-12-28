@@ -288,7 +288,7 @@ void Creature::Update(double deltaTime, double const kMapWidth,
   this->UpdateVelocities(deltaTime);
   this->Move(deltaTime, kMapWidth, kMapHeight);
   this->Rotate(deltaTime);
-  this->Think(grid, GridCellSize, deltaTime);
+  this->Think(grid, GridCellSize, deltaTime, kMapWidth, kMapHeight);
   age_ += 0.05;
 
   if (reproduction_cooldown_ <= 0) {
@@ -360,9 +360,9 @@ void Creature::OnCollision(Entity &other_entity, double const kMapWidth,
  * @param GridCellSize Size of each cell in the grid.
  */
 void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
-                     double GridCellSize, double deltaTime) {
+                     double GridCellSize, double deltaTime, double width, double height) {
   // Not pretty but we'll figure out a better way in the future
-  ProcessVisionFood(grid, GridCellSize);
+  ProcessVisionFood(grid, GridCellSize, width, height);
   neuron_data_.at(0) = energy_;
   neuron_data_.at(1) = GetVelocity();
   neuron_data_.at(2) = GetVelocityAngle();
@@ -410,11 +410,11 @@ double GetRandomFloat(double min_value, double max_value) {
  */
 void Creature::ProcessVisionFood(
     std::vector<std::vector<std::vector<Entity *>>> &grid,
-    double GridCellSize) {
+    double GridCellSize, double width, double height) {
   Food *food = GetClosestFoodInSight(grid, GridCellSize);
   if (food) {
-    distance_food_ = this->GetDistance(*food, settings::environment::kMapWidth,
-                                       settings::environment::kMapHeight) - (*food).GetSize();
+    distance_food_ = this->GetDistance(*food, width,
+                                       height) - (*food).GetSize();
     orientation_food_ = this->GetRelativeOrientation(*food);
     closest_food_id_ = food->GetID();
     food_size_ = food->GetSize();
@@ -460,45 +460,45 @@ void Creature::Grow(double energy) {
  *
  * @return A pointer to the closest food entity or nullptr if none is found.
  */
-Food *Creature::GetClosestFood(
-    std::vector<std::vector<std::vector<Entity *>>> &grid,
-    double GridCellSize) const {
-  if (grid.empty()) return nullptr;
-  std::pair<double, double> coordinates_creature = GetCoordinates();
-  int i_creature = (int)coordinates_creature.first / (int)GridCellSize;
-  int j_creature = (int)coordinates_creature.second /
-                   (int)GridCellSize;  // position of the creature on the grid
-  std::vector<Food *> closest_food_entities = get_food_at_distance(
-      grid, i_creature, j_creature,
-      0);  // here we place the candidates for the closest food
-  int grid_distance = 1;
-  int boundary = std::max(grid.size(), grid[0].size());
+// Food *Creature::GetClosestFood(
+//     std::vector<std::vector<std::vector<Entity *>>> &grid,
+//     double GridCellSize) const {
+//   if (grid.empty()) return nullptr;
+//   std::pair<double, double> coordinates_creature = GetCoordinates();
+//   int i_creature = (int)coordinates_creature.first / (int)GridCellSize;
+//   int j_creature = (int)coordinates_creature.second /
+//                    (int)GridCellSize;  // position of the creature on the grid
+//   std::vector<Food *> closest_food_entities = get_food_at_distance(
+//       grid, i_creature, j_creature,
+//       0);  // here we place the candidates for the closest food
+//   int grid_distance = 1;
+//   int boundary = std::max(grid.size(), grid[0].size());
 
-  while (closest_food_entities.size() == 0 && grid_distance <= boundary) {
-    // std::cout << "checking at distance " << grid_distance << std::endl;
-    closest_food_entities =
-        get_food_at_distance(grid, i_creature, j_creature, grid_distance);
-    grid_distance++;
-  }
-  // assert(!closest_food_entities.empty());
-  if (closest_food_entities.empty()) return nullptr;
+//   while (closest_food_entities.size() == 0 && grid_distance <= boundary) {
+//     // std::cout << "checking at distance " << grid_distance << std::endl;
+//     closest_food_entities =
+//         get_food_at_distance(grid, i_creature, j_creature, grid_distance);
+//     grid_distance++;
+//   }
+//   // assert(!closest_food_entities.empty());
+//   if (closest_food_entities.empty()) return nullptr;
 
-  Food *closest_food = closest_food_entities.front();
-  double smallest_distance =
-      GetDistance(*closest_food, settings::environment::kMapWidth,
-                  settings::environment::kMapHeight);
-  for (Food *&food : closest_food_entities) {
-    double distance = GetDistance(*food, settings::environment::kMapWidth,
-                                  settings::environment::kMapHeight);
-    if (distance < smallest_distance) {
-      closest_food = food;
-      smallest_distance = distance;
-    }
-    assert(!closest_food_entities.empty());
-    return closest_food;
-  }
-  return nullptr;
-}
+//   Food *closest_food = closest_food_entities.front();
+//   double smallest_distance =
+//       GetDistance(*closest_food, settings::environment::kMapWidth,
+//                   settings::environment::kMapHeight);
+//   for (Food *&food : closest_food_entities) {
+//     double distance = GetDistance(*food, settings::environment::kMapWidth,
+//                                   settings::environment::kMapHeight);
+//     if (distance < smallest_distance) {
+//       closest_food = food;
+//       smallest_distance = distance;
+//     }
+//     assert(!closest_food_entities.empty());
+//     return closest_food;
+//   }
+//   return nullptr;
+// }
 
 /*!
  * @brief Identifies food entities within a specified grid distance.
