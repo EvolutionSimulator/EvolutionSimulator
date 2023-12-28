@@ -1,4 +1,5 @@
 #include "simulation.h"
+#include <chrono>
 
 Simulation::Simulation(myEnvironment::Environment& environment) {
   data_ = new SimulationData(environment);
@@ -22,7 +23,7 @@ void Simulation::FixedUpdate(double deltaTime) {
   // Test function (DO NOT USE)
   data_->UpdateAllCreatures(deltaTime);
   data_->ReproduceCreatures();
-  data_->GenerateMoreFood();
+  data_->GenerateMoreFood(deltaTime);
   data_->UpdateGrid();
   data_->CheckCollisions();
   data_->world_time_ += deltaTime;

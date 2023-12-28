@@ -346,7 +346,11 @@ void Creature::OnCollision(Entity &other_entity, double const kMapWidth,
       double hunger = GetMaxEnergy()-GetEnergy();
       if (max_nutrition > hunger){
         Eats(hunger);
-        food->SetSize(((max_nutrition-hunger)/max_nutrition)*food->GetSize());
+        double newFoodSize = (max_nutrition-hunger)/max_nutrition * food->GetSize();
+        if (newFoodSize < 1){
+            food->Eat();
+        }
+        food->SetSize(newFoodSize);
       }
       else{
         Eats(max_nutrition);
