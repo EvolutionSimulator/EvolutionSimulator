@@ -93,9 +93,12 @@ void MainWindow::RestartSimulation() {
   if (engine_thread_.joinable()) {
     engine_->Stop();
     engine_thread_.join();
+    delete engine_;
   }
   // Create a new instance of the Engine and set it in the UI
-  Engine *newEngine = new Engine(food_density, creature_density);
+  int width = sf::VideoMode::getDesktopMode().width;
+  int height = sf::VideoMode::getDesktopMode().height;
+  Engine *newEngine = new Engine(width, height, food_density, creature_density);
   SetEngine(newEngine);
   engine_thread_ = std::thread(&Engine::Run, engine_);
 }
