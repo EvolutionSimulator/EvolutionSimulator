@@ -63,11 +63,20 @@ MainWindow::~MainWindow() {
 void MainWindow::SetEngine(Engine *engine) {
   engine_ = engine;
   ui_->canvas->SetSimulation(engine_->GetSimulation());
+  auto food_density_function = [this](double x, double y) {
+    return x * 2 / settings::environment::kMapWidth * 5e-5;
+  };
+
+  engine_->GetEnvironment().SetFoodDensity(food_density_function); // Update the density
+  engine_->GetSimulation()->GetSimulationData()->InitializeFood();
 }
 
 void MainWindow::ChangeFoodDensity(int value) {
-  food_density = static_cast<double>(value) / 1000.0;     // Convert to density
-  engine_->GetEnvironment().SetFoodDensity(food_density); // Update the density
+  food_density = static_cast<double>(value) / 10000.0;     // Convert to density
+  auto food_density_function = [this](double x, double y) {
+    return x * 2 / settings::environment::kMapWidth * food_density;
+  };
+  engine_->GetEnvironment().SetFoodDensity(food_density_function); // Update the density
   engine_->UpdateEnvironment(); // Apply the updated density
 }
 

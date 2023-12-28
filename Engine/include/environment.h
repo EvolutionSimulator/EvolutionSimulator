@@ -2,6 +2,7 @@
 #define ENVIRONMENT_H
 #include <iostream>
 #include <vector>
+#include <functional>
 
 #include "config.h"
 
@@ -12,9 +13,10 @@ class Environment {
   Environment();
 
   // Getter and setter for food density
-  void SetFoodDensity(double density) { food_density_ = density; }
+  void SetFoodDensity(double density);
+  void SetFoodDensity(std::function<double(double, double)> density_func);
 
-  double GetFoodDensity() const { return food_density_; }
+  double GetFoodDensity(double x, double y);
 
   // Getter and setter for creature density
   void SetCreatureDensity(double density) { creature_density_ = density; }
@@ -24,7 +26,8 @@ class Environment {
   double GetFrictionalCoefficient() const { return friction_coefficient_; }
 
  private:
-  double food_density_;  // Variable for creature density
+  // lambda for food density
+  std::function <double(double, double)> food_density_func_;
   double creature_density_;
   double friction_coefficient_;
 };
