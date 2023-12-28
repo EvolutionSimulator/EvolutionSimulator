@@ -22,16 +22,16 @@ constexpr double kAdjustmentProbability = 0.8;
 }  // namespace neat
 
 namespace environment {
-constexpr double kMapWidth = 1900.0;
-constexpr double kMapHeight = 880.0;
-constexpr double kCreatureDensity = 0.0005;
+constexpr double kMapWidth = 1000;
+constexpr double kMapHeight = 500;
 constexpr int kMaxFoodSize = 15;
 constexpr int kMaxCreatureSize = 15;
 constexpr double kTolerance = 1e-3;
-constexpr double kDefaultFoodDensity = 0.005;
+constexpr double kDefaultFoodDensity = 5e-4;
+constexpr double kFoodSpawnRate = 1e-3;
 constexpr double kEnergyToHealth = 70.0;
 constexpr double kHealthToEnergy = 10.0;
-constexpr double kDefaultCreatureDensity = 0.0001;
+constexpr double kDefaultCreatureDensity = 5e-4;
 constexpr double kPlantNutritionalValue = 2.0;
 constexpr double kMeatNutritionalValue = 3.0;
 constexpr double kRotFactor = 1.0;

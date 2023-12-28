@@ -117,22 +117,27 @@ void SimulationData::UpdateAllCreatures(double deltaTime) {
  * @brief Generates additional food entities based on the environment's food
  * density.
  */
-void SimulationData::GenerateMoreFood() {
-  double size = food_entities_.size();
-  double max_number = environment_.GetFoodDensity() *
-                      settings::environment::kMapHeight *
-                      settings::environment::kMapWidth / 100;
-  if (creatures_.size() > 300) {//temporary fix so that an abnormal number of creatures can't abuse the food generation system
-      return ;
-  }
-  while (size < max_number) {
-    Food new_food = Food();
-    new_food.RandomInitialization(settings::environment::kMapWidth,
-                                  settings::environment::kMapHeight,
-                                  settings::environment::kMaxFoodSize,
-                                  settings::environment::kMinCreatureSize);
-    food_entities_.emplace_back(new_food);
-    size++;
+void SimulationData::GenerateMoreFood(double deltaTime) {
+  double spawn_cell_size = 50.0;
+  for (double x = 0; x < settings::environment::kMapWidth;
+       x += spawn_cell_size) {
+    for (double y = 0; y < settings::environment::kMapHeight;
+         y += spawn_cell_size) {
+      double food_density = environment_.GetFoodDensity(x, y);
+      double food_spawn_probability = food_density * spawn_cell_size * spawn_cell_size *
+                                      settings::environment::kFoodSpawnRate *
+                                      deltaTime;
+
+      double random_number = static_cast<double>(rand()) / RAND_MAX;
+      if (random_number < food_spawn_probability) {
+        double x_pos =
+            x + static_cast<double>(rand()) / RAND_MAX * spawn_cell_size;
+        double y_pos =
+            y + static_cast<double>(rand()) / RAND_MAX * spawn_cell_size;
+        Food food(x_pos, y_pos);
+        food_entities_.push_back(food);
+      }
+    }
   }
 }
 
@@ -221,17 +226,22 @@ void SimulationData::InitializeCreatures() {
  * @brief Initializes food entities randomly on the map.
  */
 void SimulationData::InitializeFood() {
-  double kFoodDensity = environment_.GetFoodDensity();
   food_entities_.clear();
 
-  // Populate the vector with food entities based on the current food density
-  for (double x = 0; x < settings::environment::kMapWidth; x += 10.0) {
-    for (double y = 0; y < settings::environment::kMapHeight; y += 10.0) {
-      if (std::rand() / (RAND_MAX + 1.0) < kFoodDensity) {
-        food_entities_.emplace_back(Food(x, y));
-      }
-    }
+  for (int i = 0; i < 10000; i++) {
+    GenerateMoreFood(1);
   }
+
+  // const double step_size = 10.0;
+  // // Populate the vector with food entities based on the current food density
+  // for (double x = 0; x < settings::environment::kMapWidth; x += step_size) {
+  //   for (double y = 0; y < settings::environment::kMapHeight; y += step_size) {
+  //     double food_density = environment_.GetFoodDensity(x, y);
+  //     if (std::rand() / (RAND_MAX + 1.0) < food_density * step_size * step_size) {
+  //       food_entities_.emplace_back(Food(x, y));
+  //     }
+  //   }
+  // }
 }
 
 /*!
