@@ -22,11 +22,13 @@ TEST(CreatureTests, CreatureConstructor) {
   neat::Genome genome(0, 0);
   Mutable mutables;
   Creature creature(genome, mutables);
-  double initial_h = 100;
-  double initial_e = 100;
 
-  EXPECT_EQ(creature.GetEnergy(), initial_e);
-  EXPECT_EQ(creature.GetHealth(), initial_h);
+  double size = settings::physical_constraints::kDBabySize;
+  double initial_health = settings::physical_constraints::kDIntegrity * pow(size, 2);
+  double initial_energy = settings::physical_constraints::kDEnergyDensity * pow(size, 2);
+
+  EXPECT_EQ(creature.GetEnergy(), initial_energy);
+  EXPECT_EQ(creature.GetHealth(), initial_health);
 }
 
 // /*!
