@@ -5,6 +5,6 @@
 #include <random>
 
 // Constructor implementation
-myEnvironment::Environment::Environment()
+Environment::Environment()
     : food_density_(SETTINGS.environment.default_food_density),
       creature_density_(SETTINGS.environment.default_creature_density) {}

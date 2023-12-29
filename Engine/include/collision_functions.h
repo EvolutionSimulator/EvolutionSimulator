@@ -1,5 +1,5 @@
-#ifndef COLLISIONS_H
-#define COLLISIONS_H
+#ifndef COLLISION_FUNCTIONS_H
+#define COLLISION_FUNCTIONS_H
 
 #include <vector>
 /*!
@@ -41,4 +41,4 @@ bool CollisionRectangleRectangle(const double tolerance,
                                  const std::pair<double, double> rect2_vertex3,
                                  const std::pair<double, double> rect2_vertex4);
 
-#endif  // COLLISIONS_H
+#endif  // COLLISION_FUNCTIONS_H

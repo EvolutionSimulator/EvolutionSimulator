@@ -39,8 +39,9 @@ MainWindow::~MainWindow() {
 
 void MainWindow::ChangeFoodDensity(int value) {
   food_density = static_cast<double>(value) / 1000.0;      // Convert to density
-  engine_->GetEnvironment().SetFoodDensity(food_density);  // Update the density
-  engine_->UpdateEnvironment();  // Apply the updated density
+
+  auto environment = engine_->GetSimulation()->GetEnvironment();
+  environment->SetFoodDensity(food_density);  // Update the density
 }
 
 void MainWindow::ChangeCreatureDensity(int value) {

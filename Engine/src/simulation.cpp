@@ -1,35 +1,52 @@
 #include "simulation.h"
 
-Simulation::Simulation(myEnvironment::Environment& environment) {
-  data_ = new SimulationData(environment);
-  is_running_ = true;  // Initialize the flag to true
+Simulation::Simulation() : data_(new SimulationData()), is_running_(true) {}
+
+Simulation::Simulation(Environment &environment)
+    : data_(new SimulationData()), environment_(environment),
+      is_running_(true) {
+  food_processor_.InitializeFood(*data_, environment_);
+  entity_grid_.UpdateGrid(*data_, environment_);
 }
 
 Simulation::~Simulation() { delete data_; }
 
 // Called once at the start of the simulation
-void Simulation::Start() { std::lock_guard<std::mutex> lock(data_mutex_); }
+void Simulation::Start() {
+  auto data = GetSimulationData();
+  auto environment = GetEnvironment();
+
+  food_processor_.InitializeFood(*data, *environment);
+  creature_manager_.InitializeCreatures(*data, *environment);
+  entity_grid_.UpdateGrid(*data, *environment);
+}
 
 // Called every update cycle
 void Simulation::Update(double deltaTime) {
-  std::lock_guard<std::mutex> lock(data_mutex_);
-  // Test function (DO NOT USE)
+  //  auto data = GetSimulationData();
+  //  auto environment = GetEnvironment();
 }
 
-// Called at constant intervals
+// Called at constant intervals (SETTINGS.engine.fixed_update_interval)
 void Simulation::FixedUpdate(double deltaTime) {
-  std::lock_guard<std::mutex> lock(data_mutex_);
-  // Test function (DO NOT USE)
-  data_->UpdateAllCreatures(deltaTime);
-  data_->ReproduceCreatures();
-  data_->GenerateMoreFood();
-  data_->UpdateGrid();
-  data_->CheckCollisions();
+  auto data = GetSimulationData();
+  auto environment = GetEnvironment();
+
+  creature_manager_.UpdateAllCreatures(*data, entity_grid_, deltaTime);
+  creature_manager_.ReproduceCreatures(*data, *environment);
+  food_processor_.GenerateMoreFood(*data, *environment);
+  entity_grid_.UpdateGrid(*data, *environment);
+  collision_manager_.CheckCollisions(entity_grid_);
+
   data_->world_time_ += deltaTime;
 }
 
 DataAccessor<SimulationData> Simulation::GetSimulationData() {
   return DataAccessor<SimulationData>(*data_, data_mutex_);
+}
+
+DataAccessor<Environment> Simulation::GetEnvironment() {
+  return DataAccessor<Environment>(environment_, environment_mutex_);
 }
 
 // Function to stop the simulation

@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "collisions.h"
+#include "collision_functions.h"
 
 class Entity {
  public:

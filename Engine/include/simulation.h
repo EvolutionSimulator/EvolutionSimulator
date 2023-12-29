@@ -3,25 +3,39 @@
 #include <functional>
 #include <mutex>
 
-#include "dataaccessor.h"
-#include "environment.h"  // Include the Environment header
-#include "simulationdata.h"
+#include "collision_manager.h"
+#include "creature_manager.h"
+#include "data_accessor.h"
+#include "entity_grid.h"
+#include "environment.h"
+#include "food_processor.h"
+#include "simulation_data.h"
 
 class Simulation {
  public:
-  explicit Simulation(
-      myEnvironment::Environment&
-          environment);  // New constructor accepting Environment reference
+  Simulation();
+  explicit Simulation(Environment& environment);
   ~Simulation();
+
   DataAccessor<SimulationData> GetSimulationData();
+  DataAccessor<Environment> GetEnvironment();
+
   void Start();
   void Update(double deltaTime);
   void FixedUpdate(double deltaTime);
-  void Stop();  // Gives us the possibility to stop the simulation
+  void Stop();
   void ProcessData(std::function<void(SimulationData*)> processFunc);
 
  private:
   SimulationData* data_;
+  Environment environment_;
+
+  FoodProcessor food_processor_;
+  EntityGrid entity_grid_;
+  CreatureManager creature_manager_;
+  CollisionManager collision_manager_;
+
   std::mutex data_mutex_;
-  bool is_running_;  // New boolean flag to control simulation state
+  std::mutex environment_mutex_;
+  bool is_running_;
 };

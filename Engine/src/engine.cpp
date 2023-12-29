@@ -4,19 +4,11 @@
 
 #include "simulation.h"
 
-Engine::Engine() : environment_(), simulation_(new Simulation(environment_)) {}
-
-Engine::Engine(double food_density, double creature_density) : environment_() {
-  environment_.SetFoodDensity(food_density);
-  environment_.SetCreatureDensity(creature_density);
-  simulation_ = new Simulation(environment_);
-}
+Engine::Engine() : simulation_(new Simulation()) { }
 
 Engine::~Engine() {
-  //  delete simulation_;
+  delete simulation_;
 }
-
-myEnvironment::Environment &Engine::GetEnvironment() { return environment_; }
 
 // Main engine loop
 void Engine::Run() {
@@ -68,8 +60,6 @@ void Engine::Run() {
     last_fixed_update_time_ += duration_to_add;
   }
 }
-
-void Engine::UpdateEnvironment() {}
 
 void Engine::SetSpeed(double speed) { engine_speed_ = std::max(0.0, speed); }
 

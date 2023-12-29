@@ -5,7 +5,6 @@
 
 #include "settings.h"
 
-namespace myEnvironment {
 class Environment {
  public:
   // Constructor
@@ -24,6 +23,5 @@ class Environment {
   double food_density_;  // Variable for creature density
   double creature_density_;
 };
-}  // namespace myEnvironment
 
 #endif  // ENVIRONMENT_H

@@ -17,18 +17,15 @@ class Engine {
   void Stop();
   void Pause();
   void Resume();
-  void UpdateEnvironment();
   void SetSpeed(double speed);
 
   Simulation* GetSimulation();
-  myEnvironment::Environment& GetEnvironment();
 
  private:
-  myEnvironment::Environment environment_;
   const double kFixedUpdateInterval =
       SETTINGS.engine.fixed_update_interval;  // how often FixedUpdate is
                                               // called
-  double engine_speed_ = 1.0;
+  double engine_speed_ = 2.0;
 
   Simulation* simulation_;
   volatile bool running_ = false;
