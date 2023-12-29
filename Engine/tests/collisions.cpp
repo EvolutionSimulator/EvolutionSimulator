@@ -263,6 +263,7 @@ TEST(CollisionTests, CheckCollisionWithEntity) {
  * food, and changes in creature's energy based on the nutritional value of the
  * food.
  */
+
 TEST(CollisionTests, OnCollisionWithFood) {
   const double tolerance = 0.1;
 
@@ -274,46 +275,51 @@ TEST(CollisionTests, OnCollisionWithFood) {
 
   // Case 1: Food is alive, and Creature collides with it
   food.SetState(Entity::Alive);
-  food.SetNutritionalValue(10.0);
-  creature.SetEnergy(30.0);
-  double initialEnergy = creature.GetEnergy();
+  food.SetNutritionalValue(3.0);
+  food.SetSize(10.0);
+
+  creature.SetMaxEnergy(100.0);
+  creature.SetEnergy(80.0);
   creature.OnCollision(food, 100, 100);
 
-  // Expected result: Creature's energy increases by nutritional value, and food
-  // is dead
-  EXPECT_EQ(creature.GetEnergy(), initialEnergy + 10.0);
-  EXPECT_EQ(food.GetState(), Entity::Dead);
+  // Expected result: Creature's energy increases to the max, and food
+  // decreases in size
+  EXPECT_EQ(creature.GetEnergy(), 100.0);
+  EXPECT_NEAR(food.GetSize(), 10.0/3, 0.01);
 
   // Case 2: Food is dead, and Creature collides with it
   food.SetState(Entity::Dead);
-  food.SetNutritionalValue(10.0);
-  initialEnergy = creature.GetEnergy();
+  food.SetNutritionalValue(3.0);
+  creature.SetEnergy(30.0);
+  creature.OnCollision(food, 100, 100);
+
+  // Expected result: Creature's energy remains unchanged, and food is still
+  // dead
+  EXPECT_EQ(creature.GetEnergy(), 30.0);
+  EXPECT_EQ(food.GetState(), Entity::Dead);
+
+  // Case 3: Food is alive, but Creature has zero energy
+  creature.SetEnergy(30.0);
+
+  food.SetState(Entity::Alive);
+  food.SetNutritionalValue(3.0);
+  food.SetSize(10.0);
+
+  creature.OnCollision(food, 100, 100);
+
+  // Expected result: Creature's energy increases by nutritional value times size,
+  // and food is dead
+  EXPECT_EQ(creature.GetEnergy(), 60.0);
+  EXPECT_EQ(food.GetState(), Entity::Dead);
+
+  // Case 4: Food is dead, Creature has non-zero energy, and Creature collides
+  // again
+  double initialEnergy = creature.GetEnergy();
   creature.OnCollision(food, 100, 100);
 
   // Expected result: Creature's energy remains unchanged, and food is still
   // dead
   EXPECT_EQ(creature.GetEnergy(), initialEnergy);
-  EXPECT_EQ(food.GetState(), Entity::Dead);
-
-  // Case 3: Food is alive, but Creature has zero energy
-  creature.SetEnergy(0.0);
-  food.SetState(Entity::Alive);
-  food.SetNutritionalValue(10.0);
-  creature.OnCollision(food, 100, 100);
-
-  // Expected result: Creature's energy increases by nutritional value, and food
-  // is dead
-  EXPECT_EQ(creature.GetEnergy(), 10.0);
-  EXPECT_EQ(food.GetState(), Entity::Dead);
-
-  // Case 4: Food is dead, Creature has non-zero energy, and Creature collides
-  // again
-  double initialEnergy2 = creature.GetEnergy();
-  creature.OnCollision(food, 100, 100);
-
-  // Expected result: Creature's energy remains unchanged, and food is still
-  // dead
-  EXPECT_EQ(creature.GetEnergy(), initialEnergy2);
   EXPECT_EQ(food.GetState(), Entity::Dead);
 }
 
