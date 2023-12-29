@@ -14,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui_(new Ui::MainWindow), friction_coefficient(0.0), lastRecordedTime_(0.0) {
   ui_->setupUi(this);
 
+  //Add image as icon use region as mask to make the icon circular
   QRect rect(2,2,45,45);
   qDebug() << rect.size();
   qDebug() << ui_->runButton->size();
@@ -90,11 +91,13 @@ void MainWindow::ToggleSimulation() {
   if (engine_thread_.joinable()) {
     engine_->Stop();
     engine_thread_.join();
+    //change icon of button
     QPixmap pixMap2(":/Toggle_button_sprites/Run.png");
     QIcon icon2(pixMap2);
     ui_->runButton->setIcon(icon2);
   } else {
     engine_thread_ = std::thread(&Engine::Run, engine_);
+    //change icon of button
     QPixmap pixMap2(":/Toggle_button_sprites/Pause.png");
     QIcon icon2(pixMap2);
     ui_->runButton->setIcon(icon2);

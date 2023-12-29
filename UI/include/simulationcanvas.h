@@ -74,3 +74,5 @@ class SimulationCanvas : public QSFMLCanvas {
   sf::Vector2f initialViewSize;
   sf::Vector2f initialViewCenter;
 };
+
+sf::Sprite spriteTexture(double size);
