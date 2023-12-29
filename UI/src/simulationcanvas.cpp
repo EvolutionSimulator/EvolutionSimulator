@@ -19,7 +19,16 @@ SimulationCanvas::SimulationCanvas(QWidget* Parent)
   render_lambda_ = [this](SimulationData* data) {
     this->RenderSimulation(data);
   };
+  int width = sf::VideoMode::getDesktopMode().width;
+  int height = sf::VideoMode::getDesktopMode().height;
+  float scaleFactor = this->devicePixelRatioF(); // Get the device pixel ratio
 
+  // Scale the map width and height according to the pixel ratio
+  int scaledWidth = static_cast<int>(width/scaleFactor);
+  int scaledHeight = static_cast<int>(height/scaleFactor);
+
+  // Set the fixed size with the scaled dimensions
+  setFixedSize(scaledWidth, scaledHeight);
 
     QFile resourceFile(":/font.ttf");
     if (!resourceFile.open(QIODevice::ReadOnly)) {
