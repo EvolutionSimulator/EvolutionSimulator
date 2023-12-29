@@ -2,10 +2,10 @@
 
 #include "simulation_data.h"
 
-class FoodProcessor
+class FoodManager
 {
  public:
-  FoodProcessor();
+  FoodManager();
 
   void InitializeFood(SimulationData& data, Environment& environment);
   void GenerateMoreFood(SimulationData& data, Environment& environment);

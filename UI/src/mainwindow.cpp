@@ -9,6 +9,8 @@ MainWindow::MainWindow(QWidget *parent)
   ui_->setupUi(this);
 
   InitializeEngine();
+  RunEngine();
+  PauseEngine();
 
   //  connect(ui_->densityFood, SIGNAL(valueChanged(int)), this,
   //          SLOT(ChangeFoodDensity(int)));
@@ -59,9 +61,13 @@ void MainWindow::InitializeEngine() {
 }
 
 void MainWindow::RunEngine() {
-  if (engine_ && !engine_thread_.joinable()) {
-    std::cout << "Starting engine on a separate thread..." << std::endl;
-    engine_thread_ = std::thread(&Engine::Run, engine_);
+  if (engine_) {
+    if (!engine_thread_.joinable()) {
+      std::cout << "Starting engine on a separate thread..." << std::endl;
+      engine_thread_ = std::thread(&Engine::Run, engine_);
+    } else {
+      engine_->Resume();
+    }
   }
 }
 

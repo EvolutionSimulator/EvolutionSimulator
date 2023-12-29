@@ -11,7 +11,7 @@ class EntityGrid
  public:
   EntityGrid();
 
-  void UpdateGrid(SimulationData& data, Environment& environment);
+  void RefreshGrid(SimulationData& data, Environment& environment);
   void ClearGrid();
 
   const std::vector<std::vector<std::vector<Entity*>>>& GetGrid() const;

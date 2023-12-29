@@ -16,7 +16,7 @@ void Engine::Run() {
     return;
 
   running_ = true;
-  paused_ = false;
+  // paused_ = false;
 
   engine_start_time_ = timer::now();
   last_update_time_ = engine_start_time_;

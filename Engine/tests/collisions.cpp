@@ -10,7 +10,7 @@
 #include "entity_grid.h"
 #include "environment.h"
 #include "food.h"
-#include "food_processor.h"
+#include "food_manager.h"
 #include "simulation_data.h"
 
 /*!
@@ -526,8 +526,8 @@ TEST(SimulationDataTest, GridInitialization) {
   SimulationData data;
   Environment environment;
   EntityGrid entity_grid;
-
-  entity_grid.UpdateGrid(data, environment);
+  
+  entity_grid.RefreshGrid(data, environment);
 
   int expectedNumCellsX =
       static_cast<int>(
@@ -556,8 +556,8 @@ TEST(SimulationDataTest, UpdateGridWithAliveEntities) {
   SimulationData data;
   Environment environment;
   EntityGrid entity_grid;
-
-  entity_grid.UpdateGrid(data, environment);
+  
+  entity_grid.RefreshGrid(data, environment);
 
   data.creatures_.clear();
   data.food_entities_.clear();
@@ -579,8 +579,8 @@ TEST(SimulationDataTest, UpdateGridWithAliveEntities) {
   Food food(5.3, 6.7, 4.0);
   food.SetState(Entity::Dead);
   data.food_entities_.push_back(food);
-
-  entity_grid.UpdateGrid(data, environment);
+  
+  entity_grid.RefreshGrid(data, environment);
 
   for (const auto& row : entity_grid.GetGrid()) {
     for (const auto& cell : row) {
@@ -601,8 +601,8 @@ TEST(SimulationDataTest, CorrectEntityPlacementInGrid) {
   SimulationData data;
   Environment environment;
   EntityGrid entity_grid;
-
-  entity_grid.UpdateGrid(data, environment);
+  
+  entity_grid.RefreshGrid(data, environment);
 
   data.creatures_.clear();
   data.food_entities_.clear();
@@ -629,8 +629,8 @@ TEST(SimulationDataTest, CorrectEntityPlacementInGrid) {
   Food food_3(50.3, 60.7, 4.0);
   food_3.SetState(Entity::Dead);
   data.food_entities_.push_back(food_3);
-
-  entity_grid.UpdateGrid(data, environment);
+  
+  entity_grid.RefreshGrid(data, environment);
 
   auto creatureCoordinates = creature_1.GetCoordinates();
   int creatureGridX = static_cast<int>(creatureCoordinates.first /
@@ -666,7 +666,7 @@ TEST(GetNeighboursTest, BasicFunctionality) {
   auto neighbours = entity_grid.GetNeighbours({5, 5}, 1);
 
   std::vector<std::pair<int, int>> expected = {
-      {4, 4}, {4, 5}, {4, 6}, {5, 4}, {5, 5}, {5, 6}, {6, 4}, {6, 5}, {6, 6}};
+      {4, 4}, {5, 4}, {6, 4}, {4, 5}, {5, 5}, {6, 5}, {4, 6}, {5, 6}, {6, 6}};
   EXPECT_EQ(neighbours, expected);
 }
 

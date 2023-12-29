@@ -8,7 +8,7 @@
 #include "data_accessor.h"
 #include "entity_grid.h"
 #include "environment.h"
-#include "food_processor.h"
+#include "food_manager.h"
 #include "simulation_data.h"
 
 class Simulation {
@@ -30,7 +30,7 @@ class Simulation {
   SimulationData* data_;
   Environment environment_;
 
-  FoodProcessor food_processor_;
+  FoodManager food_manager_;
   EntityGrid entity_grid_;
   CreatureManager creature_manager_;
   CollisionManager collision_manager_;

@@ -5,8 +5,8 @@ Simulation::Simulation() : data_(new SimulationData()), is_running_(true) {}
 Simulation::Simulation(Environment &environment)
     : data_(new SimulationData()), environment_(environment),
       is_running_(true) {
-  food_processor_.InitializeFood(*data_, environment_);
-  entity_grid_.UpdateGrid(*data_, environment_);
+  food_manager_.InitializeFood(*data_, environment_);
+  entity_grid_.RefreshGrid(*data_, environment_);
 }
 
 Simulation::~Simulation() { delete data_; }
@@ -16,9 +16,9 @@ void Simulation::Start() {
   auto data = GetSimulationData();
   auto environment = GetEnvironment();
 
-  food_processor_.InitializeFood(*data, *environment);
+  food_manager_.InitializeFood(*data, *environment);
   creature_manager_.InitializeCreatures(*data, *environment);
-  entity_grid_.UpdateGrid(*data, *environment);
+  entity_grid_.RefreshGrid(*data, *environment);
 }
 
 // Called every update cycle
@@ -34,8 +34,8 @@ void Simulation::FixedUpdate(double deltaTime) {
 
   creature_manager_.UpdateAllCreatures(*data, entity_grid_, deltaTime);
   creature_manager_.ReproduceCreatures(*data, *environment);
-  food_processor_.GenerateMoreFood(*data, *environment);
-  entity_grid_.UpdateGrid(*data, *environment);
+  food_manager_.GenerateMoreFood(*data, *environment);
+  entity_grid_.RefreshGrid(*data, *environment);
   collision_manager_.CheckCollisions(entity_grid_);
 
   data_->world_time_ += deltaTime;

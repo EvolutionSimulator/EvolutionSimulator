@@ -1,12 +1,12 @@
-#include "../include/food_processor.h"
+#include "../include/food_manager.h"
 
-FoodProcessor::FoodProcessor() {}
+FoodManager::FoodManager() {}
 
 /*!
  * @brief Generates additional food entities based on the environment's food
  * density.
  */
-void FoodProcessor::InitializeFood(SimulationData &data, Environment &environment)
+void FoodManager::InitializeFood(SimulationData &data, Environment &environment)
 {
   double size = data.food_entities_.size();
   double max_number = environment.GetFoodDensity() *
@@ -28,7 +28,7 @@ void FoodProcessor::InitializeFood(SimulationData &data, Environment &environmen
  * density.
  */
 
-void FoodProcessor::GenerateMoreFood(SimulationData &data, Environment &environment)
+void FoodManager::GenerateMoreFood(SimulationData &data, Environment &environment)
 {
     double size = data.food_entities_.size();
     double max_number = environment.GetFoodDensity() *

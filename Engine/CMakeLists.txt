@@ -48,7 +48,7 @@ add_library(Engine STATIC
   include/settings.h
   include/data_accessor.h
   src/settings.cpp
-  include/food_processor.h src/food_processor.cpp
+  include/food_manager.h src/food_manager.cpp
   include/entity_grid.h src/entity_grid.cpp
   include/creature_manager.h src/creature_manager.cpp
   include/collision_manager.h src/collision_manager.cpp

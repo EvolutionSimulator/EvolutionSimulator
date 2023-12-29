@@ -5,6 +5,7 @@ EntityGrid::EntityGrid() {
                      static_cast<double>(SETTINGS.environment.map_width) /
                      SETTINGS.environment.grid_cell_size)) +
                  1;
+
   num_rows_ = static_cast<int>(std::ceil(
                   static_cast<double>(SETTINGS.environment.map_height) /
                   SETTINGS.environment.grid_cell_size)) +
@@ -69,7 +70,7 @@ void UpdateQueue(std::queue<Creature> &reproduce) {
  * @brief Updates the simulation grid, removing dead entities and placing the
  * living ones.
  */
-void EntityGrid::UpdateGrid(SimulationData &data, Environment &environment) {
+void EntityGrid::RefreshGrid(SimulationData &data, Environment &environment) {
   ClearGrid();
   UpdateGridTemplate<Creature>(data.creatures_, grid_,
                                SETTINGS.environment.grid_cell_size);
@@ -134,10 +135,8 @@ EntityGrid::GetNeighbours(const std::pair<int, int> &center,
   int x_center = center.first;
   int y_center = center.second;
 
-  for (int y = y_center - layer_number; y <= y_center + layer_number;
-       y++) {
-    for (int x = x_center - layer_number;
-         x <= x_center + layer_number; x++) {
+  for (int y = y_center - layer_number; y <= y_center + layer_number; y++) {
+    for (int x = x_center - layer_number; x <= x_center + layer_number; x++) {
       neighbours.push_back(std::make_pair((x + num_columns_) % num_columns_,
                                           (y + num_rows_) % num_rows_));
     }
