@@ -296,8 +296,8 @@ void SimulationCanvas::RenderSimulation(SimulationData* data) {
   for (const auto& creature : data->creatures_) {
     int generation = creature.GetGeneration();
     sf::Color color(20 + generation * 20, 77, 64);
-    sf::VertexArray creatureShape =
-        createGradientCircle(creature.GetSize(), color, sf::Color(41, 40, 38));
+    sf::VertexArray creatureShape = createGradientCircle(
+                creature.GetSize(), color, sf::Color(250,250,250));
 
     std::pair<double, double> creatureCoordinates = creature.GetCoordinates();
     sf::Transform creatureTransform;
@@ -640,4 +640,15 @@ void SimulationCanvas::zoom(float factor, sf::Vector2f& zoomPoint) {
     // Apply the new view and update
     setView(view);
     update();
+}
+
+sf::Sprite spriteTexture(double size) {
+    sf::Texture texture;
+    if (!texture.loadFromFile(":/Toggle_buton_sprites/Pause.png")) {
+        qDebug()  << 'Failed to open resource';
+    }
+    sf::Sprite sprite;
+    sprite.setTexture(texture);
+    sprite.setScale(size, size);
+    return sprite;
 }
