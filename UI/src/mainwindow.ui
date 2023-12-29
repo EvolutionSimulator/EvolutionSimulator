@@ -94,10 +94,10 @@
    <widget class="QPushButton" name="runButton">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>950</x>
       <y>20</y>
-      <width>80</width>
-      <height>24</height>
+      <width>50</width>
+      <height>50</height>
      </rect>
     </property>
     <property name="palette">
@@ -299,15 +299,8 @@
       </disabled>
      </palette>
     </property>
-    <property name="styleSheet">
-     <string notr="true">QPushButton {
-    background: transparent;
-    color: white;
-    border: 2px solid blue;
-}</string>
-    </property>
     <property name="text">
-     <string>RUN</string>
+     <string/>
     </property>
    </widget>
    <widget class="QSpinBox" name="densityFood">

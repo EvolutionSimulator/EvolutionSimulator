@@ -9,18 +9,24 @@
 #include <QVBoxLayout>
 
 #include "ui_mainwindow.h"
-#include "custombutton.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui_(new Ui::MainWindow), friction_coefficient(0.0), lastRecordedTime_(0.0) {
   ui_->setupUi(this);
 
-  CustomButton* customRunButton = new CustomButton(this);
-
-  // Assuming you want to replace the 'runButton' from the UI file:
-  customRunButton = new CustomButton(this);
-  // Connect the custom button click signal to the appropriate slot
-  connect(customRunButton, &CustomButton::clicked, this, &MainWindow::ToggleSimulation);
+  QRect rect(2,2,45,45);
+  qDebug() << rect.size();
+  qDebug() << ui_->runButton->size();
+  QRegion region(rect, QRegion::Ellipse);
+  qDebug() << region.boundingRect().size();
+  ui_->runButton->setMask(region);
+  QPixmap pixMap(":/Toggle_button_sprites/Run.png");
+  QIcon icon(pixMap);
+  ui_->runButton->setIcon(icon);
+  QSize size(50, 50);
+  ui_->runButton->setIconSize(size);
+  connect(ui_->runButton, &QPushButton::clicked, this,
+          &MainWindow::ToggleSimulation);
 
   ui_->densityFood->setMinimum(1);
   ui_->densityFood->setMaximum(1000);
@@ -84,8 +90,14 @@ void MainWindow::ToggleSimulation() {
   if (engine_thread_.joinable()) {
     engine_->Stop();
     engine_thread_.join();
+    QPixmap pixMap2(":/Toggle_button_sprites/Run.png");
+    QIcon icon2(pixMap2);
+    ui_->runButton->setIcon(icon2);
   } else {
     engine_thread_ = std::thread(&Engine::Run, engine_);
+    QPixmap pixMap2(":/Toggle_button_sprites/Pause.png");
+    QIcon icon2(pixMap2);
+    ui_->runButton->setIcon(icon2);
   }
 }
 
