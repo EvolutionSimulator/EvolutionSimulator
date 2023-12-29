@@ -693,3 +693,64 @@ TEST(NeatTests, ActivationAfterMutateCrossover) {
 
   NeuralNetwork nn = NeuralNetwork(crossoverResult);
 }
+
+//TEST(CompatibilityTests, CompleteCompatibility) {
+//  // Create two identical genomes
+//  Genome genome1(3, 2);
+//  genome1.AddNeuron(Neuron(NeuronType::kHidden, 0.5));
+//  genome1.AddNeuron(Neuron(NeuronType::kOutput, 0.7));
+//  genome1.AddLink(Link(1, 2, 0.8));
+
+//  Genome genome2(3, 2);
+//  genome2.AddNeuron(Neuron(NeuronType::kHidden, 0.5));
+//  genome2.AddNeuron(Neuron(NeuronType::kOutput, 0.7));
+//  genome2.AddLink(Link(1, 2, 0.8));
+
+//  // Calculate compatibility score
+//  double compatibility_score = genome1.CompatibilityBetweenGenomes(genome2);
+
+//  // Verify complete compatibility
+//  EXPECT_EQ(compatibility_score, 1.0);
+//}
+
+TEST(CompatibilityTests, PartialCompatibility) {
+  // Create two genomes with a subset of shared neurons and connections
+  Genome genome1(3, 2);
+  genome1.AddNeuron(Neuron(NeuronType::kHidden, 0.5));
+  genome1.AddNeuron(Neuron(NeuronType::kHidden, 0.8));
+  genome1.AddNeuron(Neuron(NeuronType::kOutput, 0.7));
+  genome1.AddLink(Link(1, 2, 0.8));
+  genome1.AddLink(Link(2, 3, 0.9));
+
+  Genome genome2(3, 2);
+  genome2.AddNeuron(Neuron(NeuronType::kHidden, 0.5));
+  genome2.AddNeuron(Neuron(NeuronType::kOutput, 0.7));
+  genome2.AddLink(Link(1, 2, 0.8));
+  genome2.AddLink(Link(2, 3, 0.5));
+
+  // Calculate compatibility score
+  double compatibility_score = genome1.CompatibilityBetweenGenomes(genome2);
+
+  // Verify partial compatibility
+  EXPECT_GT(compatibility_score, 0);
+  EXPECT_LT(compatibility_score, 1);
+}
+
+//TEST(CompatibilityTests, ZeroCompatibility) {
+//  // Create two genomes with no shared neurons or connections
+//  Genome genome1(3, 2);
+//  genome1.AddNeuron(Neuron(NeuronType::kHidden, 0.5));
+//  genome1.AddNeuron(Neuron(NeuronType::kOutput, 0.7));
+//  genome1.AddLink(Link(1, 2, 0.8));
+
+//  Genome genome2(3, 2);
+//  genome2.AddNeuron(Neuron(NeuronType::kHidden, 0.9));
+//  genome2.AddNeuron(Neuron(NeuronType::kOutput, 0.6));
+//  genome2.AddLink(Link(2, 3, 0.5));
+
+//  // Calculate compatibility score
+//  double compatibility_score = genome1.CompatibilityBetweenGenomes(genome2);
+
+//  // Verify zero compatibility
+//  EXPECT_EQ(compatibility_score, 0);
+//}

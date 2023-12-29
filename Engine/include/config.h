@@ -19,6 +19,10 @@ constexpr double kMaxBias = 0.1;
 constexpr double kMinBias = 0.0;
 constexpr double kChangeBiasMutationRate = 0.6;
 constexpr double kAdjustmentProbability = 0.8;
+constexpr double kActivationFunctionMutationRate = 0.02;
+constexpr double kWeightSharedNeurons = 0.2;
+constexpr double kWeightSharedLinks = 0.3;
+constexpr double kAverageWeightSharedLinks = 0.5;
 }  // namespace neat
 
 namespace environment {

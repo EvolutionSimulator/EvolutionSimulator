@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <optional>
 #include <random>
+#include <set>
 
 namespace neat {
 
@@ -544,5 +545,71 @@ Genome Crossover(const Genome& dominant, const Genome& recessive) {
 
   // Return the new Genome that is a combination of both parents.
   return offspring;
+}
+
+bool Genome::FindNeuronById(int targetId, Neuron& foundNeuron) const{
+    for (const Neuron& neuron : neurons_) {
+        if (neuron.GetId() == targetId) {
+            foundNeuron = neuron;  // Assign the found neuron to the reference parameter
+            return true;  // Return true if the neuron is found
+        }
+    }
+    return false;  // Return false if neuron isnt found
+}
+
+double Genome::CompatibilityBetweenGenomes(const Genome& other) const {
+  // Identify shared neurons
+  std::unordered_map<int, Neuron> shared_neurons;
+  for (const Neuron& neuron : neurons_) {
+      Neuron neuronCopy = neuron; // Make a copy of the neuron
+      if (other.FindNeuronById(neuron.GetId(), neuronCopy)) {
+          shared_neurons.insert(std::make_pair(neuron.GetId(), neuronCopy));
+      }
+  }
+
+  // Identify shared links
+  std::set<std::pair<int, int>> shared_link_pairs;
+  Genome& non_const_this = const_cast<Genome&>(*this);
+
+  for (const Link& link : links_) {
+      if (non_const_this.HasLink(link.GetInId(), link.GetOutId()) && link.IsActive()) {
+          shared_link_pairs.insert(std::make_pair(link.GetInId(), link.GetOutId()));
+      }
+  }
+
+  // Calculate weight similarities for shared links
+  double total_weight_similarity = 0.0;
+  for (const std::pair<int, int>& link_pair : shared_link_pairs) {
+      // Search for the link in the first genome
+      const Link* link1 = nullptr;
+      for (const Link& link : links_) {
+          if (link.GetInId() == link_pair.first && link.GetOutId() == link_pair.second) {
+              link1 = &link;
+              break;
+          }
+      }
+
+      // Search for the link in the other genome
+      const Link* link2 = nullptr;
+      for (const Link& other_link : other.GetLinks()) {
+          if (other_link.GetInId() == link_pair.first && other_link.GetOutId() == link_pair.second) {
+              link2 = &other_link;
+              break;
+          }
+      }
+
+      if (link1 && link2) {
+          // Calculate weight similarity using the absolute difference
+          double weight_similarity = std::abs(link1->GetWeight() - link2->GetWeight());
+          total_weight_similarity += weight_similarity;
+      }
+  }
+
+  // Compute compatibility score based on shared neurons, shared links, and weight similarities
+  // Use a formula that considers these factors and assigns a higher score to more compatible genomes
+  double compatibility_score = settings::neat::kWeightSharedNeurons * shared_neurons.size()
+                              + settings::neat::kWeightSharedLinks * shared_link_pairs.size()
+                              + settings::neat::kAverageWeightSharedLinks * total_weight_similarity;
+  return compatibility_score;
 }
 }  // namespace neat
