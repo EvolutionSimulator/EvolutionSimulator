@@ -4,5 +4,7 @@
         <file>Resources/Run.png</file>
         <file>Resources/Pause.png</file>
 	<file>Resources/Food_32x32.png</file>
+	<file>Resources/Creatures.png</file>
+	<file>Shaders/colorShift.frag</file>
     </qresource>
 </RCC>
