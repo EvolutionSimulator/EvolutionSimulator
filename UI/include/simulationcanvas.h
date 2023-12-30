@@ -73,6 +73,9 @@ class SimulationCanvas : public QSFMLCanvas {
   float zoomFactor = 1.0f;
   sf::Vector2f initialViewSize;
   sf::Vector2f initialViewCenter;
+  sf::Texture texture_;
+  double scale_x_;
+  double scale_y_;
 };
 
 sf::Sprite spriteTexture(double size);
