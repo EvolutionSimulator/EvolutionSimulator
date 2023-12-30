@@ -4,7 +4,7 @@
 #include <thread>
 
 #include "QtCharts/qlineseries.h"
-#include "engine.h"
+#include "core/engine.h"
 
 QT_BEGIN_NAMESPACE  //
     namespace Ui {

@@ -1,19 +1,19 @@
-#include "collision_functions.h"
+#include "core/collision_functions.h"
 
 #include <gmock/gmock-matchers.h>
 #include <gtest/gtest.h>
 
 #include <iostream>
 
-#include "creature.h"
-#include "creature_manager.h"
-#include "entity_grid.h"
-#include "environment.h"
-#include "food.h"
-#include "food_manager.h"
-#include "simulation_data.h"
+#include "entities/creature.h"
+#include "simulation/creature_manager.h"
+#include "simulation/entity_grid.h"
+#include "simulation/environment.h"
+#include "entities/food.h"
+#include "simulation/food_manager.h"
+#include "simulation/simulation_data.h"
 
-#include "geometry_primitives.h"
+#include "core/geometry_primitives.h"
 
 /*!
  * @file collisions.cpp

@@ -22,38 +22,38 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 
 add_library(Engine STATIC
-  include/engine.h src/engine.cpp
-  include/simulation.h src/simulation.cpp
-  include/simulation_data.h
-  include/neat/neat-neuron.h src/neat/neat-neuron.cpp
-  include/neat/neat-link.h src/neat/neat-link.cpp
-  include/neat/neat-genome.h src/neat/neat-genome.cpp
+  include/core/engine.h src/core/engine.cpp
+  include/simulation/simulation.h src/simulation/simulation.cpp
+  include/simulation/simulation_data.h
+  include/neat/neuron.h src/neat/neuron.cpp
+  include/neat/link.h src/neat/link.cpp
+  include/neat/genome.h src/neat/genome.cpp
 
-  include/geometry_primitives.h src/geometry_primitives.cpp
+  include/core/geometry_primitives.h src/core/geometry_primitives.cpp
 
-  include/neat/neat-neural-network.h
-  src/neat/neat-neural-network.cpp
-  include/entity.h
-  src/entity.cpp
-  src/simulation_data.cpp
-  include/food.h
-  src/food.cpp
-  include/environment.h
-  src/environment.cpp
-  include/creature.h
-  src/creature.cpp
-  src/movable_entity.cpp
-  include/movable_entity.h
-  include/collision_functions.h
-  src/collision_functions.cpp
-  include/settings.h
-  include/data_accessor.h
-  src/settings.cpp
-  include/food_manager.h src/food_manager.cpp
-  include/entity_grid.h src/entity_grid.cpp
-  include/creature_manager.h src/creature_manager.cpp
-  include/collision_manager.h src/collision_manager.cpp
-  include/mutable.h src/mutable.cpp
+  include/neat/neural_network.h
+  src/neat/neural_network.cpp
+  include/entities/entity.h
+  src/entities/entity.cpp
+
+  include/entities/food.h
+  src/entities/food.cpp
+  include/simulation/environment.h
+  src/simulation/environment.cpp
+  include/entities/creature.h
+  src/entities/creature.cpp
+  src/entities/movable_entity.cpp
+  include/entities/movable_entity.h
+  include/core/collision_functions.h
+  src/core/collision_functions.cpp
+  include/core/settings.h
+  include/core/data_accessor.h
+  src/core/settings.cpp
+  include/simulation/food_manager.h src/simulation/food_manager.cpp
+  include/simulation/entity_grid.h src/simulation/entity_grid.cpp
+  include/simulation/creature_manager.h src/simulation/creature_manager.cpp
+  include/simulation/collision_manager.h src/simulation/collision_manager.cpp
+  include/entities/mutable.h src/entities/mutable.cpp
 
 )
 

@@ -1,5 +1,5 @@
 #include "qsfmlcanvas.h"
-#include "settings.h"
+#include "core/settings.h"
 
 QSFMLCanvas::QSFMLCanvas(QWidget* Parent) : QWidget(Parent) {
   float scaleFactor = this->devicePixelRatioF(); // Get the device pixel ratio
@@ -58,7 +58,6 @@ QPaintEngine* QSFMLCanvas::paintEngine() const { return nullptr; }
 
 // called when the widget is repainted
 void QSFMLCanvas::paintEvent(QPaintEvent*) {
-  std::cout << "paintEvent" << std::endl;
   OnUpdate();
 
   display();

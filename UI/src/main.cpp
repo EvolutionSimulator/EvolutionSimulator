@@ -1,4 +1,4 @@
-#include <engine.h>
+#include <core/engine.h>
 
 #include <QApplication>
 #include <SFML/Graphics.hpp>

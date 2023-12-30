@@ -1,11 +1,11 @@
 #pragma once
 
-#include <engine.h>
+#include <core/engine.h>
 
 #include <SFML/Graphics.hpp>
 
 #include "qsfmlcanvas.h"
-#include "simulation.h"
+#include "simulation/simulation.h"
 
 class SimulationCanvas : public QSFMLCanvas {
  Q_OBJECT
