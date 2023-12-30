@@ -50,6 +50,7 @@ SimulationCanvas::SimulationCanvas(QWidget* Parent)
 
   InitializeFont();
   InitializeSprites();
+  InitializeShader();
 
   trackButton_.setSize(sf::Vector2f(100, 30));         // Example size
   trackButton_.setFillColor(sf::Color(100, 100, 200)); // Example color
@@ -58,6 +59,44 @@ SimulationCanvas::SimulationCanvas(QWidget* Parent)
   trackButtonText_.setCharacterSize(15);
   trackButtonText_.setFillColor(sf::Color::White);
 }
+
+void SimulationCanvas::InitializeShader(){
+  QFile resourceFile(":/Shaders/colorShift.frag");
+  if (!resourceFile.open(QIODevice::ReadOnly)) {
+    qDebug() << "Failed to open shader resource!";
+    return;
+  }
+
+  // Generate a unique temporary filename
+  QString tempFileName = "temp_shader_" + QUuid::createUuid().toString(QUuid::WithoutBraces)
+          + ".frag";
+  QString tempFilePath = QDir::temp().absoluteFilePath(tempFileName);
+  qDebug() << "Temporary file path:" << tempFilePath;
+
+  QFile tempFile(tempFilePath);
+  if (tempFile.exists()) {
+    qDebug() << "Temporary file already exists. Deleting...";
+    if (!tempFile.remove()) {
+      qDebug() << "Failed to remove existing temporary file.";
+      return;
+    }
+  }
+
+  if (!resourceFile.copy(tempFilePath)) {
+    qDebug() << "Failed to copy font to temporary file!";
+    qDebug() << "Error:" << resourceFile.errorString();
+    return;
+  }
+  resourceFile.close();
+  if (!shader_.loadFromFile(tempFilePath.toStdString(), sf::Shader::Fragment)) {
+    qDebug() << "Failed to load font from file!";
+    QFile::remove(tempFilePath);
+    return;
+  }
+  // Clean up the temporary file after use
+  QFile::remove(tempFilePath);
+}
+
 
 void SimulationCanvas::InitializeFont(){
   QFile resourceFile(":/Resources/font.ttf");
@@ -98,17 +137,31 @@ void SimulationCanvas::InitializeFont(){
 }
 
 void SimulationCanvas::InitializeSprites(){
+    //Creatures texture
+    QPixmap creaturePixmap;
+    if (!creaturePixmap.load(":/Resources/Creatures.png")) {
+      qDebug() << "Failed to load QPixmap from path:" << ":/Resources/Creatures.png";
+    }
+
+    QImage creatureqImage = creaturePixmap.toImage().convertToFormat(QImage::Format_RGBA8888);
+    sf::Image creaturesfImage;
+    creaturesfImage.create(creatureqImage.width(), creatureqImage.height(), reinterpret_cast<const sf::Uint8*>(creatureqImage.bits()));
+
+    if (!creature_texture_.loadFromImage(creaturesfImage)) {
+      qDebug() << "Failed to create sf::Texture from sf::Image";
+    }
+
     //Medium food texture
-    QPixmap pixmap;
-    if (!pixmap.load(":/Resources/Food_32x32.png")) {
+    QPixmap foodPixmap;
+    if (!foodPixmap.load(":/Resources/Food_32x32.png")) {
       qDebug() << "Failed to load QPixmap from path:" << ":/Resources/Food_32x32.png";
     }
 
-    QImage qImage = pixmap.toImage().convertToFormat(QImage::Format_RGBA8888);
-    sf::Image sfImage;
-    sfImage.create(qImage.width(), qImage.height(), reinterpret_cast<const sf::Uint8*>(qImage.bits()));
+    QImage foodqImage = foodPixmap.toImage().convertToFormat(QImage::Format_RGBA8888);
+    sf::Image foodsfImage;
+    foodsfImage.create(foodqImage.width(), foodqImage.height(), reinterpret_cast<const sf::Uint8*>(foodqImage.bits()));
 
-    if (!food_texture_.loadFromImage(sfImage)) {
+    if (!food_texture_.loadFromImage(foodsfImage)) {
       qDebug() << "Failed to create sf::Texture from sf::Image";
     }
 }
@@ -341,26 +394,34 @@ void SimulationCanvas::RenderSimulation(SimulationData* data) {
     // sf::VertexArray creatureShape = createGradientCircle(
     //             creature.GetSize(), color, sf::Color(250,250,250));
     sf::Sprite sprite;
-    sprite.setTexture(texture_);
-
+    sprite.setTexture(creature_texture_);
+    if (creature.GetSize() < 4){
+        sprite.setTextureRect(sf::IntRect(0, 1024, 512, 512));
+    } else if (creature.GetSize() < 10) {
+        sprite.setTextureRect(sf::IntRect(0, 512, 512, 512));
+    } else {
+        sprite.setTextureRect(sf::IntRect(0, 0, 512, 512));
+    }
     //To make the origin at 0 so that the creature rotates correctly
-    sf::Vector2u textureSize = texture_.getSize();
-    sprite.setOrigin(textureSize.x / 2.0f, textureSize.y / 2.0f);
+    sprite.setOrigin(256.0f, 256.0f);
 
     //We multiply by 2 as the creature's size is the radius
-    sprite.setScale(2 * scale_x_ * creature.GetSize(), 2* scale_y_ * creature.GetSize());
+    sprite.setScale(creature.GetSize()/256.0f, creature.GetSize()/256.0f);
     // Use creature coordinates directly for position
     std::pair<double, double> creatureCoordinates = creature.GetCoordinates();
 
     //Add color filter to creature
-    std::vector<int> spriteColor = creature.GetMutable().GetColor();
-    sprite.setColor(sf::Color(spriteColor.at(0), spriteColor.at(1), spriteColor.at(2), 200));
+    shader_.setUniform("hueShift", creature.GetMutable().GetColor());
 
     sf::Transform creatureTransform;
     creatureTransform.translate(creatureCoordinates.first,
                                 creatureCoordinates.second);
     creatureTransform.rotate(creature.GetOrientation() * 180.0f /M_PI);
-    draw(sprite, creatureTransform);
+
+    sf::RenderStates states;
+    states.shader = &shader_;
+    states.transform = creatureTransform;
+    draw(sprite, states);
   }
 }
 

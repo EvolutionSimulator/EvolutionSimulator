@@ -19,7 +19,7 @@ Mutable::Mutable()
     baby_size_(settings::physical_constraints::kDBabySize),
     max_force_(settings::physical_constraints::kDMaxForce),
     growth_factor_(settings::physical_constraints::kDGrowthFactor),
-    color_(3, 100){
+    color_(0.5f){
   UpdateReproduction();
 }
 
@@ -168,11 +168,13 @@ void Mutable::Mutate() {
   if (uniform(gen) < settings::physical_constraints::kMutationRate){
       std::normal_distribution<> dis(0.0,
             settings::physical_constraints::kColorMutationFactor);
-      std::transform(color_.begin(), color_.end(), color_.begin(), [&](int component) -> int {
-          double delta = dis(gen);
-          int newComponent = static_cast<int>(component + delta);
-          return std::clamp(newComponent, 0, 255);
-      });
+      float delta = dis(gen);
+      color_ += delta;
+      if (color_ > 1){
+          color_ = 1;
+      } else if (color_ < 0){
+          color_ = 0;
+      }
   }
 
   //Color
@@ -190,7 +192,7 @@ double Mutable::GetGrowthFactor() const { return growth_factor_; }
 double Mutable::GetVisionFactor() const { return vision_factor_; }
 double Mutable::GetReproductionCooldown() const { return reproduction_cooldown_; }
 double Mutable::GetMaturityAge() const { return maturity_age_; }
-std::vector<int> Mutable::GetColor() const { return color_; }
+float Mutable::GetColor() const { return color_; }
 
 // Setters
 void Mutable::SetEnergyDensity(double value) { energy_density_ = value; }
@@ -204,7 +206,7 @@ void Mutable::SetGrowthFactor(double value) { growth_factor_ = value; }
 void Mutable::SetVisionFactor(double value) { vision_factor_ = value; }
 void Mutable::SetReproductionCooldown(double value) { reproduction_cooldown_ = value; }
 void Mutable::SetMaturityAge(double value) { maturity_age_ = value; }
-void Mutable::SetColor(int red, int green, int blue) { color_ = {red, green, blue}; }
+void Mutable::SetColor(double hue) { color_ = hue; }
 
 /*!
  * @brief Creates a new Mutable entity as a crossover of two existing entities.
@@ -233,11 +235,8 @@ Mutable MutableCrossover(const Mutable &dominant, const Mutable &recessive) {
                              recessive.GetGrowthFactor() )/3);
   crossover.SetVisionFactor((2*dominant.GetVisionFactor() +
                              recessive.GetVisionFactor() )/3);
-  std::vector<int> Dcolor = dominant.GetColor();
-  std::vector<int> Rcolor = recessive.GetColor();
-  crossover.SetColor((2*Dcolor.at(0) + Rcolor.at(0))/3,
-                     (2*Dcolor.at(1) + Rcolor.at(1))/3,
-                     (2*Dcolor.at(2) + Rcolor.at(2))/3);
+  crossover.SetColor((2*dominant.GetColor() +
+                      recessive.GetColor())/3);
   crossover.UpdateReproduction();
   return crossover;
 }

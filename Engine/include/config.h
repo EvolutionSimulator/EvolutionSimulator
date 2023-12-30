@@ -81,7 +81,7 @@ constexpr double kDVisionFactor = 200;
 constexpr double kVisionRadius = 200; //Default values or not used not sure
 constexpr double kVisionAngle = M_PI / 3; //Default values or not used not sure
 constexpr double kVisionARratio = 200 * M_PI / 3;
-constexpr double kColorMutationFactor = 50.0;
+constexpr double kColorMutationFactor = 0.05;
 
 } //namespace physical_constraints
 

@@ -41,6 +41,7 @@ class SimulationCanvas : public QSFMLCanvas {
 
   void InitializeFont();
   void InitializeSprites();
+  void InitializeShader();
 
   protected:
   void mousePressEvent(QMouseEvent *event) override;
@@ -83,7 +84,8 @@ class SimulationCanvas : public QSFMLCanvas {
   double scale_x_;
   double scale_y_;
   sf::Texture food_texture_;
-
+  sf::Texture creature_texture_;
+  sf::Shader shader_;
   bool isDragging = false;
   sf::Vector2f initialClickPosition;
   bool isClicking = false;
