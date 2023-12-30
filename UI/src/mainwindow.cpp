@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
   QRegion region(rect, QRegion::Ellipse);
   qDebug() << region.boundingRect().size();
   ui_->runButton->setMask(region);
-  QPixmap pixMap(":/Toggle_button_sprites/Run.png");
+  QPixmap pixMap(":/Resources/Run.png");
   QIcon icon(pixMap);
   ui_->runButton->setIcon(icon);
   QSize size(50, 50);
@@ -92,13 +92,13 @@ void MainWindow::ToggleSimulation() {
     engine_->Stop();
     engine_thread_.join();
     //change icon of button
-    QPixmap pixMap2(":/Toggle_button_sprites/Run.png");
+    QPixmap pixMap2(":/Resources/Run.png");
     QIcon icon2(pixMap2);
     ui_->runButton->setIcon(icon2);
   } else {
     engine_thread_ = std::thread(&Engine::Run, engine_);
     //change icon of button
-    QPixmap pixMap2(":/Toggle_button_sprites/Pause.png");
+    QPixmap pixMap2(":/Resources/Pause.png");
     QIcon icon2(pixMap2);
     ui_->runButton->setIcon(icon2);
   }
@@ -108,7 +108,6 @@ void MainWindow::RestartSimulation() {
   if (engine_thread_.joinable()) {
     engine_->Stop();
     engine_thread_.join();
-    delete engine_;
   }
   // Create a new instance of the Engine and set it in the UI
   int width = sf::VideoMode::getDesktopMode().width;

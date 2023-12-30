@@ -1,7 +1,8 @@
 <RCC>
     <qresource prefix="/">
-        <file>font.ttf</file>
-        <file>Toggle_button_sprites/Run.png</file>
-        <file>Toggle_button_sprites/Pause.png</file>
+        <file>Resources/font.ttf</file>
+        <file>Resources/Run.png</file>
+        <file>Resources/Pause.png</file>
+	<file>Resources/Food_32x32.png</file>
     </qresource>
 </RCC>

@@ -39,6 +39,9 @@ class SimulationCanvas : public QSFMLCanvas {
 
   void zoom(float factor, sf::Vector2f& zoomPoint);
 
+  void InitializeFont();
+  void InitializeSprites();
+
   protected:
   void mousePressEvent(QMouseEvent *event) override;
   void wheelEvent(QWheelEvent *event) override;
@@ -76,6 +79,7 @@ class SimulationCanvas : public QSFMLCanvas {
   sf::Texture texture_;
   double scale_x_;
   double scale_y_;
+  sf::Texture food_texture_;
 };
 
 sf::Sprite spriteTexture(double size);
