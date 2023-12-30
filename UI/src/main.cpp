@@ -10,7 +10,7 @@
 int main(int argc, char *argv[]) {
   QApplication app(argc, argv);
 
-  SETTINGS.LoadFromFile("./settings.json");
+  // SETTINGS.LoadFromFile("./settings.json");
 
   MainWindow window;
   window.InitializeEngine();

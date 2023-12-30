@@ -8,9 +8,22 @@
 #include "simulation.h"
 
 class SimulationCanvas : public QSFMLCanvas {
-  Q_OBJECT
+ Q_OBJECT
 
  public:
+ sf::RectangleShape trackButton_;
+ sf::Text trackButtonText_;
+ bool trackButtonVisible_ = false;
+ struct CreatureInfo {
+     int id = -1; // ID of the creature, initialize with an invalid value
+     double x = 0.0;
+     double y = 0.0;
+     float size = 0.0f;
+     // You might want to add other properties like health, age, etc., if necessary
+ };
+
+  sf::RenderWindow& GetRenderWindow();
+
   SimulationCanvas(QWidget* Parent);
 
   void SetSimulation(Simulation* simulation);
@@ -20,15 +33,19 @@ class SimulationCanvas : public QSFMLCanvas {
                  double xMin, double xMax, double yMin, double yMax);
 
   // New function declaration for drawing the number of creatures over time
-  void DrawCreatureCountOverTime(sf::RenderWindow& window,
-                                 const std::vector<Creature>& creatures);
+  void DrawCreatureCountOverTime(sf::RenderWindow &window, const std::vector<Creature> &creatures);
+  void DrawVisionCone(sf::RenderTarget& target, const Creature& creature);
 
- protected:
-  void mousePressEvent(QMouseEvent* event) override;
+  protected:
+  void mousePressEvent(QMouseEvent *event) override;
 
- private:
+  private:
   virtual void OnInit() override;
   virtual void OnUpdate() override;
+  std::optional<CreatureInfo> selectedCreatureInfo;
+
+
+  sf::RenderWindow renderWindow_;
 
   sf::Font font_;
 
@@ -41,8 +58,8 @@ class SimulationCanvas : public QSFMLCanvas {
 
   Simulation* simulation_ = nullptr;
 
-  bool isCreatureClicked(const sf::Vector2f& mousePos);
+  bool isCreatureClicked(const sf::Vector2f &mousePos);
 
   void displayInfoPanel();
-  std::string formatCreatureInfo(const Creature& creature);
+  std::string formatCreatureInfo(const Creature &creature);
 };

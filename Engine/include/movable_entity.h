@@ -38,9 +38,10 @@ class MovableEntity : public Entity {
                            double const kMapHeight);
 
  protected:
-  double acceleration_, acceleration_angle, rotational_acceleration;
+  double acceleration_, acceleration_angle_, rotational_acceleration_;
   double velocity_, velocity_angle_, rotational_velocity_;
-  double strafing_difficulty;
+  double strafing_difficulty_;
+  double frictional_coefficient_;
 };
 
 #endif  // CREATURE_HPP

@@ -692,7 +692,4 @@ TEST(NeatTests, ActivationAfterMutateCrossover) {
   Genome crossoverResult = Crossover(genomeA, genomeB);
 
   NeuralNetwork nn = NeuralNetwork(crossoverResult);
-  std::cerr << nn.Activate({1, 1, 1})[0] << std::endl;
-  std::cerr << nn.Activate({1, 0, 1})[0] << std::endl;
-  std::cerr << nn.Activate({0, 1, 1})[0] << std::endl;
 }

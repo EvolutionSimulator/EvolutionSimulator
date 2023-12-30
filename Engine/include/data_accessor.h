@@ -7,10 +7,10 @@ template <typename T>
 class DataAccessor {
  private:
   T& data;
-  std::mutex& mtx;
+  std::recursive_mutex& mtx;
 
  public:
-  DataAccessor(T& data, std::mutex& mtx) : data(data), mtx(mtx) { mtx.lock(); }
+  DataAccessor(T& data, std::recursive_mutex& mtx) : data(data), mtx(mtx) { mtx.lock(); }
 
   ~DataAccessor() { mtx.unlock(); }
 

@@ -35,7 +35,7 @@ class Simulation {
   CreatureManager creature_manager_;
   CollisionManager collision_manager_;
 
-  std::mutex data_mutex_;
-  std::mutex environment_mutex_;
+  std::recursive_mutex data_mutex_;
+  std::recursive_mutex environment_mutex_;
   bool is_running_;
 };

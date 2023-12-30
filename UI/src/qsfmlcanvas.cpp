@@ -1,6 +1,17 @@
 #include "qsfmlcanvas.h"
+#include "settings.h"
 
 QSFMLCanvas::QSFMLCanvas(QWidget* Parent) : QWidget(Parent) {
+  float scaleFactor = this->devicePixelRatioF(); // Get the device pixel ratio
+
+  // Scale the map width and height according to the pixel ratio
+  int scaledWidth = static_cast<int>(SETTINGS.environment.map_width/scaleFactor);
+  int scaledHeight = static_cast<int>(SETTINGS.environment.map_height/scaleFactor);
+
+  // Set the fixed size with the scaled dimensions
+  setFixedSize(scaledWidth, scaledHeight);
+
+
   // Setup some states to allow direct rendering into the widget
   setAttribute(Qt::WA_PaintOnScreen);
   setAttribute(Qt::WA_OpaquePaintEvent);
@@ -47,6 +58,7 @@ QPaintEngine* QSFMLCanvas::paintEngine() const { return nullptr; }
 
 // called when the widget is repainted
 void QSFMLCanvas::paintEvent(QPaintEvent*) {
+  std::cout << "paintEvent" << std::endl;
   OnUpdate();
 
   display();

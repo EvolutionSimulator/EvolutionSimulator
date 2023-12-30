@@ -13,7 +13,7 @@ void FoodManager::InitializeFood(SimulationData &data, Environment &environment)
                       SETTINGS.environment.map_height *
                       SETTINGS.environment.map_width / 100;
   while (size < max_number) {
-    Food new_food = Food();
+    Plant new_food = Plant();
     new_food.RandomInitialization(SETTINGS.environment.map_width,
                                   SETTINGS.environment.map_height,
                                   SETTINGS.environment.max_food_size,
@@ -36,7 +36,7 @@ void FoodManager::GenerateMoreFood(SimulationData &data, Environment &environmen
                         SETTINGS.environment.map_width / 100;
 
     while (size < max_number) {
-      Food new_food = Food();
+      Plant new_food = Plant();
       new_food.RandomInitialization(SETTINGS.environment.map_width,
                                     SETTINGS.environment.map_height,
                                     SETTINGS.environment.max_food_size,

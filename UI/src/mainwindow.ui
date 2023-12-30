@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>600</height>
+    <height>1066</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>20</y>
+      <y>70</y>
       <width>781</width>
       <height>331</height>
      </rect>
@@ -27,8 +27,8 @@
    <widget class="QSpinBox" name="densityFood">
     <property name="geometry">
      <rect>
-      <x>510</x>
-      <y>390</y>
+      <x>550</x>
+      <y>40</y>
       <width>42</width>
       <height>22</height>
      </rect>
@@ -40,24 +40,11 @@
      <number>1000</number>
     </property>
    </widget>
-   <widget class="QPushButton" name="pauseButton">
-    <property name="geometry">
-     <rect>
-      <x>100</x>
-      <y>360</y>
-      <width>80</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>PAUSE</string>
-    </property>
-   </widget>
    <widget class="QPushButton" name="restartButton">
     <property name="geometry">
      <rect>
       <x>280</x>
-      <y>360</y>
+      <y>20</y>
       <width>80</width>
       <height>24</height>
      </rect>
@@ -69,8 +56,8 @@
    <widget class="QLineEdit" name="lineEdit">
     <property name="geometry">
      <rect>
-      <x>510</x>
-      <y>370</y>
+      <x>550</x>
+      <y>20</y>
       <width>113</width>
       <height>21</height>
      </rect>
@@ -82,8 +69,8 @@
    <widget class="QPushButton" name="graphButton">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>390</y>
+      <x>190</x>
+      <y>20</y>
       <width>80</width>
       <height>24</height>
      </rect>
@@ -92,24 +79,11 @@
      <string>GRAPH</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="testerButton">
-    <property name="geometry">
-     <rect>
-      <x>100</x>
-      <y>390</y>
-      <width>80</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>TESTER</string>
-    </property>
-   </widget>
    <widget class="QSpinBox" name="densityCreature">
     <property name="geometry">
      <rect>
-      <x>510</x>
-      <y>440</y>
+      <x>680</x>
+      <y>40</y>
       <width>42</width>
       <height>22</height>
      </rect>
@@ -118,8 +92,8 @@
    <widget class="QLineEdit" name="lineEdit_2">
     <property name="geometry">
      <rect>
-      <x>510</x>
-      <y>420</y>
+      <x>680</x>
+      <y>20</y>
       <width>113</width>
       <height>21</height>
      </rect>
@@ -131,8 +105,8 @@
    <widget class="QPushButton" name="resumeButton">
     <property name="geometry">
      <rect>
-      <x>190</x>
-      <y>360</y>
+      <x>10</x>
+      <y>20</y>
       <width>80</width>
       <height>24</height>
      </rect>
@@ -141,17 +115,62 @@
      <string>RESUME</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="runButton">
+   <widget class="QSlider" name="frictionCoefficientSpinBox">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>360</y>
+      <x>380</x>
+      <y>20</y>
+      <width>160</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>5</number>
+    </property>
+    <property name="maximum">
+     <number>100</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>430</x>
+      <y>40</y>
+      <width>91</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Friction Slider</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="frictionLabel">
+    <property name="geometry">
+     <rect>
+      <x>470</x>
+      <y>30</y>
+      <width>58</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pauseButton">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>20</y>
       <width>80</width>
       <height>24</height>
      </rect>
     </property>
     <property name="text">
-     <string>RUN</string>
+     <string>PAUSE</string>
     </property>
    </widget>
   </widget>
@@ -161,7 +180,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>21</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>

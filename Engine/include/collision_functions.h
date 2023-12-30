@@ -2,6 +2,8 @@
 #define COLLISION_FUNCTIONS_H
 
 #include <vector>
+
+#include "geometry_primitives.h"
 /*!
  * @file collisions.h
  *
@@ -41,4 +43,10 @@ bool CollisionRectangleRectangle(const double tolerance,
                                  const std::pair<double, double> rect2_vertex3,
                                  const std::pair<double, double> rect2_vertex4);
 
+bool IsGridCellPotentiallyInsideCone(Point grid_point, double grid_cell_size,
+                                     Point cone_center, double cone_radius,
+                                     OrientedAngle cone_left_boundary,
+                                     OrientedAngle cone_right_boundary);
+
+std::vector<std::pair<int, int>> SupercoverBresenhamLine(int x0, int y0, int x1, int y1);
 #endif  // COLLISION_FUNCTIONS_H

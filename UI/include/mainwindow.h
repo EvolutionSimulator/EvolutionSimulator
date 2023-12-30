@@ -3,6 +3,7 @@
 #include <QMainWindow>
 #include <thread>
 
+#include "QtCharts/qlineseries.h"
 #include "engine.h"
 
 QT_BEGIN_NAMESPACE  //
@@ -24,15 +25,18 @@ QT_END_NAMESPACE  //
   void ChangeFoodDensity(
       int value);  // Make sure this is under 'private slots:'
   void ChangeCreatureDensity(int value);
+
   void RunEngine();
   void PauseEngine();
   void ResumeEngine();
   void KillEngine();
   void RestartEngine();
   void DisplayGraph();
-  void GraphExampleFunction();
+  void ChangeFriction(int value);
+  void DrawCreaturesOverTimeGraph();
 
  private:
+  double friction_coefficient;
   double creature_density = 0.001;
   double food_density = 0.001;
   Ui::MainWindow* ui_;  // Pointer to all UI widgets
@@ -40,4 +44,8 @@ QT_END_NAMESPACE  //
   Engine* engine_;  // Pointer to the simulation engine
 
   std::thread engine_thread_;  // Thread for running the simulation engine
+
+  double lastRecordedTime_;
+  QTimer *updateTimer;
+
 };

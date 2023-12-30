@@ -19,9 +19,13 @@ class Environment {
   void SetCreatureDensity(double density) { creature_density_ = density; }
   double GetCreatureDensity() const { return creature_density_; }
 
+  void SetFrictionalCoefficient(double friction_coefficient) {friction_coefficient_ = friction_coefficient; }
+  double GetFrictionalCoefficient() const { return friction_coefficient_; }
+
  private:
   double food_density_;  // Variable for creature density
   double creature_density_;
+  double friction_coefficient_;
 };
 
 #endif  // ENVIRONMENT_H

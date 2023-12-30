@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <cmath>  // Added for M_PI
 
 class Settings {
  public:
@@ -35,8 +36,8 @@ class Settings {
   };
 
   struct EnvironmentSettings {
-    double map_width = 1000.0;
-    double map_height = 450.0;
+    double map_width = 1900.0;
+    double map_height = 880.0;
     double creature_density = 0.0005;
     int max_food_size = 15;
     int max_creature_size = 15;
@@ -50,23 +51,45 @@ class Settings {
     double rot_factor = 1.0;
     double grid_cell_size = 50.0;
     int min_creature_size = 2;
-    double reproduction_threshold = 0.90;
+    double reproduction_threshold = 0.80;
     double reproduction_cooldown = 10;
     int input_neurons = 6;
-    int output_neurons = 3;
+    int output_neurons = 4;
     double max_nutritional_value = 5;
     double default_lifespan = 30;
     double photosynthesis_factor = 0.1;
     double frictional_coefficient = 0.5;
+    double plant_proportion = 0.5;
   };
 
   struct EngineSettings {
     double fixed_update_interval = 0.05;
+    double EPS = 1e-7;
+    size_t max_cells_to_find_food = 30;
+  };
+
+  struct PhysicalConstraints {
+    double mutation_rate = 0.2;
+    double max_energy_density = 10.0;
+    double min_energy_loss = 0.1;
+    double d_energy_density = 5.0;
+    double d_energy_loss = 0.5;
+    double d_integrity = 3.0;
+    double d_strafing_difficulty = 0.5;
+    double d_max_size = 10;
+    double d_baby_size = 2;
+    double d_max_force = 10;
+    double d_growth_factor = 10;
+    double d_vision_factor = 200;
+    double vision_radius = 200;
+    double vision_angle = M_PI / 3;
+    double vision_ARratio = 200 * M_PI / 3;
   };
 
   NeatSettings neat;
   EnvironmentSettings environment;
   EngineSettings engine;
+  PhysicalConstraints physical_constraints;
 
  private:
   Settings() {}

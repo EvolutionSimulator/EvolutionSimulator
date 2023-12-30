@@ -2,15 +2,16 @@
 
 #include "cstdlib"
 #include "environment.h"
+
 /*!
  * @brief Default constructor for Food.
  *
  * @details Initializes Food with a random size and calculates its nutritional
  * value.
  */
-Food::Food()
+Food::Food(const double nutritional_value)
     : Entity(std::rand() % SETTINGS.environment.max_food_size),
-      nutritional_value_(size_ * SETTINGS.environment.plant_nutritional_value) {
+      nutritional_value_(size_ * nutritional_value) {
   // Constructor implementation
 }
 
@@ -20,11 +21,11 @@ Food::Food()
  * @param x_coord X-coordinate of the Food.
  * @param y_coord Y-coordinate of the Food.
  */
-Food::Food(const double x_coord, const double y_coord)
+Food::Food(const double x_coord, const double y_coord,
+           const double nutritional_value)
     : Entity(x_coord, y_coord,
              std::rand() % SETTINGS.environment.max_food_size),
-      nutritional_value_(size_ * SETTINGS.environment.plant_nutritional_value) {
-}
+      nutritional_value_(size_ * nutritional_value) {}
 
 /*!
  * @brief Constructor for Food with specified coordinates and size.
@@ -33,11 +34,18 @@ Food::Food(const double x_coord, const double y_coord)
  * @param y_coord Y-coordinate of the Food.
  * @param size Size of the Food.
  */
-Food::Food(const double x_coord, const double y_coord, const double size)
+Food::Food(const double x_coord, const double y_coord, const double size,
+           const double nutritional_value)
     : Entity(x_coord, y_coord, size),
-      nutritional_value_(size_ * SETTINGS.environment.plant_nutritional_value) {
+      nutritional_value_(size_ * nutritional_value) {}
 
-}
+/*!
+ * @brief Constructor for Food with specified size.
+ *
+ * @param size Size of the Food.
+ */
+Food::Food(const double size, const double nutritional_value)
+    : Entity(size), nutritional_value_(size_ * nutritional_value) {}
 
 /*!
  * @brief Simulates the consumption of the Food, setting its state to Dead.
@@ -61,6 +69,25 @@ void Food::SetNutritionalValue(double value) { nutritional_value_ = value; }
  */
 double Food::GetNutritionalValue() const { return nutritional_value_; }
 
+Food::type Food::GetType() const { return type_; }
+
+Plant::Plant() : Food(SETTINGS.environment.plant_nutritional_value) {
+  type_ = plant;
+}
+Plant::Plant(double x_coord, double y_coord)
+    : Food(x_coord, y_coord, SETTINGS.environment.plant_nutritional_value) {
+  type_ = plant;
+}
+Plant::Plant(double x_coord, double y_coord, double size)
+    : Food(x_coord, y_coord, size,
+           SETTINGS.environment.plant_nutritional_value) {
+  type_ = plant;
+}
+Plant::Plant(double size)
+    : Food(size, SETTINGS.environment.plant_nutritional_value) {
+  type_ = plant;
+}
+
 /*!
  * @brief Simulates the growth of the Plant over a period of time.
  *
@@ -69,6 +96,7 @@ double Food::GetNutritionalValue() const { return nutritional_value_; }
  * @details The plant's nutritional value increases with photosynthesis and
  * decreases with age.
  */
+
 void Plant::Grow(double deltaTime) {
   double updated_nutritional_value =
       GetNutritionalValue() + SETTINGS.environment.photosynthesis_factor;
@@ -78,7 +106,7 @@ void Plant::Grow(double deltaTime) {
 
   age_ += deltaTime;
 
-  double aging_factor = 0.02;  // Adjust this factor
+  double aging_factor = 0.02; // Adjust this factor
   updated_nutritional_value = GetNutritionalValue() - aging_factor * age_;
 
   if (updated_nutritional_value >= 0) {
@@ -86,6 +114,23 @@ void Plant::Grow(double deltaTime) {
   } else {
     SetState(Entity::Dead);
   }
+}
+
+Meat::Meat() : Food(SETTINGS.environment.plant_nutritional_value) {
+  type_ = meat;
+}
+Meat::Meat(double x_coord, double y_coord)
+    : Food(x_coord, y_coord, SETTINGS.environment.plant_nutritional_value) {
+  type_ = meat;
+}
+Meat::Meat(double x_coord, double y_coord, double size)
+    : Food(x_coord, y_coord, size,
+           SETTINGS.environment.plant_nutritional_value) {
+  type_ = meat;
+}
+Meat::Meat(double size)
+    : Food(size, SETTINGS.environment.plant_nutritional_value) {
+  type_ = meat;
 }
 
 /*!

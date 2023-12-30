@@ -32,7 +32,9 @@ void Simulation::FixedUpdate(double deltaTime) {
   auto data = GetSimulationData();
   auto environment = GetEnvironment();
 
-  creature_manager_.UpdateAllCreatures(*data, entity_grid_, deltaTime);
+  // std::cout << "Simulation::FixedUpdate: " << data_->world_time_ << std::endl;
+
+  creature_manager_.UpdateAllCreatures(*data, *environment, entity_grid_, deltaTime);
   creature_manager_.ReproduceCreatures(*data, *environment);
   food_manager_.GenerateMoreFood(*data, *environment);
   entity_grid_.RefreshGrid(*data, *environment);

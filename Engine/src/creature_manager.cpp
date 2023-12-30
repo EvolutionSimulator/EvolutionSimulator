@@ -13,7 +13,7 @@ void CreatureManager::InitializeCreatures(SimulationData& data, Environment& env
   // Retrieve information from the environment
   double world_width = SETTINGS.environment.map_width;
   double world_height = SETTINGS.environment.map_height;
-  double creature_density = SETTINGS.environment.creature_density;
+  double creature_density = environment.GetCreatureDensity();
   double max_creature_size = SETTINGS.environment.max_creature_size;
   double min_creature_size = SETTINGS.environment.min_creature_size;
 
@@ -24,10 +24,13 @@ void CreatureManager::InitializeCreatures(SimulationData& data, Environment& env
       if (std::rand() / (RAND_MAX + 1.0) < creature_density) {
         neat::Genome genome(SETTINGS.environment.input_neurons,
                             SETTINGS.environment.output_neurons);
+        Mutable mutables;
         for (int i = 0; i < 40; i++) {
           genome.Mutate();
+          mutables.Mutate();
         }
-        Creature new_creature(genome);
+
+        Creature new_creature(genome, mutables);
         new_creature.RandomInitialization(world_width, world_height,
                                           max_creature_size, min_creature_size);
         data.creatures_.emplace_back(new_creature);
@@ -48,7 +51,7 @@ void CreatureManager::ReproduceCreatures(SimulationData &data, Environment &envi
   double max_creature_size = SETTINGS.environment.max_creature_size;
   double min_creature_size = SETTINGS.environment.min_creature_size;
 
-  while (data.reproduce_.size() > 2) {
+  while (data.reproduce_.size() >= 2) {
     Creature creature1 = data.reproduce_.front();
     data.reproduce_.pop();
     Creature creature2 = data.reproduce_.front();
@@ -60,26 +63,31 @@ void CreatureManager::ReproduceCreatures(SimulationData &data, Environment &envi
           neat::Crossover(creature1.GetGenome(), creature2.GetGenome());
       new_genome.Mutate();
       new_genome.Mutate();
-      Creature new_creature(new_genome);
-      new_creature.RandomInitialization(world_width, world_height,
-                                        max_creature_size, min_creature_size);
+      Mutable new_mutable =
+          MutableCrossover(creature1.GetMutable(), creature2.GetMutable());
+      new_mutable.Mutate();
+      new_mutable.Mutate();
+      Creature new_creature(new_genome, new_mutable);
+      new_creature.RandomInitialization(world_width, world_height);
       new_creature.SetGeneration(creature1.GetGeneration() + 1);
-      data.creatures_.push_back(new_creature);
+      data.creatures_.emplace_back(new_creature);
     } else {
       neat::Genome new_genome =
           neat::Crossover(creature2.GetGenome(), creature1.GetGenome());
       new_genome.Mutate();
       new_genome.Mutate();
-      Creature new_creature(new_genome);
-      new_creature.RandomInitialization(world_width, world_height,
-                                        max_creature_size, min_creature_size);
+      Mutable new_mutable =
+          MutableCrossover(creature2.GetMutable(), creature1.GetMutable());
+      new_mutable.Mutate();
+      new_mutable.Mutate();
+      Creature new_creature(new_genome, new_mutable);
+      new_creature.RandomInitialization(world_width, world_height);
       new_creature.SetGeneration(creature2.GetGeneration() + 1);
-      data.creatures_.push_back(new_creature);
+      data.creatures_.emplace_back(new_creature);
     }
-    creature1.Reproduced();
-    creature2.Reproduced();
   }
 }
+
 
 
 /*!
@@ -108,15 +116,16 @@ void CreatureManager::ModifyAllCreatures(SimulationData &data, double delta_x, d
  * updated.
  */
 
-void CreatureManager::UpdateAllCreatures(SimulationData &data, EntityGrid &entity_grid, double deltaTime) {
+void CreatureManager::UpdateAllCreatures(SimulationData &data, Environment &environment, EntityGrid &entity_grid, double deltaTime) {
   auto grid = entity_grid.GetGrid();
 
   for (Creature& creature : data.creatures_) {
     creature.Update(deltaTime, SETTINGS.environment.map_width,
                     SETTINGS.environment.map_height, grid,
-                    SETTINGS.environment.grid_cell_size);
+                    SETTINGS.environment.grid_cell_size, environment.GetFrictionalCoefficient());
     if (creature.Fit()) {
       data.reproduce_.push(creature);
+      creature.Reproduced();
     }
   }
 }

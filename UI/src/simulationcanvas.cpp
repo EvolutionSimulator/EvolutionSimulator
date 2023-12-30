@@ -1,11 +1,11 @@
 #include "simulationcanvas.h"
-
 #include <QDebug>
 #include <QDir>
 #include <QFile>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QUuid>
+#include "creaturetracker.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/Text.hpp>
@@ -13,45 +13,53 @@
 #include <iostream>
 #include <sstream>
 
+
 SimulationCanvas::SimulationCanvas(QWidget* Parent)
     : QSFMLCanvas(Parent), showInfoPanel(false) {
-  QFile resourceFile(":/font.ttf");
-  if (!resourceFile.open(QIODevice::ReadOnly)) {
-    qDebug() << "Failed to open font resource!";
-    return;
-  }
 
-  // Generate a unique temporary filename
-  QString tempFileName = "temp_font_" +
-                         QUuid::createUuid().toString(QUuid::WithoutBraces) +
-                         ".ttf";
-  QString tempFilePath = QDir::temp().absoluteFilePath(tempFileName);
-  qDebug() << "Temporary file path:" << tempFilePath;
-
-  QFile tempFile(tempFilePath);
-  if (tempFile.exists()) {
-    qDebug() << "Temporary file already exists. Deleting...";
-    if (!tempFile.remove()) {
-      qDebug() << "Failed to remove existing temporary file.";
-      return;
+    QFile resourceFile(":/font.ttf");
+    if (!resourceFile.open(QIODevice::ReadOnly)) {
+        qDebug() << "Failed to open font resource!";
+        return;
     }
-  }
 
-  if (!resourceFile.copy(tempFilePath)) {
-    qDebug() << "Failed to copy font to temporary file!";
-    qDebug() << "Error:" << resourceFile.errorString();
-    return;
-  }
-  resourceFile.close();
+    // Generate a unique temporary filename
+    QString tempFileName = "temp_font_" + QUuid::createUuid().toString(QUuid::WithoutBraces)
+                           + ".ttf";
+    QString tempFilePath = QDir::temp().absoluteFilePath(tempFileName);
+    qDebug() << "Temporary file path:" << tempFilePath;
 
-  if (!font_.loadFromFile(tempFilePath.toStdString())) {
-    qDebug() << "Failed to load font from file!";
+    QFile tempFile(tempFilePath);
+    if (tempFile.exists()) {
+        qDebug() << "Temporary file already exists. Deleting...";
+        if (!tempFile.remove()) {
+            qDebug() << "Failed to remove existing temporary file.";
+            return;
+        }
+    }
+
+    if (!resourceFile.copy(tempFilePath)) {
+        qDebug() << "Failed to copy font to temporary file!";
+        qDebug() << "Error:" << resourceFile.errorString();
+        return;
+    }
+    resourceFile.close();
+
+    if (!font_.loadFromFile(tempFilePath.toStdString())) {
+        qDebug() << "Failed to load font from file!";
+        QFile::remove(tempFilePath);
+        return;
+    }
+
+    trackButton_.setSize(sf::Vector2f(100, 30));         // Example size
+    trackButton_.setFillColor(sf::Color(100, 100, 200)); // Example color
+    trackButtonText_.setFont(font_);                     // Assuming you've already loaded a font
+    trackButtonText_.setString("Track");
+    trackButtonText_.setCharacterSize(15);
+    trackButtonText_.setFillColor(sf::Color::White);
+
+    // Clean up the temporary file after use
     QFile::remove(tempFilePath);
-    return;
-  }
-
-  // Clean up the temporary file after use
-  QFile::remove(tempFilePath);
 }
 
 void SimulationCanvas::SetSimulation(Simulation* simulation) {
@@ -61,43 +69,103 @@ void SimulationCanvas::SetSimulation(Simulation* simulation) {
 Simulation* SimulationCanvas::GetSimulation() { return simulation_; }
 
 // called when the widget is first rendered
-void SimulationCanvas::OnInit() { clear(sf::Color(0, 255, 0)); }
+void SimulationCanvas::OnInit()
+{
+  clear(sf::Color(0, 255, 0));
+}
 
 void SimulationCanvas::OnUpdate() {
-  RenderSimulation(simulation_->GetSimulationData());
+  auto data = simulation_->GetSimulationData();
+  RenderSimulation(data);
 
-  if (showInfoPanel && clickedCreaturePos) {
-    sf::Vector2f panelSize(200.f, 100.f);
-    sf::Vector2f panelPosition(clickedCreaturePos->first,
-                               clickedCreaturePos->second);
+  // Check if a creature is selected and draw the red border if true
+  if (showInfoPanel && selectedCreatureInfo) {
+    // Right info panel setup
+    sf::Vector2f panelSize(200, getSize().y);  // Width of 200 and full height of the canvas
+    sf::Vector2f panelPosition(getSize().x - panelSize.x, 0);  // Positioned on the right side
 
+    // Info panel background
     sf::RectangleShape panel(panelSize);
-    panel.setFillColor(sf::Color(50, 50, 50, 205));
-    panel.setOutlineThickness(2.0f);
-    panel.setOutlineColor(sf::Color::Black);
+    panel.setFillColor(sf::Color(50, 50, 20, 205));  // Semi-transparent
     panel.setPosition(panelPosition);
-
-    sf::Text infoText;
-
-    // Set the font for the text
-    infoText.setFont(font_);
-
-    // Using the creature information stored in the creatureInfo member
-    // Assuming creatureInfo is updated in the mousePressEvent method
-    infoText.setString(
-        creatureInfo.toStdString());  // Convert QString to std::string
-    infoText.setCharacterSize(15);
-    infoText.setFillColor(sf::Color::White);
-    infoText.setPosition(panelPosition.x + 10, panelPosition.y + 10);
-
     draw(panel);
-    draw(infoText);
-  } else if (showInfoPanel) {
+
+    trackButton_.setPosition(panelPosition.x + 10, panelPosition.y + panelSize.y - 40);
+    trackButtonText_.setPosition(trackButton_.getPosition().x + 10, trackButton_.getPosition().y + 5);
+
+    // Draw the track button
+
+    draw(trackButton_);
+    draw(trackButtonText_);
+
+
+    const auto& creatures = data->creatures_;
+    auto creature_it = std::find_if(creatures.begin(), creatures.end(),
+                                    [this](const Creature& c) {
+                                        return c.GetID() == selectedCreatureInfo->id;
+                                    });
+    auto it = std::find_if(creatures.begin(), creatures.end(), [this](const Creature& c) {
+        return c.GetID() == selectedCreatureInfo->id;
+    });
+
+    if (creature_it != creatures.end()) {
+      const Creature& creature = *it;
+      creatureInfo = QString::fromStdString(formatCreatureInfo(creature));
+
+      if (selectedCreatureInfo && creature.GetID() == selectedCreatureInfo->id) {
+
+          sf::CircleShape redCircle(creature.GetSize()); // Adjust as needed
+          redCircle.setOutlineColor(sf::Color::Red);
+          redCircle.setOutlineThickness(2); // Adjust thickness as needed
+          redCircle.setFillColor(sf::Color::Transparent);
+          redCircle.setPosition(creature.GetCoordinates().first - creature.GetSize(),
+                                creature.GetCoordinates().second - creature.GetSize());
+          draw(redCircle);
+
+          DrawVisionCone(*this, creature);
+
+          // Check if the creature's health is 0 and display the message
+          if (creature.GetHealth() == 0) {
+              creatureInfo = QString::fromStdString("Creature " + std::to_string(creature.GetID()) + " is dead");
+          } else {
+              // Update the creature info normally
+              creatureInfo = QString::fromStdString(formatCreatureInfo(creature));
+          }
+      }
+
+      // Prepare and draw the creature info text inside the panel
+      sf::Text infoText;
+      infoText.setFont(font_);
+      infoText.setString(creatureInfo.toStdString());
+      infoText.setCharacterSize(15);
+      infoText.setFillColor(sf::Color::White);
+      infoText.setPosition(panelPosition.x + 10, 10);  // Adjust the Y position as needed
+      draw(infoText);
+    }
+  }else if (showInfoPanel) {
     std::cout << "Info panel flag is set, but no creature position is recorded."
               << std::endl;
-  } else {
-    // Any other logic when the info panel is not shown
   }
+
+  sf::Vector2i mousePixelPos = sf::Mouse::getPosition(*this);
+  sf::Vector2f mousePos = mapPixelToCoords(mousePixelPos);
+
+  // Prepare the text to display the mouse coordinates
+  sf::Text mouseCoordsText;
+  mouseCoordsText.setFont(font_);
+  std::ostringstream ss;
+  ss << "(X: " << mousePos.x << " Y: " << mousePos.y << ")";
+  mouseCoordsText.setString(ss.str());
+  mouseCoordsText.setCharacterSize(12);
+  mouseCoordsText.setFillColor(sf::Color::White);
+
+  // Position the text on the bottom right corner
+  sf::FloatRect textRect = mouseCoordsText.getLocalBounds();
+  mouseCoordsText.setOrigin(textRect.left + textRect.width, textRect.top + textRect.height);
+  mouseCoordsText.setPosition(getSize().x - 10, getSize().y - 5);
+
+  // Draw the mouse coordinates text
+  draw(mouseCoordsText);
 }
 
 sf::VertexArray createGradientCircle(float radius, const sf::Color& centerColor,
@@ -134,8 +202,14 @@ void SimulationCanvas::RenderSimulation(DataAccessor<SimulationData> data) {
 
   // Iterate through food and create a gradient circle shape for each
   for (const auto& food : data->food_entities_) {
-    sf::VertexArray foodShape = createGradientCircle(
-        food.GetSize(), sf::Color(50, 100, 49), sf::Color(150, 250, 148));
+    sf::VertexArray foodShape;
+    if (food.GetType() == Food::type::plant) {
+        foodShape = createGradientCircle(
+                    food.GetSize(), sf::Color(50, 100, 49), sf::Color(150, 250, 148));
+    } else if (food.GetType() == Food::type::meat) {
+        foodShape = createGradientCircle(
+                    food.GetSize(), sf::Color(100, 50, 49), sf::Color(250, 150, 148));
+    }
 
     std::pair<double, double> foodCoordinates = food.GetCoordinates();
     sf::Transform foodTransform;
@@ -304,27 +378,63 @@ void SimulationCanvas::DrawCreatureCountOverTime(
 }
 
 void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
-  sf::Vector2f mousePos =
-      mapPixelToCoords(sf::Vector2i(event->pos().x(), event->pos().y()));
+  // Adjust coordinates for screen scaling
+  float scaleFactor = this->devicePixelRatioF(); // Get the device pixel ratio from the QWidget
+
+  // Convert QPoint to sf::Vector2i and adjust for the scaling factor
+  sf::Vector2i scaledPos(static_cast<int>(event->pos().x() * scaleFactor),
+                         static_cast<int>(event->pos().y() * scaleFactor));
+
+  // Map the scaled pixel coordinates to world coordinates
+  sf::Vector2f mousePos = mapPixelToCoords(scaledPos);
+
+  qDebug() << "Mouse Pressed at: " << mousePos.x << ", " << mousePos.y;
+
+  if (showInfoPanel) {
+    auto bounds = trackButton_.getGlobalBounds();
+    qDebug() << "Track Button Bounds: " << bounds.left << ", " << bounds.top << ", " << bounds.width << ", " << bounds.height;
+  }
 
   auto data = simulation_->GetSimulationData();
 
+  if (showInfoPanel && trackButton_.getGlobalBounds().contains(mousePos)) {
+    qDebug() << "Track Button Clicked";
+    if (selectedCreatureInfo) {
+      const auto& creatures = data->creatures_;
+      auto it = std::find_if(creatures.begin(), creatures.end(), [this](const Creature& c) {
+          return c.GetID() == selectedCreatureInfo->id;
+      });
+
+      if (it != creatures.end()) {
+          const Creature& selectedCreature = *it;
+          CreatureTracker tracker(selectedCreature);
+          tracker.Show();
+      }
+    }
+  }
+
   for (const auto& creature : data->creatures_) {
-    auto [x, y] = creature.GetCoordinates();
-    sf::Vector2f creaturePos(x, y);
-    if (sqrt(pow(mousePos.x - creaturePos.x, 2) +
-             pow(mousePos.y - creaturePos.y, 2)) <=
-        20) {  // Assuming a creature radius of 10
+    auto [creatureX, creatureY] = creature.GetCoordinates();
+    float creatureSize = creature.GetSize();
+    sf::Vector2f creaturePos(creatureX, creatureY);
+
+    if (sqrt(pow(mousePos.x - creaturePos.x, 2) + pow(mousePos.y - creaturePos.y, 2)) <= creatureSize) {
+      qDebug() << "Creature Clicked: ID" << creature.GetID();
       showInfoPanel = true;
-      clickedCreaturePos = std::make_pair(mousePos.x, mousePos.y);
-      creatureInfo = QString::fromStdString(formatCreatureInfo(creature));
+      selectedCreatureInfo = CreatureInfo{creature.GetID(), creatureX, creatureY, creatureSize};
       repaint();
       return;
     }
   }
+
+  qDebug() << "Click Outside, closing panel";
   showInfoPanel = false;
+  selectedCreatureInfo.reset();
+  repaint();
 }
 
+
+// Functions checking if a creature has been clicked
 bool SimulationCanvas::isCreatureClicked(const sf::Vector2f& mousePos) {
   auto data = simulation_->GetSimulationData();
 
@@ -333,7 +443,7 @@ bool SimulationCanvas::isCreatureClicked(const sf::Vector2f& mousePos) {
     sf::Vector2f creaturePos(x, y);
     if (sqrt(pow(mousePos.x - creaturePos.x, 2) +
              pow(mousePos.y - creaturePos.y, 2)) <=
-        20) {  // Assuming a creature radius of 10
+        creature.GetSize()+1) {
       return true;
     }
   }
@@ -348,14 +458,51 @@ void SimulationCanvas::displayInfoPanel() {
   }
 }
 
+// Structure of the info panel (appearing when a creature is clicked)
 std::string SimulationCanvas::formatCreatureInfo(const Creature& creature) {
   std::stringstream ss;
-  ss << "Creature\n";
-  ss << "Size: " << creature.GetSize()
-     << "\n";  // Assuming Creature class has GetSize method
-  ss << "Health: " << creature.GetHealth()
-     << "\n";  // Assuming Creature class has GetHealth method
-  ss << "Energy Level: " << creature.GetEnergy()
-     << "\n";  // Assuming Creature class has GetEnergyLevel method
+  ss << "Creature ID: " << creature.GetID() << "\n\n";
+  ss << "Size: " << creature.GetSize() << "\n";
+  ss << "Age: " << creature.GetAge() << "\n";
+  ss << "Generation: " << creature.GetGeneration() << "\n";
+  ss << "Health: " << creature.GetHealth() << "\n";
+  ss << "Energy Level: " << creature.GetEnergy() << "\n";
+  ss << "Velocity: " << creature.GetVelocity() << "\n\n";
+  auto [x, y] = creature.GetCoordinates();
+  ss << "(x=" << x << ", y=" << y << ")\n";
   return ss.str();
 }
+
+
+void SimulationCanvas::DrawVisionCone(sf::RenderTarget& target, const Creature& creature) {
+
+  double visionRadius = creature.GetVisionRadius();
+  double visionAngle = creature.GetVisionAngle();
+
+  double creatureOrientation = creature.GetOrientation();
+
+  double leftRad = creatureOrientation - visionAngle / 2.0;
+  double rightRad = creatureOrientation + visionAngle / 2.0;
+
+  auto [creatureX, creatureY] = creature.GetCoordinates();
+
+  std::vector<sf::Vertex> triangleFan;
+  triangleFan.push_back(sf::Vertex(sf::Vector2f(creatureX, creatureY), sf::Color::Transparent));
+
+  int numPoints = 30;
+  for (int i = 0; i <= numPoints; ++i) {
+    double angle = leftRad + (i * (rightRad - leftRad) / numPoints);
+    double x = creatureX + visionRadius * cos(angle);
+    double y = creatureY + visionRadius * sin(angle);
+    triangleFan.push_back(sf::Vertex(sf::Vector2f(x, y), sf::Color(255, 255, 255, 150)));
+  }
+
+  for (size_t i = 1; i < triangleFan.size() - 1; ++i) {
+    sf::VertexArray triangle(sf::Triangles, 3);
+    triangle[0] = triangleFan[0];
+    triangle[1] = triangleFan[i];
+    triangle[2] = triangleFan[i + 1];
+    target.draw(triangle);
+  }
+}
+
