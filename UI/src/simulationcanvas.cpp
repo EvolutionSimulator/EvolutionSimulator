@@ -19,6 +19,24 @@ SimulationCanvas::SimulationCanvas(QWidget* Parent)
   render_lambda_ = [this](SimulationData* data) {
     this->RenderSimulation(data);
   };
+  //Load textures for the sprites
+  QPixmap pixmap;
+  if (!pixmap.load(":/Toggle_button_sprites/Pause.png")) {
+    qDebug() << "Failed to load QPixmap from path:" << ":/Toggle_button_sprites/Pause.png";
+  }
+
+  QImage qImage = pixmap.toImage().convertToFormat(QImage::Format_RGBA8888);
+  sf::Image sfImage;
+  sfImage.create(qImage.width(), qImage.height(), reinterpret_cast<const sf::Uint8*>(qImage.bits()));
+
+  if (!texture_.loadFromImage(sfImage)) {
+    qDebug() << "Failed to create sf::Texture from sf::Image";
+  }
+
+  scale_x_ = 1.0/texture_.getSize().x;
+  scale_y_ = 1.0/texture_.getSize().y;
+
+
   int width = sf::VideoMode::getDesktopMode().width;
   int height = sf::VideoMode::getDesktopMode().height;
   float scaleFactor = this->devicePixelRatioF(); // Get the device pixel ratio
@@ -296,9 +314,18 @@ void SimulationCanvas::RenderSimulation(SimulationData* data) {
   for (const auto& creature : data->creatures_) {
     int generation = creature.GetGeneration();
     sf::Color color(20 + generation * 20, 77, 64);
-    sf::VertexArray creatureShape = createGradientCircle(
-                creature.GetSize(), color, sf::Color(250,250,250));
+    // sf::VertexArray creatureShape = createGradientCircle(
+    //             creature.GetSize(), color, sf::Color(250,250,250));
+    sf::Sprite creatureShape;
+    creatureShape.setTexture(texture_);
 
+    //To make the origin at 0 so that the creature rotates correctly
+    sf::Vector2u textureSize = texture_.getSize();
+    creatureShape.setOrigin(textureSize.x / 2.0f, textureSize.y / 2.0f);
+
+    //We multiply by 2 as the creature's size is the radius
+    creatureShape.setScale(2 * scale_x_ * creature.GetSize(), 2* scale_y_ * creature.GetSize());
+    // Use creature coordinates directly for position
     std::pair<double, double> creatureCoordinates = creature.GetCoordinates();
     sf::Transform creatureTransform;
     creatureTransform.translate(creatureCoordinates.first,
@@ -642,13 +669,4 @@ void SimulationCanvas::zoom(float factor, sf::Vector2f& zoomPoint) {
     update();
 }
 
-sf::Sprite spriteTexture(double size) {
-    sf::Texture texture;
-    if (!texture.loadFromFile(":/Toggle_buton_sprites/Pause.png")) {
-        qDebug()  << 'Failed to open resource';
-    }
-    sf::Sprite sprite;
-    sprite.setTexture(texture);
-    sprite.setScale(size, size);
-    return sprite;
-}
+
