@@ -520,6 +520,9 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
   // Map the scaled pixel coordinates to world coordinates
   sf::Vector2f mousePos = mapPixelToCoords(scaledPos);
 
+  initialClickPosition = mousePos;
+  isClicking = true;
+
   qDebug() << "Mouse Pressed at: " << mousePos.x << ", " << mousePos.y;
 
   if (showInfoPanel) {
@@ -699,4 +702,45 @@ void SimulationCanvas::zoom(float factor, sf::Vector2f& zoomPoint) {
     update();
 }
 
+void SimulationCanvas::mouseMoveEvent(QMouseEvent* event) {
+    float scaleFactor = this->devicePixelRatioF();
+    sf::Vector2i scaledPos(static_cast<int>(event->position().x() * scaleFactor),
+                           static_cast<int>(event->position().y() * scaleFactor));
+    sf::Vector2f currentMousePosition = mapPixelToCoords(scaledPos);
 
+    if (isClicking) {
+        float distance = sqrt(pow(currentMousePosition.x - initialClickPosition.x, 2) +
+                              pow(currentMousePosition.y - initialClickPosition.y, 2));
+
+        if (distance > settings::ui::KDraggingSensitivity) {
+      qDebug() << "Switched to dragging";
+      isDragging = true;
+      isClicking = false;
+        }
+    }
+
+    if (isDragging) {
+        sf::Vector2f delta = initialClickPosition - currentMousePosition;
+        qDebug() << "Moving by "<< delta.x<< " "<< delta.y;
+        sf::View view = getView();
+        view.move(delta);
+        setView(view);
+        initialClickPosition = currentMousePosition;
+    }
+}
+
+void SimulationCanvas::mouseReleaseEvent(QMouseEvent* event) {
+    qDebug() << "Mouse released";
+    if (isDragging) {
+        isDragging = false;
+    }
+    isClicking = false;
+}
+
+void SimulationCanvas::resizeEvent(QResizeEvent* event) {
+    sf::Vector2u newSize(event->size().width(), event->size().height());
+    sf::View view = getView();
+    view.setSize(newSize.x, newSize.y);
+    view.setCenter(newSize.x / 2, newSize.y / 2);
+    setView(view);
+}
