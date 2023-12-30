@@ -21,8 +21,8 @@ SimulationCanvas::SimulationCanvas(QWidget* Parent)
   };
   //Load textures for the sprites
   QPixmap pixmap;
-  if (!pixmap.load(":/Toggle_button_sprites/Pause.png")) {
-    qDebug() << "Failed to load QPixmap from path:" << ":/Toggle_button_sprites/Pause.png";
+  if (!pixmap.load(":/Resources/Pause.png")) {
+    qDebug() << "Failed to load QPixmap from path:" << ":/Resources/Pause.png";
   }
 
   QImage qImage = pixmap.toImage().convertToFormat(QImage::Format_RGBA8888);
@@ -48,51 +48,70 @@ SimulationCanvas::SimulationCanvas(QWidget* Parent)
   // Set the fixed size with the scaled dimensions
   setFixedSize(scaledWidth, scaledHeight);
 
-    QFile resourceFile(":/font.ttf");
-    if (!resourceFile.open(QIODevice::ReadOnly)) {
-        qDebug() << "Failed to open font resource!";
-        return;
-    }
+  InitializeFont();
+  InitializeSprites();
 
-    // Generate a unique temporary filename
-    QString tempFileName = "temp_font_" + QUuid::createUuid().toString(QUuid::WithoutBraces)
-                           + ".ttf";
-    QString tempFilePath = QDir::temp().absoluteFilePath(tempFileName);
-    qDebug() << "Temporary file path:" << tempFilePath;
-
-    QFile tempFile(tempFilePath);
-    if (tempFile.exists()) {
-        qDebug() << "Temporary file already exists. Deleting...";
-        if (!tempFile.remove()) {
-            qDebug() << "Failed to remove existing temporary file.";
-            return;
-        }
-    }
-
-    if (!resourceFile.copy(tempFilePath)) {
-        qDebug() << "Failed to copy font to temporary file!";
-        qDebug() << "Error:" << resourceFile.errorString();
-        return;
-    }
-    resourceFile.close();
-
-    if (!font_.loadFromFile(tempFilePath.toStdString())) {
-        qDebug() << "Failed to load font from file!";
-        QFile::remove(tempFilePath);
-        return;
-    }
-
-    trackButton_.setSize(sf::Vector2f(100, 30));         // Example size
-    trackButton_.setFillColor(sf::Color(100, 100, 200)); // Example color
-    trackButtonText_.setFont(font_);                     // Assuming you've already loaded a font
-    trackButtonText_.setString("Track");
-    trackButtonText_.setCharacterSize(15);
-    trackButtonText_.setFillColor(sf::Color::White);
-
-    // Clean up the temporary file after use
-    QFile::remove(tempFilePath);
+  trackButton_.setSize(sf::Vector2f(100, 30));         // Example size
+  trackButton_.setFillColor(sf::Color(100, 100, 200)); // Example color
+  trackButtonText_.setFont(font_);                     // Assuming you've already loaded a font
+  trackButtonText_.setString("Track");
+  trackButtonText_.setCharacterSize(15);
+  trackButtonText_.setFillColor(sf::Color::White);
 }
 
+void SimulationCanvas::InitializeFont(){
+  QFile resourceFile(":/Resources/font.ttf");
+  if (!resourceFile.open(QIODevice::ReadOnly)) {
+    qDebug() << "Failed to open font resource!";
+    return;
+  }
+
+  // Generate a unique temporary filename
+  QString tempFileName = "temp_font_" + QUuid::createUuid().toString(QUuid::WithoutBraces)
+          + ".ttf";
+  QString tempFilePath = QDir::temp().absoluteFilePath(tempFileName);
+  qDebug() << "Temporary file path:" << tempFilePath;
+
+  QFile tempFile(tempFilePath);
+  if (tempFile.exists()) {
+    qDebug() << "Temporary file already exists. Deleting...";
+    if (!tempFile.remove()) {
+      qDebug() << "Failed to remove existing temporary file.";
+      return;
+    }
+  }
+
+  if (!resourceFile.copy(tempFilePath)) {
+    qDebug() << "Failed to copy font to temporary file!";
+    qDebug() << "Error:" << resourceFile.errorString();
+    return;
+  }
+  resourceFile.close();
+
+  if (!font_.loadFromFile(tempFilePath.toStdString())) {
+    qDebug() << "Failed to load font from file!";
+    QFile::remove(tempFilePath);
+    return;
+  }
+  // Clean up the temporary file after use
+  QFile::remove(tempFilePath);
+}
+
+void SimulationCanvas::InitializeSprites(){
+    //Medium food texture
+    QPixmap pixmap;
+    if (!pixmap.load(":/Resources/Food_32x32.png")) {
+      qDebug() << "Failed to load QPixmap from path:" << ":/Resources/Food_32x32.png";
+    }
+
+    QImage qImage = pixmap.toImage().convertToFormat(QImage::Format_RGBA8888);
+    sf::Image sfImage;
+    sfImage.create(qImage.width(), qImage.height(), reinterpret_cast<const sf::Uint8*>(qImage.bits()));
+
+    if (!food_texture_.loadFromImage(sfImage)) {
+      qDebug() << "Failed to create sf::Texture from sf::Image";
+    }
+}
 void SimulationCanvas::SetSimulation(Simulation* simulation) {
   simulation_ = simulation;
 }
@@ -291,23 +310,28 @@ sf::VertexArray createGradientCircle(float radius, const sf::Color& centerColor,
 
 // use this to process the simulation data and render it on the screen
 void SimulationCanvas::RenderSimulation(SimulationData* data) {
-  clear(sf::Color(9, 109, 6));
+  clear(sf::Color(20, 22, 69));
 
-  // Iterate through food and create a gradient circle shape for each
+  // Iterate through food and load the corresponding sprite
+  // Note that we are assuming to be working with a sprite sheet of 256x256 per sprite
+  int spriteIndex = 0;
   for (const auto& food : data->food_entities_) {
-    sf::VertexArray foodShape;
-    if (food.GetType() == Food::type::plant) {
-        foodShape = createGradientCircle(
-                    food.GetSize(), sf::Color(50, 100, 49), sf::Color(150, 250, 148));
-    } else if (food.GetType() == Food::type::meat) {
-        foodShape = createGradientCircle(
-                    food.GetSize(), sf::Color(100, 50, 49), sf::Color(250, 150, 148));
-    }
+    sf::Sprite foodSprite;
+    foodSprite.setTexture(food_texture_);
 
+    if (food.GetType() == Food::type::plant) {
+      foodSprite.setTextureRect(sf::IntRect(0, spriteIndex * 256, 256, 256));
+    } else if (food.GetType() == Food::type::meat) {
+      foodSprite.setTextureRect(sf::IntRect(256, spriteIndex * 256, 256, 256));
+    }
+    spriteIndex = spriteIndex == 2 ? 0 : spriteIndex+1;
+    foodSprite.setOrigin(128.0f, 128.0f);
+
+    foodSprite.setScale(food.GetSize()/128.0f, food.GetSize()/128.0f);
     std::pair<double, double> foodCoordinates = food.GetCoordinates();
     sf::Transform foodTransform;
     foodTransform.translate(foodCoordinates.first, foodCoordinates.second);
-    draw(foodShape, foodTransform);
+    draw(foodSprite, foodTransform);
   }
 
   // Iterate through creatures and create a gradient circle shape for each
@@ -316,22 +340,27 @@ void SimulationCanvas::RenderSimulation(SimulationData* data) {
     sf::Color color(20 + generation * 20, 77, 64);
     // sf::VertexArray creatureShape = createGradientCircle(
     //             creature.GetSize(), color, sf::Color(250,250,250));
-    sf::Sprite creatureShape;
-    creatureShape.setTexture(texture_);
+    sf::Sprite sprite;
+    sprite.setTexture(texture_);
 
     //To make the origin at 0 so that the creature rotates correctly
     sf::Vector2u textureSize = texture_.getSize();
-    creatureShape.setOrigin(textureSize.x / 2.0f, textureSize.y / 2.0f);
+    sprite.setOrigin(textureSize.x / 2.0f, textureSize.y / 2.0f);
 
     //We multiply by 2 as the creature's size is the radius
-    creatureShape.setScale(2 * scale_x_ * creature.GetSize(), 2* scale_y_ * creature.GetSize());
+    sprite.setScale(2 * scale_x_ * creature.GetSize(), 2* scale_y_ * creature.GetSize());
     // Use creature coordinates directly for position
     std::pair<double, double> creatureCoordinates = creature.GetCoordinates();
+
+    //Add color filter to creature
+    std::vector<int> spriteColor = creature.GetMutable().GetColor();
+    sprite.setColor(sf::Color(spriteColor.at(0), spriteColor.at(1), spriteColor.at(2), 200));
+
     sf::Transform creatureTransform;
     creatureTransform.translate(creatureCoordinates.first,
                                 creatureCoordinates.second);
     creatureTransform.rotate(creature.GetOrientation() * 180.0f /M_PI);
-    draw(creatureShape, creatureTransform);
+    draw(sprite, creatureTransform);
   }
 }
 

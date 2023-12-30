@@ -1,6 +1,6 @@
 #ifndef MUTABLE_H
 #define MUTABLE_H
-
+#include <vector>
 
 class Mutable
 {
@@ -24,6 +24,7 @@ public:
   double GetVisionFactor()  const;
   double GetReproductionCooldown() const;
   double GetMaturityAge() const;
+  std::vector<int> GetColor() const;
 
   // Setters
   void SetEnergyDensity(double value);
@@ -37,6 +38,7 @@ public:
   void SetVisionFactor(double value);
   void SetReproductionCooldown(double value);
   void SetMaturityAge(double value);
+  void SetColor(int red, int green, int blue);
 
 private:
   //Any values added here need to be included in the complexity, mutation, and crossover functions
@@ -53,6 +55,7 @@ private:
   double reproduction_cooldown_; /*!< Cooldown period before the creature can
                                     reproduce again. */
   double maturity_age_;
+  std::vector<int> color_;
 };
 
 Mutable MutableCrossover(const Mutable& dominant, const Mutable& recessive);
