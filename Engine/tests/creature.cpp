@@ -1,6 +1,6 @@
-#include <creature.h>
+#include <entities/creature.h>
 #include <gtest/gtest.h>
-#include "geometry_primitives.h"
+#include "core/geometry_primitives.h"
 
 /*!
  * @file creature.cpp

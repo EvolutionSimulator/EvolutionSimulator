@@ -11,11 +11,16 @@
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), ui_(new Ui::MainWindow), friction_coefficient(0.0), lastRecordedTime_(0.0) {
+    : QMainWindow(parent), ui_(new Ui::MainWindow), engine_(nullptr), friction_coefficient(0.0), lastRecordedTime_(0.0) {
   ui_->setupUi(this);
+
+  InitializeEngine();
+  RunEngine();
+  PauseEngine();
+
   // Calculate total size needed for the window based on canvas size and additional widgets/controls
-  int totalWidth = settings::environment::kMapWidth + 30;
-  int totalHeight = settings::environment::kMapHeight + 300; // add extra height for other controls if needed
+  int totalWidth = SETTINGS.environment.map_width + 30;
+  int totalHeight = SETTINGS.environment.map_height + 300; // add extra height for other controls if needed
 
   float scaleFactor = this->devicePixelRatioF(); // Get the device pixel ratio
   int scaledWidth = static_cast<int>(totalWidth/scaleFactor);
@@ -23,15 +28,17 @@ MainWindow::MainWindow(QWidget *parent)
 
   // Resize the main window to fit the canvas and other controls
   resize(scaledWidth, scaledHeight);
-  ui_->densityFood->setMinimum(1);
-  ui_->densityFood->setMaximum(1000);
-  connect(ui_->runButton, &QPushButton::clicked, this, &MainWindow::ToggleSimulation);
-  connect(ui_->densityFood, SIGNAL(valueChanged(int)), this,
-          SLOT(ChangeFoodDensity(int)));
-  connect(ui_->densityCreature, SIGNAL(valueChanged(int)), this,
-          SLOT(ChangeCreatureDensity(int)));
+
+  // connect(ui_->densityFood, SIGNAL(valueChanged(int)), this,
+  //        SLOT(ChangeFoodDensity(int)));
+  // connect(ui_->densityCreature, SIGNAL(valueChanged(int)), this,
+  //        SLOT(ChangeCreatureDensity(int)));
   connect(ui_->restartButton, &QPushButton::clicked, this,
-          &MainWindow::RestartSimulation);
+          &MainWindow::RestartEngine);
+  connect(ui_->pauseButton, &QPushButton::clicked, this,
+          &MainWindow::PauseEngine);
+  connect(ui_->resumeButton, &QPushButton::clicked, this,
+          &MainWindow::ResumeEngine);
   connect(ui_->graphButton, &QPushButton::clicked, this,
           &MainWindow::DrawCreaturesOverTimeGraph);
   updateTimer = new QTimer(this);
@@ -44,8 +51,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::ChangeFriction(int value) {
   double friction_coefficient = static_cast<double>(value) / 100.0;  // Scale slider value to be in the range 0.05 to 0.20
-  engine_->GetEnvironment().SetFrictionalCoefficient(friction_coefficient);
-  engine_->UpdateEnvironment();
+  engine_->GetSimulation()->GetEnvironment()->SetFrictionalCoefficient(friction_coefficient);
 
   // Update the QLabel to display the current value
   ui_->frictionLabel->setText(QString::number(friction_coefficient, 'f', 2));  // Display with 2 decimal places
@@ -60,46 +66,75 @@ MainWindow::~MainWindow() {
   delete ui_;
 }
 
-void MainWindow::SetEngine(Engine *engine) {
-  engine_ = engine;
-  ui_->canvas->SetSimulation(engine_->GetSimulation());
-}
-
 void MainWindow::ChangeFoodDensity(int value) {
-  food_density = static_cast<double>(value) / 1000.0;     // Convert to density
-  engine_->GetEnvironment().SetFoodDensity(food_density); // Update the density
-  engine_->UpdateEnvironment(); // Apply the updated density
+  food_density = static_cast<double>(value) / 1000.0;      // Convert to density
+
+  auto environment = engine_->GetSimulation()->GetEnvironment();
+  environment->SetFoodDensity(food_density);  // Update the density
 }
 
 void MainWindow::ChangeCreatureDensity(int value) {
-  creature_density = static_cast<double>(value) / 10000.0; // Convert to density
-  RestartSimulation(); // restart simulation with new creature density
+  creature_density =
+      static_cast<double>(value) / 10000.0;  // Convert to density
+  RestartEngine();  // restart simulation with new creature density
 }
 
-void MainWindow::RunSimulation() {
-  if (!engine_thread_.joinable()) {
-    engine_thread_ = std::thread(&Engine::Run, engine_);
+void MainWindow::InitializeEngine() {
+  if (!engine_) {
+    std::cout << "Creating new engine..." << std::endl;
+    engine_ = new Engine();
+    ui_->canvas->SetSimulation(engine_->GetSimulation());
   }
 }
 
-void MainWindow::ToggleSimulation() {
-  if (engine_thread_.joinable()) {
+void MainWindow::RunEngine() {
+  if (engine_) {
+    if (!engine_thread_.joinable()) {
+      std::cout << "Starting engine on a separate thread..." << std::endl;
+      engine_thread_ = std::thread(&Engine::Run, engine_);
+    } else {
+      engine_->Resume();
+    }
+  }
+}
+
+void MainWindow::RestartEngine() {
+  KillEngine();
+
+  InitializeEngine();
+
+  RunEngine();
+}
+
+void MainWindow::PauseEngine() {
+  if (engine_) {
+    engine_->Pause();
+  }
+}
+
+void MainWindow::ResumeEngine() {
+  if (engine_) {
+    engine_->Resume();
+  }
+}
+
+void MainWindow::KillEngine() {
+  if (engine_) {
+    std::cout << "Stopping engine..." << std::endl;
     engine_->Stop();
+  }
+
+  if (engine_thread_.joinable()) {
+    std::cout << "Joining engine thread..." << std::endl;
     engine_thread_.join();
   } else {
     engine_thread_ = std::thread(&Engine::Run, engine_);
   }
-}
 
-void MainWindow::RestartSimulation() {
-  if (engine_thread_.joinable()) {
-    engine_->Stop();
-    engine_thread_.join();
-  }
-  // Create a new instance of the Engine and set it in the UI
-  Engine *newEngine = new Engine(food_density, creature_density);
-  SetEngine(newEngine);
-  engine_thread_ = std::thread(&Engine::Run, engine_);
+  std::cout << "Deleting engine..." << std::endl;
+  delete engine_;
+  std::cout << "Engine deleted." << std::endl;
+  engine_ = nullptr;
 }
 
 double ExampleGraphFunction(double x) { return x * x; }
@@ -137,43 +172,48 @@ void MainWindow::DisplayGraph() {
 
 
 void MainWindow::DrawCreaturesOverTimeGraph() {
-  if (engine_->GetSimulation()) {
-    // Get the creature count over time from the simulation data
-    std::vector<int> creatureCountOverTime = engine_->GetSimulation()->GetSimulationData()->GetCreatureCountOverTime();
+  // if (engine_->GetSimulation()) {
+  //   // Get the creature count over time from the simulation data
+  //   std::vector<int> creatureCountOverTime = engine_->GetSimulation()->GetSimulationData()->GetCreatureCountOverTime();
 
-    // Check if there's any data to display
-    if (creatureCountOverTime.empty()) {
-        qDebug() << "No data to display.";
-        return;
-    }
+  //   // Check if there's any data to display
+  //   if (creatureCountOverTime.empty()) {
+  //       qDebug() << "No data to display.";
+  //       return;
+  //   }
 
-    // Create a new line series
-    QLineSeries *series = new QLineSeries();
+  //   // Create a new line series
+  //   QLineSeries *series = new QLineSeries();
 
-    // Add data points to the series
-    for (size_t i = 0; i < creatureCountOverTime.size(); ++i) {
-        series->append(i, creatureCountOverTime[i]);
-    }
+  //   auto data = engine_->GetSimulation()->GetSimulationData();
+  //   // Pass relevant information to the drawing function directly
+  //   ui_->canvas->DrawCreatureCountOverTime(graphWindow, data->creatures_);
 
-    // Create a chart and add the series to it
-    QChart *chart = new QChart();
-    chart->addSeries(series);
-    chart->createDefaultAxes();
+  //   // Add data points to the series
+  //   for (size_t i = 0; i < creatureCountOverTime.size(); ++i) {
+  //       series->append(i, creatureCountOverTime[i]);
+  //   }
 
-    // Create a chart view with the chart
-    QChartView *chartView = new QChartView(chart);
-    chartView->setRenderHint(QPainter::Antialiasing);
 
-    // Create a dialog to display the graph
-    QDialog *dialog = new QDialog(this);
-    dialog->setWindowTitle("Creature Count Over Time");
-    QVBoxLayout *layout = new QVBoxLayout(dialog);
-    layout->addWidget(chartView);
-    dialog->setLayout(layout);
-    dialog->resize(800, 600);
+  //   // Create a chart and add the series to it
+  //   QChart *chart = new QChart();
+  //   chart->addSeries(series);
+  //   chart->createDefaultAxes();
 
-    // Show the dialog modally and connect it to delete later
-    connect(dialog, &QDialog::finished, dialog, &QObject::deleteLater);
-    dialog->exec();
-  }
+  //   // Create a chart view with the chart
+  //   QChartView *chartView = new QChartView(chart);
+  //   chartView->setRenderHint(QPainter::Antialiasing);
+
+  //   // Create a dialog to display the graph
+  //   QDialog *dialog = new QDialog(this);
+  //   dialog->setWindowTitle("Creature Count Over Time");
+  //   QVBoxLayout *layout = new QVBoxLayout(dialog);
+  //   layout->addWidget(chartView);
+  //   dialog->setLayout(layout);
+  //   dialog->resize(800, 600);
+
+  //   // Show the dialog modally and connect it to delete later
+  //   connect(dialog, &QDialog::finished, dialog, &QObject::deleteLater);
+  //   dialog->exec();
+  // }
 }

@@ -4,7 +4,7 @@
 #include <thread>
 
 #include "QtCharts/qlineseries.h"
-#include "engine.h"
+#include "core/engine.h"
 
 QT_BEGIN_NAMESPACE  //
     namespace Ui {
@@ -19,15 +19,18 @@ QT_END_NAMESPACE  //
   MainWindow(QWidget* parent = nullptr);
   ~MainWindow();
 
-  void SetEngine(Engine* engine);
+  void InitializeEngine();
 
  private slots:  // Slots should be placed under this section
-  void RunSimulation();
   void ChangeFoodDensity(
       int value);  // Make sure this is under 'private slots:'
   void ChangeCreatureDensity(int value);
-  void ToggleSimulation();
-  void RestartSimulation();
+
+  void RunEngine();
+  void PauseEngine();
+  void ResumeEngine();
+  void KillEngine();
+  void RestartEngine();
   void DisplayGraph();
   void ChangeFriction(int value);
   void DrawCreaturesOverTimeGraph();

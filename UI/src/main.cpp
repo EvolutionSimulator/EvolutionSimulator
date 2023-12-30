@@ -1,4 +1,4 @@
-#include <engine.h>
+#include <core/engine.h>
 
 #include <QApplication>
 #include <SFML/Graphics.hpp>
@@ -6,15 +6,14 @@
 #include <thread>
 
 #include "mainwindow.h"
-#include "qsfmlcanvas.h"
 
 int main(int argc, char *argv[]) {
   QApplication app(argc, argv);
 
-  Engine mainEngine;
+  // SETTINGS.LoadFromFile("./settings.json");
 
   MainWindow window;
-  window.SetEngine(&mainEngine);
+  window.InitializeEngine();
   window.show();
 
   int result = app.exec();

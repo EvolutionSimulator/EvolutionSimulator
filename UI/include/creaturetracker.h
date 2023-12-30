@@ -2,7 +2,7 @@
 #define CREATURETRACKER_H
 
 #include <SFML/Graphics.hpp>
-#include <creature.h>
+#include <entities/creature.h>
 #include <deque>
 #include <unordered_map>
 

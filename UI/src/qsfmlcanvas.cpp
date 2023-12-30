@@ -1,12 +1,12 @@
 #include "qsfmlcanvas.h"
-#include "config.h"
+#include "core/settings.h"
 
 QSFMLCanvas::QSFMLCanvas(QWidget* Parent) : QWidget(Parent) {
   float scaleFactor = this->devicePixelRatioF(); // Get the device pixel ratio
 
   // Scale the map width and height according to the pixel ratio
-  int scaledWidth = static_cast<int>(settings::environment::kMapWidth/scaleFactor);
-  int scaledHeight = static_cast<int>(settings::environment::kMapHeight/scaleFactor);
+  int scaledWidth = static_cast<int>(SETTINGS.environment.map_width/scaleFactor);
+  int scaledHeight = static_cast<int>(SETTINGS.environment.map_height/scaleFactor);
 
   // Set the fixed size with the scaled dimensions
   setFixedSize(scaledWidth, scaledHeight);

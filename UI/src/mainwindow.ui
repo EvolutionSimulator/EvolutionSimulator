@@ -24,19 +24,6 @@
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="runButton">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>20</y>
-      <width>80</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>RUN</string>
-    </property>
-   </widget>
    <widget class="QSpinBox" name="densityFood">
     <property name="geometry">
      <rect>
@@ -46,11 +33,17 @@
       <height>22</height>
      </rect>
     </property>
+    <property name="minimum">
+     <number>1</number>
+    </property>
+    <property name="maximum">
+     <number>1000</number>
+    </property>
    </widget>
    <widget class="QPushButton" name="restartButton">
     <property name="geometry">
      <rect>
-      <x>190</x>
+      <x>280</x>
       <y>20</y>
       <width>80</width>
       <height>24</height>
@@ -76,7 +69,7 @@
    <widget class="QPushButton" name="graphButton">
     <property name="geometry">
      <rect>
-      <x>100</x>
+      <x>190</x>
       <y>20</y>
       <width>80</width>
       <height>24</height>
@@ -109,10 +102,23 @@
      <string>Density of Creature:</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="resumeButton">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>80</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>RESUME</string>
+    </property>
+   </widget>
    <widget class="QSlider" name="frictionCoefficientSpinBox">
     <property name="geometry">
      <rect>
-      <x>290</x>
+      <x>380</x>
       <y>20</y>
       <width>160</width>
       <height>25</height>
@@ -131,7 +137,7 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>340</x>
+      <x>430</x>
       <y>40</y>
       <width>91</width>
       <height>16</height>
@@ -152,6 +158,19 @@
     </property>
     <property name="text">
      <string/>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pauseButton">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>20</y>
+      <width>80</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>PAUSE</string>
     </property>
    </widget>
   </widget>

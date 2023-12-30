@@ -1,0 +1,46 @@
+{
+  "neat": {
+    "weight_mutation_rate": 0.2,
+    "standard_deviation_weight": 0.1,
+    "max_weight": 1.0,
+    "min_weight": 0.0,
+    "add_neuron_mutation_rate": 0.05,
+    "add_link_mutation_rate": 0.25,
+    "remove_neuron_mutation_rate": 0.02,
+    "remove_link_mutation_rate": 0.15,
+    "change_weight_mutation_rate": 0.6,
+    "bias_mutation_rate": 0.2,
+    "max_bias": 0.1,
+    "min_bias": 0.0,
+    "change_bias_mutation_rate": 0.6,
+    "adjustment_probability": 0.8
+  },
+  "environment": {
+    "map_width": 1000.0,
+    "map_height": 450.0,
+    "creature_density": 0.0005,
+    "max_food_size": 15,
+    "max_creature_size": 15,
+    "tolerance": 0.001,
+    "default_food_density": 0.005,
+    "energy_to_health": 70.0,
+    "health_to_energy": 10.0,
+    "default_creature_density": 0.0001,
+    "plant_nutritional_value": 2.0,
+    "meat_nutritional_value": 3.0,
+    "rot_factor": 1.0,
+    "grid_cell_size": 50.0,
+    "min_creature_size": 2,
+    "reproduction_threshold": 0.9,
+    "reproduction_cooldown": 10,
+    "input_neurons": 6,
+    "output_neurons": 3,
+    "max_nutritional_value": 5,
+    "default_lifespan": 30,
+    "photosynthesis_factor": 0.1,
+    "frictional_coefficient": 0.5
+  },
+  "engine": {
+    "fixed_update_interval": 0.05
+  }
+}

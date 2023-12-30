@@ -16,11 +16,6 @@
 
 SimulationCanvas::SimulationCanvas(QWidget* Parent)
     : QSFMLCanvas(Parent), showInfoPanel(false) {
-  render_lambda_ = [this](SimulationData* data) {
-    this->RenderSimulation(data);
-  };
-
-
 
     QFile resourceFile(":/font.ttf");
     if (!resourceFile.open(QIODevice::ReadOnly)) {
@@ -79,10 +74,9 @@ void SimulationCanvas::OnInit()
   clear(sf::Color(0, 255, 0));
 }
 
-void SimulationCanvas::OnUpdate()
-{
-  simulation_->ProcessData(render_lambda_);
-  RenderSimulation(simulation_->GetSimulationData());
+void SimulationCanvas::OnUpdate() {
+  auto data = simulation_->GetSimulationData();
+  RenderSimulation(data);
 
   // Check if a creature is selected and draw the red border if true
   if (showInfoPanel && selectedCreatureInfo) {
@@ -105,7 +99,7 @@ void SimulationCanvas::OnUpdate()
     draw(trackButtonText_);
 
 
-    const auto& creatures = simulation_->GetSimulationData()->creatures_;
+    const auto& creatures = data->creatures_;
     auto creature_it = std::find_if(creatures.begin(), creatures.end(),
                                     [this](const Creature& c) {
                                         return c.GetID() == selectedCreatureInfo->id;
@@ -203,7 +197,7 @@ sf::VertexArray createGradientCircle(float radius, const sf::Color& centerColor,
 }
 
 // use this to process the simulation data and render it on the screen
-void SimulationCanvas::RenderSimulation(SimulationData* data) {
+void SimulationCanvas::RenderSimulation(DataAccessor<SimulationData> data) {
   clear(sf::Color(9, 109, 6));
 
   // Iterate through food and create a gradient circle shape for each
@@ -401,10 +395,12 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
     qDebug() << "Track Button Bounds: " << bounds.left << ", " << bounds.top << ", " << bounds.width << ", " << bounds.height;
   }
 
+  auto data = simulation_->GetSimulationData();
+
   if (showInfoPanel && trackButton_.getGlobalBounds().contains(mousePos)) {
     qDebug() << "Track Button Clicked";
     if (selectedCreatureInfo) {
-      const auto& creatures = simulation_->GetSimulationData()->creatures_;
+      const auto& creatures = data->creatures_;
       auto it = std::find_if(creatures.begin(), creatures.end(), [this](const Creature& c) {
           return c.GetID() == selectedCreatureInfo->id;
       });
@@ -417,7 +413,7 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
     }
   }
 
-  for (const auto& creature : simulation_->GetSimulationData()->creatures_) {
+  for (const auto& creature : data->creatures_) {
     auto [creatureX, creatureY] = creature.GetCoordinates();
     float creatureSize = creature.GetSize();
     sf::Vector2f creaturePos(creatureX, creatureY);
@@ -440,7 +436,9 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
 
 // Functions checking if a creature has been clicked
 bool SimulationCanvas::isCreatureClicked(const sf::Vector2f& mousePos) {
-  for (const auto& creature : simulation_->GetSimulationData()->creatures_) {
+  auto data = simulation_->GetSimulationData();
+
+  for (const auto& creature : data->creatures_) {
     auto [x, y] = creature.GetCoordinates();
     sf::Vector2f creaturePos(x, y);
     if (sqrt(pow(mousePos.x - creaturePos.x, 2) +

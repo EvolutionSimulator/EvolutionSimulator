@@ -1,11 +1,11 @@
 #pragma once
 
-#include <engine.h>
+#include <core/engine.h>
 
 #include <SFML/Graphics.hpp>
 
 #include "qsfmlcanvas.h"
-#include "simulation.h"
+#include "simulation/simulation.h"
 
 class SimulationCanvas : public QSFMLCanvas {
  Q_OBJECT
@@ -54,12 +54,9 @@ class SimulationCanvas : public QSFMLCanvas {
   QString creatureInfo;
   QRectF panelRect;
 
-  void RenderSimulation(SimulationData *data);
+  void RenderSimulation(DataAccessor<SimulationData> data);
 
-  Simulation *simulation_ = nullptr;
-  std::function<void(SimulationData *)>
-      render_lambda_; // we will pass this to the ProcessData method of
-                      // Simulation
+  Simulation* simulation_ = nullptr;
 
   bool isCreatureClicked(const sf::Vector2f &mousePos);
 
