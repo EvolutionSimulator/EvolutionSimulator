@@ -330,6 +330,7 @@ void SimulationCanvas::RenderSimulation(SimulationData* data) {
     sf::Transform creatureTransform;
     creatureTransform.translate(creatureCoordinates.first,
                                 creatureCoordinates.second);
+    creatureTransform.rotate(creature.GetOrientation() * 180.0f /M_PI);
     draw(creatureShape, creatureTransform);
   }
 }
