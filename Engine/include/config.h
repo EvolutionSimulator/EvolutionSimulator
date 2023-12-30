@@ -46,7 +46,7 @@ constexpr double kMaxNutritionalValue = 5;
 constexpr double kDefaultLifespan = 30;
 constexpr double kPhotosynthesisFactor = 0.1;
 constexpr double kFrictionalCoefficient =
-    0.5;  // Needs to be less than 1
+    0.15;  // Needs to be less than 1
 }  // namespace environment
 
 namespace engine {
@@ -74,6 +74,11 @@ constexpr double kVisionARratio = 200 * M_PI / 3;
 constexpr double kColorMutationFactor = 50.0;
 
 } //namespace physical_constraints
+
+namespace ui {
+constexpr double KDraggingSensitivity = 1.0f;
+} //namespace ui
+
 }  // namespace settings
 
 #endif  // CONFIG_H
