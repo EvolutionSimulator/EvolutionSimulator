@@ -407,6 +407,7 @@ void SimulationCanvas::RenderSimulation(SimulationData* data) {
 
     //We multiply by 2 as the creature's size is the radius
     sprite.setScale(creature.GetSize()/256.0f, creature.GetSize()/256.0f);
+    sprite.setRotation(90.0f);
     // Use creature coordinates directly for position
     std::pair<double, double> creatureCoordinates = creature.GetCoordinates();
 
