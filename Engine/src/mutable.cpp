@@ -16,7 +16,8 @@ Mutable::Mutable()
     max_size_(settings::physical_constraints::kDMaxSize),
     baby_size_(settings::physical_constraints::kDBabySize),
     max_force_(settings::physical_constraints::kDMaxForce),
-    growth_factor_(settings::physical_constraints::kDGrowthFactor) {
+    growth_factor_(settings::physical_constraints::kDGrowthFactor),
+    stomach_capacity_factor_(settings::physical_constraints::kDStomachCapacity){
   UpdateReproduction();
 }
 
@@ -44,7 +45,8 @@ double Mutable::Complexity() {
                        + integrity_ * 20
                        + 5/(1+strafing_difficulty_)
                        + max_force_ * 2
-                       + 5/growth_factor_) * baby_size_/10;
+                       + 5/growth_factor_
+                       + stomach_capacity_factor_) * baby_size_/10;
   return complexity;
 }
 
@@ -161,6 +163,17 @@ void Mutable::Mutate() {
         vision_factor_ = 0.1;
     }
   }
+
+  //Stomach capacity
+  if (uniform(gen) < settings::physical_constraints::kMutationRate){
+    std::normal_distribution<> dis(0.0,
+                                   settings::physical_constraints::kDStomachCapacity/20);
+    double delta = dis(gen);
+    stomach_capacity_factor_ += delta;
+    if (stomach_capacity_factor_ < 2.0) {
+        vision_factor_ = 2.0;
+    }
+  }
 }
 
 // Getters
@@ -175,6 +188,8 @@ double Mutable::GetGrowthFactor() const { return growth_factor_; }
 double Mutable::GetVisionFactor() const { return vision_factor_; }
 double Mutable::GetReproductionCooldown() const { return reproduction_cooldown_; }
 double Mutable::GetMaturityAge() const { return maturity_age_; }
+double Mutable::GetStomachCapacityFactor() const { return stomach_capacity_factor_; }
+
 
 // Setters
 void Mutable::SetEnergyDensity(double value) { energy_density_ = value; }
@@ -188,6 +203,7 @@ void Mutable::SetGrowthFactor(double value) { growth_factor_ = value; }
 void Mutable::SetVisionFactor(double value) { vision_factor_ = value; }
 void Mutable::SetReproductionCooldown(double value) { reproduction_cooldown_ = value; }
 void Mutable::SetMaturityAge(double value) { maturity_age_ = value; }
+void Mutable::SetStomachCapacityFactor(double value) { stomach_capacity_factor_ = value; }
 
 /*!
  * @brief Creates a new Mutable entity as a crossover of two existing entities.
@@ -216,6 +232,8 @@ Mutable MutableCrossover(const Mutable &dominant, const Mutable &recessive) {
                              recessive.GetGrowthFactor() )/3);
   crossover.SetVisionFactor((2*dominant.GetVisionFactor() +
                              recessive.GetVisionFactor() )/3);
+  crossover.SetStomachCapacityFactor((2*dominant.GetStomachCapacityFactor() +
+                                      recessive.GetStomachCapacityFactor() )/3);
   crossover.UpdateReproduction();
   return crossover;
 }

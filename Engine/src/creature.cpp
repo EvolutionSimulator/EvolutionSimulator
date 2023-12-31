@@ -29,6 +29,7 @@
  * - Reproduction Cooldown: Set to
  * `settings::environment::kReproductionCooldown`.
  * - Age: 0
+ * - Stomach capacity: area of creature * settings::environment::kDStomachCapacityFactor
  */
 Creature::Creature(neat::Genome genome, Mutable mutables)
     : MovableEntity(),
@@ -44,6 +45,7 @@ Creature::Creature(neat::Genome genome, Mutable mutables)
     size_ = mutables.GetBabySize();
     health_ = mutables.GetIntegrity() * pow(size_, 2);
     energy_ = mutables.GetEnergyDensity() * pow(size_, 2);
+    stomach_capacity_ = mutables.GetStomachCapacityFactor() * pow(size_, 2);
 }
 
 
@@ -264,7 +266,6 @@ void Creature::SetAge(double age) {
  * @param nutritional_value The nutritional value of the consumed food.
  */
 void Creature::Eats(double nutritional_value) {
-  velocity_ = 0;
   SetEnergy(GetEnergy() + nutritional_value);
   if (GetEnergy() > max_energy_) {
     BalanceHealthEnergy();
@@ -340,15 +341,23 @@ void Creature::OnCollision(Entity &other_entity, double const kMapWidth,
                            double const kMapHeight) {
   if (Food *food = dynamic_cast<Food *>(&other_entity)) {
     if (food->GetState() == Entity::Alive) {
+
       double max_nutrition = food->GetNutritionalValue() * food->GetSize();
       double hunger = GetMaxEnergy()-GetEnergy();
+      double initial_food_size = food->GetSize();
+      velocity_ = 0;
+
       if (max_nutrition > hunger){
-        Eats(hunger);
+        //Eats(hunger);
         food->SetSize(((max_nutrition-hunger)/max_nutrition)*food->GetSize());
+        stomach_fullness_ += pow(initial_food_size, 2) - pow(food->GetSize(),2);
+        potential_energy_in_stomach_ += hunger;
       }
       else{
-        Eats(max_nutrition);
+        //Eats(max_nutrition);
         food->Eat();
+        stomach_fullness_ += pow(initial_food_size, 2);
+        potential_energy_in_stomach_ += max_nutrition;
       }
     }
   } else {
@@ -376,11 +385,13 @@ void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
   neuron_data_.at(3) = GetRotationalVelocity();
   neuron_data_.at(4) = orientation_food_;
   neuron_data_.at(5) = distance_food_;
+  neuron_data_.at(6) = GetFullnessPercent();
   std::vector<double> output = brain_.Activate(neuron_data_);
   SetAcceleration(std::tanh(output.at(0))*mutable_.GetMaxForce());
   SetAccelerationAngle(std::tanh(output.at(1)) * M_PI);
   SetRotationalAcceleration(std::tanh(output.at(2))*mutable_.GetMaxForce());
   Grow(std::max(std::tanh(output.at(3)) * deltaTime, 0.0));
+  Digest(std::tanh(output.at(4)) * potential_energy_in_stomach_);
 }
 
 /*!
@@ -441,6 +452,7 @@ void Creature::Grow(double energy) {
   double size = GetSize() + energy * mutable_.GetGrowthFactor();
   (size > mutable_.GetMaxSize()) ? SetSize(mutable_.GetMaxSize()) : SetSize(size);
   SetEnergy(GetEnergy() - energy);
+  stomach_capacity_ = mutable_.GetStomachCapacityFactor() * pow(size_, 2);
 }
 
 /*!
@@ -697,4 +709,17 @@ Food *Creature::GetClosestFoodInSight(
     }
   }
   return closest_food;
+}
+
+double Creature::GetStomachCapacity() const {return stomach_capacity_;};
+double Creature::GetStomachFullness() const {return stomach_fullness_;};
+double Creature::GetFullnessPercent() const {return 100 * stomach_fullness_/stomach_capacity_;};
+
+void Creature::Digest(double nutritional_value_quantity)
+{
+  if (nutritional_value_quantity <= 0){return;}
+  Eats(nutritional_value_quantity);
+  double avg_nutritional_value = potential_energy_in_stomach_ / stomach_fullness_;
+  potential_energy_in_stomach_ -= nutritional_value_quantity;
+  stomach_fullness_ -= nutritional_value_quantity/avg_nutritional_value;
 }

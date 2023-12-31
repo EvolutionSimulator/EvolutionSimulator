@@ -79,6 +79,7 @@ class Creature : public MovableEntity {
       double grid_cell_size) const;
 
   void Grow(double energy);
+  void Digest(double quantity);
 
   void Think(std::vector<std::vector<std::vector<Entity *> > > &grid,
              double GridCellSize, double deltaTime);
@@ -88,6 +89,10 @@ class Creature : public MovableEntity {
 
   int GetGeneration() const;
   void SetGeneration(int generation);
+
+  double GetStomachCapacity() const;
+  double GetStomachFullness() const;
+  double GetFullnessPercent() const;
 
  protected:
   double max_energy_;
@@ -116,6 +121,10 @@ class Creature : public MovableEntity {
                             other entities. */
   double vision_angle_;  /*!< The angle of vision for the creature, representing
                             the field of view. */
+
+  double stomach_capacity_; /*!< The stomach capacity (area) */
+  double stomach_fullness_; /*!< How much the stomach is filled (area) */
+  double potential_energy_in_stomach_; /*! Energy to be gained in the stomach */
 };
 
 std::vector<Food *> get_food_at_distance(

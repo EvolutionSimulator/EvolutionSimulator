@@ -24,6 +24,7 @@ public:
   double GetVisionFactor()  const;
   double GetReproductionCooldown() const;
   double GetMaturityAge() const;
+  double GetStomachCapacityFactor() const;
 
   // Setters
   void SetEnergyDensity(double value);
@@ -37,6 +38,8 @@ public:
   void SetVisionFactor(double value);
   void SetReproductionCooldown(double value);
   void SetMaturityAge(double value);
+  void SetStomachCapacityFactor(double value);
+
 
 private:
   //Any values added here need to be included in the complexity, mutation, and crossover functions
@@ -53,6 +56,8 @@ private:
   double reproduction_cooldown_; /*!< Cooldown period before the creature can
                                     reproduce again. */
   double maturity_age_;
+  double stomach_capacity_factor_; /*!< Determines the stomach capacity in relation to
+                            its size. */
 };
 
 Mutable MutableCrossover(const Mutable& dominant, const Mutable& recessive);

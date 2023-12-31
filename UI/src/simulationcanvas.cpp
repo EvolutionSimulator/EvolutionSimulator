@@ -470,6 +470,8 @@ std::string SimulationCanvas::formatCreatureInfo(const Creature& creature) {
   ss << "Health: " << creature.GetHealth() << "\n";
   ss << "Energy Level: " << creature.GetEnergy() << "\n";
   ss << "Velocity: " << creature.GetVelocity() << "\n\n";
+  ss << "Stomach capacity: " << creature.GetStomachCapacity() << "\n\n";
+  ss << "Stomach fulness: " << creature.GetStomachFullness() << "\n\n";
   auto [x, y] = creature.GetCoordinates();
   ss << "(x=" << x << ", y=" << y << ")\n";
   return ss.str();
