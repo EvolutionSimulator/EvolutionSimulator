@@ -24,6 +24,7 @@ public:
   double GetReproductionCooldown() const;
   double GetMaturityAge() const;
   float GetColor() const;
+  double GetStomachCapacityFactor() const;
 
   // Setters
   void SetEnergyDensity(double value);
@@ -38,7 +39,7 @@ public:
   void SetReproductionCooldown(double value);
   void SetMaturityAge(double value);
   void SetColor(double hue);
-
+  void SetStomachCapacityFactor(double value);
   double CompatibilityBetweenMutables(const Mutable& other_mutable);
 private:
   //Any values added here need to be included in the complexity, mutation, and crossover functions
@@ -56,6 +57,8 @@ private:
                                     reproduce again. */
   double maturity_age_;
   float color_;
+  double stomach_capacity_factor_; /*!< Determines the stomach capacity in relation to
+                            its size. */
 };
 
 Mutable MutableCrossover(const Mutable& dominant, const Mutable& recessive);
