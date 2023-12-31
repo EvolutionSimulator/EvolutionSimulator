@@ -830,13 +830,20 @@ void SimulationCanvas::mouseMoveEvent(QMouseEvent* event) {
       isClicking = false;
         }
     }
-
     if (isDragging) {
         sf::Vector2f delta = initialClickPosition - currentMousePosition;
-        qDebug() << "Moving by "<< delta.x<< " "<< delta.y;
+        deltaHistory.push_back(delta);
+        if (deltaHistory.size() > 5) {
+            deltaHistory.pop_front();
+        }
+
+        sf::Vector2f averagedDelta = std::accumulate(deltaHistory.begin(), deltaHistory.end(), sf::Vector2f(0, 0));
+        averagedDelta /= static_cast<float>(deltaHistory.size());
+
         sf::View view = getView();
-        view.move(delta);
+        view.move(averagedDelta);
         setView(view);
+
         initialClickPosition = currentMousePosition;
     }
 }

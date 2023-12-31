@@ -91,6 +91,7 @@ class SimulationCanvas : public QSFMLCanvas {
   bool isDragging = false;
   sf::Vector2f initialClickPosition;
   bool isClicking = false;
+  std::deque<sf::Vector2f> deltaHistory;
 };
 
 sf::Sprite spriteTexture(double size);
