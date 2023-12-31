@@ -446,9 +446,9 @@ void SimulationCanvas::RenderSimulation(SimulationData* data) {
     tail_sprite.setOrigin(384.0f, 384.0f);
 
     //We use a certain proportion because the creature's body doesn't occupy the entirety of the image
-    base_sprite.setScale(creature.GetSize() * 13/4608.0f, creature.GetSize()*13/4608.0f);
-    eyes_sprite.setScale(creature.GetSize() * 13/4608.0f, creature.GetSize()*13/4608.0f);
-    tail_sprite.setScale(creature.GetSize() * 13/4608.0f, creature.GetSize()*13/4608.0f);
+    base_sprite.setScale(creature.GetSize()/208.0f, creature.GetSize()/208.0f);
+    eyes_sprite.setScale(creature.GetSize()/208.0f, creature.GetSize()/208.0f);
+    tail_sprite.setScale(creature.GetSize()/208.0f, creature.GetSize()/208.0f);
 
     //Rotation offset
     base_sprite.setRotation(90.0f);
