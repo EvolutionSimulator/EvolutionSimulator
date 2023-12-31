@@ -137,10 +137,10 @@ void SimulationCanvas::InitializeFont(){
 }
 
 void SimulationCanvas::InitializeSprites(){
-    //Creatures texture
+    //Base Creature texture
     QPixmap creaturePixmap;
-    if (!creaturePixmap.load(":/Resources/Creatures.png")) {
-      qDebug() << "Failed to load QPixmap from path:" << ":/Resources/Creatures.png";
+    if (!creaturePixmap.load(":/Resources/Creature_base.png")) {
+      qDebug() << "Failed to load QPixmap from path:" << ":/Resources/Creature_base.png";
     }
 
     QImage creatureqImage = creaturePixmap.toImage().convertToFormat(QImage::Format_RGBA8888);
@@ -148,6 +148,33 @@ void SimulationCanvas::InitializeSprites(){
     creaturesfImage.create(creatureqImage.width(), creatureqImage.height(), reinterpret_cast<const sf::Uint8*>(creatureqImage.bits()));
 
     if (!creature_texture_.loadFromImage(creaturesfImage)) {
+      qDebug() << "Failed to create sf::Texture from sf::Image";
+    }
+    //Eyes texture
+    QPixmap eyesPixmap;
+    if (!eyesPixmap.load(":/Resources/Creature_eyes.png")) {
+      qDebug() << "Failed to load QPixmap from path:" << ":/Resources/Creature_eyes.png";
+    }
+
+    QImage eyesqImage = eyesPixmap.toImage().convertToFormat(QImage::Format_RGBA8888);
+    sf::Image eyessfImage;
+    eyessfImage.create(eyesqImage.width(), eyesqImage.height(), reinterpret_cast<const sf::Uint8*>(eyesqImage.bits()));
+
+    if (!eyes_texture_.loadFromImage(eyessfImage)) {
+      qDebug() << "Failed to create sf::Texture from sf::Image";
+    }
+
+    //Tail texture
+    QPixmap tailPixmap;
+    if (!tailPixmap.load(":/Resources/Creature_tails.png")) {
+      qDebug() << "Failed to load QPixmap from path:" << ":/Resources/Creature_tails.png";
+    }
+
+    QImage tailqImage = tailPixmap.toImage().convertToFormat(QImage::Format_RGBA8888);
+    sf::Image tailsfImage;
+    tailsfImage.create(tailqImage.width(), tailqImage.height(), reinterpret_cast<const sf::Uint8*>(tailqImage.bits()));
+
+    if (!tail_texture_.loadFromImage(tailsfImage)) {
       qDebug() << "Failed to create sf::Texture from sf::Image";
     }
 
@@ -237,7 +264,7 @@ void SimulationCanvas::OnUpdate()
       draw(energyBarOutline);
       draw(energyBar);
 
-      // Draw the energy bar
+      // Draw the health bar
 
       float healthRatio = static_cast<float>(creature.GetHealth()) / static_cast<float>(creature.GetMutable().GetIntegrity() * pow(creature.GetSize(), 2));
       if (healthRatio < 0 ) {
@@ -258,7 +285,7 @@ void SimulationCanvas::OnUpdate()
 
           sf::CircleShape redCircle(creature.GetSize()); // Adjust as needed
           redCircle.setOutlineColor(sf::Color::Red);
-          redCircle.setOutlineThickness(2); // Adjust thickness as needed
+          redCircle.setOutlineThickness(creature.GetSize()/5); // Adjust thickness as needed
           redCircle.setFillColor(sf::Color::Transparent);
           redCircle.setPosition(creature.GetCoordinates().first - creature.GetSize(),
                                 creature.GetCoordinates().second - creature.GetSize());
@@ -389,25 +416,45 @@ void SimulationCanvas::RenderSimulation(SimulationData* data) {
 
   // Iterate through creatures and create a gradient circle shape for each
   for (const auto& creature : data->creatures_) {
-    int generation = creature.GetGeneration();
-    sf::Color color(20 + generation * 20, 77, 64);
+    // int generation = creature.GetGeneration();
+    // sf::Color color(20 + generation * 20, 77, 64);
     // sf::VertexArray creatureShape = createGradientCircle(
     //             creature.GetSize(), color, sf::Color(250,250,250));
-    sf::Sprite sprite;
-    sprite.setTexture(creature_texture_);
-    if (creature.GetSize() < 4){
-        sprite.setTextureRect(sf::IntRect(0, 1024, 512, 512));
-    } else if (creature.GetSize() < 10) {
-        sprite.setTextureRect(sf::IntRect(0, 512, 512, 512));
-    } else {
-        sprite.setTextureRect(sf::IntRect(0, 0, 512, 512));
-    }
-    //To make the origin at 0 so that the creature rotates correctly
-    sprite.setOrigin(256.0f, 256.0f);
+    sf::Sprite base_sprite;
+    sf::Sprite eyes_sprite;
+    sf::Sprite tail_sprite;
+    base_sprite.setTexture(creature_texture_);
+    eyes_sprite.setTexture(eyes_texture_);
+    tail_sprite.setTexture(tail_texture_);
 
-    //We multiply by 2 as the creature's size is the radius
-    sprite.setScale(creature.GetSize()/256.0f, creature.GetSize()/256.0f);
-    sprite.setRotation(90.0f);
+    //Get which sprites to use depending on the characteristics of the creature
+    int size_type  = std::floor((15 - creature.GetSize())/5); //size is the other way around
+    size_type = size_type > 2 ? 2 : size_type;
+    int eyes_type = std::floor(creature.GetMutable().GetVisionFactor()/100);
+    eyes_type = eyes_type > 3 ? 3 : eyes_type;
+    int tail_type = std::floor(creature.GetMutable().GetMaxForce()/5);
+    tail_type = tail_type > 3 ? 3 : tail_type;
+
+    //Assuming the sprites are size 768x768
+    base_sprite.setTextureRect(sf::IntRect(0, size_type * 768, 768, 768));
+    eyes_sprite.setTextureRect(sf::IntRect(eyes_type * 768, size_type * 768, 768, 768));
+    tail_sprite.setTextureRect(sf::IntRect(tail_type * 768, size_type * 768, 768, 768));
+
+    //To make the origin at 0 so that the creature rotates correctly
+    base_sprite.setOrigin(384.0f, 384.0f);
+    eyes_sprite.setOrigin(384.0f, 384.0f);
+    tail_sprite.setOrigin(384.0f, 384.0f);
+
+    //We use a certain proportion because the creature's body doesn't occupy the entirety of the image
+    base_sprite.setScale(creature.GetSize() * 13/4608.0f, creature.GetSize()*13/4608.0f);
+    eyes_sprite.setScale(creature.GetSize() * 13/4608.0f, creature.GetSize()*13/4608.0f);
+    tail_sprite.setScale(creature.GetSize() * 13/4608.0f, creature.GetSize()*13/4608.0f);
+
+    //Rotation offset
+    base_sprite.setRotation(90.0f);
+    eyes_sprite.setRotation(90.0f);
+    tail_sprite.setRotation(90.0f);
+
     // Use creature coordinates directly for position
     std::pair<double, double> creatureCoordinates = creature.GetCoordinates();
 
@@ -422,7 +469,10 @@ void SimulationCanvas::RenderSimulation(SimulationData* data) {
     sf::RenderStates states;
     states.shader = &shader_;
     states.transform = creatureTransform;
-    draw(sprite, states);
+
+    draw(base_sprite, states);
+    draw(eyes_sprite, states);
+    draw(tail_sprite, states);
   }
 }
 
