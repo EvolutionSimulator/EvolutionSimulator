@@ -7,6 +7,7 @@
  */
 
 #include <algorithm>
+#include <unordered_map>
 #include <optional>
 #include <random>
 #include <set>
