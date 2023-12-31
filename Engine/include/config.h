@@ -50,8 +50,8 @@ constexpr double kGridCellSize = 50.0;
 constexpr int kMinCreatureSize = 2;
 constexpr double kReproductionThreshold = 0.80;
 constexpr double kReproductionCooldown = 10;
-constexpr int kInputNeurons = 7;
-constexpr int kOutputNeurons = 4;
+constexpr int kInputNeurons = 8;
+constexpr int kOutputNeurons = 5;
 constexpr double kMaxNutritionalValue = 5;
 constexpr double kDefaultLifespan = 30;
 constexpr double kPhotosynthesisFactor = 0.1;
@@ -82,6 +82,7 @@ constexpr double kVisionRadius = 200; //Default values or not used not sure
 constexpr double kVisionAngle = M_PI / 3; //Default values or not used not sure
 constexpr double kVisionARratio = 200 * M_PI / 3;
 constexpr double kColorMutationFactor = 0.05;
+constexpr double kDStomachCapacity = 10;
 
 } //namespace physical_constraints
 
