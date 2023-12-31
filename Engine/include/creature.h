@@ -43,8 +43,8 @@ class Creature : public MovableEntity {
   void SetEnergy(double energy);
   double GetMaxEnergy() const;
   void SetMaxEnergy(double max_energy);
-  neat::Genome GetGenome();
-  Mutable GetMutable();
+  neat::Genome GetGenome() const;
+  Mutable GetMutable() const;
 
   void Update(double deltaTime, double const kMapWidth, double const kMapHeight,
               std::vector<std::vector<std::vector<Entity *> > > &grid,
@@ -89,6 +89,8 @@ class Creature : public MovableEntity {
   int GetGeneration() const;
   void SetGeneration(int generation);
 
+
+  bool Compatible(const Creature& other_creature);
  protected:
   double max_energy_;
   double energy_; /*!< Stores the current energy level of the creature. */

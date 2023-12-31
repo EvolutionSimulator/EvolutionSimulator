@@ -38,6 +38,7 @@ public:
   void SetReproductionCooldown(double value);
   void SetMaturityAge(double value);
 
+  double CompatibilityBetweenMutables(const Mutable& other_mutable);
 private:
   //Any values added here need to be included in the complexity, mutation, and crossover functions
   double energy_density_;

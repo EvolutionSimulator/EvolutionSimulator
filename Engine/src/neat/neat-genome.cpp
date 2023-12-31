@@ -607,9 +607,9 @@ double Genome::CompatibilityBetweenGenomes(const Genome& other) const {
 
   // Compute compatibility score based on shared neurons, shared links, and weight similarities
   // Use a formula that considers these factors and assigns a higher score to more compatible genomes
-  double compatibility_score = settings::neat::kWeightSharedNeurons * shared_neurons.size()
-                              + settings::neat::kWeightSharedLinks * shared_link_pairs.size()
-                              + settings::neat::kAverageWeightSharedLinks * total_weight_similarity;
+  double compatibility_score = settings::compatibility::kWeightSharedNeurons * shared_neurons.size()
+                              + settings::compatibility::kWeightSharedLinks * shared_link_pairs.size()
+                              + settings::compatibility::kAverageWeightSharedLinks * total_weight_similarity;
   return compatibility_score;
 }
 }  // namespace neat

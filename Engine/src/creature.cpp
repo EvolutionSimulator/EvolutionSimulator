@@ -214,6 +214,20 @@ void Creature::Reproduced() {
 }
 
 /*!
+ * @brief Determines if the current creature is compatible with another creature.
+ *
+ * @details This function calculates the compatibility between the current creature and another creature based on their genomes and mutable characteristics. It sums the brain distance, derived from genome compatibility, with the mutable distance, derived from mutable characteristics compatibility. The creatures are considered compatible if the sum is less than a predefined compatibility threshold.
+ *
+ * @param other_creature A reference to another `Creature` object for compatibility comparison.
+ * @return bool Returns `true` if the sum of brain and mutable distances is less than the compatibility threshold, indicating compatibility; otherwise returns `false`.
+ */
+bool Creature::Compatible(const Creature& other_creature){
+  double brain_distance = this->GetGenome().CompatibilityBetweenGenomes(other_creature.GetGenome());
+  double mutable_distance = this->GetMutable().CompatibilityBetweenMutables(other_creature.GetMutable());
+  return brain_distance + mutable_distance < settings::compatibility::kCompatibilityThreshold;
+}
+
+/*!
  * @brief Retrieves the maximum energy level of the creature.
  *
  * @details This method returns the upper limit of the creature's energy
@@ -313,7 +327,7 @@ void Creature::Update(double deltaTime, double const kMapWidth,
  *
  * @return The genome of the creature.
  */
-neat::Genome Creature::GetGenome() { return genome_; }
+neat::Genome Creature::GetGenome() const { return genome_; }
 
 /*!
  * @brief Retrieves the creature's mutables
@@ -323,7 +337,7 @@ neat::Genome Creature::GetGenome() { return genome_; }
  *
  * @return The mutables of the creature.
  */
-Mutable Creature::GetMutable() {return mutable_;}
+Mutable Creature::GetMutable() const {return mutable_;}
 
 /*!
  * @brief Handles the collision of the creature with another entity.

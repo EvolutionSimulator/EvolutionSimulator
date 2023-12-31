@@ -139,7 +139,7 @@ void SimulationData::GenerateMoreFood() {
 /*!
  * @brief Handles the reproduction process of creatures in the simulation.
  *
- * @details Pairs creatures from the reproduction queue and creates offspring
+ * @details Pairs creatures by compatibility from the reproduction queue and creates offspring
  * with crossed-over genomes.
  */
 void SimulationData::ReproduceCreatures() {
@@ -147,40 +147,70 @@ void SimulationData::ReproduceCreatures() {
   double world_height = settings::environment::kMapHeight;
   double max_creature_size = settings::environment::kMaxCreatureSize;
   double min_creature_size = settings::environment::kMinCreatureSize;
-  while (reproduce_.size() >= 2) {
+
+  std::queue<Creature> not_reproduced;
+  std::queue<Creature> temp_queue;
+
+  while (!reproduce_.empty()) {
     Creature creature1 = reproduce_.front();
     reproduce_.pop();
-    Creature creature2 = reproduce_.front();
-    reproduce_.pop();
-    double energy1 = creature1.GetEnergy();
-    double energy2 = creature2.GetEnergy();
-    if (energy1 > energy2) {
-      neat::Genome new_genome =
-          neat::Crossover(creature1.GetGenome(), creature2.GetGenome());
-      new_genome.Mutate();
-      new_genome.Mutate();
-      Mutable new_mutable =
-          MutableCrossover(creature1.GetMutable(), creature2.GetMutable());
-      new_mutable.Mutate();
-      new_mutable.Mutate();
-      Creature new_creature(new_genome, new_mutable);
-      new_creature.RandomInitialization(world_width, world_height);
-      new_creature.SetGeneration(creature1.GetGeneration() + 1);
-      AddCreature(new_creature);
-    } else {
-      neat::Genome new_genome =
-          neat::Crossover(creature2.GetGenome(), creature1.GetGenome());
-      new_genome.Mutate();
-      new_genome.Mutate();
-      Mutable new_mutable =
-          MutableCrossover(creature2.GetMutable(), creature1.GetMutable());
-      new_mutable.Mutate();
-      new_mutable.Mutate();
-      Creature new_creature(new_genome, new_mutable);
-      new_creature.RandomInitialization(world_width, world_height);
-      new_creature.SetGeneration(creature2.GetGeneration() + 1);
-      AddCreature(new_creature);
+    bool paired = false;
+
+    // Attempt to pair creature1 with a compatible creature
+    while (!reproduce_.empty() && !paired) {
+      Creature creature2 = reproduce_.front();
+      reproduce_.pop();
+      if (creature1.Compatible(creature2)) {
+        double energy1 = creature1.GetEnergy();
+        double energy2 = creature2.GetEnergy();
+        if (energy1 > energy2) {
+          neat::Genome new_genome =
+                  neat::Crossover(creature1.GetGenome(), creature2.GetGenome());
+          new_genome.Mutate();
+          new_genome.Mutate();
+          Mutable new_mutable =
+                  MutableCrossover(creature1.GetMutable(), creature2.GetMutable());
+          new_mutable.Mutate();
+          new_mutable.Mutate();
+          Creature new_creature(new_genome, new_mutable);
+          new_creature.RandomInitialization(world_width, world_height);
+          new_creature.SetGeneration(creature1.GetGeneration() + 1);
+          AddCreature(new_creature);
+        } else {
+          neat::Genome new_genome =
+                  neat::Crossover(creature2.GetGenome(), creature1.GetGenome());
+          new_genome.Mutate();
+          new_genome.Mutate();
+          Mutable new_mutable =
+                  MutableCrossover(creature2.GetMutable(), creature1.GetMutable());
+          new_mutable.Mutate();
+          new_mutable.Mutate();
+          Creature new_creature(new_genome, new_mutable);
+          new_creature.RandomInitialization(world_width, world_height);
+          new_creature.SetGeneration(creature2.GetGeneration() + 1);
+          AddCreature(new_creature);
+        }
+        paired = true;
+      } else {
+        temp_queue.push(creature2); // Save for next round
+      }
     }
+
+    if (!paired) {
+      not_reproduced.push(creature1); // Save unpaired for next round
+    }
+
+    // Refill reproduce_ with unpaired creatures for next attempt
+    while (!temp_queue.empty()) {
+      reproduce_.push(temp_queue.front());
+      temp_queue.pop();
+    }
+  }
+
+  // Handle remaining unpaired creatures
+  while (!not_reproduced.empty()) {
+    reproduce_.push(not_reproduced.front());
+    not_reproduced.pop();
   }
 }
 
