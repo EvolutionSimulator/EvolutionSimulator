@@ -25,6 +25,9 @@ public:
   double GetMaturityAge() const;
   float GetColor() const;
   double GetStomachCapacityFactor() const;
+  double GetDiet() const;
+  double GetGeneticStrength() const;
+  double GetEatingSpeed() const;
 
   // Setters
   void SetEnergyDensity(double value);
@@ -41,6 +44,10 @@ public:
   void SetColor(double hue);
   void SetStomachCapacityFactor(double value);
   double CompatibilityBetweenMutables(const Mutable& other_mutable);
+  void SetDiet(double value);
+  void SetGeneticStrength(double value);
+  void SetEatingSpeed(double value);
+
 private:
   //Any values added here need to be included in the complexity, mutation, and crossover functions
   double energy_density_;
@@ -59,6 +66,9 @@ private:
   float color_;
   double stomach_capacity_factor_; /*!< Determines the stomach capacity in relation to
                             its size. */
+  double diet_;/*!< Determines whether a creature is herbivore or carnivore */
+  double genetic_strength_; /*! Determines bite stength */
+  double eating_speed_; /*! Determines eating and digestion cooldown */
 };
 
 Mutable MutableCrossover(const Mutable& dominant, const Mutable& recessive);

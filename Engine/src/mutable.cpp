@@ -20,7 +20,10 @@ Mutable::Mutable()
     max_force_(settings::physical_constraints::kDMaxForce),
     growth_factor_(settings::physical_constraints::kDGrowthFactor),
     color_(0.5f),
-    stomach_capacity_factor_(settings::physical_constraints::kDStomachCapacity){
+    stomach_capacity_factor_(settings::physical_constraints::kDStomachCapacity),
+    diet_(settings::physical_constraints::kDDiet),
+    eating_speed_(settings::physical_constraints::KDEatingCooldown),
+    genetic_strength_(settings::physical_constraints::KDGeneticStrength){
   UpdateReproduction();
 }
 
@@ -49,7 +52,9 @@ double Mutable::Complexity() {
                        + 5/(1+strafing_difficulty_)
                        + max_force_ * 2
                        + 5/growth_factor_
-                       + stomach_capacity_factor_) * baby_size_/10;
+                       + stomach_capacity_factor_
+                       + eating_speed_
+                       + genetic_strength_) * baby_size_/12;
   return complexity;
 }
 
@@ -186,8 +191,36 @@ void Mutable::Mutate() {
                                    settings::physical_constraints::kDStomachCapacity/20);
     double delta = dis(gen);
     stomach_capacity_factor_ += delta;
-    if (stomach_capacity_factor_ < 2.0) {
-        vision_factor_ = 2.0;
+    if (stomach_capacity_factor_ < 1.0) {
+        stomach_capacity_factor_ = 1.0;
+    }
+  }
+
+  //Diet
+  if (uniform(gen) < settings::physical_constraints::kMutationRate){
+    std::normal_distribution<> dis(0.0,
+                                   settings::physical_constraints::kDDiet/10);
+    double delta = dis(gen);
+    diet_ += delta;
+    if (diet_ < 0.1) {
+        diet_ = 0.1;
+    }
+    if (diet_ > 0.9) {
+        diet_ = 0.9;
+    }
+  }
+
+  //Genetic Strength
+  if (uniform(gen) < settings::physical_constraints::kMutationRate){
+    std::normal_distribution<> dis(0.0,
+                                   settings::physical_constraints::KDGeneticStrength/10);
+    double delta = dis(gen);
+    genetic_strength_ += delta;
+    if (genetic_strength_  < 0.2) {
+        genetic_strength_ = 0.2;
+    }
+    if (genetic_strength_ > 1.2) {
+        genetic_strength_ = 1.2;
     }
   }
 }
@@ -206,6 +239,9 @@ double Mutable::GetReproductionCooldown() const { return reproduction_cooldown_;
 double Mutable::GetMaturityAge() const { return maturity_age_; }
 float Mutable::GetColor() const { return color_; }
 double Mutable::GetStomachCapacityFactor() const { return stomach_capacity_factor_; }
+double Mutable::GetDiet() const {return diet_; };
+double Mutable::GetGeneticStrength() const {return genetic_strength_; };
+double Mutable::GetEatingSpeed() const {return eating_speed_; };
 
 // Setters
 void Mutable::SetEnergyDensity(double value) { energy_density_ = value; }
@@ -221,6 +257,10 @@ void Mutable::SetReproductionCooldown(double value) { reproduction_cooldown_ = v
 void Mutable::SetMaturityAge(double value) { maturity_age_ = value; }
 void Mutable::SetColor(double hue) { color_ = hue; }
 void Mutable::SetStomachCapacityFactor(double value) { stomach_capacity_factor_ = value; }
+void Mutable::SetDiet(double value) {diet_ = value; };
+void Mutable::SetGeneticStrength(double value) {genetic_strength_= value; };
+void Mutable::SetEatingSpeed(double value) {eating_speed_ = value; };
+
 
 /*!
  * @brief Creates a new Mutable entity as a crossover of two existing entities.
@@ -253,6 +293,12 @@ Mutable MutableCrossover(const Mutable &dominant, const Mutable &recessive) {
                       recessive.GetColor())/3);
   crossover.SetStomachCapacityFactor((2*dominant.GetStomachCapacityFactor() +
                                       recessive.GetStomachCapacityFactor() )/3);
+  crossover.SetDiet((2*dominant.GetDiet() +
+                                      recessive.GetDiet() )/3);
+  crossover.SetGeneticStrength((2*dominant.GetGeneticStrength() +
+                     recessive.GetGeneticStrength() )/3);
+  crossover.SetEatingSpeed((2*dominant.GetEatingSpeed() +
+                                recessive.GetEatingSpeed() )/3);
   crossover.UpdateReproduction();
   return crossover;
 }
