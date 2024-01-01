@@ -6,7 +6,7 @@
 namespace neat {
 
 enum class NeuronType { kInput, kOutput, kHidden };
-enum class ActivationType {sigmoid, tanh, relu, elu, leakyRelu, binary, linear, na};
+enum class ActivationType { sigmoid, relu, elu, leakyRelu, binary, linear };
 
 /*!
  * @class Neuron

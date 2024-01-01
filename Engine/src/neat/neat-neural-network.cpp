@@ -196,8 +196,6 @@ double activation_function(ActivationType n, double x) {
     switch (n) {
         case ActivationType::sigmoid:
             return 1/(1+exp(-x));
-        case ActivationType::tanh:
-            return (exp(x)-exp(-x))/(exp(x)+exp(-x));
         case ActivationType::relu:
             return std::max(0.0,x);
         case ActivationType::leakyRelu:

@@ -577,7 +577,6 @@ void Genome::MutateActivationFunction() {
     }
     std::vector<ActivationType> activationTypes = {
             ActivationType::sigmoid,
-            ActivationType::tanh,
             ActivationType::relu,
             ActivationType::elu,
             ActivationType::leakyRelu,
