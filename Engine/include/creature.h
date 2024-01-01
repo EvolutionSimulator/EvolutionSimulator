@@ -37,7 +37,6 @@ class Creature : public MovableEntity {
   Creature(neat::Genome genome, Mutable mutable_);
 
   void Dies();
-  void Eats(double nutritional_value);
   void UpdateEnergy(double deltaTime);
   double GetEnergy() const;
   void SetEnergy(double energy);
@@ -80,6 +79,7 @@ class Creature : public MovableEntity {
 
   void Grow(double energy);
   void Digest(double quantity);
+  void Bite(Food *food);
 
   void Think(std::vector<std::vector<std::vector<Entity *> > > &grid,
              double GridCellSize, double deltaTime);
@@ -92,7 +92,7 @@ class Creature : public MovableEntity {
 
   double GetStomachCapacity() const;
   double GetStomachFullness() const;
-  double GetFullnessPercent() const;
+  double GetEmptinessPercent() const;
 
  protected:
   double max_energy_;
@@ -122,9 +122,12 @@ class Creature : public MovableEntity {
   double vision_angle_;  /*!< The angle of vision for the creature, representing
                             the field of view. */
 
-  double stomach_capacity_; /*!< The stomach capacity (area) */
+  double stomach_capacity_; /*!< The stomach capacity (area) - mutable proportional to size squared */
   double stomach_fullness_; /*!< How much the stomach is filled (area) */
   double potential_energy_in_stomach_; /*! Energy to be gained in the stomach */
+  double bite_strength_; /*! How much radius of things it can bite - - mutable proportional to size */
+  double eating_cooldown_; /*! How much time it has to wait to bite - mutable*/
+  double digestion_cooldown_; /*! How much time it has to wait to digest - physical constraint*/
 };
 
 std::vector<Food *> get_food_at_distance(

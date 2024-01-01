@@ -25,6 +25,9 @@ public:
   double GetReproductionCooldown() const;
   double GetMaturityAge() const;
   double GetStomachCapacityFactor() const;
+  double GetDiet() const;
+  double GetGeneticStrength() const;
+  double GetEatingSpeed() const;
 
   // Setters
   void SetEnergyDensity(double value);
@@ -39,6 +42,9 @@ public:
   void SetReproductionCooldown(double value);
   void SetMaturityAge(double value);
   void SetStomachCapacityFactor(double value);
+  void SetDiet(double value);
+  void SetGeneticStrength(double value);
+  void SetEatingSpeed(double value);
 
 
 private:
@@ -58,6 +64,9 @@ private:
   double maturity_age_;
   double stomach_capacity_factor_; /*!< Determines the stomach capacity in relation to
                             its size. */
+  double diet_;/*!< Determines whether a creature is herbivore or carnivore */
+  double genetic_strength_; /*! Determines bite stength */
+  double eating_speed_; /*! Determines eating and digestion cooldown */
 };
 
 Mutable MutableCrossover(const Mutable& dominant, const Mutable& recessive);

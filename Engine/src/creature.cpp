@@ -41,11 +41,14 @@ Creature::Creature(neat::Genome genome, Mutable mutables)
       vision_angle_(settings::physical_constraints::kVisionARratio
                     / mutables.GetVisionFactor()),
       age_(0),
-      reproduction_cooldown_ (mutables.GetMaturityAge()) {
+      reproduction_cooldown_ (mutables.GetMaturityAge()),
+      eating_cooldown_ (mutables.GetEatingSpeed()),
+      digestion_cooldown_ (settings::physical_constraints::KDDigestionCooldown) {
     size_ = mutables.GetBabySize();
     health_ = mutables.GetIntegrity() * pow(size_, 2);
     energy_ = mutables.GetEnergyDensity() * pow(size_, 2);
     stomach_capacity_ = mutables.GetStomachCapacityFactor() * pow(size_, 2);
+    bite_strength_ = mutables.GetGeneticStrength() * size_;
 }
 
 
@@ -256,21 +259,7 @@ void Creature::SetAge(double age) {
   age_ = age;
 }
 
-/*!
- * @brief Handles the creature's consumption of food.
- *
- * @details Increases the creature's energy based on the nutritional value of
- * the food consumed. If the resulting energy exceeds the maximum energy limit,
- * it triggers a health balance routine.
- *
- * @param nutritional_value The nutritional value of the consumed food.
- */
-void Creature::Eats(double nutritional_value) {
-  SetEnergy(GetEnergy() + nutritional_value);
-  if (GetEnergy() > max_energy_) {
-    BalanceHealthEnergy();
-  }
-}
+
 
 /*!
  * @brief Updates the creature's state over a given time interval.
@@ -304,6 +293,19 @@ void Creature::Update(double deltaTime, double const kMapWidth,
   } else {
     reproduction_cooldown_ -= deltaTime;
   }
+
+  if (eating_cooldown_ <= 0) {
+    eating_cooldown_ = 0.0;
+  } else {
+    eating_cooldown_ -= deltaTime;
+  }
+
+  if (digestion_cooldown_ <= 0) {
+    digestion_cooldown_ = 0.0;
+  } else {
+    digestion_cooldown_ -= deltaTime;
+  }
+
 }
 
 /*!
@@ -340,25 +342,8 @@ Mutable Creature::GetMutable() {return mutable_;}
 void Creature::OnCollision(Entity &other_entity, double const kMapWidth,
                            double const kMapHeight) {
   if (Food *food = dynamic_cast<Food *>(&other_entity)) {
-    if (food->GetState() == Entity::Alive) {
-
-      double max_nutrition = food->GetNutritionalValue() * food->GetSize();
-      double hunger = GetMaxEnergy()-GetEnergy();
-      double initial_food_size = food->GetSize();
-      velocity_ = 0;
-
-      if (max_nutrition > hunger){
-        //Eats(hunger);
-        food->SetSize(((max_nutrition-hunger)/max_nutrition)*food->GetSize());
-        stomach_fullness_ += pow(initial_food_size, 2) - pow(food->GetSize(),2);
-        potential_energy_in_stomach_ += hunger;
-      }
-      else{
-        //Eats(max_nutrition);
-        food->Eat();
-        stomach_fullness_ += pow(initial_food_size, 2);
-        potential_energy_in_stomach_ += max_nutrition;
-      }
+    if (food->GetState() == Entity::Alive & eating_cooldown_ == 0.0) {
+    Bite(food);
     }
   } else {
     MovableEntity::OnCollision(other_entity, kMapWidth, kMapHeight);
@@ -385,7 +370,7 @@ void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
   neuron_data_.at(3) = GetRotationalVelocity();
   neuron_data_.at(4) = orientation_food_;
   neuron_data_.at(5) = distance_food_;
-  neuron_data_.at(6) = GetFullnessPercent();
+  neuron_data_.at(6) = GetEmptinessPercent();
   std::vector<double> output = brain_.Activate(neuron_data_);
   SetAcceleration(std::tanh(output.at(0))*mutable_.GetMaxForce());
   SetAccelerationAngle(std::tanh(output.at(1)) * M_PI);
@@ -453,6 +438,7 @@ void Creature::Grow(double energy) {
   (size > mutable_.GetMaxSize()) ? SetSize(mutable_.GetMaxSize()) : SetSize(size);
   SetEnergy(GetEnergy() - energy);
   stomach_capacity_ = mutable_.GetStomachCapacityFactor() * pow(size_, 2);
+  bite_strength_ = mutable_.GetGeneticStrength() * size_;
 }
 
 /*!
@@ -713,13 +699,85 @@ Food *Creature::GetClosestFoodInSight(
 
 double Creature::GetStomachCapacity() const {return stomach_capacity_;};
 double Creature::GetStomachFullness() const {return stomach_fullness_;};
-double Creature::GetFullnessPercent() const {return 100 * stomach_fullness_/stomach_capacity_;};
+double Creature::GetEmptinessPercent() const {return 100 * (1 - stomach_fullness_/stomach_capacity_);};
 
+/*!
+ * @brief Handles the creature's digestion of food.
+ *
+ * @details Increases the creature's energy based on the nutritional value of
+ * the food digested. If the resulting energy exceeds the maximum energy limit,
+ * it triggers a health balance routine. Then empties out stomach.
+ *
+ * @param nutritional_value The nutritional value of the food to be digested.
+ */
 void Creature::Digest(double nutritional_value_quantity)
 {
-  if (nutritional_value_quantity <= 0){return;}
-  Eats(nutritional_value_quantity);
+  if (nutritional_value_quantity <= 0 || digestion_cooldown_ > 0.0){return;}
+
+  // Digests the food, increasing energy
+  SetEnergy(GetEnergy() + nutritional_value_quantity);
+  if (GetEnergy() > max_energy_) {
+    BalanceHealthEnergy();
+  }
+
+  // Empties out the stomach space
   double avg_nutritional_value = potential_energy_in_stomach_ / stomach_fullness_;
   potential_energy_in_stomach_ -= nutritional_value_quantity;
   stomach_fullness_ -= nutritional_value_quantity/avg_nutritional_value;
+
+  //Resets digestion cooldown
+  digestion_cooldown_ = settings::physical_constraints::KDDigestionCooldown;
+}
+
+/*!
+ * @brief Handles the biting of the food.
+ *
+ * @details Adds the food it bites to the stomach (increasing fulness and potential
+ * energy). Decreases food size/deletes food that gets bitten.
+ *
+ * @param food The food the creature bites into.
+ */
+void Creature::Bite(Food* food)
+{
+  //Reset eating cooldown, makes creature stop to bite
+  eating_cooldown_ = mutable_.GetEatingSpeed();
+  velocity_ = 0;
+
+  //Bite logic
+  double max_nutrition = 0;
+
+  //Check how much food the creature can eat, depending on bite strength and fullness of stomach
+  double available_space = stomach_capacity_ - stomach_fullness_;
+  double food_to_eat = std::sqrt(std::min(pow(bite_strength_,2), available_space));
+
+  // Check if creature eats the whole food or a part of it
+  if (food_to_eat >= food->GetSize())
+  {
+    max_nutrition = food->GetNutritionalValue() * food->GetSize();
+    stomach_fullness_ += pow(food->GetSize(), 2);
+    food->Eat();
+  }
+  else
+  {
+    double initial_food_size = food->GetSize();
+    double new_radius = std::sqrt(pow(initial_food_size,2) - pow(food_to_eat,2));
+    food->SetSize(new_radius);
+    stomach_fullness_ += pow(food_to_eat, 2);
+    max_nutrition =  food->GetNutritionalValue() * food_to_eat;
+  }
+
+  // Herbivore/carnivore multiplier
+  if (Plant *plant = dynamic_cast<Plant *>(food)) {
+    max_nutrition = max_nutrition * 1/mutable_.GetDiet() / 2;
+  }
+  else if (Meat *meat = dynamic_cast<Meat *>(food)) {
+    max_nutrition = max_nutrition * 1/(1-mutable_.GetDiet()) / 2;
+  }
+
+  //Add nutrition to stomach, make sure capacity is not surpassed
+  potential_energy_in_stomach_ += max_nutrition;
+  if (stomach_fullness_ > stomach_capacity_)
+  {
+    stomach_fullness_ = stomach_capacity_;
+  }
 }
