@@ -6,6 +6,7 @@
 namespace neat {
 
 enum class NeuronType { kInput, kOutput, kHidden };
+enum class ActivationType { sigmoid, relu, elu, leakyRelu, binary, linear };
 
 /*!
  * @class Neuron
@@ -21,20 +22,23 @@ class Neuron {
 
   int GetId() const;
   NeuronType GetType() const;
+  ActivationType GetActivation() const;
   double GetBias() const;
   bool IsActive() const;
 
   void SetBias(double bias);
   void SetActive();
   void SetInactive();
+  void SetActivation(ActivationType activation);
 
  private:
-  static int next_id_; /*!< Static variable used to assign unique IDs to new
+  static int next_id_; /*! Static variable used to assign unique IDs to new
                           neurons. */
-  int id_;             /*!< Unique identifier for the neuron. */
-  NeuronType type_;    /*!< Type of the neuron (input, output, hidden). */
-  double bias_;        /*!< Bias of the neuron. */
-  bool active_;        /*!< Indicates whether the neuron is active or not. */
+  int id_;             /*! Unique identifier for the neuron. */
+  NeuronType type_;    /*! Type of the neuron (input, output, hidden). */
+  ActivationType activation_; /*! Activation function of the neuron. */
+  double bias_;        /*! Bias of the neuron. */
+  bool active_;        /*! Indicates whether the neuron is active or not. */
 };
 
 Neuron CrossoverNeuron(const Neuron &a, const Neuron &b);

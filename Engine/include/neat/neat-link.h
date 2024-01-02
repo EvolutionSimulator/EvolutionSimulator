@@ -20,10 +20,13 @@ class Link {
   int GetOutId() const;
   double GetWeight() const;
   bool IsActive() const;
+  bool IsCyclic() const;
 
   void SetWeight(double weight);
   void SetActive();
   void SetInactive();
+  void SetCyclic();
+  void SetNonCyclic();
 
  private:
   static int
@@ -33,6 +36,7 @@ class Link {
   int out_id_;  /*!< ID of the output neuron. */
   double weight_; /*!< Weight of the connection. */
   bool active_;   /*!< Indicates whether the link is active or not. */
+  bool cyclic_;   /*!< Indicates whether the link introduces a cycle or not. */
 };
 
 Link CrossoverLink(const Link &a, const Link &b);

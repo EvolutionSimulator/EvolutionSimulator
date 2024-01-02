@@ -208,15 +208,15 @@ void Genome::Mutate() {
   if (uniform(gen) < settings::neat::kAddLinkMutationRate) {
     MutateAddLink();
   }
+  /* Removing things can mess up the cycles
+    if (uniform(gen) < settings::neat::kRemoveNeuronMutationRate) {
+      MutateRemoveNeuron();
+    }
 
-  if (uniform(gen) < settings::neat::kRemoveNeuronMutationRate) {
-    MutateRemoveNeuron();
-  }
-
-  if (uniform(gen) < settings::neat::kRemoveLinkMutationRate) {
-    MutateRemoveLink();
-  }
-
+    if (uniform(gen) < settings::neat::kRemoveLinkMutationRate) {
+      MutateRemoveLink();
+    }
+  */
   if (uniform(gen) < settings::neat::kChangeWeightMutationRate) {
     MutateChangeWeight();
   }
@@ -392,6 +392,10 @@ bool Genome::DFS(const Neuron& currentNeuron, std::unordered_set<int>& visited,
   visiting.insert(currentId);
 
   for (const auto& link : links_) {
+    if (link.IsCyclic()) {
+      continue;
+    }
+    // link is not cyclic
     if (link.GetInId() == currentId) {
       int neighborId = link.GetOutId();
       auto neighborIt = std::find_if(
@@ -429,8 +433,9 @@ bool Genome::DetectLoops(const Neuron& startNeuron) {
 /*!
  * @brief Mutates the Genome by adding a new link between neurons.
  *
- * @details Adds a new link between two randomly chosen neurons, ensuring no
- * cycles are formed.
+ * @details Adds a new link between two randomly chosen neurons.
+ * If this creates a cycle, the added link is characterized as cyclic
+ * and its parameter cyclic_ is set to true.
  */
 void Genome::MutateAddLink() {
   std::random_device rd;
@@ -454,9 +459,8 @@ void Genome::MutateAddLink() {
 
   // Check if cycle exists:
   AddLink(Link(n1, n2, 1));
-  Link newl = links_.back();
   if (DetectLoops(neurons_[indexRandomNeuron1])) {
-    RemoveLink(newl.GetId());
+    links_.back().SetCyclic();
     return;
   }
 }
@@ -481,8 +485,13 @@ void Genome::MutateAddNeuron() {
   AddNeuron(Neuron(NeuronType::kHidden, 0.0));
   // disable the initial link between the inId and outId
   int newNeuronId = neurons_.back().GetId();
-  AddLink(Link(RandomLink.GetInId(), newNeuronId, 1));
-  AddLink(Link(newNeuronId, RandomLink.GetOutId(), RandomLink.GetWeight()));
+  Link newlink1(RandomLink.GetInId(), newNeuronId, 1);
+  Link newlink2(newNeuronId, RandomLink.GetOutId(), RandomLink.GetWeight());
+  if (RandomLink.IsCyclic()) {
+    newlink2.SetCyclic();
+  }
+  AddLink(newlink1);
+  AddLink(newlink2);
 }
 
 /*!
@@ -546,6 +555,33 @@ Genome Crossover(const Genome& dominant, const Genome& recessive) {
 
   // Return the new Genome that is a combination of both parents.
   return offspring;
+}
+
+
+
+void Genome::MutateActivationFunction() {
+    if (GetInputCount()+GetOutputCount()==neurons_.size()){
+        return ;
+    }
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<size_t> dist(0, neurons_.size() - 1);
+    size_t indexRandomNeuronHidden = dist(gen);
+    while (neurons_[indexRandomNeuronHidden].GetType() != NeuronType::kHidden) {
+      indexRandomNeuronHidden = dist(gen);
+    }
+    std::vector<ActivationType> activationTypes = {
+            ActivationType::sigmoid,
+            ActivationType::relu,
+            ActivationType::elu,
+            ActivationType::leakyRelu,
+            ActivationType::binary,
+            ActivationType::linear
+        };
+    std::mt19937 generator(rd());
+    std::uniform_int_distribution<int> distribution(0, activationTypes.size() - 1);
+    int randomIndex = distribution(generator);
+    neurons_[indexRandomNeuronHidden].SetActivation(activationTypes[randomIndex]);
 }
 
 bool Genome::FindNeuronById(int targetId, Neuron& foundNeuron) const{

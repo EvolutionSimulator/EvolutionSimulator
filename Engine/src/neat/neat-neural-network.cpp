@@ -35,13 +35,20 @@ NeuralNetwork::NeuralNetwork(const Genome &genom) {
   for (const std::vector<Neuron> &layer : layers) {
     for (const Neuron &neuron : layer) {
       std::vector<NeuronInput> inputs;
+      std::vector<NeuronInput> inputs_from_cycles;
       for (const Link &link : genom.GetLinks()) {
         if (link.GetOutId() == neuron.GetId()) {
           NeuronInput input = {link.GetInId(), link.GetWeight()};
-          inputs.push_back(input);
+          if (link.IsCyclic()) {
+            inputs_from_cycles.push_back(input);
+          } else {
+            inputs.push_back(input);
+          }
         }
       }
-      FeedForwardNeuron ffneuron = {neuron.GetId(), neuron.GetBias(), inputs};
+      FeedForwardNeuron ffneuron = {
+          neuron.GetId(), neuron.GetBias(),   0.0,
+          inputs,         inputs_from_cycles, neuron.GetActivation()};
       ffneurons.push_back(ffneuron);
     }
   }
@@ -56,7 +63,7 @@ NeuralNetwork::NeuralNetwork(const Genome &genom) {
  * @return A vector of output values after network activation.
  */
 std::vector<double> NeuralNetwork::Activate(
-    const std::vector<double> &input_values) const {
+    const std::vector<double> &input_values) {
   assert(input_values.size() == input_ids_.size());
   std::unordered_map<int, double> values;
   for (int i = 0; i < input_values.size(); i++) {
@@ -66,7 +73,7 @@ std::vector<double> NeuralNetwork::Activate(
   for (const FeedForwardNeuron &ffneuron : ffneurons_) {
     if (values.find(ffneuron.id) ==
         values.end()) {  // if ffneuron is not already activated
-      double value = 0;
+      double value = ffneuron.value;
       for (const NeuronInput &input : ffneuron.inputs) {
         // assert(values.find(input.input_id) != values.end()); //previous
         // neurons have to be activated
@@ -78,10 +85,18 @@ std::vector<double> NeuralNetwork::Activate(
 
       if (std::find(output_ids_.begin(), output_ids_.end(), ffneuron.id) ==
           output_ids_.end()) {
-        value = activation_function(value);
+        value = activation_function(ffneuron.activation , value);
       }
 
       values[ffneuron.id] = value;
+    }
+  }
+  // update values stored by ffneurons. this affects those neurons which start a
+  // cycle
+  for (FeedForwardNeuron &ffneuron : ffneurons_) {
+    // ffneuron.value = 0;
+    for (const NeuronInput &neuron_input : ffneuron.inputs_from_cycles) {
+      ffneuron.value += neuron_input.weight * values[neuron_input.input_id];
     }
   }
   std::vector<double> result;
@@ -133,7 +148,8 @@ std::vector<std::vector<Neuron> > get_layers(const Genome &genom) {
               active.end()) {
         bool is_active = true;
         for (const Link &link : links) {
-          if (link.IsActive() && link.GetOutId() == neuron.GetId() &&
+          if (link.IsActive() && !link.IsCyclic() &&
+              link.GetOutId() == neuron.GetId() &&
               std::find(active.begin(), active.end(), link.GetInId()) ==
                   active.end()) {
             is_active = false;
@@ -155,6 +171,10 @@ std::vector<std::vector<Neuron> > get_layers(const Genome &genom) {
   return layers;
 }
 
+std::vector<FeedForwardNeuron> NeuralNetwork::GetNeurons() const {
+  return ffneurons_;
+}
+
 /*!
  * @brief Activation function used in the neural network.
  *
@@ -162,5 +182,21 @@ std::vector<std::vector<Neuron> > get_layers(const Genome &genom) {
  *
  * @return The output of the activation function.
  */
-double activation_function(double x) { return 1 / (1 + exp(-x)); }
+double activation_function(ActivationType n, double x) {
+    switch (n) {
+        case ActivationType::sigmoid:
+            return 1/(1+exp(-x));
+        case ActivationType::relu:
+            return std::max(0.0,x);
+        case ActivationType::leakyRelu:
+            return std::max(0.1*x, x);
+        case ActivationType::binary:
+            return (x >= 0.0) ? 1.0 : 0.0;
+        case ActivationType::linear:
+            return x;
+        default:
+            return x;
+    }
+}
+//double activation_function(double x) { return 1 / (1 + exp(-x)); }
 }  // end of namespace neat

@@ -37,6 +37,7 @@ namespace neat {
     void RemoveNeuron(int id);
     void RemoveLink(int id);
 
+
     void Mutate();
 
     void MutateAddNeuron();

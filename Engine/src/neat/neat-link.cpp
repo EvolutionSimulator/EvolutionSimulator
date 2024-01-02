@@ -25,8 +25,8 @@ Link::Link(int in_id, int out_id, double weight)
       in_id_(in_id),
       out_id_(out_id),
       weight_(weight),
-      active_(true) {}
-
+      active_(true),
+      cyclic_(false) {}
 /*!
  * @brief Gets the unique identifier of the link.
  *
@@ -64,6 +64,13 @@ double Link::GetWeight() const { return weight_; }
 bool Link::IsActive() const { return active_; }
 
 /*!
+ * @brief Checks if the link is cyclic.
+ *
+ * @return True if the link is cyclic, false otherwise.
+ */
+bool Link::IsCyclic() const { return cyclic_; }
+
+/*!
  * @brief Sets the weight of the link.
  *
  * @param weight The new weight to be set for the connection.
@@ -79,6 +86,16 @@ void Link::SetActive() { active_ = true; }
  * @brief Sets the link to be inactive.
  */
 void Link::SetInactive() { active_ = false; }
+
+/*!
+ * @brief Sets the link to be cyclic.
+ */
+void Link::SetCyclic() { cyclic_ = true; }
+
+/*!
+ * @brief Sets the link to be non-cyclic.
+ */
+void Link::SetNonCyclic() { cyclic_ = false; }
 
 /*!
  * @brief Creates a new Link with specified input and output neuron IDs and
