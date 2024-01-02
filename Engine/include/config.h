@@ -83,10 +83,11 @@ constexpr double kVisionAngle = M_PI / 3; //Default values or not used not sure
 constexpr double kVisionARratio = 200 * M_PI / 3;
 constexpr double kColorMutationFactor = 0.05;
 constexpr double kDStomachCapacity = 2;
-constexpr double kDDiet = 1/2; // Default omnivores
+constexpr double kDDiet = 0.5; // Default omnivores
 constexpr double KDEatingCooldown = 1; // Decrease for easier survival
-constexpr double KDDigestionCooldown = 2; // Decrease for easier survival
+constexpr double KDDigestionRate = 3;
 constexpr double KDGeneticStrength = 0.6;
+constexpr double KDAcidToEnergy = 10;
 } //namespace physical_constraints
 
 namespace ui {

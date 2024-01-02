@@ -273,4 +273,53 @@ TEST(CreatureTests, GetClosestFoodInSight_NoFoodInSight) {
 }
 
 
+TEST(CreatureTests, Digest) {
+  // Initialize creature with specific energy and stomach fullness
+  neat::Genome genome(3, 4);
+  Mutable mutables;
+  Creature creature(genome, mutables);
 
+  double deltaTime = 1.0;
+  Plant plant = Plant(3.0);
+  creature.Bite(&plant);
+  creature.AddAcid(1.0);
+
+  double initialEnergy = creature.GetEnergy();
+  double initialStomachFullness = creature.GetStomachFullness();
+
+  creature.SetMaxEnergy(100);
+  creature.Digest(deltaTime);
+
+  ASSERT_GT(creature.GetEnergy(), initialEnergy);
+  ASSERT_LT(creature.GetStomachFullness(), initialStomachFullness);
+}
+
+TEST(CreatureTests, Bite) {
+  neat::Genome genome(3, 4);
+  Mutable mutables;
+  Creature creature(genome, mutables);
+  Plant food = Plant(3.0);
+
+  double initialFoodSize = food.GetSize();
+  double initialStomachFullness = creature.GetStomachFullness();
+
+  creature.Bite(&food);
+
+  ASSERT_LT(food.GetSize(), initialFoodSize);
+  ASSERT_GT(creature.GetStomachFullness(), initialStomachFullness);
+}
+
+TEST(CreatureTests, EmptinessPercent) {
+  neat::Genome genome(3, 4);
+  Mutable mutables;
+  Creature creature(genome, mutables);
+
+  double expectedEmptiness = 0;
+
+  ASSERT_EQ(creature.GetEmptinessPercent(), 100.0);
+
+  Plant food = Plant(3.0);
+  creature.Bite(&food);
+
+  ASSERT_LT(creature.GetStomachFullness(), 100.0);
+}

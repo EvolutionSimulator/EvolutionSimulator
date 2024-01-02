@@ -89,8 +89,9 @@ class Creature : public MovableEntity {
   void ProcessVisionFood(std::vector<std::vector<std::vector<Entity *> > > &grid,
                          double grid_cell_size, double width, double height);
   int GetFoodID() const;
-  void Digest(double quantity);
+  void Digest(double deltaTime);
   void Bite(Food *food);
+  void AddAcid(double quantity);
 
 
   int GetGeneration() const;
@@ -100,6 +101,8 @@ class Creature : public MovableEntity {
   double GetStomachCapacity() const;
   double GetStomachFullness() const;
   double GetEmptinessPercent() const;
+  double GetAcid() const;
+  double GetEnergyInStomach() const;
 
  protected:
   double max_energy_;
@@ -142,7 +145,7 @@ class Creature : public MovableEntity {
   double potential_energy_in_stomach_; /*! Energy to be gained in the stomach */
   double bite_strength_; /*! How much radius of things it can bite - - mutable proportional to size */
   double eating_cooldown_; /*! How much time it has to wait to bite - mutable*/
-  double digestion_cooldown_; /*! How much time it has to wait to digest - physical constraint*/
+  double stomach_acid_; /*! Added when digestion occurs */
 };
 
 std::vector<Food *> get_food_at_distance(

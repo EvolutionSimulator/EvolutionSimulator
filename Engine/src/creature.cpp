@@ -43,7 +43,8 @@ Creature::Creature(neat::Genome genome, Mutable mutables)
       age_(0),
       reproduction_cooldown_ (mutables.GetMaturityAge()),
       eating_cooldown_ (mutables.GetEatingSpeed()),
-      digestion_cooldown_ (settings::physical_constraints::KDDigestionCooldown) {
+      stomach_acid_ (0.0),
+      potential_energy_in_stomach_(0.0){
     size_ = mutables.GetBabySize();
     health_ = mutables.GetIntegrity() * pow(size_, 2);
     energy_ = mutables.GetEnergyDensity() * pow(size_, 2);
@@ -288,6 +289,7 @@ void Creature::Update(double deltaTime, double const kMapWidth,
   this->Move(deltaTime, kMapWidth, kMapHeight);
   this->Rotate(deltaTime);
   this->Think(grid, GridCellSize, deltaTime, kMapWidth, kMapHeight);
+  this->Digest(deltaTime);
   age_ += 0.05;
 
   if (reproduction_cooldown_ <= 0) {
@@ -300,12 +302,6 @@ void Creature::Update(double deltaTime, double const kMapWidth,
     eating_cooldown_ = 0.0;
   } else {
     eating_cooldown_ -= deltaTime;
-  }
-
-  if (digestion_cooldown_ <= 0) {
-    digestion_cooldown_ = 0.0;
-  } else {
-    digestion_cooldown_ -= deltaTime;
   }
 
 }
@@ -382,7 +378,7 @@ void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
   SetAccelerationAngle(std::tanh(output.at(1)) * M_PI);
   SetRotationalAcceleration(std::tanh(output.at(2))*mutable_.GetMaxForce());
   Grow(std::max(std::tanh(output.at(3)) * deltaTime, 0.0));
-  Digest(std::tanh(output.at(4)) * potential_energy_in_stomach_);
+  AddAcid(std::max(std::tanh(output.at(4)) * 10.0, 0.0));
 }
 
 /*!
@@ -764,6 +760,7 @@ Food *Creature::GetClosestFoodInSight(
 double Creature::GetStomachCapacity() const {return stomach_capacity_;};
 double Creature::GetStomachFullness() const {return stomach_fullness_;};
 double Creature::GetEmptinessPercent() const {return 100 * (1 - stomach_fullness_/stomach_capacity_);};
+double Creature::GetEnergyInStomach() const {return potential_energy_in_stomach_;};
 
 /*!
  * @brief Handles the creature's digestion of food.
@@ -774,23 +771,24 @@ double Creature::GetEmptinessPercent() const {return 100 * (1 - stomach_fullness
  *
  * @param nutritional_value The nutritional value of the food to be digested.
  */
-void Creature::Digest(double nutritional_value_quantity)
+void Creature::Digest(double deltaTime)
 {
-  if (nutritional_value_quantity <= 0 || digestion_cooldown_ > 0.0){return;}
+
+  double quantity = std::min(deltaTime * settings::physical_constraints::KDDigestionRate, stomach_acid_);
+  quantity = std::min(quantity,  potential_energy_in_stomach_);
+  stomach_acid_ -= quantity;
 
   // Digests the food, increasing energy
-  SetEnergy(GetEnergy() + nutritional_value_quantity);
+  SetEnergy(GetEnergy() + quantity);
   if (GetEnergy() > max_energy_) {
     BalanceHealthEnergy();
   }
 
   // Empties out the stomach space
   double avg_nutritional_value = potential_energy_in_stomach_ / stomach_fullness_;
-  potential_energy_in_stomach_ -= nutritional_value_quantity;
-  stomach_fullness_ -= nutritional_value_quantity/avg_nutritional_value;
+  potential_energy_in_stomach_ -= quantity;
+  stomach_fullness_ -= quantity/avg_nutritional_value;
 
-  //Resets digestion cooldown
-  digestion_cooldown_ = settings::physical_constraints::KDDigestionCooldown;
 }
 
 /*!
@@ -845,3 +843,12 @@ void Creature::Bite(Food* food)
     stomach_fullness_ = stomach_capacity_;
   }
 }
+
+void Creature::AddAcid(double quantity)
+{
+  double initial_acid = stomach_acid_;
+  stomach_acid_ = std::min(stomach_capacity_, stomach_acid_ + quantity);
+  SetEnergy(GetEnergy() - (stomach_acid_ - initial_acid)/settings::physical_constraints::KDAcidToEnergy);
+}
+
+double Creature::GetAcid() const {return stomach_acid_; };
