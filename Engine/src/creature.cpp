@@ -703,7 +703,10 @@ Food *Creature::GetClosestFoodInSight(
       break;
     }
 
-    assert(processed_cells <= max_cells_to_find_food && "processed_cells exceeded max_cells_to_find_food in GetClosestFoodInSight");
+    //assert(processed_cells <= max_cells_to_find_food && "processed_cells exceeded max_cells_to_find_food in GetClosestFoodInSight");
+    if (processed_cells > max_cells_to_find_food){
+        break;
+    }
 
     for (int dx = -1; dx <= 1; ++dx) {
       for (int dy = -1; dy <= 1; ++dy) {
