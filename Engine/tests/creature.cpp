@@ -235,9 +235,9 @@ TEST(CreatureTests, GetClosestFoodInSight_MultipleFoods) {
   creature.SetOrientation(OrientedAngle(Point(creature_x,creature_y),Point(target_x,target_y)).GetAngle());
   creature.SetVision(2.0, M_PI/3);
 
-//  auto closest_food = creature.GetClosestFoodInSight(grid, gridCellSize);
+  auto closest_food = creature.GetClosestFoodInSight(grid, gridCellSize, Food::type::meat);
 
-//  ASSERT_EQ(closest_food, &meat_1);
+  ASSERT_EQ(closest_food, &meat_1);
 }
 
 TEST(CreatureTests, GetClosestFoodInSight_NoFoodInSight) {
@@ -267,9 +267,9 @@ TEST(CreatureTests, GetClosestFoodInSight_NoFoodInSight) {
   creature.SetOrientation(OrientedAngle(Point(creature_x,creature_y),Point(target_x,target_y)).GetAngle());
   creature.SetVision(1, M_PI/3);
 
-//  auto closest_food = creature.GetClosestFoodInSight(grid, gridCellSize);
+  auto closest_food = creature.GetClosestFoodInSight(grid, gridCellSize, Food::type::meat);
 
-//  ASSERT_EQ(closest_food, nullptr);
+  ASSERT_EQ(closest_food, nullptr);
 }
 
 

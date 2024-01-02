@@ -378,6 +378,7 @@ void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
   neuron_data_.at(9) = meat_size_;
   neuron_data_.at(10) = GetEmptinessPercent();
   std::vector<double> output = brain_.Activate(neuron_data_);
+  std::cout << output.size() << std::endl;
   SetAcceleration(std::tanh(output.at(0))*mutable_.GetMaxForce());
   SetAccelerationAngle(std::tanh(output.at(1)) * M_PI);
   SetRotationalAcceleration(std::tanh(output.at(2))*mutable_.GetMaxForce());
