@@ -45,6 +45,7 @@ struct SimulationData {
   std::vector<Creature> creatures_;
   std::vector<Food> food_entities_;
   std::queue<Creature> reproduce_;
+  std::queue<Creature> new_reproduce_;
 
   double world_time_ = 0;
 
