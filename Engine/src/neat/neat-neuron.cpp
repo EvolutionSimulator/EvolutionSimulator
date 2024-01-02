@@ -36,6 +36,14 @@ int Neuron::GetId() const { return id_; }
 NeuronType Neuron::GetType() const { return type_; }
 
 /*!
+ * @brief Gets the activation function of the neuron
+ *
+ * @return The activation function of the neuron.
+ */
+ActivationType Neuron::GetActivation() const { return activation_; }
+
+
+/*!
  * @brief Gets the bias of the neuron.
  *
  * @return The bias of the neuron.
@@ -69,7 +77,7 @@ void Neuron::SetInactive() { active_ = false; }
 /*!
  * @brief Sets the activation type of the neuron.
  */
-void Neuron::SetActivation(ActivationType type){  type_ = type; }
+void Neuron::SetActivation(ActivationType activation){  activation_ = activation; }
 
 
 /*!

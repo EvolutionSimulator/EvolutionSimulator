@@ -41,7 +41,7 @@ NeuralNetwork::NeuralNetwork(const Genome &genom) {
           inputs.push_back(input);
         }
       }
-      FeedForwardNeuron ffneuron = {neuron.GetId(), neuron.GetBias(), inputs};
+      FeedForwardNeuron ffneuron = {neuron.GetId(), neuron.GetBias(), inputs, neuron.GetActivation()};
       ffneurons.push_back(ffneuron);
     }
   }
@@ -78,7 +78,7 @@ std::vector<double> NeuralNetwork::Activate(
 
       if (std::find(output_ids_.begin(), output_ids_.end(), ffneuron.id) ==
           output_ids_.end()) {
-        value = activation_function(value);
+        value = activation_function(ffneuron.activation , value);
       }
 
       values[ffneuron.id] = value;
