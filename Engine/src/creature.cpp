@@ -368,8 +368,8 @@ void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
   neuron_data_.at(1) = GetVelocity();
   neuron_data_.at(2) = GetVelocityAngle();
   neuron_data_.at(3) = GetRotationalVelocity();
-  neuron_data_.at(4) = orientation_food_;
-  neuron_data_.at(5) = distance_food_;
+  neuron_data_.at(4) = orientation_plant_;
+  neuron_data_.at(5) = distance_plant_;
   neuron_data_.at(6) = GetEmptinessPercent();
   std::vector<double> output = brain_.Activate(neuron_data_);
   SetAcceleration(std::tanh(output.at(0))*mutable_.GetMaxForce());
@@ -413,14 +413,27 @@ double GetRandomFloat(double min_value, double max_value) {
 void Creature::ProcessVisionFood(
     std::vector<std::vector<std::vector<Entity *>>> &grid,
     double GridCellSize) {
-  Food *food = GetClosestFoodInSight(grid, GridCellSize);
-  if (food) {
-    distance_food_ = this->GetDistance(*food, settings::environment::kMapWidth,
-                                       settings::environment::kMapHeight) - (*food).GetSize();
-    orientation_food_ = this->GetRelativeOrientation(*food);
-  } else {
-    distance_food_ = vision_radius_;
-    orientation_food_ = remainder(GetRandomFloat(orientation_- vision_angle_/2, orientation_+ vision_angle_/2), 2*M_PI);
+  Food *closePlant = GetClosestPlantInSight(grid, GridCellSize);
+  Food *closeMeat = GetClosestMeatInSight(grid, GridCellSize);
+
+  if (closePlant){
+        distance_plant_ = this->GetDistance(*closePlant, settings::environment::kMapWidth,
+                                           settings::environment::kMapHeight) - (*closePlant).GetSize();
+        orientation_plant_ = this->GetRelativeOrientation(*closePlant);
+  }
+  else {
+      distance_plant_ = vision_radius_;
+      orientation_plant_ = remainder(GetRandomFloat(orientation_- vision_angle_/2, orientation_+ vision_angle_/2), 2*M_PI);
+  }
+
+  if (closeMeat){
+        distance_meat_ = this->GetDistance(*closeMeat, settings::environment::kMapWidth,
+                                           settings::environment::kMapHeight) - (*closeMeat).GetSize();
+        orientation_meat_ = this->GetRelativeOrientation(*closeMeat);
+  }
+  else {
+      distance_meat_ = vision_radius_;
+      orientation_meat_ = remainder(GetRandomFloat(orientation_- vision_angle_/2, orientation_+ vision_angle_/2), 2*M_PI);
   }
 }
 
@@ -598,6 +611,20 @@ double Creature::GetVisionRadius() const { return vision_radius_; }
 double Creature::GetVisionAngle() const { return vision_angle_; }
 
 
+
+Food* Creature::GetClosestMeatInSight(
+    std::vector<std::vector<std::vector<Entity *>>> &grid,
+    double grid_cell_size) const {
+    return (GetClosestFoodInSight(grid, grid_cell_size, Food::type::meat));
+}
+
+// Function to get the closest plant in sight
+Food* Creature::GetClosestPlantInSight(
+    std::vector<std::vector<std::vector<Entity *>>> &grid,
+    double grid_cell_size) const {
+    return (GetClosestFoodInSight(grid, grid_cell_size, Food::type::plant));
+}
+
 /*!
  * @brief Finds the closest food entity (meat or plant) within the creature's line of sight.
  *
@@ -615,7 +642,7 @@ double Creature::GetVisionAngle() const { return vision_angle_; }
  */
 Food *Creature::GetClosestFoodInSight(
     std::vector<std::vector<std::vector<Entity *>>> &grid,
-    double grid_cell_size) const {
+    double grid_cell_size, Food::type food_type) const {
   int grid_width = grid.size();
   int grid_height = grid[0].size();
 
@@ -649,7 +676,7 @@ Food *Creature::GetClosestFoodInSight(
     for (Entity *entity : grid[x][y]) {
       Food *food = dynamic_cast<Food *>(entity);
 
-      if (food) {
+      if (food && food->GetType()==food_type) {
         auto food_point = Point(entity->GetCoordinates());
 
         auto food_direction = OrientedAngle(cone_center, food_point);

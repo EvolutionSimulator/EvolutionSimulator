@@ -75,7 +75,13 @@ class Creature : public MovableEntity {
                        double GridCellSize) const;
   Food *GetClosestFoodInSight(
       std::vector<std::vector<std::vector<Entity *>>> &grid,
-      double grid_cell_size) const;
+      double grid_cell_size, Food::type food_type) const;
+
+  Food *GetClosestPlantInSight(std::vector<std::vector<std::vector<Entity *>>> &grid,
+          double grid_cell_size) const;
+  Food *GetClosestMeatInSight(std::vector<std::vector<std::vector<Entity *>>> &grid,
+          double grid_cell_size) const;
+
 
   void Grow(double energy);
   void Digest(double quantity);
@@ -107,9 +113,13 @@ class Creature : public MovableEntity {
   neat::NeuralNetwork brain_; /*!< Neural network for processing environmental
                                  stimuli and decision making. */
   neat::Genome genome_;       /*!< Genetic makeup of the creature. */
-  double distance_food_;      /*!< Distance to the nearest food source. */
-  double orientation_food_;   /*!< Orientation relative to the nearest food
+  double distance_plant_;       /*!< Distance to the nearest plant source. */
+  double distance_meat_;        /*!< Distance to the nearest meat source. */
+  double orientation_plant_;   /*!< Orientation relative to the nearest plant
                                  source. */
+  double orientation_meat_;   /*!< Orientation relative to the nearest meat
+                                 source. */
+
   std::vector<double>
       neuron_data_; /*!< Neuron data used in the neural network. */
   bool fit_; /*!< Indicates whether the creature is fit in the evolutionary
