@@ -170,9 +170,9 @@ void Mutable::Mutate() {
       float delta = dis(gen);
       color_ += delta;
       if (color_ > 1){
-          color_ = 1;
+          color_ -= 1;
       } else if (color_ < 0){
-          color_ = 0;
+          color_ += 1;
       }
   }
 
