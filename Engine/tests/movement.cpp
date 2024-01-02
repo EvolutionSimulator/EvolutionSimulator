@@ -14,10 +14,10 @@
 
 double positive_angle_mod(double angle){
     double positive_angle = fmod(angle, 2*M_PI);
-    if (angle < 0) {
-        angle += 2*M_PI;
+    if (positive_angle < 0) {
+        positive_angle += 2*M_PI;
     }
-    return angle;
+    return positive_angle;
 }
 
 using namespace testing;

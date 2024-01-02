@@ -22,6 +22,15 @@ constexpr double kAdjustmentProbability = 0.8;
 constexpr double kActivationFunctionMutationRate = 0.02;
 }  // namespace neat
 
+namespace compatibility {
+constexpr double kWeightSharedNeurons = 0.2;
+constexpr double kWeightSharedLinks = 0.3;
+constexpr double kAverageWeightSharedLinks = 0.5;
+constexpr double kColorCompatibility = 0.1;
+constexpr double kMutablesCompatibility = 0.5;
+constexpr double kCompatibilityThreshold = 1;
+}
+
 namespace environment {
 constexpr double kMapWidth = 1900.0;
 constexpr double kMapHeight = 880.0;
@@ -35,6 +44,7 @@ constexpr double kHealthToEnergy = 10.0;
 constexpr double kDefaultCreatureDensity = 0.0001;
 constexpr double kPlantNutritionalValue = 2.0;
 constexpr double kMeatNutritionalValue = 3.0;
+constexpr double kPlantProportion = 0.5; /* PlantProportion + MeatProportion = 1 */
 constexpr double kRotFactor = 1.0;
 constexpr double kGridCellSize = 50.0;
 constexpr int kMinCreatureSize = 2;

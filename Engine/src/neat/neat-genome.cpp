@@ -1,5 +1,4 @@
 #include "neat/neat-genome.h"
-#include "neat/neat-neuron.h"
 /*!
  * @file neat-genome.h
  *
@@ -8,8 +7,10 @@
  */
 
 #include <algorithm>
+#include <unordered_map>
 #include <optional>
 #include <random>
+#include <set>
 
 namespace neat {
 
@@ -207,14 +208,14 @@ void Genome::Mutate() {
   if (uniform(gen) < settings::neat::kAddLinkMutationRate) {
     MutateAddLink();
   }
-  /* cycles aren't supported with remove mutations
-    if (uniform(gen) < settings::neat::kRemoveNeuronMutationRate) {
-      MutateRemoveNeuron();
-    }/*
 
-  /*  if (uniform(gen) < settings::neat::kRemoveLinkMutationRate) {
-      MutateRemoveLink();
-    }*/
+  if (uniform(gen) < settings::neat::kRemoveNeuronMutationRate) {
+    MutateRemoveNeuron();
+  }
+
+  if (uniform(gen) < settings::neat::kRemoveLinkMutationRate) {
+    MutateRemoveLink();
+  }
 
   if (uniform(gen) < settings::neat::kChangeWeightMutationRate) {
     MutateChangeWeight();
@@ -223,10 +224,6 @@ void Genome::Mutate() {
   if (uniform(gen) < settings::neat::kChangeBiasMutationRate) {
     MutateChangeBias();
   }
-
-  if (uniform(gen) < settings::neat::kActivationFunctionMutationRate) {
-      MutateActivationFunction();
-    }
 }
 
 /*!
@@ -395,10 +392,6 @@ bool Genome::DFS(const Neuron& currentNeuron, std::unordered_set<int>& visited,
   visiting.insert(currentId);
 
   for (const auto& link : links_) {
-    if (link.IsCyclic()) {
-      continue;
-    }
-    //link is not cyclic
     if (link.GetInId() == currentId) {
       int neighborId = link.GetOutId();
       auto neighborIt = std::find_if(
@@ -436,9 +429,8 @@ bool Genome::DetectLoops(const Neuron& startNeuron) {
 /*!
  * @brief Mutates the Genome by adding a new link between neurons.
  *
- * @details Adds a new link between two randomly chosen neurons.
- * If this creates a cycle, the added link is characterized as cyclic
- * and its parameter cyclic_ is set to true.
+ * @details Adds a new link between two randomly chosen neurons, ensuring no
+ * cycles are formed.
  */
 void Genome::MutateAddLink() {
   std::random_device rd;
@@ -460,12 +452,11 @@ void Genome::MutateAddLink() {
     return;  // IF WE END UP USING ENABLED/DISABLE LINKS, THEN ENABLE LINK
   }
 
-  AddLink(Link(n1, n2, 1));
   // Check if cycle exists:
-
+  AddLink(Link(n1, n2, 1));
+  Link newl = links_.back();
   if (DetectLoops(neurons_[indexRandomNeuron1])) {
-    //RemoveLink(newl.GetId());
-    links_.back().SetCyclic();
+    RemoveLink(newl.GetId());
     return;
   }
 }
@@ -485,19 +476,13 @@ void Genome::MutateAddNeuron() {
   std::uniform_int_distribution<size_t> dist(0, links_.size() - 1);
   size_t randIndex = dist(gen);
   Link RandomLink = links_[randIndex];
-
   DisableLink(RandomLink.GetId());  // test
 
   AddNeuron(Neuron(NeuronType::kHidden, 0.0));
   // disable the initial link between the inId and outId
   int newNeuronId = neurons_.back().GetId();
-  Link newlink1(RandomLink.GetInId(), newNeuronId, 1);
-  Link newlink2(newNeuronId, RandomLink.GetOutId(), RandomLink.GetWeight());
-  if (RandomLink.IsCyclic()) {
-    newlink2.SetCyclic();
-  }
-  AddLink(newlink1);
-  AddLink(newlink2);
+  AddLink(Link(RandomLink.GetInId(), newNeuronId, 1));
+  AddLink(Link(newNeuronId, RandomLink.GetOutId(), RandomLink.GetWeight()));
 }
 
 /*!
@@ -564,6 +549,7 @@ Genome Crossover(const Genome& dominant, const Genome& recessive) {
 }
 
 
+
 void Genome::MutateActivationFunction() {
     if (GetInputCount()+GetOutputCount()==neurons_.size()){
         return ;
@@ -597,5 +583,61 @@ bool Genome::FindNeuronById(int targetId, Neuron& foundNeuron) const{
         }
     }
     return false;  // Return false if neuron isnt found
+}
+
+double Genome::CompatibilityBetweenGenomes(const Genome& other) const {
+  // Identify shared neurons
+  std::unordered_map<int, Neuron> shared_neurons;
+  for (const Neuron& neuron : neurons_) {
+      Neuron neuronCopy = neuron; // Make a copy of the neuron
+      if (other.FindNeuronById(neuron.GetId(), neuronCopy)) {
+          shared_neurons.insert(std::make_pair(neuron.GetId(), neuronCopy));
+      }
+  }
+
+  // Identify shared links
+  std::set<std::pair<int, int>> shared_link_pairs;
+  Genome& non_const_this = const_cast<Genome&>(*this);
+
+  for (const Link& link : links_) {
+      if (non_const_this.HasLink(link.GetInId(), link.GetOutId()) && link.IsActive()) {
+          shared_link_pairs.insert(std::make_pair(link.GetInId(), link.GetOutId()));
+      }
+  }
+
+  // Calculate weight similarities for shared links
+  double total_weight_similarity = 0.0;
+  for (const std::pair<int, int>& link_pair : shared_link_pairs) {
+      // Search for the link in the first genome
+      const Link* link1 = nullptr;
+      for (const Link& link : links_) {
+          if (link.GetInId() == link_pair.first && link.GetOutId() == link_pair.second) {
+              link1 = &link;
+              break;
+          }
+      }
+
+      // Search for the link in the other genome
+      const Link* link2 = nullptr;
+      for (const Link& other_link : other.GetLinks()) {
+          if (other_link.GetInId() == link_pair.first && other_link.GetOutId() == link_pair.second) {
+              link2 = &other_link;
+              break;
+          }
+      }
+
+      if (link1 && link2) {
+          // Calculate weight similarity using the absolute difference
+          double weight_similarity = std::abs(link1->GetWeight() - link2->GetWeight());
+          total_weight_similarity += weight_similarity;
+      }
+  }
+
+  // Compute compatibility score based on shared neurons, shared links, and weight similarities
+  // Use a formula that considers these factors and assigns a higher score to more compatible genomes
+  double compatibility_score = settings::compatibility::kWeightSharedNeurons * shared_neurons.size()
+                              + settings::compatibility::kWeightSharedLinks * shared_link_pairs.size()
+                              + settings::compatibility::kAverageWeightSharedLinks * total_weight_similarity;
+  return compatibility_score;
 }
 }  // namespace neat

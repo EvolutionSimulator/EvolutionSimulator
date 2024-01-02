@@ -214,6 +214,20 @@ void Creature::Reproduced() {
 }
 
 /*!
+ * @brief Determines if the current creature is compatible with another creature.
+ *
+ * @details This function calculates the compatibility between the current creature and another creature based on their genomes and mutable characteristics. It sums the brain distance, derived from genome compatibility, with the mutable distance, derived from mutable characteristics compatibility. The creatures are considered compatible if the sum is less than a predefined compatibility threshold.
+ *
+ * @param other_creature A reference to another `Creature` object for compatibility comparison.
+ * @return bool Returns `true` if the sum of brain and mutable distances is less than the compatibility threshold, indicating compatibility; otherwise returns `false`.
+ */
+bool Creature::Compatible(const Creature& other_creature){
+  double brain_distance = this->GetGenome().CompatibilityBetweenGenomes(other_creature.GetGenome());
+  double mutable_distance = this->GetMutable().CompatibilityBetweenMutables(other_creature.GetMutable());
+  return brain_distance + mutable_distance < settings::compatibility::kCompatibilityThreshold;
+}
+
+/*!
  * @brief Retrieves the maximum energy level of the creature.
  *
  * @details This method returns the upper limit of the creature's energy
@@ -221,6 +235,7 @@ void Creature::Reproduced() {
  *
  * @return double The maximum energy level of the creature.
  */
+double Creature::GetMaxEnergy(){ return max_energy_; }
 
 /*!
  * @brief Updates the maximum energy level of the creature.
@@ -263,6 +278,7 @@ void Creature::SetAge(double age) {
  * @param nutritional_value The nutritional value of the consumed food.
  */
 void Creature::Eats(double nutritional_value) {
+  velocity_ = 0;
   SetEnergy(GetEnergy() + nutritional_value);
   if (GetEnergy() > max_energy_) {
     BalanceHealthEnergy();
@@ -311,7 +327,7 @@ void Creature::Update(double deltaTime, double const kMapWidth,
  *
  * @return The genome of the creature.
  */
-neat::Genome Creature::GetGenome() { return genome_; }
+neat::Genome Creature::GetGenome() const { return genome_; }
 
 /*!
  * @brief Retrieves the creature's mutables
@@ -321,7 +337,7 @@ neat::Genome Creature::GetGenome() { return genome_; }
  *
  * @return The mutables of the creature.
  */
-Mutable Creature::GetMutable() {return mutable_;}
+Mutable Creature::GetMutable() const {return mutable_;}
 
 /*!
  * @brief Handles the collision of the creature with another entity.
@@ -338,8 +354,16 @@ void Creature::OnCollision(Entity &other_entity, double const kMapWidth,
                            double const kMapHeight) {
   if (Food *food = dynamic_cast<Food *>(&other_entity)) {
     if (food->GetState() == Entity::Alive) {
-      Eats(food->GetNutritionalValue() * food->GetSize());
-      food->Eat();
+      double max_nutrition = food->GetNutritionalValue() * food->GetSize();
+      double hunger = GetMaxEnergy()-GetEnergy();
+      if (max_nutrition > hunger){
+        Eats(hunger);
+        food->SetSize(((max_nutrition-hunger)/max_nutrition)*food->GetSize());
+      }
+      else{
+        Eats(max_nutrition);
+        food->Eat();
+      }
     }
   } else {
     MovableEntity::OnCollision(other_entity, kMapWidth, kMapHeight);

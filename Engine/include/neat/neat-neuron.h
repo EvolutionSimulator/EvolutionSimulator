@@ -28,9 +28,7 @@ class Neuron {
   void SetBias(double bias);
   void SetActive();
   void SetInactive();
-
-  ActivationType GetActivation() const;
-  void SetActivation(ActivationType a);
+  void SetActivation(ActivationType type);
 
  private:
   static int next_id_; /*!< Static variable used to assign unique IDs to new
@@ -39,7 +37,6 @@ class Neuron {
   NeuronType type_;    /*!< Type of the neuron (input, output, hidden). */
   double bias_;        /*!< Bias of the neuron. */
   bool active_;        /*!< Indicates whether the neuron is active or not. */
-  ActivationType activation_=ActivationType::sigmoid;
 };
 
 Neuron CrossoverNeuron(const Neuron &a, const Neuron &b);

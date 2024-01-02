@@ -208,8 +208,14 @@ void SimulationCanvas::RenderSimulation(SimulationData* data) {
 
   // Iterate through food and create a gradient circle shape for each
   for (const auto& food : data->food_entities_) {
-    sf::VertexArray foodShape = createGradientCircle(
-        food.GetSize(), sf::Color(50, 100, 49), sf::Color(150, 250, 148));
+    sf::VertexArray foodShape;
+    if (food.GetType() == Food::type::plant) {
+        foodShape = createGradientCircle(
+                    food.GetSize(), sf::Color(50, 100, 49), sf::Color(150, 250, 148));
+    } else if (food.GetType() == Food::type::meat) {
+        foodShape = createGradientCircle(
+                    food.GetSize(), sf::Color(100, 50, 49), sf::Color(250, 150, 148));
+    }
 
     std::pair<double, double> foodCoordinates = food.GetCoordinates();
     sf::Transform foodTransform;

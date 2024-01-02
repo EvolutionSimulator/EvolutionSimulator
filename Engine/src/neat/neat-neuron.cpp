@@ -57,18 +57,6 @@ bool Neuron::IsActive() const { return active_; }
 void Neuron::SetBias(double bias) { bias_ = bias; }
 
 /*!
- * @brief Sets the activation function of the neuron.
- *
- * @param a The new activation function to be set for the neuron.
- */
-void Neuron::SetActivation(ActivationType a) {activation_=a;}
-
-/*!
- * @brief Sets the activation function of the neuron.
- */
-ActivationType Neuron::GetActivation() const {return activation_;}
-
-/*!
  * @brief Sets the neuron to be active.
  */
 void Neuron::SetActive() { active_ = true; }
@@ -77,6 +65,12 @@ void Neuron::SetActive() { active_ = true; }
  * @brief Sets the neuron to be inactive.
  */
 void Neuron::SetInactive() { active_ = false; }
+
+/*!
+ * @brief Sets the activation type of the neuron.
+ */
+void Neuron::SetActivation(ActivationType type){  type_ = type; }
+
 
 /*!
  * @brief Performs crossover between two Neurons to produce a new Neuron.

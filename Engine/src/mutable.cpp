@@ -1,5 +1,6 @@
 #include "mutable.h"
 #include "config.h"
+#include "math.h"
 #include <random>
 
 /*!
@@ -218,4 +219,64 @@ Mutable MutableCrossover(const Mutable &dominant, const Mutable &recessive) {
                              recessive.GetVisionFactor() )/3);
   crossover.UpdateReproduction();
   return crossover;
+}
+
+/*!
+ * @brief Calculates the compatibility distance between two `Mutable` objects.
+ *
+ * @details This function computes the compatibility distance between the current `Mutable` object and another `Mutable` object. The distance is calculated by summing the absolute differences of various mutable attributes (like energy density, energy loss, integrity, etc.) between the two objects, each normalized by a respective physical constraint constant. The total distance is then scaled by a compatibility factor. A lower distance value indicates higher compatibility.
+ *
+ * The mutable attributes considered are:
+ * - Energy Density
+ * - Energy Loss
+ * - Integrity
+ * - Strafing Difficulty
+ * - Max Size
+ * - Baby Size
+ * - Max Force
+ * - Growth Factor
+ * - Vision Factor
+ *
+ * @param other_mutable A constant reference to another `Mutable` object to compare with.
+ * @return double The calculated compatibility distance. A lower value indicates higher compatibility between the two `Mutable` objects.
+ */
+double Mutable::CompatibilityBetweenMutables(const Mutable& other_mutable) {
+  double distance = 0;
+  // Energy Density
+  distance += fabs(other_mutable.GetEnergyDensity() - this->GetEnergyDensity())
+              / settings::physical_constraints::kDEnergyDensity;
+
+  // Energy Loss
+  distance += fabs(other_mutable.GetEnergyLoss() - this->GetEnergyLoss())
+              / settings::physical_constraints::kDEnergyLoss;
+
+  // Integrity
+  distance += fabs(other_mutable.GetIntegrity() - this->GetIntegrity())
+              / settings::physical_constraints::kDIntegrity;
+
+  // Strafing Difficulty
+  distance += fabs(other_mutable.GetStrafingDifficulty() - this->GetStrafingDifficulty())
+              / settings::physical_constraints::kDStrafingDifficulty;
+
+  // Max Size
+  distance += fabs(other_mutable.GetMaxSize() - this->GetMaxSize())
+              / settings::physical_constraints::kDMaxSize;
+
+  // Baby Size
+  distance += fabs(other_mutable.GetBabySize() - this->GetBabySize())
+              / settings::physical_constraints::kDBabySize;
+
+  // Max Force
+  distance += fabs(other_mutable.GetMaxForce() - this->GetMaxForce())
+              / settings::physical_constraints::kDMaxForce;
+
+  // Growth Factor
+  distance += fabs(other_mutable.GetGrowthFactor() - this->GetGrowthFactor())
+              / settings::physical_constraints::kDGrowthFactor;
+
+  // Vision Factor
+  distance += fabs(other_mutable.GetVisionFactor() - this->GetVisionFactor())
+              / settings::physical_constraints::kDVisionFactor;
+
+  return distance * settings::compatibility::kMutablesCompatibility;
 }
