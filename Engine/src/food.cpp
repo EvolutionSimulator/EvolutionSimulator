@@ -34,7 +34,7 @@ Food::Food(const double x_coord, const double y_coord, const double nutritional_
  */
 Food::Food(const double x_coord, const double y_coord, const double size, const double nutritional_value)
     : Entity(x_coord, y_coord, size),
-      nutritional_value_(size_ *nutritional_value) {}
+      nutritional_value_(size_ * nutritional_value) {}
 
 /*!
  * @brief Constructor for Food with specified size.
@@ -43,7 +43,7 @@ Food::Food(const double x_coord, const double y_coord, const double size, const 
  */
 Food::Food(const double size, const double nutritional_value)
     : Entity(size),
-    nutritional_value_(size_ *nutritional_value) {}
+    nutritional_value_(size_ * nutritional_value) {}
 
 
 /*!
