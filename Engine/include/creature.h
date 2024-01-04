@@ -6,7 +6,7 @@
 #include "config.h"
 #include "food.h"
 #include "movable_entity.h"
-#include "neat/neat-neural-network.h"
+#include "alive_entity.h"
 #include "mutable.h"
 
 /*!
@@ -32,25 +32,15 @@
  * for and consuming food, and managing its energy and health. The class also
  * supports evolutionary features like reproduction and genetic inheritance.
  */
-class Creature : public MovableEntity {
+class Creature : public MovableEntity, public AliveEntity {
  public:
   Creature(neat::Genome genome, Mutable mutable_);
 
-  void Dies();
   void UpdateEnergy(double deltaTime);
-  double GetEnergy() const;
-  void SetEnergy(double energy);
-  void SetMaxEnergy(double max_energy);
-  neat::Genome GetGenome() const;
-  Mutable GetMutable() const;
 
   void Update(double deltaTime, double const kMapWidth, double const kMapHeight,
               std::vector<std::vector<std::vector<Entity *> > > &grid,
               double GridCellSize, double frictional_coefficient);
-
-
-  double GetHealth() const;
-  void SetHealth(double health);
 
   void OnCollision(Entity &other_entity, double const kMapWidth,
                    double const kMapHeight) override;
@@ -58,18 +48,11 @@ class Creature : public MovableEntity {
   bool Fit();
   void Reproduced();
 
-
-  double GetMaxEnergy() const;
-  void UpdateMaxEnergy();
-
-  double GetAge() const;
-  void SetAge(double age);
-
   void SetVision(double radius, double angle);
   double GetVisionRadius() const;
   double GetVisionAngle() const;
 
-  void BalanceHealthEnergy();
+  void Eats(double nutritional_value);
 
   Food *GetClosestFood(std::vector<std::vector<std::vector<Entity *>>> &grid,
                        double GridCellSize) const;
@@ -94,9 +77,6 @@ class Creature : public MovableEntity {
   void Bite(Food *food);
   void AddAcid(double quantity);
 
-
-  int GetGeneration() const;
-  void SetGeneration(int generation);
   bool Compatible(const Creature& other_creature);
 
   double GetStomachCapacity() const;
@@ -106,18 +86,6 @@ class Creature : public MovableEntity {
   double GetEnergyInStomach() const;
 
  protected:
-  double max_energy_;
-  double energy_; /*!< Stores the current energy level of the creature. */
-
-  double health_; /*!< Represents the current health status of the creature. */
-
-  double age_;    /*!< Tracks the age of the creature. */
-
-  Mutable mutable_;
-
-  neat::NeuralNetwork brain_; /*!< Neural network for processing environmental
-                                 stimuli and decision making. */
-  neat::Genome genome_;       /*!< Genetic makeup of the creature. */
   double distance_plant_;       /*!< Distance to the nearest plant source. */
   double distance_meat_;        /*!< Distance to the nearest meat source. */
   double orientation_plant_;   /*!< Orientation relative to the nearest plant
@@ -127,13 +95,9 @@ class Creature : public MovableEntity {
   int closest_plant_id_;       /*! Id of the closest plant to show in the UI */
   int closest_meat_id_;      /*! Id of the closest meat to show in the UI */
   double orientation_meat_;   /*!< Orientation relative to the nearest meat
-                                 source. */
-
-  std::vector<double>
-      neuron_data_; /*!< Neuron data used in the neural network. */
+                                source. */
   bool fit_; /*!< Indicates whether the creature is fit in the evolutionary
                 sense. */
-  int generation_ = 0;           /*!< Generation count of the creature. */
   double reproduction_cooldown_; /*!< Cooldown period before the creature can
                                     reproduce again. */
   double vision_radius_; /*!< The radius within which the creature can detect

@@ -57,10 +57,12 @@ add_library(Engine STATIC
   src/collisions.cpp
   include/config.h
   include/mutable.h src/mutable.cpp
+
   include/data_accessor.h
   include/synchronization_primitives.h
   include/settings.h src/settings.cpp
 
+  include/alive_entity.h src/alive_entity.cpp
 )
 
 add_subdirectory(tests)
