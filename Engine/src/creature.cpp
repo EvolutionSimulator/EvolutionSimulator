@@ -25,9 +25,13 @@
 Creature::Creature(neat::Genome genome, Mutable mutables)
     : MovableEntity(),
       AliveEntity(genome, mutables),
+<<<<<<< HEAD
       vision_radius_(mutables.GetVisionFactor()),
       vision_angle_(SETTINGS.physical_constraints.vision_ar_ratio
                     / mutables.GetVisionFactor()),
+=======
+      VisionSystem(genome, mutables),
+>>>>>>> 6b889d7 ((not working) first separation of vision)
       reproduction_cooldown_ (mutables.GetMaturityAge()),
       eating_cooldown_ (mutables.GetEatingSpeed()),
       stomach_acid_ (0.0),
@@ -228,80 +232,6 @@ void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
 }
 
 /*!
- * @brief Generates a random floating-point number within a given range.
- *
- * @details This function uses a uniform distribution to ensure an even spread
- * of values.
- *
- * @param max_value The upper limit of the random number range.
- *
- * @return A random floating-point number between 0 and max_value.
- */
-double GetRandomFloat(double min_value, double max_value) {
-  std::random_device rd;
-  std::mt19937 gen(rd());
-
-  std::uniform_real_distribution<double> dis(min_value, max_value);
-  return dis(gen);
-}
-
-
-/*!
- * @brief Processes the creature's vision to locate food.
- *
- * @details Determines the closest food entity based on the creature's position
- * and updates the creature's orientation and distance metrics towards the
- * located food. If there is no food in sight, it assumes the distance to food is
- * the vision radius (so far away), and the orientation is something random
- * in its field of view.
- *
- * @param grid The environmental grid.
- * @param GridCellSize Size of each cell in the grid.
- */
-void Creature::ProcessVisionFood(
-    std::vector<std::vector<std::vector<Entity *>>> &grid,
-    double GridCellSize, double width, double height) {
-  Food *closePlant = GetClosestPlantInSight(grid, GridCellSize);
-  Food *closeMeat = GetClosestMeatInSight(grid, GridCellSize);
-
-  if (closePlant){
-        distance_plant_ = this->GetDistance(*closePlant, width, height) - (*closePlant).GetSize();
-        orientation_plant_ = this->GetRelativeOrientation(*closePlant);
-        closest_plant_id_ = closePlant->GetID();
-        plant_size_ = closePlant->GetSize();
-  }
-  else {
-      distance_plant_ = vision_radius_;
-      orientation_plant_ = remainder(GetRandomFloat(orientation_- vision_angle_/2, orientation_+ vision_angle_/2), 2*M_PI);
-      closest_plant_id_ = 0;
-      plant_size_ = -1;
-  }
-
-  if (closeMeat){
-        distance_meat_ = this->GetDistance(*closeMeat, width, height) - (*closeMeat).GetSize();
-        orientation_meat_ = this->GetRelativeOrientation(*closeMeat);
-        closest_meat_id_ = closeMeat->GetID();
-        meat_size_ = closeMeat->GetSize();
-  }
-  else {
-      distance_meat_ = vision_radius_;
-      orientation_meat_ = remainder(GetRandomFloat(orientation_- vision_angle_/2, orientation_+ vision_angle_/2), 2*M_PI);
-      closest_meat_id_ = 0;
-      meat_size_ = -1;
-  }
-}
-
-/*!
- * @brief Retrieves the id of the closest food.
- *
- * @return The id of the closest food or -1 if there is no food in vision.
- */
-int Creature::GetFoodID() const {
-  if (distance_plant_ <= distance_meat_) {return closest_plant_id_;};
-  return closest_meat_id_;
-}
-
-/*!
  * @brief Manages the creature's growth based on energy consumption.
  *
  * @details This function calculates the creature's growth as a function of the
@@ -453,6 +383,7 @@ std::vector<Food *> get_food_at_distance(
   return food;
 }
 
+<<<<<<< HEAD
 /*!
  * @brief Sets the vision parameters for the creature.
  *
@@ -602,6 +533,8 @@ Food *Creature::GetClosestFoodInSight(
   }
   return closest_food;
 }
+=======
+>>>>>>> 6b889d7 ((not working) first separation of vision)
 
 double Creature::GetStomachCapacity() const {return stomach_capacity_;};
 double Creature::GetStomachFullness() const {return stomach_fullness_;};
@@ -699,15 +632,4 @@ void Creature::AddAcid(double quantity)
 
 double Creature::GetAcid() const {return stomach_acid_; };
 
-bool Creature::IsFoodInSight(Food *food)
-{
-  auto cone_center = Point(x_coord_, y_coord_);
-  auto cone_orientation = GetOrientation();
-  auto cone_left_boundary = OrientedAngle(cone_orientation - vision_angle_ / 2);
-  auto cone_right_boundary =
-      OrientedAngle(cone_orientation + vision_angle_ / 2);
-  auto food_point = Point(food->GetCoordinates());
-  auto food_direction = OrientedAngle(cone_center, food_point);
 
-  return food_direction.IsInsideCone(cone_left_boundary, cone_right_boundary);
-}

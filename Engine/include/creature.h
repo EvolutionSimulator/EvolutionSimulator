@@ -7,6 +7,7 @@
 #include "food.h"
 #include "movable_entity.h"
 #include "alive_entity.h"
+#include "vision_system.h"
 #include "mutable.h"
 
 /*!
@@ -32,7 +33,7 @@
  * for and consuming food, and managing its energy and health. The class also
  * supports evolutionary features like reproduction and genetic inheritance.
  */
-class Creature : public MovableEntity, public AliveEntity {
+class Creature : virtual public MovableEntity, virtual public AliveEntity, virtual public VisionSystem {
  public:
   Creature(neat::Genome genome, Mutable mutable_);
 
@@ -48,31 +49,10 @@ class Creature : public MovableEntity, public AliveEntity {
   bool Fit();
   void Reproduced();
 
-  void SetVision(double radius, double angle);
-  double GetVisionRadius() const;
-  double GetVisionAngle() const;
-
   void Eats(double nutritional_value);
-
-  Food *GetClosestFood(std::vector<std::vector<std::vector<Entity *>>> &grid,
-                       double GridCellSize) const;
-  Food *GetClosestFoodInSight(
-      std::vector<std::vector<std::vector<Entity *>>> &grid,
-      double grid_cell_size, Food::type food_type) const;
-
-  Food *GetClosestPlantInSight(std::vector<std::vector<std::vector<Entity *>>> &grid,
-          double grid_cell_size) const;
-  Food *GetClosestMeatInSight(std::vector<std::vector<std::vector<Entity *>>> &grid,
-          double grid_cell_size) const;
-  bool IsFoodInSight(Food *food);
-
-
   void Grow(double energy);
   void Think(std::vector<std::vector<std::vector<Entity *> > > &grid,
              double GridCellSize, double deltaTime, double width, double height);
-  void ProcessVisionFood(std::vector<std::vector<std::vector<Entity *> > > &grid,
-                         double grid_cell_size, double width, double height);
-  int GetFoodID() const;
   void Digest(double deltaTime);
   void Bite(Food *food);
   void AddAcid(double quantity);
@@ -86,25 +66,10 @@ class Creature : public MovableEntity, public AliveEntity {
   double GetEnergyInStomach() const;
 
  protected:
-  double distance_plant_;       /*!< Distance to the nearest plant source. */
-  double distance_meat_;        /*!< Distance to the nearest meat source. */
-  double orientation_plant_;   /*!< Orientation relative to the nearest plant
-                                 source. */
-  double plant_size_;          /*! Size of the closest plant*/
-  double meat_size_;          /*! Size of the closest meat*/
-  int closest_plant_id_;       /*! Id of the closest plant to show in the UI */
-  int closest_meat_id_;      /*! Id of the closest meat to show in the UI */
-  double orientation_meat_;   /*!< Orientation relative to the nearest meat
-                                source. */
   bool fit_; /*!< Indicates whether the creature is fit in the evolutionary
                 sense. */
   double reproduction_cooldown_; /*!< Cooldown period before the creature can
                                     reproduce again. */
-  double vision_radius_; /*!< The radius within which the creature can detect
-                            other entities. */
-  double vision_angle_;  /*!< The angle of vision for the creature, representing
-                            the field of view. */
-
   double stomach_capacity_; /*!< The stomach capacity (area) - mutable proportional to size squared */
   double stomach_fullness_; /*!< How much the stomach is filled (area) */
   double potential_energy_in_stomach_; /*! Energy to be gained in the stomach */

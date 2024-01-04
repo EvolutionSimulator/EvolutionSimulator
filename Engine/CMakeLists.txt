@@ -33,36 +33,34 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 add_library(Engine STATIC
   include/engine.h src/engine.cpp
   include/simulation.h src/simulation.cpp
-  include/simulationdata.h
+  include/simulationdata.h src/simulationdata.cpp
+  include/environment.h src/environment.cpp
+
   include/neat/neat-neuron.h src/neat/neat-neuron.cpp
   include/neat/neat-link.h src/neat/neat-link.cpp
   include/neat/neat-genome.h src/neat/neat-genome.cpp
+  include/neat/neat-neural-network.h src/neat/neat-neural-network.cpp
 
-  include/geometry_primitives.h src/geometry_primitives.cpp
-
-  include/neat/neat-neural-network.h
-  src/neat/neat-neural-network.cpp
-  include/entity.h
-  src/entity.cpp
-  src/simulationdata.cpp
-  include/food.h
-  src/food.cpp
-  include/environment.h
-  src/environment.cpp
-  include/creature.h
-  src/creature.cpp
-  src/movable_entity.cpp
-  include/movable_entity.h
-  include/collisions.h
-  src/collisions.cpp
-  include/config.h
   include/mutable.h src/mutable.cpp
 
   include/data_accessor.h
   include/synchronization_primitives.h
   include/settings.h src/settings.cpp
 
+  include/entity.h src/entity.cpp
+
+  include/food.h src/food.cpp
+
+  include/movable_entity.h src/movable_entity.cpp
   include/alive_entity.h src/alive_entity.cpp
+
+  include/vision_system.h src/vision_system.cpp
+
+  include/creature.h src/creature.cpp
+
+  include/geometry_primitives.h src/geometry_primitives.cpp
+  include/collisions.h src/collisions.cpp
+  include/config.h
 )
 
 add_subdirectory(tests)
