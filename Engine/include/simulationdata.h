@@ -41,6 +41,7 @@ struct SimulationData {
   std::vector<std::vector<std::vector<Entity*>>> GetGrid();
 
   void ReproduceCreatures();
+  void ReproduceTwoCreatures(Creature& creature1, Creature& creature2);
 
   std::vector<Creature> creatures_;
   std::vector<Food> food_entities_;
