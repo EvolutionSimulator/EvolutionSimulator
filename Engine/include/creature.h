@@ -47,24 +47,12 @@ class Creature : public MovableEntity, public AliveEntity {
   bool Fit();
   void Reproduced();
 
-  void SetVision(double radius, double angle);
-  double GetVisionRadius() const;
-  double GetVisionAngle() const;
-
   void Eats(double nutritional_value);
-
-  Food *GetClosestFood(std::vector<std::vector<std::vector<Entity *>>> &grid,
-                       double GridCellSize) const;
-  Food *GetClosestFoodInSight(
-      std::vector<std::vector<std::vector<Entity *>>> &grid,
-      double grid_cell_size) const;
 
   void Grow(double energy);
   void Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
              double GridCellSize, double deltaTime, double width, double height);
-  void ProcessVisionFood(std::vector<std::vector<std::vector<Entity *>>> &grid,
-                         double grid_cell_size, double width, double height);
-  int GetFoodID() const;
+
 
   bool Compatible(const Creature& other_creature);
  protected:
