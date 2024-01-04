@@ -137,84 +137,103 @@ void SimulationData::GenerateMoreFood() {
 }
 
 /*!
- * @brief Handles the reproduction process of creatures in the simulation.
- *
- * @details Pairs creatures by compatibility from the reproduction queue and creates offspring
- * with crossed-over genomes.
- */
+* @brief Handles the reproduction process of creatures in the simulation.
+*
+* @details Pairs creatures by compatibility from the reproduction queue and creates offspring
+* with crossed-over genomes.
+*/
 void SimulationData::ReproduceCreatures() {
-    double world_width = environment_.GetMapWidth();
-    double world_height = environment_.GetMapHeight();
-    double max_creature_size = settings::environment::kMaxCreatureSize;
-    double min_creature_size = settings::environment::kMinCreatureSize;
+   double world_width = environment_.GetMapWidth();
+   double world_height = environment_.GetMapHeight();
+   double max_creature_size = settings::environment::kMaxCreatureSize;
+   double min_creature_size = settings::environment::kMinCreatureSize;
 
-    std::queue<Creature> not_reproduced;
-    std::queue<Creature> temp_queue;
+   std::queue<Creature> not_reproduced;
+   std::queue<Creature> temp_queue;
 
-    while (!reproduce_.empty()) {
-        Creature creature1 = reproduce_.front();
-        reproduce_.pop();
-        bool paired = false;
+   while (!reproduce_.empty()) {
+       Creature creature1 = reproduce_.front();
+       reproduce_.pop();
+       bool paired = false;
 
-        // Attempt to pair creature1 with a compatible new creature
-        // Loop through newCreatures instead of reproduce_
-        while (!new_reproduce_.empty() && !paired) {
-            Creature creature2 = new_reproduce_.front();
-            new_reproduce_.pop();
+       // Attempt to pair creature1 with a compatible new creature
+       while (!new_reproduce_.empty() && !paired) {
+           Creature creature2 = new_reproduce_.front();
+           new_reproduce_.pop();
+           //If these two creatures are compatible reproduce them otherwise
+           //save the creature in a temporary queue for the next pairing round
+           if (creature1.Compatible(creature2)) {
+               ReproduceTwoCreatures(creature1, creature2);
+               paired = true;
+           } else {
+               temp_queue.push(creature2); // Save for next round
+           }
+       }
 
-            if (creature1.Compatible(creature2)) {
-                double energy1 = creature1.GetEnergy();
-                double energy2 = creature2.GetEnergy();
-                if (energy1 > energy2) {
-                  neat::Genome new_genome =
-                          neat::Crossover(creature1.GetGenome(), creature2.GetGenome());
-                  new_genome.Mutate();
-                  new_genome.Mutate();
-                  Mutable new_mutable =
-                          MutableCrossover(creature1.GetMutable(), creature2.GetMutable());
-                  new_mutable.Mutate();
-                  new_mutable.Mutate();
-                  Creature new_creature(new_genome, new_mutable);
-                  new_creature.RandomInitialization(world_width, world_height);
-                  new_creature.SetGeneration(creature1.GetGeneration() + 1);
-                  AddCreature(new_creature);
-                } else {
-                  neat::Genome new_genome =
-                          neat::Crossover(creature2.GetGenome(), creature1.GetGenome());
-                  new_genome.Mutate();
-                  new_genome.Mutate();
-                  Mutable new_mutable =
-                          MutableCrossover(creature2.GetMutable(), creature1.GetMutable());
-                  new_mutable.Mutate();
-                  new_mutable.Mutate();
-                  Creature new_creature(new_genome, new_mutable);
-                  new_creature.RandomInitialization(world_width, world_height);
-                  new_creature.SetGeneration(creature2.GetGeneration() + 1);
-                  AddCreature(new_creature);
-                }
-                paired = true;
-            } else {
-                temp_queue.push(creature2); // Save for next round
-            }
-        }
+       // If the creature wasn't paired add it to not_reproduced
+       if (!paired) {
+           not_reproduced.push(creature1);
+       }
 
-        // Move creature1 reproduce_ if not paired
-        if (!paired) {
-            reproduce_.push(creature1);
-        }
+       // Refill newCreatures with unpaired creatures for next attempt
+       while (!temp_queue.empty()) {
+           new_reproduce_.push(temp_queue.front());
+           temp_queue.pop();
+       }
+   }
 
-        // Refill newCreatures with unpaired creatures for next attempt
-        while (!temp_queue.empty()) {
-            new_reproduce_.push(temp_queue.front());
-            temp_queue.pop();
-        }
-    }
+   // Refill reproduce_ with creatures for the next iteration
+   while (!new_reproduce_.empty()) {
+       reproduce_.push(new_reproduce_.front());
+       new_reproduce_.pop();
+   }
 
-    // Refill reproduce_ with creatures for the next iteration
-    while (!new_reproduce_.empty()) {
-        reproduce_.push(new_reproduce_.front());
-        new_reproduce_.pop();
-    }
+   // Refill reproduce_ with the remaining creatures
+   while (!not_reproduced.empty()) {
+       reproduce_.push(not_reproduced.front());
+       not_reproduced.pop();
+   }
+}
+
+/*!
+*  @brief Reproduces two creatures and adds a descendant to the simulation
+*
+*  @details Takes two creatures and uses the crossover functions for genomes and
+*  mutables to create a child creature out of the previous two. We take as the dominant
+*  creature for the algorithms that that has the highest energy at the moment of reproduction
+*/
+void SimulationData::ReproduceTwoCreatures(Creature& creature1, Creature& creature2){
+ double world_width = environment_.GetMapWidth();
+ double world_height = environment_.GetMapHeight();
+ double energy1 = creature1.GetEnergy();
+ double energy2 = creature2.GetEnergy();
+ if (energy1 > energy2) {
+   neat::Genome new_genome =
+           neat::Crossover(creature1.GetGenome(), creature2.GetGenome());
+   new_genome.Mutate();
+   new_genome.Mutate();
+   Mutable new_mutable =
+           MutableCrossover(creature1.GetMutable(), creature2.GetMutable());
+   new_mutable.Mutate();
+   new_mutable.Mutate();
+   Creature new_creature(new_genome, new_mutable);
+   new_creature.RandomInitialization(world_width, world_height);
+   new_creature.SetGeneration(creature1.GetGeneration() + 1);
+   AddCreature(new_creature);
+ } else {
+   neat::Genome new_genome =
+           neat::Crossover(creature2.GetGenome(), creature1.GetGenome());
+   new_genome.Mutate();
+   new_genome.Mutate();
+   Mutable new_mutable =
+           MutableCrossover(creature2.GetMutable(), creature1.GetMutable());
+   new_mutable.Mutate();
+   new_mutable.Mutate();
+   Creature new_creature(new_genome, new_mutable);
+   new_creature.RandomInitialization(world_width, world_height);
+   new_creature.SetGeneration(creature2.GetGeneration() + 1);
+   AddCreature(new_creature);
+ }
 }
 
 
