@@ -16,131 +16,19 @@
  * (neural network), genome, neuron data, reproduction cooldown, and age. It
  * also initializes the creature as a movable entity.
  *
- * @param genome A `neat::Genome` object that represents the genetic makeup of
- * the creature, which is used to initialize the creature's neural network
- * (`brain_`).
+ * @param genome A `neat::Genome´object used to initialize the brain of the
+ * AliveEntity.
+ * @param mutables A Mutable object used to initialize the properties of the
+ * AliveEntity.
  *
- * Default properties:
- * - Health: 100
- * - Energy: 100
- * - Brain (Neural Network): Constructed from the provided genome.
- * - Neuron Data: Initialized with zeros (size equal to
- * `settings::environment::kInputNeurons`).
- * - Reproduction Cooldown: Set to
- * `settings::environment::kReproductionCooldown`.
- * - Age: 0
  */
 Creature::Creature(neat::Genome genome, Mutable mutables)
     : MovableEntity(),
-      mutable_(mutables),
-      brain_(neat::NeuralNetwork(genome)),
-      genome_(genome),
-      neuron_data_(settings::environment::kInputNeurons, 0),
+      AliveEntity(genome, mutables),
       vision_radius_(mutables.GetVisionFactor()),
       vision_angle_(settings::physical_constraints::kVisionARratio
                     / mutables.GetVisionFactor()),
-      age_(0),
       reproduction_cooldown_ (mutables.GetMaturityAge()) {
-    size_ = mutables.GetBabySize();
-    health_ = mutables.GetIntegrity() * pow(size_, 2);
-    energy_ = mutables.GetEnergyDensity() * pow(size_, 2);
-}
-
-
-/*!
- * @brief Retrieves the generation of the creature.
- *
- * @details This function returns the generation number of the creature
- * instance. The generation is stored as a private member variable `generation_`
- * within the Creature class. This function is a constant member function,
- * implying it does not modify any member variables.
- *
- * @return int The generation number of the creature.
- */
-int Creature::GetGeneration() const { return generation_; }
-
-/*!
- * @brief Sets the generation number for the creature.
- *
- * @details This method assigns a new generation number to the creature.
- * The generation number typically represents the creature's place in a
- * generational sequence.
- *
- * @param generation The generation number to be set for the creature.
- */
-void Creature::SetGeneration(int generation) { generation_ = generation; }
-
-/*!
- * @brief Retrieves the current energy level of the creature.
- *
- * @details This method returns the creature's current energy, which is a key
- * factor in its survival and activities.
- *
- * @return double The current energy level of the creature.
- */
-double Creature::GetEnergy() const { return energy_; }
-
-/*!
- * @brief Balances the creature's health and energy levels based on various
- * conditions.
- *
- * @details This method adjusts the creature's health and energy depending on
- * their current values and predefined thresholds.
- */
-void Creature::BalanceHealthEnergy() {
-  if (GetEnergy() < 0) {
-    SetHealth(GetHealth() + GetEnergy() - 0.1);
-    SetEnergy(0.1);
-  } else if (GetHealth() < GetEnergy() &&
-             GetEnergy() >= 0.1*max_energy_) {
-    SetEnergy(GetEnergy() - 0.1);
-    SetHealth(GetHealth() + 0.1);
-  }
-}
-
-/*!
- * @brief Retrieves the current health level of the creature.
- *
- * @details This method returns the creature's current health, reflecting its
- * overall well-being.
- *
- * @return double The current health level of the creature.
- */
-double Creature::GetHealth() const { return health_; }
-
-/*!
- * @brief Sets the health level of the creature.
- *
- * @param health The new health level to be set, capped at 100.
- */
-void Creature::SetHealth(double health) {
-  if (health > mutable_.GetIntegrity() * pow(size_, 2)) {
-    health_ = mutable_.GetIntegrity() * pow(size_, 2);
-  } else {
-    health_ = health;
-  }
-}
-
-/*!
- * @brief Triggers the death of the creature.
- *
- * @details This method changes the state of the creature to 'Dead', indicating
- * its demise.
- */
-void Creature::Dies() { SetState(Dead); }
-
-/*!
- * @brief Sets the energy level of the creature.
- *
- * @param energy The new energy level to be set, limited by the creature's
- * maximum energy.
- */
-void Creature::SetEnergy(double energy) {
-  if (energy > max_energy_) {
-    energy_ = max_energy_;
-  } else {
-    energy_ = energy;
-  }
 }
 
 /*!
@@ -206,57 +94,6 @@ bool Creature::Compatible(const Creature& other_creature){
 }
 
 /*!
- * @brief Retrieves the maximum energy level of the creature.
- *
- * @details This method returns the upper limit of the creature's energy
- * capacity.
- *
- * @return double The maximum energy level of the creature.
- */
-double Creature::GetMaxEnergy() const { return max_energy_; }
-
-
-/*!
- * @brief Sets  the maximum energy level of the creature.
- *
- * @details This method sets the upper limit of the creature's energy
- * capacity.
- */
-void Creature::SetMaxEnergy(double max_energy) { max_energy_ = max_energy; };
-
-
-/*!
- * @brief Updates the maximum energy level of the creature.
- *
- * @details This method takes into account the changes in the energy
- *          level due to both the increased size and the age.
- *
- * @param max_energy The desired maximum energy level.
- */
-void Creature::UpdateMaxEnergy() {
-  max_energy_ = mutable_.GetEnergyDensity() * pow(size_, 2) * (1 - age_/1000);
-}
-
-/*!
- * @brief Retrieves the age of the creature.
- *
- * @details This method returns the current age of the creature, which is stored
- * in the age_ member variable.
- *
- * @return The current age of the creature.
- */
-double Creature::GetAge() const { return age_; }
-
-/*!
- * @brief Sets the age of the creature.
- *
- * @param age The new age to be set.
- */
-void Creature::SetAge(double age) {
-  age_ = age;
-}
-
-/*!
  * @brief Handles the creature's consumption of food.
  *
  * @details Increases the creature's energy based on the nutritional value of
@@ -307,25 +144,6 @@ void Creature::Update(double deltaTime, double const kMapWidth,
   }
 }
 
-/*!
- * @brief Retrieves the creature's genetic genome.
- *
- * @details Returns the genome of the creature, which is a representation of its
- * genetic makeup.
- *
- * @return The genome of the creature.
- */
-neat::Genome Creature::GetGenome() const { return genome_; }
-
-/*!
- * @brief Retrieves the creature's mutables
- *
- * @details Return the mutables of the creature which is a representation of its
- * characteristics
- *
- * @return The mutables of the creature.
- */
-Mutable Creature::GetMutable() const {return mutable_;}
 
 /*!
  * @brief Handles the collision of the creature with another entity.

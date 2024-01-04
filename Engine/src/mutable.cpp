@@ -19,7 +19,7 @@ Mutable::Mutable()
     baby_size_(settings::physical_constraints::kDBabySize),
     max_force_(settings::physical_constraints::kDMaxForce),
     growth_factor_(settings::physical_constraints::kDGrowthFactor),
-    color_(0.5f){
+    color_(0.0f){
   UpdateReproduction();
 }
 

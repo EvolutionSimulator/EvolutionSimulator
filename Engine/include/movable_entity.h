@@ -3,7 +3,7 @@
 
 #include "entity.h"
 
-class MovableEntity : public Entity {
+class MovableEntity : virtual public Entity {
  public:
   MovableEntity();
 

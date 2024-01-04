@@ -38,6 +38,7 @@ add_library(Engine STATIC
   src/collisions.cpp
   include/config.h
   include/mutable.h src/mutable.cpp
+  include/alive_entity.h src/alive_entity.cpp
 
 )
 
