@@ -37,7 +37,6 @@ void Engine::Run() {
   while (running_) {
     if (paused_)
       continue;
-
     timer::time_point current_time = timer::now();
     double speed = engine_speed_;
 
