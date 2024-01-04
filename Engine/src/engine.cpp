@@ -33,12 +33,12 @@ void Engine::Run() {
       // time since last FixedUpdate call
       double fixed_update_delta =
           std::chrono::duration<double>(current_time - last_fixed_update_time_)
-              .count() * 2;
+              .count();
 
       // time since last Update call
       double update_delta =
           std::chrono::duration<double>(current_time - last_update_time_)
-              .count() * 2;
+              .count();
 
       // we calculate how many times we should call FixedUpdate using the time
       // since last execution
