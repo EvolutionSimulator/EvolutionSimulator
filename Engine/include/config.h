@@ -51,7 +51,7 @@ constexpr int kMinCreatureSize = 2;
 constexpr double kReproductionThreshold = 0.80;
 constexpr double kReproductionCooldown = 10;
 constexpr int kInputNeurons = 11;
-constexpr int kOutputNeurons = 5;
+constexpr int kOutputNeurons = 6;
 constexpr double kMaxNutritionalValue = 5;
 constexpr double kDefaultLifespan = 30;
 constexpr double kPhotosynthesisFactor = 0.1;
@@ -87,7 +87,7 @@ constexpr double kDDiet = 0.5; // Default omnivores
 constexpr double KDEatingCooldown = 1; // Decrease for easier survival
 constexpr double KDDigestionRate = 3;
 constexpr double KDGeneticStrength = 0.6;
-constexpr double KDAcidToEnergy = 10;
+constexpr double KDAcidToEnergy = 5; // Increase for easier survival
 } //namespace physical_constraints
 
 namespace ui {

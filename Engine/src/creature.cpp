@@ -340,12 +340,16 @@ Mutable Creature::GetMutable() const {return mutable_;}
 void Creature::OnCollision(Entity &other_entity, double const kMapWidth,
                            double const kMapHeight) {
   if (Food *food = dynamic_cast<Food *>(&other_entity)) {
-    if (food->GetState() == Entity::Alive & eating_cooldown_ == 0.0) {
-    Bite(food);
+    if (food->GetState() == Entity::Alive && eating_cooldown_ == 0.0 && biting_ == 1) {
+      {
+        if (IsFoodInSight(food))
+        {
+          Bite(food);
+        }
+      }
     }
-  } else {
-    MovableEntity::OnCollision(other_entity, kMapWidth, kMapHeight);
   }
+  MovableEntity::OnCollision(other_entity, kMapWidth, kMapHeight);
 }
 
 /*!
@@ -379,6 +383,7 @@ void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
   SetRotationalAcceleration(std::tanh(output.at(2))*mutable_.GetMaxForce());
   Grow(std::max(std::tanh(output.at(3)) * deltaTime, 0.0));
   AddAcid(std::max(std::tanh(output.at(4)) * 10.0, 0.0));
+  biting_ = std::tanh(output.at(5)) > 0 ? 1 : 0;
 }
 
 /*!
@@ -434,8 +439,8 @@ void Creature::ProcessVisionFood(
   if (closeMeat){
         distance_meat_ = this->GetDistance(*closeMeat, width, height) - (*closeMeat).GetSize();
         orientation_meat_ = this->GetRelativeOrientation(*closeMeat);
-        closest_meat_id_ = closePlant->GetID();
-        meat_size_ = closePlant->GetSize();
+        closest_meat_id_ = closeMeat->GetID();
+        meat_size_ = closeMeat->GetSize();
   }
   else {
       distance_meat_ = vision_radius_;
@@ -775,20 +780,21 @@ void Creature::Digest(double deltaTime)
 {
 
   double quantity = std::min(deltaTime * settings::physical_constraints::KDDigestionRate, stomach_acid_);
-  quantity = std::min(quantity,  potential_energy_in_stomach_);
-  stomach_acid_ -= quantity;
+  quantity = std::min(quantity,  stomach_fullness_);
+
+  if (quantity < settings::engine::EPS || stomach_fullness_ < settings::engine::EPS) { return; };
+  double avg_nutritional_value = potential_energy_in_stomach_ / stomach_fullness_;
 
   // Digests the food, increasing energy
-  SetEnergy(GetEnergy() + quantity);
+  SetEnergy(GetEnergy() + quantity * avg_nutritional_value);
   if (GetEnergy() > max_energy_) {
     BalanceHealthEnergy();
   }
 
   // Empties out the stomach space
-  double avg_nutritional_value = potential_energy_in_stomach_ / stomach_fullness_;
-  potential_energy_in_stomach_ -= quantity;
-  stomach_fullness_ -= quantity/avg_nutritional_value;
-
+  stomach_acid_ -= quantity;
+  potential_energy_in_stomach_ -= quantity * avg_nutritional_value;
+  stomach_fullness_ -= quantity;
 }
 
 /*!
@@ -803,13 +809,12 @@ void Creature::Bite(Food* food)
 {
   //Reset eating cooldown, makes creature stop to bite
   eating_cooldown_ = mutable_.GetEatingSpeed();
-  velocity_ = 0;
 
   //Bite logic
   double max_nutrition = 0;
 
   //Check how much food the creature can eat, depending on bite strength and fullness of stomach
-  double available_space = stomach_capacity_ - stomach_fullness_;
+  double available_space = std::max(stomach_capacity_ - stomach_fullness_, 0.0);
   double food_to_eat = std::sqrt(std::min(pow(bite_strength_,2), available_space));
 
   // Check if creature eats the whole food or a part of it
@@ -830,10 +835,10 @@ void Creature::Bite(Food* food)
 
   // Herbivore/carnivore multiplier
   if (Plant *plant = dynamic_cast<Plant *>(food)) {
-    max_nutrition = max_nutrition * 1/mutable_.GetDiet() / 2;
+    max_nutrition = max_nutrition * 2 * (1 - mutable_.GetDiet());
   }
   else if (Meat *meat = dynamic_cast<Meat *>(food)) {
-    max_nutrition = max_nutrition * 1/(1-mutable_.GetDiet()) / 2;
+    max_nutrition = max_nutrition * 2 * mutable_.GetDiet();
   }
 
   //Add nutrition to stomach, make sure capacity is not surpassed
@@ -852,3 +857,16 @@ void Creature::AddAcid(double quantity)
 }
 
 double Creature::GetAcid() const {return stomach_acid_; };
+
+bool Creature::IsFoodInSight(Food *food)
+{
+  auto cone_center = Point(x_coord_, y_coord_);
+  auto cone_orientation = GetOrientation();
+  auto cone_left_boundary = OrientedAngle(cone_orientation - vision_angle_ / 2);
+  auto cone_right_boundary =
+      OrientedAngle(cone_orientation + vision_angle_ / 2);
+  auto food_point = Point(food->GetCoordinates());
+  auto food_direction = OrientedAngle(cone_center, food_point);
+
+  return food_direction.IsInsideCone(cone_left_boundary, cone_right_boundary);
+}
