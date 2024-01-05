@@ -81,6 +81,7 @@ class Creature : public MovableEntity {
           double grid_cell_size) const;
   Food *GetClosestMeatInSight(std::vector<std::vector<std::vector<Entity *>>> &grid,
           double grid_cell_size) const;
+  bool IsFoodInSight(Food *food);
 
 
   void Grow(double energy);
@@ -146,6 +147,7 @@ class Creature : public MovableEntity {
   double bite_strength_; /*! How much radius of things it can bite - - mutable proportional to size */
   double eating_cooldown_; /*! How much time it has to wait to bite - mutable*/
   double stomach_acid_; /*! Added when digestion occurs */
+  bool biting_; /*! Indicates whether creature is biting or not*/
 };
 
 std::vector<Food *> get_food_at_distance(
