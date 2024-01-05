@@ -28,7 +28,7 @@ constexpr double kWeightSharedLinks = 0.3;
 constexpr double kAverageWeightSharedLinks = 0.5;
 constexpr double kColorCompatibility = 0.1;
 constexpr double kMutablesCompatibility = 0.5;
-constexpr double kCompatibilityThreshold = 1;
+constexpr double kCompatibilityThreshold = 2;
 }
 
 namespace environment {
@@ -50,7 +50,7 @@ constexpr double kGridCellSize = 50.0;
 constexpr int kMinCreatureSize = 2;
 constexpr double kReproductionThreshold = 0.80;
 constexpr double kReproductionCooldown = 10;
-constexpr int kInputNeurons = 11;
+constexpr int kInputNeurons = 12;
 constexpr int kOutputNeurons = 6;
 constexpr double kMaxNutritionalValue = 5;
 constexpr double kDefaultLifespan = 30;

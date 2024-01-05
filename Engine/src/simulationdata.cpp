@@ -250,15 +250,14 @@ void SimulationData::InitializeCreatures() {
   double min_creature_size = settings::environment::kMinCreatureSize;
 
   creatures_.clear();
-
+  neat::Genome genome = neat::minimallyViableGenome();
   for (double x = 0; x < world_width; x += 2.0) {
     for (double y = 0; y < world_height; y += 2.0) {
       if (std::rand() / (RAND_MAX + 1.0) < creature_density) {
-        neat::Genome genome(settings::environment::kInputNeurons,
-                            settings::environment::kOutputNeurons);
+        //neat::Genome genome(settings::environment::kInputNeurons,
+        //                    settings::environment::kOutputNeurons);
         Mutable mutables;
         for (int i = 0; i < 40; i++) {
-          genome.Mutate();
           mutables.Mutate();
         }
         Creature new_creature(genome, mutables);

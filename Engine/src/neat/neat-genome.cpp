@@ -596,6 +596,7 @@ bool Genome::FindNeuronById(int targetId, Neuron& foundNeuron) const{
 
 double Genome::CompatibilityBetweenGenomes(const Genome& other) const {
   // Identify shared neurons
+  int maxNeurons = std::min(this->neurons_.size(), other.neurons_.size());
   std::unordered_map<int, Neuron> shared_neurons;
   for (const Neuron& neuron : neurons_) {
       Neuron neuronCopy = neuron; // Make a copy of the neuron
@@ -605,6 +606,7 @@ double Genome::CompatibilityBetweenGenomes(const Genome& other) const {
   }
 
   // Identify shared links
+  int maxLinks = std::min(this->links_.size(), other.links_.size());
   std::set<std::pair<int, int>> shared_link_pairs;
   Genome& non_const_this = const_cast<Genome&>(*this);
 
@@ -644,9 +646,40 @@ double Genome::CompatibilityBetweenGenomes(const Genome& other) const {
 
   // Compute compatibility score based on shared neurons, shared links, and weight similarities
   // Use a formula that considers these factors and assigns a higher score to more compatible genomes
-  double compatibility_score = settings::compatibility::kWeightSharedNeurons * shared_neurons.size()
-                              + settings::compatibility::kWeightSharedLinks * shared_link_pairs.size()
+  double compatibility_score = settings::compatibility::kWeightSharedNeurons * (maxNeurons - shared_neurons.size())
+                              + settings::compatibility::kWeightSharedLinks * (maxLinks - shared_link_pairs.size())
                               + settings::compatibility::kAverageWeightSharedLinks * total_weight_similarity;
   return compatibility_score;
+}
+
+
+Genome minimallyViableGenome(){
+  Genome genome(settings::environment::kInputNeurons, 6);
+
+  Link constant_acceleration(1, 13, 1);
+  genome.AddLink(constant_acceleration);
+
+  Link digest(1, 18, 1);
+  Link stop_digesting(6, 18, -1);
+  genome.AddLink(digest);
+  genome.AddLink(stop_digesting);
+
+  Link orient_towards_food(7, 15, 1);
+  genome.AddLink(orient_towards_food);
+
+  Neuron BiteManager(NeuronType::kHidden, 1);
+  BiteManager.SetActivation(ActivationType::sigmoid);
+  int id = BiteManager.GetId();
+  genome.AddNeuron(BiteManager);
+
+  Link distance_bite(8, id, -1);
+  Link activation_bite(id, 17, 1);
+  genome.AddLink(distance_bite);
+  genome.AddLink(activation_bite);
+
+  Link slow_rotation(5, 15, -0.1);
+  genome.AddLink(slow_rotation);
+
+  return genome;
 }
 }  // namespace neat
