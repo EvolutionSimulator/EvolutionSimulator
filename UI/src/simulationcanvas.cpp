@@ -460,7 +460,7 @@ void SimulationCanvas::RenderSimulation(DataAccessor<SimulationData> data) {
   sf::Vector2f viewTopLeft = currentView.getCenter() - (currentView.getSize() / 2.0f);
   sf::Vector2f viewSize = currentView.getSize(); // View size considering the zoom
 
-  food_density_shader_.setUniform("resolution", sf::Vector2f(data->GetEnvironment().GetMapWidth(), data->GetEnvironment().GetMapHeight()));
+  food_density_shader_.setUniform("resolution", sf::Vector2f(mapWidth, mapHeight));
   food_density_shader_.setUniform("viewTopLeft", viewTopLeft);
   food_density_shader_.setUniform("viewSize", viewSize);  // Updated to pass view size
   food_density_shader_.setUniform("densityTexture", food_density_texture_);
