@@ -470,6 +470,9 @@ void SimulationCanvas::RenderSimulation(DataAccessor<SimulationData> data) {
   int spriteIndex = 0;
 
   for (const auto& food : data->food_entities_) {
+    if (!EntityOnScreen(food)) {
+        continue;
+    }
     sf::Sprite foodSprite;
     foodSprite.setTexture(food_texture_);
 
@@ -490,6 +493,10 @@ void SimulationCanvas::RenderSimulation(DataAccessor<SimulationData> data) {
 
   // Iterate through creatures and create a gradient circle shape for each
   for (const auto& creature : data->creatures_) {
+    if(!EntityOnScreen(creature)){
+        continue;
+    }
+
     // int generation = creature.GetGeneration();
     // sf::Color color(20 + generation * 20, 77, 64);
     // sf::VertexArray creatureShape = createGradientCircle(
@@ -595,6 +602,31 @@ void SimulationCanvas::DrawGraph(sf::RenderWindow& window,
 
   // Draw the graph
   window.draw(line);
+}
+
+bool SimulationCanvas::EntityOnScreen(const Entity& entity){
+    sf::Vector2f center = getView().getCenter();
+    sf::Vector2f size = getView().getSize();
+    std::pair<float, float> coords = entity.GetCoordinates();
+    double entity_size = entity.GetSize();
+    double width = GetSimulation()->GetSimulationData()->GetEnvironment().GetMapWidth();
+    double height = GetSimulation()->GetSimulationData()->GetEnvironment().GetMapHeight();
+    bool result = false;
+
+    // Calculate distances to the view's edges
+    float distanceToLeftEdge = std::fabs(coords.first - (center.x - size.x / 2));
+    float distanceToRightEdge = std::fabs((center.x + size.x / 2) - coords.first);
+    float distanceToTopEdge = std::fabs(coords.second - (center.y - size.y / 2));
+    float distanceToBottomEdge = std::fabs((center.y + size.y / 2) - coords.second);
+
+    // Check if the entity is within the view bounds
+    bool withinHorizontalBounds = distanceToLeftEdge < size.x / 2 + entity_size || distanceToRightEdge < size.x / 2 + entity_size;
+    bool withinVerticalBounds = distanceToTopEdge < size.y / 2 + entity_size || distanceToBottomEdge < size.y / 2 + entity_size;
+
+    if (withinHorizontalBounds && withinVerticalBounds) {
+        result = true;  // The entity is visible in the view
+    }
+    return result;
 }
 
 void SimulationCanvas::DrawCreatureCountOverTime(
@@ -922,6 +954,35 @@ void SimulationCanvas::mouseMoveEvent(QMouseEvent* event) {
 
         sf::View view = getView();
         view.move(averagedDelta);
+        // Get map dimensions
+        double mapWidth = simulation_->GetSimulationData()->GetEnvironment().GetMapWidth();
+        double mapHeight = simulation_->GetSimulationData()->GetEnvironment().GetMapHeight();
+
+        // Get the new center of the view
+        sf::Vector2f newCenter = view.getCenter();
+
+        // Wrap around horizontally
+        if (newCenter.x < 0) {
+            currentMousePosition.x += mapWidth;
+            newCenter.x += mapWidth;
+        }
+        else if (newCenter.x > mapWidth) {
+            currentMousePosition.x -= mapWidth;
+            newCenter.x -= mapWidth;
+        }
+        std::cout << newCenter.x;
+
+        // Wrap around vertically
+        if (newCenter.y < 0) {
+            currentMousePosition.y += mapHeight;
+            newCenter.y += mapHeight;
+        }
+        else if (newCenter.y > mapHeight) {
+            currentMousePosition.y -= mapHeight;
+            newCenter.y -= mapHeight;
+        }
+        // Set the wrapped center back to the view
+        view.setCenter(newCenter);
         setView(view);
 
         initialClickPosition = currentMousePosition;
