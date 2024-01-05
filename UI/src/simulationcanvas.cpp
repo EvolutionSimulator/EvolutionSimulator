@@ -451,25 +451,30 @@ void SimulationCanvas::RenderSimulation(DataAccessor<SimulationData> data) {
   clear(sf::Color(20, 22, 69));
 
   // Create a full-screen rectangle
-  sf::RectangleShape background(sf::Vector2f(getSize().x, getSize().y));
-
+  double mapWidth = data->GetEnvironment().GetMapWidth();
+  double mapHeight = data->GetEnvironment().GetMapHeight();
   // Apply the shader to the background
   sf::RenderStates backgroundState;
 
   sf::View currentView = getView();
   sf::Vector2f viewTopLeft = currentView.getCenter() - (currentView.getSize() / 2.0f);
-  float zoomFactorShader = initialViewSize.x / currentView.getSize().x; // Assuming initialViewSize is stored during initialization
+  sf::Vector2f viewSize = currentView.getSize(); // View size considering the zoom
 
-  food_density_shader_.setUniform("resolution", sf::Vector2f(data->GetEnvironment().GetMapWidth(),
-                                                             data->GetEnvironment().GetMapHeight()));
+  food_density_shader_.setUniform("resolution", sf::Vector2f(data->GetEnvironment().GetMapWidth(), data->GetEnvironment().GetMapHeight()));
   food_density_shader_.setUniform("viewTopLeft", viewTopLeft);
-  food_density_shader_.setUniform("zoomFactor", zoomFactorShader);
+  food_density_shader_.setUniform("viewSize", viewSize);  // Updated to pass view size
   food_density_shader_.setUniform("densityTexture", food_density_texture_);
   food_density_shader_.setUniform("maxDensity", 1.0f);
 
   backgroundState.shader = &food_density_shader_;
 
-  draw(background, backgroundState);
+  for (int xShift = -1; xShift <= 1; xShift++) {
+    for (int yShift = -1; yShift <= 1; yShift++) {
+      sf::RectangleShape background(sf::Vector2f(mapWidth, mapHeight));
+      background.setPosition(xShift * mapWidth, yShift * mapHeight);
+      draw(background, backgroundState);
+    }
+  }
 
   // Iterate through food and load the corresponding sprite
   // Note that we are assuming to be working with a sprite sheet of 256x256 per sprite
