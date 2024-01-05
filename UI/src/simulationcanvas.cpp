@@ -456,8 +456,14 @@ void SimulationCanvas::RenderSimulation(DataAccessor<SimulationData> data) {
   // Apply the shader to the background
   sf::RenderStates backgroundState;
 
+  sf::View currentView = getView();
+  sf::Vector2f viewTopLeft = currentView.getCenter() - (currentView.getSize() / 2.0f);
+  float zoomFactorShader = initialViewSize.x / currentView.getSize().x; // Assuming initialViewSize is stored during initialization
+
   food_density_shader_.setUniform("resolution", sf::Vector2f(data->GetEnvironment().GetMapWidth(),
                                                              data->GetEnvironment().GetMapHeight()));
+  food_density_shader_.setUniform("viewTopLeft", viewTopLeft);
+  food_density_shader_.setUniform("zoomFactor", zoomFactorShader);
   food_density_shader_.setUniform("densityTexture", food_density_texture_);
   food_density_shader_.setUniform("maxDensity", 1.0f);
 
@@ -467,94 +473,95 @@ void SimulationCanvas::RenderSimulation(DataAccessor<SimulationData> data) {
 
   // Iterate through food and load the corresponding sprite
   // Note that we are assuming to be working with a sprite sheet of 256x256 per sprite
-  int spriteIndex = 0;
 
   for (const auto& food : data->food_entities_) {
-    if (!EntityOnScreen(food)) {
-        continue;
+    auto renderPositions = getEntityRenderPositions(food);
+    for (const auto& pos : renderPositions) {
+      RenderFoodAtPosition(food, pos);
     }
-    sf::Sprite foodSprite;
-    foodSprite.setTexture(food_texture_);
-
-    if (food.GetType() == Food::type::plant) {
-      foodSprite.setTextureRect(sf::IntRect(0, spriteIndex * 256, 256, 256));
-    } else if (food.GetType() == Food::type::meat) {
-      foodSprite.setTextureRect(sf::IntRect(256, spriteIndex * 256, 256, 256));
-    }
-    spriteIndex = spriteIndex == 2 ? 0 : spriteIndex+1;
-    foodSprite.setOrigin(128.0f, 128.0f);
-
-    foodSprite.setScale(food.GetSize()/128.0f, food.GetSize()/128.0f);
-    std::pair<double, double> foodCoordinates = food.GetCoordinates();
-    sf::Transform foodTransform;
-    foodTransform.translate(foodCoordinates.first, foodCoordinates.second);
-    draw(foodSprite, foodTransform);
   }
 
   // Iterate through creatures and create a gradient circle shape for each
   for (const auto& creature : data->creatures_) {
-    if(!EntityOnScreen(creature)){
-        continue;
+    auto renderPositions = getEntityRenderPositions(creature);
+    for (const auto& pos : renderPositions) {
+      RenderCreatureAtPosition(creature, pos);
     }
-
-    // int generation = creature.GetGeneration();
-    // sf::Color color(20 + generation * 20, 77, 64);
-    // sf::VertexArray creatureShape = createGradientCircle(
-    //             creature.GetSize(), color, sf::Color(250,250,250));
-    sf::Sprite base_sprite;
-    sf::Sprite eyes_sprite;
-    sf::Sprite tail_sprite;
-    base_sprite.setTexture(creature_texture_);
-    eyes_sprite.setTexture(eyes_texture_);
-    tail_sprite.setTexture(tail_texture_);
-
-    //Get which sprites to use depending on the characteristics of the creature
-    int size_type  = std::floor((15 - creature.GetSize())/5); //size is the other way around
-    size_type = size_type > 2 ? 2 : size_type;
-    int eyes_type = std::floor(creature.GetMutable().GetVisionFactor()/100);
-    eyes_type = eyes_type > 3 ? 3 : eyes_type;
-    int tail_type = std::floor(creature.GetMutable().GetMaxForce()/5);
-    tail_type = tail_type > 3 ? 3 : tail_type;
-
-    //Assuming the sprites are size 768x768
-    base_sprite.setTextureRect(sf::IntRect(0, size_type * 768, 768, 768));
-    eyes_sprite.setTextureRect(sf::IntRect(eyes_type * 768, size_type * 768, 768, 768));
-    tail_sprite.setTextureRect(sf::IntRect(tail_type * 768, size_type * 768, 768, 768));
-
-    //To make the origin at 0 so that the creature rotates correctly
-    base_sprite.setOrigin(384.0f, 384.0f);
-    eyes_sprite.setOrigin(384.0f, 384.0f);
-    tail_sprite.setOrigin(384.0f, 384.0f);
-
-    //We use a certain proportion because the creature's body doesn't occupy the entirety of the image
-    base_sprite.setScale(creature.GetSize()/208.0f, creature.GetSize()/208.0f);
-    eyes_sprite.setScale(creature.GetSize()/208.0f, creature.GetSize()/208.0f);
-    tail_sprite.setScale(creature.GetSize()/208.0f, creature.GetSize()/208.0f);
-
-    //Rotation offset
-    base_sprite.setRotation(90.0f);
-    eyes_sprite.setRotation(90.0f);
-    tail_sprite.setRotation(90.0f);
-
-    // Use creature coordinates directly for position
-    std::pair<double, double> creatureCoordinates = creature.GetCoordinates();
-
-    //Add color filter to creature
-    color_shader_.setUniform("hueShift", creature.GetMutable().GetColor());
-
-    sf::Transform creatureTransform;
-    creatureTransform.translate(creatureCoordinates.first,
-                                creatureCoordinates.second);
-    creatureTransform.rotate(creature.GetOrientation() * 180.0f /M_PI);
-
-    sf::RenderStates states;
-    states.shader = &color_shader_;
-    states.transform = creatureTransform;
-
-    draw(base_sprite, states);
-    draw(eyes_sprite, states);
-    draw(tail_sprite, states);
   }
+}
+
+void SimulationCanvas::RenderFoodAtPosition(const Food& food, const std::pair<double, double>& position){
+  sf::Sprite foodSprite;
+  foodSprite.setTexture(food_texture_);
+  int spriteIndex = food.GetID() % 3;
+  if (food.GetType() == Food::type::plant) {
+    foodSprite.setTextureRect(sf::IntRect(0, spriteIndex * 256, 256, 256));
+  } else if (food.GetType() == Food::type::meat) {
+    foodSprite.setTextureRect(sf::IntRect(256, spriteIndex * 256, 256, 256));
+  }
+  foodSprite.setOrigin(128.0f, 128.0f);
+
+  foodSprite.setScale(food.GetSize()/128.0f, food.GetSize()/128.0f);
+
+  sf::Transform foodTransform;
+  foodTransform.translate(position.first, position.second);
+  draw(foodSprite, foodTransform);
+}
+
+void SimulationCanvas::RenderCreatureAtPosition(const Creature& creature, const std::pair<double, double>& position){
+  sf::Sprite base_sprite;
+  sf::Sprite eyes_sprite;
+  sf::Sprite tail_sprite;
+  base_sprite.setTexture(creature_texture_);
+  eyes_sprite.setTexture(eyes_texture_);
+  tail_sprite.setTexture(tail_texture_);
+
+  //Get which sprites to use depending on the characteristics of the creature
+  int size_type  = std::floor((15 - creature.GetSize())/5); //size is the other way around
+  size_type = size_type > 2 ? 2 : size_type;
+  int eyes_type = std::floor(creature.GetMutable().GetVisionFactor()/100);
+  eyes_type = eyes_type > 3 ? 3 : eyes_type;
+  int tail_type = std::floor(creature.GetMutable().GetMaxForce()/5);
+  tail_type = tail_type > 3 ? 3 : tail_type;
+
+  //Assuming the sprites are size 768x768
+  base_sprite.setTextureRect(sf::IntRect(0, size_type * 768, 768, 768));
+  eyes_sprite.setTextureRect(sf::IntRect(eyes_type * 768, size_type * 768, 768, 768));
+  tail_sprite.setTextureRect(sf::IntRect(tail_type * 768, size_type * 768, 768, 768));
+
+  //To make the origin at 0 so that the creature rotates correctly
+  base_sprite.setOrigin(384.0f, 384.0f);
+  eyes_sprite.setOrigin(384.0f, 384.0f);
+  tail_sprite.setOrigin(384.0f, 384.0f);
+
+  //We use a certain proportion because the creature's body doesn't occupy the entirety of the image
+  base_sprite.setScale(creature.GetSize()/208.0f, creature.GetSize()/208.0f);
+  eyes_sprite.setScale(creature.GetSize()/208.0f, creature.GetSize()/208.0f);
+  tail_sprite.setScale(creature.GetSize()/208.0f, creature.GetSize()/208.0f);
+
+  //Rotation offset
+  base_sprite.setRotation(90.0f);
+  eyes_sprite.setRotation(90.0f);
+  tail_sprite.setRotation(90.0f);
+
+  // Use creature coordinates directly for position
+  std::pair<double, double> creatureCoordinates = creature.GetCoordinates();
+
+  //Add color filter to creature
+  color_shader_.setUniform("hueShift", creature.GetMutable().GetColor());
+
+  sf::Transform creatureTransform;
+  creatureTransform.translate(position.first,
+                              position.second);
+  creatureTransform.rotate(creature.GetOrientation() * 180.0f /M_PI);
+
+  sf::RenderStates states;
+  states.shader = &color_shader_;
+  states.transform = creatureTransform;
+
+  draw(base_sprite, states);
+  draw(eyes_sprite, states);
+  draw(tail_sprite, states);
 }
 
 void SimulationCanvas::DrawGraph(sf::RenderWindow& window,
@@ -604,29 +611,48 @@ void SimulationCanvas::DrawGraph(sf::RenderWindow& window,
   window.draw(line);
 }
 
-bool SimulationCanvas::EntityOnScreen(const Entity& entity){
-    sf::Vector2f center = getView().getCenter();
-    sf::Vector2f size = getView().getSize();
-    std::pair<float, float> coords = entity.GetCoordinates();
-    double entity_size = entity.GetSize();
-    double width = GetSimulation()->GetSimulationData()->GetEnvironment().GetMapWidth();
-    double height = GetSimulation()->GetSimulationData()->GetEnvironment().GetMapHeight();
-    bool result = false;
+std::vector<std::pair<double, double>> SimulationCanvas::getEntityRenderPositions(const Entity& entity) {
+    std::vector<std::pair<double, double>> positions;
+    auto [entityX, entityY] = entity.GetCoordinates();
+    double entitySize = entity.GetSize();
+    sf::Vector2f viewCenter = getView().getCenter();
+    sf::Vector2f viewSize = getView().getSize();
+    double mapWidth = GetSimulation()->GetSimulationData()->GetEnvironment().GetMapWidth();
+    double mapHeight = GetSimulation()->GetSimulationData()->GetEnvironment().GetMapHeight();
 
-    // Calculate distances to the view's edges
-    float distanceToLeftEdge = std::fabs(coords.first - (center.x - size.x / 2));
-    float distanceToRightEdge = std::fabs((center.x + size.x / 2) - coords.first);
-    float distanceToTopEdge = std::fabs(coords.second - (center.y - size.y / 2));
-    float distanceToBottomEdge = std::fabs((center.y + size.y / 2) - coords.second);
+    // Function to check if position is within view bounds
+    auto isInView = [&](double x, double y) {
+        double halfWidth = viewSize.x / 2;
+        double halfHeight = viewSize.y / 2;
+        double leftBound = viewCenter.x - halfWidth - entitySize;
+        double rightBound = viewCenter.x + halfWidth + entitySize;
+        double topBound = viewCenter.y - halfHeight - entitySize;
+        double bottomBound = viewCenter.y + halfHeight + entitySize;
 
-    // Check if the entity is within the view bounds
-    bool withinHorizontalBounds = distanceToLeftEdge < size.x / 2 + entity_size || distanceToRightEdge < size.x / 2 + entity_size;
-    bool withinVerticalBounds = distanceToTopEdge < size.y / 2 + entity_size || distanceToBottomEdge < size.y / 2 + entity_size;
+        return (x + entitySize > leftBound) && (x - entitySize < rightBound) &&
+               (y + entitySize > topBound) && (y - entitySize < bottomBound);
+    };
 
-    if (withinHorizontalBounds && withinVerticalBounds) {
-        result = true;  // The entity is visible in the view
+    // Check original position
+    if (isInView(entityX, entityY)) {
+        positions.emplace_back(entityX, entityY);
     }
-    return result;
+
+    // Check wrap-around positions
+    std::vector<std::pair<double, double>> potentialPositions = {
+        {entityX + mapWidth, entityY}, {entityX - mapWidth, entityY},
+        {entityX, entityY + mapHeight}, {entityX, entityY - mapHeight},
+        {entityX + mapWidth, entityY + mapHeight}, {entityX - mapWidth, entityY - mapHeight},
+        {entityX + mapWidth, entityY - mapHeight}, {entityX - mapWidth, entityY + mapHeight}
+    };
+
+    for (const auto& pos : potentialPositions) {
+        if (isInView(pos.first, pos.second)) {
+            positions.push_back(pos);
+        }
+    }
+
+    return positions;
 }
 
 void SimulationCanvas::DrawCreatureCountOverTime(
@@ -970,7 +996,6 @@ void SimulationCanvas::mouseMoveEvent(QMouseEvent* event) {
             currentMousePosition.x -= mapWidth;
             newCenter.x -= mapWidth;
         }
-        std::cout << newCenter.x;
 
         // Wrap around vertically
         if (newCenter.y < 0) {
