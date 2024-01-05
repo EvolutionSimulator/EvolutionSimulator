@@ -76,6 +76,8 @@ class SimulationCanvas : public QSFMLCanvas {
 
   bool isCreatureClicked(const sf::Vector2f &mousePos);
 
+  bool EntityOnScreen(const Entity& entity);
+
   void displayInfoPanel();
   std::string formatCreatureInfo(const Creature &creature);
 
@@ -98,6 +100,9 @@ class SimulationCanvas : public QSFMLCanvas {
   sf::Vector2f initialClickPosition;
   bool isClicking = false;
   std::deque<sf::Vector2f> deltaHistory;
+
+  sf::Vector2f offset_;
+
 };
 
 sf::Sprite spriteTexture(double size);
