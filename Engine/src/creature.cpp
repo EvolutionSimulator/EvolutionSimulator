@@ -366,24 +366,25 @@ void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
                      double GridCellSize, double deltaTime, double width, double height) {
   // Not pretty but we'll figure out a better way in the future
   ProcessVisionFood(grid, GridCellSize, width, height);
-  neuron_data_.at(0) = energy_;
-  neuron_data_.at(1) = GetVelocity();
-  neuron_data_.at(2) = GetVelocityAngle();
-  neuron_data_.at(3) = GetRotationalVelocity();
-  neuron_data_.at(4) = orientation_plant_;
-  neuron_data_.at(5) = distance_plant_;
-  neuron_data_.at(6) = plant_size_;
-  neuron_data_.at(7) = orientation_meat_;
-  neuron_data_.at(8) = distance_meat_;
-  neuron_data_.at(9) = meat_size_;
-  neuron_data_.at(10) = GetEmptinessPercent();
+  neuron_data_.at(0) = 1;
+  neuron_data_.at(1) = energy_;
+  neuron_data_.at(2) = GetVelocity();
+  neuron_data_.at(3) = GetVelocityAngle();
+  neuron_data_.at(4) = GetRotationalVelocity();
+  neuron_data_.at(5) = GetEmptinessPercent();
+  neuron_data_.at(6) = orientation_plant_;
+  neuron_data_.at(7) = distance_plant_;
+  neuron_data_.at(8) = plant_size_;
+  neuron_data_.at(9) = orientation_meat_;
+  neuron_data_.at(10) = distance_meat_;
+  neuron_data_.at(11) = meat_size_;
   std::vector<double> output = brain_.Activate(neuron_data_);
   SetAcceleration(std::tanh(output.at(0))*mutable_.GetMaxForce());
   SetAccelerationAngle(std::tanh(output.at(1)) * M_PI);
   SetRotationalAcceleration(std::tanh(output.at(2))*mutable_.GetMaxForce());
   Grow(std::max(std::tanh(output.at(3)) * deltaTime, 0.0));
   AddAcid(std::max(std::tanh(output.at(4)) * 10.0, 0.0));
-  biting_ = std::tanh(output.at(5)) > 0 ? 1 : 0;
+  biting_ = std::tanh(output.at(5)) > 0 ? 0 : 1;
 }
 
 /*!
