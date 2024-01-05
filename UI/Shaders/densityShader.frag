@@ -1,10 +1,16 @@
+// Updated shader code
 uniform vec2 resolution;
+uniform vec2 viewTopLeft;   // Top-left corner of the view
+uniform float zoomFactor;   // New uniform for the zoom factor
 uniform float maxDensity;
 uniform sampler2D densityTexture;
 
 void main() {
-    vec2 uv = gl_FragCoord.xy / resolution.xy;
-    float density = texture2D(densityTexture, uv).g; // Assuming density is stored in the red channel
+    // Adjust texture coordinates to account for zoom and wrap around
+    vec2 uv = (gl_FragCoord.xy - viewTopLeft) / (resolution * zoomFactor);
+    uv = fract(uv); // Use the fractional part for wrapping
+
+    float density = texture(densityTexture, uv).g;
 
     // Normalize the density value to a range of 0-1
     float normalizedDensity = clamp(density / maxDensity, 0.0, 1.0);

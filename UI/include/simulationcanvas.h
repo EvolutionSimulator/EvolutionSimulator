@@ -67,7 +67,10 @@ class SimulationCanvas : public QSFMLCanvas {
   QString creatureInfo;
   QRectF panelRect;
 
+
   void RenderSimulation(DataAccessor<SimulationData> data);
+  void RenderFoodAtPosition(const Food& food, const std::pair<double, double>& position);
+  void RenderCreatureAtPosition(const Creature& creature, const std::pair<double, double>& position);
 
   Simulation *simulation_ = nullptr;
   std::function<void(SimulationData *)>
@@ -76,7 +79,7 @@ class SimulationCanvas : public QSFMLCanvas {
 
   bool isCreatureClicked(const sf::Vector2f &mousePos);
 
-  bool EntityOnScreen(const Entity& entity);
+  std::vector<std::pair<double, double>> getEntityRenderPositions(const Entity& entity);
 
   void displayInfoPanel();
   std::string formatCreatureInfo(const Creature &creature);
