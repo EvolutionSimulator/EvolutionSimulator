@@ -43,6 +43,8 @@ class SimulationCanvas : public QSFMLCanvas {
   void InitializeSprites();
   void InitializeShader();
 
+  void UpdateFoodDensityTexture(double width, double height);
+
   protected:
   void mousePressEvent(QMouseEvent *event) override;
   void wheelEvent(QWheelEvent *event) override;
@@ -87,7 +89,11 @@ class SimulationCanvas : public QSFMLCanvas {
   sf::Texture creature_texture_;
   sf::Texture eyes_texture_;
   sf::Texture tail_texture_;
-  sf::Shader shader_;
+  sf::Shader color_shader_;
+
+  sf::Texture food_density_texture_;
+  sf::Shader food_density_shader_;
+
   bool isDragging = false;
   sf::Vector2f initialClickPosition;
   bool isClicking = false;

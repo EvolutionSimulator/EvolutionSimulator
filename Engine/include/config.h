@@ -64,6 +64,8 @@ namespace engine {
 constexpr double kFixedUpdateInterval = 0.05;
 constexpr double EPS = 1e-7;
 constexpr size_t kMaxCellsToFindFood = 30;
+//with the current function the max value is 1e-4 so we select a higher value
+constexpr double kMaxFoodDensityColored = 5e-4;
 }  // namespace engine
 
 namespace physical_constraints {
