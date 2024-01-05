@@ -278,7 +278,7 @@ void SimulationData::InitializeCreatures() {
  */
 void SimulationData::InitializeFood() {
   food_entities_.clear();
-  for (int i = 0; i < 5000; i++) {
+  for (int i = 0; i < 10000; i++) {
     GenerateMoreFood(1);
   }
   // const double step_size = 10.0;

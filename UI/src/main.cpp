@@ -22,6 +22,7 @@ int main(int argc, char *argv[]) {
   std::cout << "Running in release mode." << std::endl;
 #endif
 
+
   window.showFullScreen();
 
   int result = app.exec();

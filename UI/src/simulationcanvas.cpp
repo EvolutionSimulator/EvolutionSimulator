@@ -60,40 +60,75 @@ SimulationCanvas::SimulationCanvas(QWidget* Parent)
 }
 
 void SimulationCanvas::InitializeShader(){
-  QFile resourceFile(":/Shaders/colorShift.frag");
-  if (!resourceFile.open(QIODevice::ReadOnly)) {
+  QFile resourceFile1(":/Shaders/colorShift.frag");
+  if (!resourceFile1.open(QIODevice::ReadOnly)) {
     qDebug() << "Failed to open shader resource!";
     return;
   }
 
   // Generate a unique temporary filename
-  QString tempFileName = "temp_shader_" + QUuid::createUuid().toString(QUuid::WithoutBraces)
+  QString tempFileName1 = "temp_shader_" + QUuid::createUuid().toString(QUuid::WithoutBraces)
           + ".frag";
-  QString tempFilePath = QDir::temp().absoluteFilePath(tempFileName);
-  qDebug() << "Temporary file path:" << tempFilePath;
+  QString tempFilePath1 = QDir::temp().absoluteFilePath(tempFileName1);
+  qDebug() << "Temporary file path:" << tempFilePath1;
 
-  QFile tempFile(tempFilePath);
-  if (tempFile.exists()) {
+  QFile tempFile1(tempFilePath1);
+  if (tempFile1.exists()) {
     qDebug() << "Temporary file already exists. Deleting...";
-    if (!tempFile.remove()) {
+    if (!tempFile1.remove()) {
       qDebug() << "Failed to remove existing temporary file.";
       return;
     }
   }
 
-  if (!resourceFile.copy(tempFilePath)) {
-    qDebug() << "Failed to copy font to temporary file!";
-    qDebug() << "Error:" << resourceFile.errorString();
+  if (!resourceFile1.copy(tempFilePath1)) {
+    qDebug() << "Failed to copy color shader to temporary file!";
+    qDebug() << "Error:" << resourceFile1.errorString();
     return;
   }
-  resourceFile.close();
-  if (!shader_.loadFromFile(tempFilePath.toStdString(), sf::Shader::Fragment)) {
-    qDebug() << "Failed to load font from file!";
-    QFile::remove(tempFilePath);
+  resourceFile1.close();
+  if (!color_shader_.loadFromFile(tempFilePath1.toStdString(), sf::Shader::Fragment)) {
+    qDebug() << "Failed to load color shader from file!";
+    QFile::remove(tempFilePath1);
     return;
   }
   // Clean up the temporary file after use
-  QFile::remove(tempFilePath);
+  QFile::remove(tempFilePath1);
+
+  QFile resourceFile2(":/Shaders/densityShader.frag");
+  if (!resourceFile2.open(QIODevice::ReadOnly)) {
+    qDebug() << "Failed to open shader resource!";
+    return;
+  }
+
+  // Generate a unique temporary filename
+  QString tempFileName2 = "temp_shader_" + QUuid::createUuid().toString(QUuid::WithoutBraces)
+          + ".frag";
+  QString tempFilePath2 = QDir::temp().absoluteFilePath(tempFileName2);
+  qDebug() << "Temporary file path:" << tempFilePath2;
+
+  QFile tempFile2(tempFilePath2);
+  if (tempFile2.exists()) {
+    qDebug() << "Temporary file already exists. Deleting...";
+    if (!tempFile2.remove()) {
+      qDebug() << "Failed to remove existing temporary file.";
+      return;
+    }
+  }
+
+  if (!resourceFile2.copy(tempFilePath2)) {
+    qDebug() << "Failed to copy density shader to temporary file!";
+    qDebug() << "Error:" << resourceFile2.errorString();
+    return;
+  }
+  resourceFile2.close();
+  if (!food_density_shader_.loadFromFile(tempFilePath2.toStdString(), sf::Shader::Fragment)) {
+    qDebug() << "Failed to load density shader from file!";
+    QFile::remove(tempFilePath2);
+    return;
+  }
+  // Clean up the temporary file after use
+  QFile::remove(tempFilePath2);
 }
 
 
@@ -191,6 +226,31 @@ void SimulationCanvas::InitializeSprites(){
       qDebug() << "Failed to create sf::Texture from sf::Image";
     }
 }
+
+void SimulationCanvas::UpdateFoodDensityTexture(double width, double height){
+    food_density_texture_.create(width, height);
+    sf::Image densityImage;
+    densityImage.create(width, height, sf::Color::Black);
+    // Fill the image with the density data
+    for (unsigned int x = 0; x < width; ++x) {
+        for (unsigned int y = 0; y < height; ++y) {
+            // Get the density value from the function
+            float densityValue = simulation_->GetSimulationData()->GetEnvironment().GetFoodDensity(x, y);
+
+            // Normalize the density value to the range 0 - 255 for the red channel
+            sf::Uint8 greenValue = static_cast<sf::Uint8>(255 * std::min(
+                                                              std::max(densityValue, 0.0f)/settings::engine::kMaxFoodDensityColored,
+                                                              1.0));
+
+            // Set the pixel color in the image
+            densityImage.setPixel(x, y, sf::Color(0, greenValue, 0));
+        }
+    }
+    food_density_texture_.setSmooth(true);
+    // Load the image into the texture
+    food_density_texture_.update(densityImage);
+}
+
 void SimulationCanvas::SetSimulation(Simulation* simulation) {
   simulation_ = simulation;
 }
@@ -390,6 +450,21 @@ sf::VertexArray createGradientCircle(float radius, const sf::Color& centerColor,
 void SimulationCanvas::RenderSimulation(DataAccessor<SimulationData> data) {
   clear(sf::Color(20, 22, 69));
 
+  // Create a full-screen rectangle
+  sf::RectangleShape background(sf::Vector2f(getSize().x, getSize().y));
+
+  // Apply the shader to the background
+  sf::RenderStates backgroundState;
+
+  food_density_shader_.setUniform("resolution", sf::Vector2f(data->GetEnvironment().GetMapWidth(),
+                                                             data->GetEnvironment().GetMapHeight()));
+  food_density_shader_.setUniform("densityTexture", food_density_texture_);
+  food_density_shader_.setUniform("maxDensity", 1.0f);
+
+  backgroundState.shader = &food_density_shader_;
+
+  draw(background, backgroundState);
+
   // Iterate through food and load the corresponding sprite
   // Note that we are assuming to be working with a sprite sheet of 256x256 per sprite
   int spriteIndex = 0;
@@ -458,7 +533,7 @@ void SimulationCanvas::RenderSimulation(DataAccessor<SimulationData> data) {
     std::pair<double, double> creatureCoordinates = creature.GetCoordinates();
 
     //Add color filter to creature
-    shader_.setUniform("hueShift", creature.GetMutable().GetColor());
+    color_shader_.setUniform("hueShift", creature.GetMutable().GetColor());
 
     sf::Transform creatureTransform;
     creatureTransform.translate(creatureCoordinates.first,
@@ -466,7 +541,7 @@ void SimulationCanvas::RenderSimulation(DataAccessor<SimulationData> data) {
     creatureTransform.rotate(creature.GetOrientation() * 180.0f /M_PI);
 
     sf::RenderStates states;
-    states.shader = &shader_;
+    states.shader = &color_shader_;
     states.transform = creatureTransform;
 
     draw(base_sprite, states);

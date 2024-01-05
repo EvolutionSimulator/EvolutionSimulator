@@ -79,21 +79,27 @@ void MainWindow::InitializeEngine()
     engine_->SetSpeed(10);
     ui_->canvas->SetSimulation(engine_->GetSimulation());
   }
+  // If this function changes change the kMaxFoodDensityColor in config.h as for a correct shade of the backgroung we need this measure
   auto food_density_function = [this](double x, double y) {
-    return x * 2 / ui_->canvas->GetSimulation()->GetSimulationData()->GetEnvironment().GetMapWidth() * 5e-5;
+    return x * y * 2 / (ui_->canvas->GetSimulation()->GetSimulationData()->GetEnvironment().GetMapWidth() *
+                        ui_->canvas->GetSimulation()->GetSimulationData()->GetEnvironment().GetMapHeight()) * 5e-5;
   };
-
   engine_->GetEnvironment().SetFoodDensity(food_density_function); // Update the density
   engine_->GetSimulation()->GetSimulationData()->InitializeFood();
+  ui_->canvas->UpdateFoodDensityTexture(engine_->GetEnvironment().GetMapWidth(),
+                                        engine_->GetEnvironment().GetMapHeight());
 }
 
 void MainWindow::ChangeFoodDensity(int value) {
-  food_density = static_cast<double>(value) / 10000.0;     // Convert to density
+  food_density = static_cast<double>(value) / 100000.0;     // Convert to density
   auto food_density_function = [this](double x, double y) {
-    return x * 2 / ui_->canvas->GetSimulation()->GetSimulationData()->GetEnvironment().GetMapWidth() * food_density;
+      return x * y * 2 / (ui_->canvas->GetSimulation()->GetSimulationData()->GetEnvironment().GetMapWidth() *
+                          ui_->canvas->GetSimulation()->GetSimulationData()->GetEnvironment().GetMapHeight()) * food_density;
   };
   engine_->GetEnvironment().SetFoodDensity(food_density_function); // Update the density
   engine_->UpdateEnvironment(); // Apply the updated density
+  ui_->canvas->UpdateFoodDensityTexture(engine_->GetEnvironment().GetMapWidth(),
+                                        engine_->GetEnvironment().GetMapHeight());
 }
 
 void MainWindow::ChangeCreatureDensity(int value) {

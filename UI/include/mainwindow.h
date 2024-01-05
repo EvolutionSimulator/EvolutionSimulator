@@ -40,7 +40,7 @@ QT_END_NAMESPACE  //
  private:
   double friction_coefficient;
   double creature_density = 0.001;
-  double food_density = 0.001;
+  double food_density = 5e-5;
   Ui::MainWindow* ui_;  // Pointer to all UI widgets
 
   Engine* engine_ = nullptr;  // Pointer to the simulation engine
