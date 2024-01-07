@@ -8,6 +8,7 @@
 #include "config.h"
 #include "neat-link.h"
 #include "neat-neuron.h"
+#include "brain_module.h"
 
 namespace neat {
 
@@ -47,6 +48,8 @@ namespace neat {
     void MutateChangeWeight();
     void MutateChangeBias();
     void MutateActivationFunction();
+    void MutateActivateBrainModule(BrainModule module);
+    void MutateDisableBrainModule(BrainModule module);
 
     bool FindNeuronById(int targetId, Neuron& foundNeuron) const;
 
@@ -64,6 +67,8 @@ namespace neat {
                                       */
     bool DFS(const Neuron& currentNeuron, std::unordered_set<int>& visited,
              std::unordered_set<int>& visiting) const;
+    std::vector<BrainModule> modules_; /*! A vector of BrainModule objects
+                                         representing the modules activated. */
   };
 
 

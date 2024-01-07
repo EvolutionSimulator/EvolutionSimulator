@@ -18,6 +18,7 @@ add_library(Engine STATIC
   include/neat/neat-neuron.h src/neat/neat-neuron.cpp
   include/neat/neat-link.h src/neat/neat-link.cpp
   include/neat/neat-genome.h src/neat/neat-genome.cpp
+  include/neat/brain_module.h src/neat/brain_module.cpp
 
   include/geometry_primitives.h src/geometry_primitives.cpp
 
@@ -38,7 +39,6 @@ add_library(Engine STATIC
   src/collisions.cpp
   include/config.h
   include/mutable.h src/mutable.cpp
-
 )
 
 add_subdirectory(tests)
