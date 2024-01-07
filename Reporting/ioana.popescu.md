@@ -6,7 +6,7 @@
 - started the implementation of spatial partitioning and checking collisions
 
 # Week 2 - working on collisions
-- completed spatial partitioning and checking collisions (Berra wrote the code and I helped integrate it)
+- Berra completed spatial partitioning and checking collisions and I helped integrate it
 - refactored some of the classes to work with pointers
 - added state variable to entities, and deletion of dead entities in the simulation loop
 - added gtests for collisions
