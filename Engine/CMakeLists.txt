@@ -40,8 +40,10 @@ add_library(Engine STATIC
   include/neat/neat-link.h src/neat/neat-link.cpp
   include/neat/neat-genome.h src/neat/neat-genome.cpp
   include/neat/neat-neural-network.h src/neat/neat-neural-network.cpp
+  include/neat/brain_module.h src/neat/brain_module.cpp
 
   include/mutable.h src/mutable.cpp
+
 
   include/data_accessor.h
   include/synchronization_primitives.h
@@ -55,16 +57,15 @@ add_library(Engine STATIC
   include/alive_entity.h src/alive_entity.cpp
 
   include/vision_system.h src/vision_system.cpp
+  include/digestive_system.h src/digestive_system.cpp
+  include/reproductive_system.h src/reproductive_system.cpp
 
   include/creature.h src/creature.cpp
 
   include/geometry_primitives.h src/geometry_primitives.cpp
   include/collisions.h src/collisions.cpp
   include/config.h
-  include/digestive_system.h
-  src/digestive_system.cpp
-  include/reproductive_system.h
-  src/reproductive_system.cpp
+
 )
 
 add_subdirectory(tests)
