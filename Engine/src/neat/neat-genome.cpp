@@ -12,6 +12,7 @@
 #include <random>
 #include <set>
 
+
 namespace neat {
 
 /*!
@@ -223,6 +224,10 @@ void Genome::Mutate() {
 
   if (uniform(gen) < settings::neat::kChangeBiasMutationRate) {
     MutateChangeBias();
+  }
+
+  if (uniform(gen) < settings::neat::kModuleActivationMutationRate) {
+      MutateActivateBrainModule();
   }
 }
 
@@ -582,6 +587,42 @@ void Genome::MutateActivationFunction() {
     std::uniform_int_distribution<int> distribution(0, activationTypes.size() - 1);
     int randomIndex = distribution(generator);
     neurons_[indexRandomNeuronHidden].SetActivation(activationTypes[randomIndex]);
+}
+
+void Genome::MutateActivateBrainModule(BrainModule module){
+
+  std::random_device rd;
+  std::mt19937 generator(rd());
+  std::uniform_int_distribution<int> distribution(0, modules.size() - 1);
+  int randomIndex = distribution(generator);
+
+
+  int input_size = module.GetInputNeuronIds().size();
+  std::vector<int> input_ids(input_size, 0);
+  for (int i = 0; i < module.GetInputNeuronIds().size(); i++){
+    if (i == 0) module.SetFirstInputId(GetInputCount());
+    AddNeuron(Neuron(NeuronType::kInput, 0));
+    input_ids.at(i) = neurons_.back().GetId();
+  }
+  module.SetInputNeuronIds(input_ids);
+
+  int output_size = module.GetOutputNeuronIds().size();
+  std::vector<int> output_ids(output_size, 0);
+  for (int i = 0; i < module.GetOutputNeuronIds().size(); i++){
+    if (i == 0) module.SetFirstOutputId(GetOutputCount());
+    AddNeuron(Neuron(NeuronType::kOutput, 0));
+    output_ids.at(i) = neurons_.back().GetId();
+  }
+  module.SetOutputNeuronIds(output_ids);
+}
+
+void Genome::MutateDisableBrainModule(BrainModule module){
+    for (const int i : module.GetInputNeuronIds()){
+        DisableNeuron(i);
+    }
+    for (const int i : module.GetOutputNeuronIds()){
+        DisableNeuron(i);
+    }
 }
 
 bool Genome::FindNeuronById(int targetId, Neuron& foundNeuron) const{
