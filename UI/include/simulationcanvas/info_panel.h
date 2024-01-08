@@ -22,6 +22,7 @@ public:
   bool IsVisible() const;
   void Draw();
   void DrawVisionCone(sf::RenderTarget& target, const Creature &creature);
+  void DrawStomach(sf::RenderTarget& target, const Creature& creature);
   std::string FormatCreatureInfo(const Creature& creature);
 
 private:
@@ -30,7 +31,6 @@ private:
   Creature* selected_creature_;
   Food* selected_food_;
   bool is_visible_;
-  sf::Font font_;
   TextureManager* texture_manager_;
 
   void DrawPanel(sf::RenderTarget& target);

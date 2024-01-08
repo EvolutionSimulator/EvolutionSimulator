@@ -13,6 +13,8 @@
         <file>Resources/down2.png</file>
         <file>Resources/graph-wiki_ver_1.png</file>
 	<file>Resources/Food_32x32.png</file>
+	<file>Resources/Stomach.png</file>
+	<file>Resources/EmptyStomach.png</file>
 	<file>Resources/Creature_base.png</file>
 	<file>Resources/Creature_eyes.png</file>
 	<file>Resources/Creature_tails.png</file>
@@ -20,5 +22,6 @@
 	<file>Resources/Configuration.png</file>
 	<file>Resources/Health.png</file>
 	<file>Resources/Energy.png</file>
+	<file>Shaders/stomachShader.frag</file>
     </qresource>
 </RCC>
