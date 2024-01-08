@@ -61,6 +61,7 @@ SimulationCanvas::SimulationCanvas(QWidget* Parent)
 }
 
 void SimulationCanvas::InitializeShader(){
+
   QFile resourceFile(":/Shaders/colorShift.frag");
   if (!resourceFile.open(QIODevice::ReadOnly)) {
     qDebug() << "Failed to open shader resource!";
@@ -95,6 +96,39 @@ void SimulationCanvas::InitializeShader(){
   }
   // Clean up the temporary file after use
   QFile::remove(tempFilePath);
+
+  QFile stomachResourceFile(":/Shaders/stomachShader.frag");
+  if (!stomachResourceFile.open(QIODevice::ReadOnly)) {
+    qDebug() << "Failed to open stomach shader resource!";
+    return;
+  }
+
+  QString stomachTempFileName = "stomach_temp_shader_" + QUuid::createUuid().toString(QUuid::WithoutBraces) + ".frag";
+  QString stomachTempFilePath = QDir::temp().absoluteFilePath(stomachTempFileName);
+  qDebug() << "Stomach Temporary file path:" << stomachTempFilePath;
+
+  QFile stomachTempFile(stomachTempFilePath);
+  if (stomachTempFile.exists()) {
+    qDebug() << "Stomach Temporary file already exists. Deleting...";
+    if (!stomachTempFile.remove()) {
+      qDebug() << "Failed to remove existing stomach temporary file.";
+      return;
+    }
+  }
+
+  if (!stomachResourceFile.copy(stomachTempFilePath)) {
+    qDebug() << "Failed to copy stomach shader to temporary file!";
+    qDebug() << "Error:" << stomachResourceFile.errorString();
+    return;
+  }
+  stomachResourceFile.close();
+  if (!stomach_shader_.loadFromFile(stomachTempFilePath.toStdString(), sf::Shader::Fragment)) {
+    qDebug() << "Failed to load stomach shader from file!";
+    QFile::remove(stomachTempFilePath);
+    return;
+  }
+  // Clean up the temporary file after use
+  QFile::remove(stomachTempFilePath);
 }
 
 
@@ -189,6 +223,20 @@ void SimulationCanvas::InitializeSprites(){
     foodsfImage.create(foodqImage.width(), foodqImage.height(), reinterpret_cast<const sf::Uint8*>(foodqImage.bits()));
 
     if (!food_texture_.loadFromImage(foodsfImage)) {
+      qDebug() << "Failed to create sf::Texture from sf::Image";
+    }
+
+    // Stomach texture
+    QPixmap stomachPixmap;
+    if (!stomachPixmap.load(":/Resources/EmptyStomach.png")) {
+      qDebug() << "Failed to load QPixmap from path:" << ":/Resources/EmptyStomach.png";
+    }
+
+    QImage stomachqImage = stomachPixmap.toImage().convertToFormat(QImage::Format_RGBA8888);
+    sf::Image stomachsfImage;
+    stomachsfImage.create(stomachqImage.width(), stomachqImage.height(), reinterpret_cast<const sf::Uint8*>(stomachqImage.bits()));
+
+    if (!stomach_texture_.loadFromImage(stomachsfImage)) {
       qDebug() << "Failed to create sf::Texture from sf::Image";
     }
 }
@@ -292,6 +340,7 @@ void SimulationCanvas::OnUpdate()
           draw(redCircle);
 
           DrawVisionCone(*this, creature);
+          DrawStomach(*this, creature);
 
           // Check if the creature's health is 0 and display the message
           if (creature.GetHealth() == 0) {
@@ -865,4 +914,72 @@ void SimulationCanvas::resizeEvent(QResizeEvent* event) {
     view.setSize(newSize.x, newSize.y);
     view.setCenter(newSize.x / 2, newSize.y / 2);
     setView(view);
+}
+
+void SimulationCanvas::DrawStomach(sf::RenderTarget& target, const Creature& creature) {
+    // Use the window size to determine the position of the stomach images
+    sf::Vector2u windowSize = target.getSize();
+    float margin = 10.0f;  // Margin from the bottom left corner
+
+           // Fullness sprite setup
+    sf::Sprite stomachFullnessSprite;
+    stomachFullnessSprite.setTexture(stomach_texture_);
+    stomachFullnessSprite.setOrigin(0, 0);
+    float consistentScaleFactor = 1.0f; // Scaling factor for the sprite
+    stomachFullnessSprite.setScale(consistentScaleFactor, consistentScaleFactor);
+
+           // Position for the fullness stomach sprite at the bottom left corner
+    float posX = margin; // 10 pixels from the left
+    float posY = windowSize.y - stomach_texture_.getSize().y * consistentScaleFactor - 2 * margin; // 20 pixels from the bottom
+    stomachFullnessSprite.setPosition(posX, posY);
+
+           // Acid sprite setup (positioned above the fullness sprite)
+    sf::Sprite stomachAcidSprite;
+    stomachAcidSprite.setTexture(stomach_texture_);
+    stomachAcidSprite.setOrigin(0, 0);
+    stomachAcidSprite.setScale(consistentScaleFactor, consistentScaleFactor);
+
+           // Position for the acid stomach sprite above the fullness sprite
+           // The additional margin is for spacing between the two sprites
+    float additionalMargin = 130.0f; // Adjust this value as needed
+    float posYAcid = posY - additionalMargin;
+    stomachAcidSprite.setPosition(posX, posYAcid);
+
+           // Set uniform variables for the fullness shader
+    float fullnessRatio = creature.GetStomachFullness() / creature.GetStomachCapacity();
+    stomach_shader_.setUniform("fullness", fullnessRatio);
+    stomach_shader_.setUniform("texture", sf::Shader::CurrentTexture);
+    stomach_shader_.setUniform("fillColor", sf::Glsl::Vec4(sf::Color(255, 0, 255))); // Magenta for fullness
+
+           // Draw the fullness sprite with the shader
+    target.draw(stomachFullnessSprite, &stomach_shader_);
+
+    sf::Text foodLabel;
+    foodLabel.setFont(font_);
+    foodLabel.setString("Food");
+    foodLabel.setCharacterSize(24); // Or another appropriate size
+    foodLabel.setFillColor(sf::Color::White); // Or another color
+    // Set position for the food label above the fullness sprite
+    foodLabel.setPosition(posX + 52.0f, posY - foodLabel.getLocalBounds().height + 20.0f); // Adjust Y position based on height of text and desired ma
+
+    sf::Text acidLabel;
+    acidLabel.setFont(font_);
+    acidLabel.setString("Acid");
+    acidLabel.setCharacterSize(24); // Or another appropriate size
+    acidLabel.setFillColor(sf::Color::White); // Or another color
+    // Set position for the acid label above the acid sprite
+    acidLabel.setPosition(posX + 57.0f , posYAcid - acidLabel.getLocalBounds().height + 20.0f); // Adjust Y position based on height of text and desired margin
+
+
+           // Set uniform variables for the acid shader
+    float acidRatio = creature.GetAcid() / creature.GetStomachCapacity();
+    stomach_shader_.setUniform("fullness", acidRatio);
+    stomach_shader_.setUniform("texture", sf::Shader::CurrentTexture);
+    stomach_shader_.setUniform("fillColor", sf::Glsl::Vec4(sf::Color(255, 255, 0))); // Yellow for acid
+
+           // Draw the acid sprite with the shader
+    target.draw(stomachAcidSprite, &stomach_shader_);
+
+    target.draw(foodLabel);
+    target.draw(acidLabel);
 }

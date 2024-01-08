@@ -36,6 +36,7 @@ class SimulationCanvas : public QSFMLCanvas {
   // New function declaration for drawing the number of creatures over time
   void DrawCreatureCountOverTime(sf::RenderWindow &window, const std::vector<Creature> &creatures);
   void DrawVisionCone(sf::RenderTarget& target, const Creature& creature);
+  void DrawStomach(sf::RenderTarget& target, const Creature& creature);
 
   void zoom(float factor, sf::Vector2f& zoomPoint);
 
@@ -87,7 +88,9 @@ class SimulationCanvas : public QSFMLCanvas {
   sf::Texture creature_texture_;
   sf::Texture eyes_texture_;
   sf::Texture tail_texture_;
+  sf::Texture stomach_texture_;
   sf::Shader shader_;
+  sf::Shader stomach_shader_;
   bool isDragging = false;
   sf::Vector2f initialClickPosition;
   bool isClicking = false;

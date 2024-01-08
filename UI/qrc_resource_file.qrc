@@ -4,9 +4,12 @@
         <file>Resources/Run.png</file>
         <file>Resources/Pause.png</file>
 	<file>Resources/Food_32x32.png</file>
+	<file>Resources/Stomach.png</file>
+	<file>Resources/EmptyStomach.png</file>
 	<file>Resources/Creature_base.png</file>
 	<file>Resources/Creature_eyes.png</file>
 	<file>Resources/Creature_tails.png</file>
 	<file>Shaders/colorShift.frag</file>
+	<file>Shaders/stomachShader.frag</file>
     </qresource>
 </RCC>
