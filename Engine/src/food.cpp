@@ -12,7 +12,8 @@
  */
 Food::Food(const double nutritional_value)
     : Entity(std::rand() % SETTINGS.environment.max_food_size),
-      nutritional_value_(size_ * nutritional_value){
+      nutritional_value_(nutritional_value) {
+  // Constructor implementation
 }
 
 /*!
