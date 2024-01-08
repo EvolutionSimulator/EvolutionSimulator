@@ -26,11 +26,13 @@ public:
   // Info panel textures
   sf::Texture health_texture_;
   sf::Texture energy_texture_;
+  sf::Texture stomach_texture_;
 
   // Shaders
   sf::Shader shader_;
   sf::Shader color_shader_;
   sf::Shader food_density_shader_;
+  sf::Shader stomach_shader_;
 
   // Font
   sf::Font font_;
