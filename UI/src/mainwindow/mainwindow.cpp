@@ -182,10 +182,6 @@ void MainWindow::SetUpConnections()
 
     // Connect graph logic
     connect(ui_->graphMenu, SIGNAL(currentIndexChanged(int)), graph_manager_, SLOT(handleDropdownSelection(int)));
-    updateTimer = new QTimer(this);
-    connect(updateTimer, SIGNAL(timeout()), this, SLOT(recordCreatureCount()));
-    updateTimer->start(1000);  // Set the interval to 1000 milliseconds (1 second)
-
 }
 
 void MainWindow::DrawUI()
