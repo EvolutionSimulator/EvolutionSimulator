@@ -3,7 +3,6 @@
 #include <QMainWindow>
 #include <thread>
 
-#include "QtCharts/qlineseries.h"
 #include "QtWidgets/qslider.h"
 #include "engine.h"
 #include "graph_manager.h"
@@ -46,7 +45,6 @@ QT_END_NAMESPACE  //
   std::thread engine_thread_;  // Thread for running the simulation engine
 
   double lastRecordedTime_;
-  QTimer *updateTimer;
 
   GraphManager* graph_manager_;
   ConfigManager* config_manager_;
