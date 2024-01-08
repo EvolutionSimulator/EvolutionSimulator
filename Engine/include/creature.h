@@ -37,6 +37,7 @@ class Creature : public MovableEntity {
   Creature(neat::Genome genome, Mutable mutable_);
 
   void Dies();
+  void Disappear();
   void UpdateEnergy(double deltaTime);
   double GetEnergy() const;
   void SetEnergy(double energy);
@@ -92,6 +93,7 @@ class Creature : public MovableEntity {
   int GetFoodID() const;
   void Digest(double deltaTime);
   void Bite(Food *food);
+  void Bite(Creature* creature);
   void AddAcid(double quantity);
 
 

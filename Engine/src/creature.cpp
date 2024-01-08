@@ -816,7 +816,7 @@ void Creature::Bite(Food* food)
 
   //Check how much food the creature can eat, depending on bite strength and fullness of stomach
   double available_space = std::max(stomach_capacity_ - stomach_fullness_, 0.0);
-  double food_to_eat = std::sqrt(std::min(pow(bite_strength_,2), available_space));
+  double food_to_eat = std::sqrt(std::min(M_PI*pow(bite_strength_,2), available_space));
 
   // Check if creature eats the whole food or a part of it
   if (food_to_eat >= food->GetSize())
@@ -830,7 +830,7 @@ void Creature::Bite(Food* food)
     double initial_food_size = food->GetSize();
     double new_radius = std::sqrt(pow(initial_food_size,2) - pow(food_to_eat,2));
     food->SetSize(new_radius);
-    stomach_fullness_ += pow(food_to_eat, 2);
+    stomach_fullness_ += M_PI*pow(food_to_eat, 2);
     max_nutrition =  food->GetNutritionalValue() * food_to_eat;
   }
 
@@ -848,6 +848,52 @@ void Creature::Bite(Food* food)
   {
     stomach_fullness_ = stomach_capacity_;
   }
+}
+
+/*!
+ * @brief Handles the biting of the food.
+ *
+ * @details Adds the food it bites to the stomach (increasing fulness and potential
+ * energy). Decreases food size/deletes food that gets bitten.
+ *
+ * @param food The food the creature bites into.
+ */
+void Creature::Bite(Creature* creature)
+{
+  //Reset eating cooldown, makes creature stop to bite
+  eating_cooldown_ = mutable_.GetEatingSpeed();
+
+  //Bite logic
+  double max_nutrition = 0;
+
+  //Check how much food the creature can eat, depending on bite strength and fullness of stomach
+  double available_space = std::max(stomach_capacity_ - stomach_fullness_, 0.0);
+  double food_to_eat = std::sqrt(std::min(M_PI*pow(bite_strength_,2), available_space));
+
+  // Check if creature eats the whole food or a part of it
+  if (food_to_eat >= creature->GetSize())
+  {
+    max_nutrition = settings::environment::kMeatNutritionalValue * creature->GetSize() * 2 * mutable_.GetDiet();
+    stomach_fullness_ += M_PI*pow(creature->GetSize(), 2);
+    creature->Disappear();
+  }
+  else
+  {
+    double initial_food_size = creature->GetSize();
+    double new_radius = std::sqrt(pow(initial_food_size,2) - pow(food_to_eat,2));
+    creature->SetSize(new_radius); //assumes that the creature immmediatey turns itself to a circle again
+    stomach_fullness_ += M_PI*pow(food_to_eat, 2);
+    max_nutrition =  settings::environment::kMeatNutritionalValue * food_to_eat * 2 * mutable_.GetDiet();
+  }
+
+
+  //Add nutrition to stomach, make sure capacity is not surpassed
+  potential_energy_in_stomach_ += max_nutrition;
+  if (stomach_fullness_ > stomach_capacity_)
+  {
+    stomach_fullness_ = stomach_capacity_;
+  }
+  //settings::physical_constraints::kBiteDamageRatio;
 }
 
 void Creature::AddAcid(double quantity)
