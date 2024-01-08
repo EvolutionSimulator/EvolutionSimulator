@@ -46,6 +46,7 @@ class Creature : virtual public MovableEntity,
   Creature(neat::Genome genome, Mutable mutable_);
   virtual ~Creature() override {}
 
+
   void UpdateEnergy(double deltaTime);
 
   void UpdateMatingDesire();
@@ -60,6 +61,8 @@ class Creature : virtual public MovableEntity,
   void Grow(double energy);
   void Think(std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
              double GridCellSize, double deltaTime, double width, double height);
+
+  void Bite(Creature* creature);
   bool Compatible(const Creature& other_creature);
 
   bool GetMatingDesire() const;

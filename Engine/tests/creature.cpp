@@ -283,7 +283,7 @@ TEST(CreatureTests, Digest) {
 
   double deltaTime = 1.0;
   Plant plant = Plant(3.0);
-  creature.Bite(&plant);
+  creature.DigestiveSystem::Bite(&plant);
   creature.AddAcid(1.0);
 
   double initialEnergy = creature.GetEnergy();
@@ -305,7 +305,7 @@ TEST(CreatureTests, Bite) {
   double initialFoodSize = food.GetSize();
   double initialStomachFullness = creature.GetStomachFullness();
 
-  creature.Bite(&food);
+  creature.DigestiveSystem::Bite(&food);
 
   ASSERT_LT(food.GetSize(), initialFoodSize);
   ASSERT_GT(creature.GetStomachFullness(), initialStomachFullness);
@@ -321,7 +321,7 @@ TEST(CreatureTests, EmptinessPercent) {
   ASSERT_EQ(creature.GetEmptinessPercent(), 100.0);
 
   Plant food = Plant(3.0);
-  creature.Bite(&food);
+  creature.DigestiveSystem::Bite(&food);
 
   ASSERT_LT(creature.GetStomachFullness(), 100.0);
 }

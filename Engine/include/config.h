@@ -99,6 +99,7 @@ constexpr double kDDiet = 0.5;          // Default omnivores
 constexpr double KDEatingCooldown = 1;  // Decrease for easier survival
 constexpr double KDDigestionRate = 3;
 constexpr double KDGeneticStrength = 0.6;
+<<<<<<< HEAD
 constexpr double KDAcidToEnergy = 5;  // Increase for easier survival
 
 constexpr double kMaxRepdroducingAge = 700;
@@ -108,6 +109,11 @@ constexpr double kPregnancyEnergyFactor = 0.7;
 constexpr double kPregnancyVelocityFactor = 0.5;
 constexpr double kAfterBirthVelocityFactor = 1.5;
 }  // namespace physical_constraints
+=======
+constexpr double KDAcidToEnergy = 5; // Increase for easier survival
+constexpr double kBiteDamageRatio = 1;
+} //namespace physical_constraints
+>>>>>>> eac0cea (creation of the new bite function)
 
 namespace ui {
 constexpr double KDraggingSensitivity = 1.0f;
