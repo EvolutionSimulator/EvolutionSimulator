@@ -51,6 +51,7 @@ void InfoPanel::Draw() {
   sf::RenderTarget& target = *canvas_;
   DrawPanel(target);
   DrawVisionCone(target, *selected_creature_);
+  DrawStomach(target, *selected_creature_);
 }
 
 double round_double(double number, int decimal_places) {
@@ -212,4 +213,72 @@ void InfoPanel::DrawVisionCone(sf::RenderTarget& target, const Creature &creatur
     triangle[2] = triangleFan[i + 1];
     target.draw(triangle);
   }
+}
+
+void InfoPanel::DrawStomach(sf::RenderTarget& target, const Creature& creature) {
+  // Use the window size to determine the position of the stomach images
+  sf::Vector2u windowSize = target.getSize();
+  float margin = 10.0f;  // Margin from the bottom left corner
+
+         // Fullness sprite setup
+  sf::Sprite stomachFullnessSprite;
+  stomachFullnessSprite.setTexture(texture_manager_->stomach_texture_);
+  stomachFullnessSprite.setOrigin(0, 0);
+  float consistentScaleFactor = 1.0f; // Scaling factor for the sprite
+  stomachFullnessSprite.setScale(consistentScaleFactor, consistentScaleFactor);
+
+         // Position for the fullness stomach sprite at the bottom left corner
+  float posX = margin; // 10 pixels from the left
+  float posY = windowSize.y - texture_manager_->stomach_texture_.getSize().y * consistentScaleFactor - 2 * margin; // 20 pixels from the bottom
+  stomachFullnessSprite.setPosition(posX, posY);
+
+         // Acid sprite setup (positioned above the fullness sprite)
+  sf::Sprite stomachAcidSprite;
+  stomachAcidSprite.setTexture(texture_manager_->stomach_texture_);
+  stomachAcidSprite.setOrigin(0, 0);
+  stomachAcidSprite.setScale(consistentScaleFactor, consistentScaleFactor);
+
+         // Position for the acid stomach sprite above the fullness sprite
+         // The additional margin is for spacing between the two sprites
+  float additionalMargin = 130.0f; // Adjust this value as needed
+  float posYAcid = posY - additionalMargin;
+  stomachAcidSprite.setPosition(posX, posYAcid);
+
+         // Set uniform variables for the fullness shader
+  float fullnessRatio = creature.GetStomachFullness() / creature.GetStomachCapacity();
+  texture_manager_->stomach_shader_.setUniform("fullness", fullnessRatio);
+  texture_manager_->stomach_shader_.setUniform("texture", sf::Shader::CurrentTexture);
+  texture_manager_->stomach_shader_.setUniform("fillColor", sf::Glsl::Vec4(sf::Color(255, 0, 255))); // Magenta for fullness
+
+         // Draw the fullness sprite with the shader
+  target.draw(stomachFullnessSprite, &texture_manager_->stomach_shader_);
+
+  sf::Text foodLabel;
+  foodLabel.setFont(texture_manager_->font_);
+  foodLabel.setString("Food");
+  foodLabel.setCharacterSize(24); // Or another appropriate size
+  foodLabel.setFillColor(sf::Color::White); // Or another color
+  // Set position for the food label above the fullness sprite
+  foodLabel.setPosition(posX + 52.0f, posY - foodLabel.getLocalBounds().height + 20.0f); // Adjust Y position based on height of text and desired ma
+
+  sf::Text acidLabel;
+  acidLabel.setFont(texture_manager_->font_);
+  acidLabel.setString("Acid");
+  acidLabel.setCharacterSize(24); // Or another appropriate size
+  acidLabel.setFillColor(sf::Color::White); // Or another color
+  // Set position for the acid label above the acid sprite
+  acidLabel.setPosition(posX + 57.0f , posYAcid - acidLabel.getLocalBounds().height + 20.0f); // Adjust Y position based on height of text and desired margin
+
+
+         // Set uniform variables for the acid shader
+  float acidRatio = creature.GetAcid() / creature.GetStomachCapacity();
+  texture_manager_->stomach_shader_.setUniform("fullness", acidRatio);
+  texture_manager_->stomach_shader_.setUniform("texture", sf::Shader::CurrentTexture);
+  texture_manager_->stomach_shader_.setUniform("fillColor", sf::Glsl::Vec4(sf::Color(255, 255, 0))); // Yellow for acid
+
+         // Draw the acid sprite with the shader
+  target.draw(stomachAcidSprite, &texture_manager_->stomach_shader_);
+
+  target.draw(foodLabel);
+  target.draw(acidLabel);
 }
