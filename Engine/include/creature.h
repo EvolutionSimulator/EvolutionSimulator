@@ -39,6 +39,7 @@ class Creature : virtual public MovableEntity, virtual public AliveEntity, virtu
  public:
   Creature(neat::Genome genome, Mutable mutable_);
 
+
   void UpdateEnergy(double deltaTime);
   void Update(double deltaTime, double const kMapWidth, double const kMapHeight,
               std::vector<std::vector<std::vector<Entity *> > > &grid,
@@ -50,6 +51,8 @@ class Creature : virtual public MovableEntity, virtual public AliveEntity, virtu
   void Grow(double energy);
   void Think(std::vector<std::vector<std::vector<Entity *> > > &grid,
              double GridCellSize, double deltaTime, double width, double height);
+
+  void Bite(Creature* creature);
   bool Compatible(const Creature& other_creature);
 
  protected:
