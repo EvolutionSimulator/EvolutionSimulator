@@ -46,7 +46,6 @@ class Creature : virtual public MovableEntity,
   Creature(neat::Genome genome, Mutable mutable_);
   virtual ~Creature() override {}
 
-
   void UpdateEnergy(double deltaTime);
 
   void UpdateMatingDesire();
@@ -64,6 +63,7 @@ class Creature : virtual public MovableEntity,
 
   void Bite(Creature* creature);
   bool Compatible(const Creature& other_creature);
+  void Parasite(Creature* host);
 
   bool GetMatingDesire() const;
 

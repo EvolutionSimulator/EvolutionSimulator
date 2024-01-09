@@ -416,7 +416,7 @@ std::vector<Food *> get_food_at_distance(
 }
 
 /*!
- * @brief Handles the biting of the food.
+ * @brief Handles the biting of the creature.
  *
  * @details Adds the food it bites to the stomach (increasing fulness and potential
  * energy). Decreases food size/deletes food that gets bitten.
@@ -442,4 +442,5 @@ void Creature::Bite(Creature* creature)
     creature->SetHealth(initial_health-damage);
   }
 }
+
 
