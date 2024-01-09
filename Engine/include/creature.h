@@ -39,7 +39,6 @@ class Creature : virtual public MovableEntity, virtual public AliveEntity, virtu
  public:
   Creature(neat::Genome genome, Mutable mutable_);
 
-
   void UpdateEnergy(double deltaTime);
   void Update(double deltaTime, double const kMapWidth, double const kMapHeight,
               std::vector<std::vector<std::vector<Entity *> > > &grid,
@@ -54,6 +53,7 @@ class Creature : virtual public MovableEntity, virtual public AliveEntity, virtu
 
   void Bite(Creature* creature);
   bool Compatible(const Creature& other_creature);
+  void Parasite(Creature* host);
 
  protected:
   int think_count; /*! Keeps track so that creatures think every 5 loops */
