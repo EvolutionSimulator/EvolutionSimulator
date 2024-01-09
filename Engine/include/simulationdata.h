@@ -33,6 +33,8 @@ struct SimulationData {
   void CheckCreatureCollisions();
   void CheckCollisions();
 
+  void UpdateAllFood(double deltaTime);
+
   void ModifyAllCreatures(double delta_x, double delta_y);
   void UpdateAllCreatures(double deltaTime);
 

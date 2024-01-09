@@ -236,6 +236,17 @@ void SimulationData::ReproduceTwoCreatures(Creature& creature1, Creature& creatu
  }
 }
 
+void SimulationData::UpdateAllFood(double deltaTime){
+  for (Food& food : food_entities_){
+      if (food.GetType() == Food::meat) {
+          Meat& meat = dynamic_cast<Meat &>(food);
+          meat.Rot(deltaTime);
+      } else if (food.GetType() == Food::plant) {
+          Plant& plant = dynamic_cast<Plant &> (food);
+          plant.Grow(deltaTime);
+      }
+  }
+}
 
 /*!
  * @brief Initializes creatures randomly on the map, mutating their genome

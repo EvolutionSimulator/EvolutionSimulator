@@ -46,7 +46,7 @@ class Meat : public Food {
   Meat(const double x_coord, const double y_coord);
   Meat(const double x_coord, const double y_coord, const double size);
   Meat(const double size);
-  void Rot();
+  void Rot(double deltaTime);
 };
 
 #endif  // FOOD_H
