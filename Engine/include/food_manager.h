@@ -7,6 +7,7 @@ class FoodManager {
  public:
   FoodManager();
 
+  void UpdateAllFood(SimulationData &data, Environment &environment, double deltaTime);
   void InitializeFood(SimulationData &data, Environment &environment);
   void GenerateMoreFood(SimulationData &data, Environment &environment, double deltaTime);
 };

@@ -12,6 +12,7 @@ endif()
 # Global settings
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CSX_FLAGS_RELEASE "-O3")
 
 # Compiler specific options for Debug and Release modes
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")

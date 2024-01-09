@@ -31,6 +31,8 @@ void SimulationData::SetEnvironment(Environment& environment) {
   environment_ = environment;
 }
 
+
+
 void SimulationData::UpdateStatistics() {
   double current_time = world_time_;
   if (current_time - lastRecordedTime_ >= 1.0) {

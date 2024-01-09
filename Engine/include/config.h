@@ -48,7 +48,7 @@ constexpr double kDefaultCreatureDensity = 5e-4;
 constexpr double kPlantNutritionalValue = 1.0;
 constexpr double kMeatNutritionalValue = 2.0;
 constexpr double kPlantProportion = 0.5; /* PlantProportion + MeatProportion = 1 */
-constexpr double kRotFactor = 1.0;
+constexpr double kRotFactor = 5.0;
 constexpr double kGridCellSize = 50.0;
 constexpr int kMinCreatureSize = 2;
 constexpr double kReproductionThreshold = 0.80;
