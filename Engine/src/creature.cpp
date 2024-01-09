@@ -122,6 +122,8 @@ double Creature::GetHealth() const { return health_; }
 void Creature::SetHealth(double health) {
   if (health > mutable_.GetIntegrity() * pow(size_, 2)) {
     health_ = mutable_.GetIntegrity() * pow(size_, 2);
+  } else if (health<=0) {
+    Dies();
   } else {
     health_ = health;
   }
@@ -870,42 +872,21 @@ void Creature::Bite(Creature* creature)
   //Reset eating cooldown, makes creature stop to bite
   eating_cooldown_ = mutable_.GetEatingSpeed();
 
-  //Bite logic
+  SetEnergy(GetEnergy()-bite_strength_*settings::physical_constraints::kBiteEnergyConsumptionRatio);
   const double damage = M_PI*pow(bite_strength_,2)*settings::physical_constraints::kBiteDamageRatio;
-
-  // Check if main creature kills the other
-  if (damage >= creature->GetHealth())
-  {
-    creature->Dies();
-  }
-  else
-  {
-    double const initial_health = creature->GetHealth();
-    creature->SetHealth(initial_health-damage);
-  }
+  creature->SetHealth(creature->GetHealth()-damage);
 }
 
 void Creature::Parasite(Creature* host)
 {
   // Parasites are assumed to be attached to the host and to have a biting size smaller than the host
-
+  SetEnergy(GetEnergy()-bite_strength_*settings::physical_constraints::kBiteEnergyConsumptionRatio);
   const double nutrition = settings::environment::kMeatNutritionalValue * M_PI*pow(bite_strength_,2) * 2 * mutable_.GetDiet();
   SetEnergy(GetEnergy()+nutrition);
   SetStomachFullness(GetStomachFullness()+M_PI*pow(bite_strength_,2));
 
-  const double damage = M_PI*pow(bite_strength_,2)*settings::physical_constraints::kBiteDamageRatio;
-
-  if (damage >= host->GetHealth())
-  {
-    SetEnergy(host->GetHealth()*settings::physical_constraints::kBiteEnergyRatio);
-    host->Dies();
-  }
-  else
-  {
-    SetEnergy(damage*settings::physical_constraints::kBiteEnergyRatio);
-    double const initial_health = host->GetHealth();
-    host->SetHealth(initial_health-damage);
-  }
+  const double damage = std::min(M_PI*pow(bite_strength_,2)*settings::physical_constraints::kBiteDamageRatio, host->GetHealth());
+  host->SetHealth(host->GetHealth()-damage);
 }
 
 void Creature::AddAcid(double quantity)
