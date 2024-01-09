@@ -98,7 +98,7 @@ Plant::Plant(double size)
 
 void Plant::Grow(double deltaTime) {
   double updated_nutritional_value =
-      GetNutritionalValue() + settings::environment::kPhotosynthesisFactor;
+      GetNutritionalValue() + settings::environment::kPhotosynthesisFactor * deltaTime;
   if (updated_nutritional_value <=
       settings::environment::kMaxNutritionalValue) {
     SetNutritionalValue(updated_nutritional_value);
@@ -139,9 +139,9 @@ Meat::Meat(double size)
  * @details The nutritional value of the Meat decreases over time, and it
  * becomes Dead when it reaches zero.
  */
-void Meat::Rot() {
+void Meat::Rot(double deltaTime) {
   double updated_nutritional_value =
-      GetNutritionalValue() - settings::environment::kRotFactor;
+      GetNutritionalValue() - settings::environment::kRotFactor * deltaTime;
   if (updated_nutritional_value < 0) {
     SetState(Entity::Dead);
     return;
