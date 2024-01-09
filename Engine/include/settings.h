@@ -110,7 +110,6 @@ class Settings {
     double d_eating_cooldown = 1;  // Decrease for easier survival
     double d_digestion_rate = 3;
     double d_genetic_strength = 0.6;
-<<<<<<< HEAD
     double d_acid_to_energy = 5;  // Increase for easier survival
     double max_reproducing_age = 700;
     double mating_desire_max_prob = 0.05;
@@ -119,10 +118,8 @@ class Settings {
         0.2;  // Causes the biggest change in number of creatures
     double pregnancy_velocity_factor = 0.5; //Not used currently
     double after_birth_velocity_factor = 1.5; //Not used currently
-=======
-    double d_acid_to_energy = 5; // Increase for easier survival
     double d_bite_damage_ratio = 1;
->>>>>>> d3afa94 (update bite creature function)
+    double d_bite_energy_consumption_ratio = 0.01;
   } physical_constraints;
 
   struct UISettings {
