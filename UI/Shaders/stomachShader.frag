@@ -12,7 +12,10 @@ void main() {
     bool isGray = abs(texColor.r - colorIntensity) < 0.1 && abs(texColor.g - colorIntensity) < 0.1 && abs(texColor.b - colorIntensity) < 0.1;
 
     // Calculate the y-coordinate threshold for the current fullness level
+<<<<<<< HEAD
     // The factors are included due to the relationship between the full texture (with transparent background) and the actual sprite
+=======
+>>>>>>> 954d584 (Add optimization, fix shader, apply rot and grow)
     float fillThreshold = 0.75 - fullness*7/16;
 
     // If the pixel is in the gray area and below the fill threshold, fill it with yellow

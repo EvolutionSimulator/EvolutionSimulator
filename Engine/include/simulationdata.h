@@ -23,9 +23,13 @@ struct SimulationData {
 
   Environment GetEnvironment();
   void SetEnvironment(Environment& environment);
+<<<<<<< HEAD
 
   std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> GetGrid();
 
+=======
+  std::vector<std::vector<std::vector<Entity*>>> GetGrid();
+>>>>>>> acc4d52 (Add optimization, fix shader, apply rot and grow)
 
   void UpdateStatistics();
 
