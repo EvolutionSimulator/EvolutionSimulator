@@ -112,6 +112,7 @@ constexpr double kAfterBirthVelocityFactor = 1.5;
 =======
 constexpr double KDAcidToEnergy = 5; // Increase for easier survival
 constexpr double kBiteDamageRatio = 1;
+constexpr double kBiteEnergyConsumptionRatio = 0.01;
 } //namespace physical_constraints
 >>>>>>> eac0cea (creation of the new bite function)
 
