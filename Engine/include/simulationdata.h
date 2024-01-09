@@ -19,7 +19,6 @@ struct SimulationData {
 
   Environment GetEnvironment();
   void SetEnvironment(Environment& environment);
-
   std::vector<std::vector<std::vector<Entity*>>> GetGrid();
 
   void UpdateStatistics();
