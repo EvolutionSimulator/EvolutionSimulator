@@ -32,7 +32,7 @@ Creature::Creature(neat::Genome genome, Mutable mutables)
     size_ = mutables.GetBabySize();
     health_ = mutables.GetIntegrity() * pow(size_, 2);
     energy_ = mutables.GetEnergyDensity() * pow(size_, 2);
-    int neural_inputs = settings::environment::kInputNeurons;
+    int neural_inputs = SETTINGS.environment.input_neurons;
     for (BrainModule module : genome.GetModules()){
         neural_inputs += module.GetInputNeuronIds().size();
     }
@@ -369,20 +369,8 @@ void Creature::Bite(Creature* creature)
 {
   //Reset eating cooldown, makes creature stop to bite
   eating_cooldown_ = mutable_.GetEatingSpeed();
-
   //Bite logic
   const double damage = M_PI*pow(bite_strength_,2)*SETTINGS.physical_constraints.d_bite_damage_ratio;
-
-  // Check if main creature kills the other
-  if (damage >= creature->GetHealth())
-  {
-    creature->Dies();
-  }
-  else
-  {
-    double const initial_health = creature->GetHealth();
-    creature->SetHealth(initial_health-damage);
-  }
+  SetEnergy(GetEnergy()-bite_strength_*SETTINGS.physical_constraints.d_bite_energy_consumption_ratio);
+  creature->SetHealth(creature->GetHealth()-damage);
 }
-
-
