@@ -49,6 +49,7 @@ class Meat : public Food {
   Meat(const double x_coord, const double y_coord, const double size);
   Meat(const double size);
   virtual void Update(double deltaTime) override;
+
 };
 
 #endif  // FOOD_H
