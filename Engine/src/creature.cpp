@@ -765,6 +765,13 @@ Food *Creature::GetClosestFoodInSight(
 
 double Creature::GetStomachCapacity() const {return stomach_capacity_;};
 double Creature::GetStomachFullness() const {return stomach_fullness_;};
+void Creature::SetStomachFullness(const double& new_fullness) {
+  if (new_fullness > stomach_capacity_) {
+    stomach_fullness_ = stomach_capacity_;
+  } else {
+    stomach_fullness_ = new_fullness;
+  }
+};
 double Creature::GetEmptinessPercent() const {return 100 * (1 - stomach_fullness_/stomach_capacity_);};
 double Creature::GetEnergyInStomach() const {return potential_energy_in_stomach_;};
 
@@ -822,7 +829,7 @@ void Creature::Bite(Food* food)
   if (food_to_eat >= food->GetSize())
   {
     max_nutrition = food->GetNutritionalValue() * food->GetSize();
-    stomach_fullness_ += pow(food->GetSize(), 2);
+    stomach_fullness_ += M_PI*pow(food->GetSize(), 2);
     food->Eat();
   }
   else
@@ -851,7 +858,7 @@ void Creature::Bite(Food* food)
 }
 
 /*!
- * @brief Handles the biting of the food.
+ * @brief Handles the biting of another creature.
  *
  * @details Adds the food it bites to the stomach (increasing fulness and potential
  * energy). Decreases food size/deletes food that gets bitten.
@@ -875,6 +882,29 @@ void Creature::Bite(Creature* creature)
   {
     double const initial_health = creature->GetHealth();
     creature->SetHealth(initial_health-damage);
+  }
+}
+
+void Creature::Parasite(Creature* host)
+{
+  // Parasites are assumed to be attached to the host and to have a biting size smaller than the host
+
+  const double nutrition = settings::environment::kMeatNutritionalValue * M_PI*pow(bite_strength_,2) * 2 * mutable_.GetDiet();
+  SetEnergy(GetEnergy()+nutrition);
+  SetStomachFullness(GetStomachFullness()+M_PI*pow(bite_strength_,2));
+
+  const double damage = M_PI*pow(bite_strength_,2)*settings::physical_constraints::kBiteDamageRatio;
+
+  if (damage >= host->GetHealth())
+  {
+    SetEnergy(host->GetHealth()*settings::physical_constraints::kBiteEnergyRatio);
+    host->Dies();
+  }
+  else
+  {
+    SetEnergy(damage*settings::physical_constraints::kBiteEnergyRatio);
+    double const initial_health = host->GetHealth();
+    host->SetHealth(initial_health-damage);
   }
 }
 
