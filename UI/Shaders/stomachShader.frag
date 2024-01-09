@@ -12,7 +12,7 @@ void main() {
     bool isGray = abs(texColor.r - colorIntensity) < 0.1 && abs(texColor.g - colorIntensity) < 0.1 && abs(texColor.b - colorIntensity) < 0.1;
 
     // Calculate the y-coordinate threshold for the current fullness level
-    float fillThreshold = 1.0 - fullness;
+    float fillThreshold = 0.75 - fullness*7/16;
 
     // If the pixel is in the gray area and below the fill threshold, fill it with yellow
     if (uv.y > fillThreshold && isGray) {
