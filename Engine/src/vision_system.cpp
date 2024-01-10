@@ -162,17 +162,18 @@ Food *VisionSystem::GetClosestFoodInSight(
   return closest_food;
 }
 
-bool VisionSystem::IsFoodInSight(Food *food)
+
+bool VisionSystem::IsInSight(Entity *entity)
 {
   auto cone_center = Point(x_coord_, y_coord_);
   auto cone_orientation = GetOrientation();
   auto cone_left_boundary = OrientedAngle(cone_orientation - vision_angle_ / 2);
   auto cone_right_boundary =
       OrientedAngle(cone_orientation + vision_angle_ / 2);
-  auto food_point = Point(food->GetCoordinates());
-  auto food_direction = OrientedAngle(cone_center, food_point);
+  auto entity_point = Point(entity->GetCoordinates());
+  auto entity_direction = OrientedAngle(cone_center, entity_point);
 
-  return food_direction.IsInsideCone(cone_left_boundary, cone_right_boundary);
+  return entity_direction.IsInsideCone(cone_left_boundary, cone_right_boundary);
 }
 
 

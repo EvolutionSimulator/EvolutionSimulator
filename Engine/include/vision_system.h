@@ -25,7 +25,7 @@ public:
           double grid_cell_size) const;
   Food *GetClosestMeatInSight(std::vector<std::vector<std::vector<Entity *>>> &grid,
           double grid_cell_size) const;
-  bool IsFoodInSight(Food *food);
+  bool IsInSight(Entity *entity);
 
 protected:
   double distance_plant_;       /*!< Distance to the nearest plant source. */
