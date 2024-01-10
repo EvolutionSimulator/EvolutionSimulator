@@ -42,6 +42,11 @@ void FoodManager::GenerateMoreFood(SimulationData &data,
   }
 }
 
+/*!
+ * @brief Updates all the food entities (meat rots) and plants grow
+ *
+ * @param deltaTime Time that has passed since last update
+ */
 void FoodManager::UpdateAllFood(SimulationData &data, Environment &environment, double deltaTime){
   for (Food& food : data.food_entities_){
     if (food.GetType() == Food::meat) {
