@@ -236,6 +236,11 @@ void SimulationData::ReproduceTwoCreatures(Creature& creature1, Creature& creatu
  }
 }
 
+/*!
+ * @brief Updates all the food entities (meat rots) and plants grow
+ *
+ * @param deltaTime Time that has passed since last update
+ */
 void SimulationData::UpdateAllFood(double deltaTime){
   for (Food& food : food_entities_){
       if (food.GetType() == Food::meat) {
