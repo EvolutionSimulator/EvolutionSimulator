@@ -339,16 +339,17 @@ Mutable Creature::GetMutable() const {return mutable_;}
  * @param kMapWidth Width of the map.
  * @param kMapHeight Height of the map.
  */
-void Creature::OnCollision(Entity &other_entity, double const kMapWidth,
-                           double const kMapHeight) {
-  if (Food *food = dynamic_cast<Food *>(&other_entity)) {
-    if (food->GetState() == Entity::Alive && eating_cooldown_ == 0.0 && biting_ == 1) {
-      {
-        if (IsFoodInSight(food))
-        {
-          Bite(food);
+void Creature::OnCollision(Entity &other_entity, double const kMapWidth, double const kMapHeight) {
+  if (other_entity.GetState() == Entity::Alive && eating_cooldown_ == 0.0 && biting_ == 1) {
+    SetEnergy(GetEnergy()-bite_strength_*settings::physical_constraints::kBiteEnergyConsumptionRatio);
+    if (Food* food_entity = dynamic_cast<Food*>(&other_entity)) {
+        if (IsInSight(food_entity)) {
+            Bite(food_entity);
         }
-      }
+    } else if (Creature* creature_entity = dynamic_cast<Creature*>(&other_entity)) {
+        if (IsInSight(creature_entity)) {
+            Bite(creature_entity);
+        }
     }
   }
   MovableEntity::OnCollision(other_entity, kMapWidth, kMapHeight);
@@ -872,7 +873,6 @@ void Creature::Bite(Creature* creature)
   //Reset eating cooldown, makes creature stop to bite
   eating_cooldown_ = mutable_.GetEatingSpeed();
 
-  SetEnergy(GetEnergy()-bite_strength_*settings::physical_constraints::kBiteEnergyConsumptionRatio);
   const double damage = M_PI*pow(bite_strength_,2)*settings::physical_constraints::kBiteDamageRatio;
   creature->SetHealth(creature->GetHealth()-damage);
 }
@@ -898,15 +898,15 @@ void Creature::AddAcid(double quantity)
 
 double Creature::GetAcid() const {return stomach_acid_; };
 
-bool Creature::IsFoodInSight(Food *food)
+bool Creature::IsInSight(Entity *entity)
 {
   auto cone_center = Point(x_coord_, y_coord_);
   auto cone_orientation = GetOrientation();
   auto cone_left_boundary = OrientedAngle(cone_orientation - vision_angle_ / 2);
   auto cone_right_boundary =
       OrientedAngle(cone_orientation + vision_angle_ / 2);
-  auto food_point = Point(food->GetCoordinates());
-  auto food_direction = OrientedAngle(cone_center, food_point);
+  auto entity_point = Point(entity->GetCoordinates());
+  auto entity_direction = OrientedAngle(cone_center, entity_point);
 
-  return food_direction.IsInsideCone(cone_left_boundary, cone_right_boundary);
+  return entity_direction.IsInsideCone(cone_left_boundary, cone_right_boundary);
 }

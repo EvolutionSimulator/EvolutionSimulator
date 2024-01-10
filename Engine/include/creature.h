@@ -81,7 +81,7 @@ class Creature : public MovableEntity {
           double grid_cell_size) const;
   Food *GetClosestMeatInSight(std::vector<std::vector<std::vector<Entity *>>> &grid,
           double grid_cell_size) const;
-  bool IsFoodInSight(Food *food);
+  bool IsInSight(Entity *entity);
 
 
   void Grow(double energy);
