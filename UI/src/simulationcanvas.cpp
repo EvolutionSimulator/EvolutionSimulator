@@ -767,9 +767,6 @@ std::string SimulationCanvas::formatCreatureInfo(const Creature& creature) {
   ss << "Energy: " << "\n";
   ss << "Velocity: " << round_double(creature.GetVelocity(), 2) << "\n";
   ss << "Rot. Velocity: " << round_double(creature.GetRotationalVelocity(), 2) << "\n\n";
-  ss << "Stomach capacity: " << creature.GetStomachCapacity() << "\n\n";
-  ss << "Stomach fullness: " << creature.GetStomachFullness() << "\n\n";
-  ss << "Stomach acid: " << creature.GetAcid() << "\n\n";
   auto [x, y] = creature.GetCoordinates();
   ss << "(x=" << x << ", y=" << y << ")\n \n";
   ss << "Mutables information: \n";
@@ -782,6 +779,7 @@ std::string SimulationCanvas::formatCreatureInfo(const Creature& creature) {
   ss << "Baby size: " << mutables.GetBabySize() << "\n";
   ss << "Rep. cooldown: " << mutables.GetReproductionCooldown() << "\n";
   ss << "Maturity age: " << mutables.GetMaturityAge() << "\n";
+  ss << "Stomach capacity: " << creature.GetStomachCapacity() << "\n\n";
   return ss.str();
 }
 
