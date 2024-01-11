@@ -19,16 +19,20 @@ QT_END_NAMESPACE  //
   MainWindow(QWidget* parent = nullptr);
   ~MainWindow();
 
-  void SetEngine(Engine* engine);
+  void InitializeEngine();
+
   void keyPressEvent(QKeyEvent *event) override; // Add this line
 
  private slots:  // Slots should be placed under this section
   void RunSimulation();
+  void PauseSimulation();
+  void ResumeSimulation();
+  void KillEngine();
+  void ToggleSimulation();
+  void RestartSimulation();
   void ChangeFoodDensity(
       int value);  // Make sure this is under 'private slots:'
   void ChangeCreatureDensity(int value);
-  void ToggleSimulation();
-  void RestartSimulation();
   void DisplayGraph();
   void ChangeFriction(int value);
   void DrawCreaturesOverTimeGraph();
