@@ -30,6 +30,8 @@ constexpr double kColorCompatibility = 0.1;
 constexpr double kMutablesCompatibility = 0.5;
 constexpr double kCompatibilityThreshold = 2;
 constexpr double kCompatibilityDistance = 100;
+constexpr double kMaxReproducingAge = 3;
+constexpr double kMinReproducingAge = 1;
 }
 
 namespace environment {
