@@ -7,6 +7,9 @@
 	<file>Resources/Creature_base.png</file>
 	<file>Resources/Creature_eyes.png</file>
 	<file>Resources/Creature_tails.png</file>
+	<file>Resources/Health.png</file>
+	<file>Resources/Energy.png</file>
+
 	<file>Shaders/colorShift.frag</file>
     </qresource>
 </RCC>
