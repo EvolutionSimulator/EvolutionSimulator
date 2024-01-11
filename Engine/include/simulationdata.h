@@ -11,6 +11,7 @@
 struct SimulationData {
  public:
   std::vector<int> GetCreatureCountOverTime() const;
+  std::vector<int> GetCreatureSizeOverTime() const;
   explicit SimulationData(myEnvironment::Environment& env)
       : environment_(env), creatures_(), food_entities_(), lastRecordedTime_(0.0){
     InitializeFood();
@@ -55,6 +56,7 @@ struct SimulationData {
   myEnvironment::Environment& environment_;
   std::vector<std::vector<std::vector<Entity*>>> grid_;
   std::vector<int> creatureCountOverTime_;
+  std::vector<int> creatureSizeOverTime_;
 };
 
 std::vector<std::pair<int, int>> GetNeighbours(
