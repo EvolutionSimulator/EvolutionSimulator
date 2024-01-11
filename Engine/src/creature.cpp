@@ -27,7 +27,7 @@ Creature::Creature(neat::Genome genome, Mutable mutables)
       AliveEntity(genome, mutables),
       VisionSystem(genome, mutables),
       DigestiveSystem(genome, mutables),
-      reproduction_cooldown_ (mutables.GetMaturityAge())
+      ReproductiveSystem(genome,mutables)
       {
     size_ = mutables.GetBabySize();
     health_ = mutables.GetIntegrity() * pow(size_, 2);
@@ -53,33 +53,6 @@ void Creature::UpdateEnergy(double deltaTime) {
   if (GetHealth() <= 0) {
     Dies();
   }
-}
-
-/*!
- * @brief Checks if the creature is fit for reproduction.
- *
- * @details This method determines if the creature meets the energy requirements
- * and cooldown period for reproduction.
- *
- * @return true if the creature is fit for reproduction, false otherwise.
- */
-bool Creature::Fit() {
-  if (energy_ > SETTINGS.environment.reproduction_threshold * max_energy_ &&
-      reproduction_cooldown_ == 0.0 && age_ < 700) {
-    return true;
-  }
-  return false;
-}
-
-/*!
- * @brief Handles the creature's reproduction process.
- *
- * @details This method deducts the energy cost of reproduction and initiates
- * the cooldown period.
- */
-void Creature::Reproduced() {
-  SetEnergy(GetEnergy() - 0.7 * max_energy_);
-  reproduction_cooldown_ = mutable_.GetReproductionCooldown();
 }
 
 /*!
