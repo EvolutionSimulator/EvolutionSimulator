@@ -51,7 +51,7 @@ Creature::Creature(neat::Genome genome, Mutable mutables)
     stomach_capacity_ = mutables.GetStomachCapacityFactor() * pow(size_, 2);
     bite_strength_ = mutables.GetGeneticStrength() * size_;
     gender_ = rand() % 2;
-    std::cout <<mutables.GetBabySize() << std::endl;
+    mating_desire_ = false;
 }
 
 
@@ -126,6 +126,15 @@ double Creature::GetHealth() const { return health_; }
 int Creature::GetGender() const { return gender_;}
 
 /*!
+ * @brief Retrieves the whether or not a creature wants to mate
+ *
+ * @details This method returns the creature's mating desire
+ *
+ * @return bool True if wants to mate false otherwise
+ */
+bool Creature::GetMatingDesire() const { return mating_desire_;}
+
+/*!
  * @brief Sets the health level of the creature.
  *
  * @param health The new health level to be set, capped at 100.
@@ -179,6 +188,34 @@ void Creature::UpdateEnergy(double deltaTime) {
   if (GetHealth() <= 0) {
     Dies();
   }
+}
+
+/*!
+ * @brief Updates the creature's desire to mate
+ *
+ * @details This method modifies the boolean desire of creatures to mate.
+ * For females, can mate in the age range kMinReproducingAge to
+ * kMaxReproducingAge, with a probability that is inversely proportional to age,
+ * while for males can mate past kMinProducingAge with falling probability.
+ */
+void Creature::UpdateMatingDesire(){
+    if (age_<settings::compatibility::kMinReproducingAge){
+        mating_desire_=false;
+        return;
+    }
+    if (gender_ == 1) {
+        // For females, desire to mate is high at young age and decays over time until age 50
+        if (age_ >= settings::compatibility::kMaxReproducingAge){
+            mating_desire_ = false;
+            return;
+        }
+        double probability = 1 - static_cast<double>(age_-settings::compatibility::kMinReproducingAge) / (settings::compatibility::kMaxReproducingAge-settings::compatibility::kMinReproducingAge);
+        mating_desire_ = (rand() % 100) < (probability * 100);
+    } else{
+        // For males, desire to mate is high at young age, and there is no age limit
+        double probability = 1-static_cast<double>(age_-settings::compatibility::kMinReproducingAge) / 5; //5 SHOULD BE REPLACED BY MAX AGE
+        mating_desire_ = (rand() % 100) < (probability * 100);
+}
 }
 
 /*!
@@ -305,6 +342,7 @@ void Creature::Update(double deltaTime, double const kMapWidth,
   this->Rotate(deltaTime);
   this->Think(grid, GridCellSize, deltaTime, kMapWidth, kMapHeight);
   this->Digest(deltaTime);
+  this->UpdateMatingDesire();
   age_ += 0.05;
 
   if (reproduction_cooldown_ <= 0) {

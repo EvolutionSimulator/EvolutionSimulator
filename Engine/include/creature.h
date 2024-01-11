@@ -62,6 +62,8 @@ class Creature : public MovableEntity {
   double GetMaxEnergy() const;
   void UpdateMaxEnergy();
 
+  void UpdateMatingDesire();
+
   double GetAge() const;
   void SetAge(double age);
 
@@ -94,7 +96,6 @@ class Creature : public MovableEntity {
   void Bite(Food *food);
   void AddAcid(double quantity);
 
-
   int GetGeneration() const;
   void SetGeneration(int generation);
   bool Compatible(const Creature& other_creature);
@@ -104,6 +105,7 @@ class Creature : public MovableEntity {
   double GetEmptinessPercent() const;
   double GetAcid() const;
   double GetEnergyInStomach() const;
+  bool GetMatingDesire() const;
   int GetGender() const;
 
  protected:
@@ -150,7 +152,8 @@ class Creature : public MovableEntity {
   double stomach_acid_; /*! Added when digestion occurs */
   bool biting_; /*! Indicates whether creature is biting or not*/
 
-  int gender_;
+  bool mating_desire_; /*! Indicates whether creature currently wants to mate*/
+  int gender_; /*! Indicates the gender of the creature*/
 };
 
 class Egg : public MovableEntity {
