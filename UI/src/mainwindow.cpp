@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
   //Add image as icon use region as mask to make the icon circular
   QRect rect(2,2,45,45);
   QRegion region(rect, QRegion::Ellipse);
-  qDebug() << region.boundingRect().size();
+  ui_->runButton->setMask(region);
   QPixmap pixMap(":/Resources/Run.png");
   QIcon icon(pixMap);
   ui_->runButton->setIcon(icon);

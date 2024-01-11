@@ -1,11 +1,12 @@
-#include "../include/alive_entity.h"
+#include "alive_entity.h"
+#include "settings.h"
 
 AliveEntity::AliveEntity(neat::Genome genome, Mutable mutables)
     : Entity(),
       mutable_(mutables),
       brain_(neat::NeuralNetwork(genome)),
       genome_(genome),
-      neuron_data_(settings::environment::kInputNeurons, 0),
+      neuron_data_(SETTINGS.environment.input_neurons, 0),
       age_(0) {
     size_ = mutables.GetBabySize();
     health_ = mutables.GetIntegrity() * pow(size_, 2);
