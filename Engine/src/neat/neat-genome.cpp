@@ -563,7 +563,12 @@ Genome Crossover(const Genome& dominant, const Genome& recessive) {
 }
 
 
-
+/*!
+ * @brief Randomly mutates the activation function of a hidden neuron in the Genome.
+ *
+ * This function selects a random hidden neuron and changes its activation function to a new type
+ * randomly chosen from a predefined list of activation types.
+ */
 void Genome::MutateActivationFunction() {
     if (GetInputCount()+GetOutputCount()==neurons_.size()){
         return ;
@@ -589,13 +594,20 @@ void Genome::MutateActivationFunction() {
     neurons_[indexRandomNeuronHidden].SetActivation(activationTypes[randomIndex]);
 }
 
-void Genome::MutateActivateBrainModule(BrainModule module){
+/*!
+ * @brief Activates a random brain module from the available modules in the Genome.
+ *
+ * Adds a randomly selected brain module to the genome, updating input and output
+ * neurons of the module to reflect the current state of the genome.
+ */
+void Genome::MutateActivateBrainModule(){
 
   std::random_device rd;
   std::mt19937 generator(rd());
-  std::uniform_int_distribution<int> distribution(0, modules.size() - 1);
+  std::uniform_int_distribution<int> distribution(0, AvailableModules.size() - 1);
   int randomIndex = distribution(generator);
-
+  BrainModule module = AvailableModules.at(randomIndex);
+  modules_.push_back(module);
 
   int input_size = module.GetInputNeuronIds().size();
   std::vector<int> input_ids(input_size, 0);
@@ -616,15 +628,41 @@ void Genome::MutateActivateBrainModule(BrainModule module){
   module.SetOutputNeuronIds(output_ids);
 }
 
-void Genome::MutateDisableBrainModule(BrainModule module){
-    for (const int i : module.GetInputNeuronIds()){
-        DisableNeuron(i);
-    }
-    for (const int i : module.GetOutputNeuronIds()){
-        DisableNeuron(i);
-    }
+/*!
+ * @brief Disables a random brain module in the Genome.
+ *
+ * Removes a randomly selected brain module from the genome, including its associated
+ * input and output neurons.
+ */
+void Genome::MutateDisableBrainModule(){
+  std::random_device rd;
+  std::mt19937 generator(rd());
+  std::uniform_int_distribution<int> distribution(0, modules_.size() - 1);
+  int randomIndex = distribution(generator);
+  BrainModule module = modules_.at(randomIndex);
+  modules_.erase(modules_.begin() + randomIndex);
+  for (const int i : module.GetInputNeuronIds()){
+    RemoveNeuron(i);
+  }
+  for (const int i : module.GetOutputNeuronIds()){
+    RemoveNeuron(i);
+  }
 }
 
+/*!
+ * @brief Retrieves the list of modules currently in the Genome.
+ *
+ * @return A vector of BrainModule objects representing the modules currently in the genome.
+ */
+std::vector<BrainModule> Genome::GetModules(){ return modules_; }
+
+/*!
+ * @brief Finds a neuron in the Genome by its ID.
+ *
+ * @param targetId The ID of the neuron to find.
+ * @param foundNeuron A reference to a Neuron object where the found neuron will be stored.
+ * @return True if the neuron is found, false otherwise.
+ */
 bool Genome::FindNeuronById(int targetId, Neuron& foundNeuron) const{
     for (const Neuron& neuron : neurons_) {
         if (neuron.GetId() == targetId) {
@@ -635,6 +673,15 @@ bool Genome::FindNeuronById(int targetId, Neuron& foundNeuron) const{
     return false;  // Return false if neuron isnt found
 }
 
+/*!
+ * @brief Calculates the compatibility score between this Genome and another Genome.
+ *
+ * This method computes a score based on the shared neurons, shared links, and weight
+ * similarities between the two genomes, following a specific compatibility formula.
+ *
+ * @param other A reference to another Genome object to compare with.
+ * @return The calculated compatibility score.
+ */
 double Genome::CompatibilityBetweenGenomes(const Genome& other) const {
   // Identify shared neurons
   std::unordered_map<int, Neuron> shared_neurons;
