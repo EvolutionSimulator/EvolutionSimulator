@@ -53,10 +53,19 @@ class Creature : virtual public MovableEntity, virtual public AliveEntity, virtu
 
   void Bite(Creature* creature);
   bool Compatible(const Creature& other_creature);
-  void Parasite(Creature* host);
+
+  Creature *GetClosestEnemyInSight(
+      std::vector<std::vector<std::vector<Entity *>>> &grid,
+      double grid_cell_size);
+  void ProcessVisionEnemies(std::vector<std::vector<std::vector<Entity *>>> &grid,
+                            double grid_cell_size, double width, double height);
 
  protected:
   int think_count; /*! Keeps track so that creatures think every 5 loops */
+
+  double distance_enemy_;  /*!< Distance to the nearest enemy creature. */
+  double orientation_enemy_; /*!< Orientation relative to the nearest enemy creature. */
+  double enemy_size_; /*! Size of the closest enemy*/
 };
 
 std::vector<Food *> get_food_at_distance(

@@ -165,6 +165,7 @@ void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
   think_count = 0;
   // To allow creatures to use a module it should be included below
   ProcessVisionFood(grid, GridCellSize, width, height);
+  ProcessVisionEnemies(grid, GridCellSize, width, height);
 
   neuron_data_.at(0) = 1;
   neuron_data_.at(1) = energy_;
@@ -196,13 +197,9 @@ void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
   Grow(std::max(std::tanh(output.at(3)) * deltaTime, 0.0));
   AddAcid(std::max(std::tanh(output.at(4)) * 10.0, 0.0));
   biting_ = std::tanh(output.at(5)) > 0 ? 0 : 1;
-
-
-
-  for (BrainModule& module : GetGenome().GetModules()){
-     //No module with outputs atm but they should be used as with the input
-  }
 }
+
+
 
 /*!
  * @brief Manages the creature's growth based on energy consumption.
@@ -355,6 +352,135 @@ std::vector<Food *> get_food_at_distance(
     }
   }
   return food;
+}
+
+/*!
+ * @brief Finds the closest enemy creature within the creature's line of sight.
+ *
+ * @details Performs a breadth-first search (BFS) on the grid cells within the creature's
+ * field of view to locate the closest enemy creature. A creature is considered an enemy if it
+ * is not compatible with it.
+ *
+ * @param grid A 3-dimensional vector representing the environmental grid where each cell contains entities.
+ * @param grid_cell_size The size of each square cell in the grid.
+ *
+ * @return A pointer to the closest food entity within the line of sight; nullptr if no food is found.
+ */
+Creature *Creature::GetClosestEnemyInSight(
+    std::vector<std::vector<std::vector<Entity *>>> &grid,
+    double grid_cell_size){
+  int grid_width = grid.size();
+  int grid_height = grid[0].size();
+
+  int x_grid = static_cast<int>(x_coord_ / grid_cell_size);
+  int y_grid = static_cast<int>(y_coord_ / grid_cell_size);
+
+         //temporary fix multiply by 4
+  int max_cells_to_find_food = 4 * M_PI * pow(vision_radius_ + 2 * sqrt(2) * grid_cell_size + settings::environment::kMaxFoodSize, 2) / (grid_cell_size * grid_cell_size);
+
+  auto cone_center = Point(x_coord_, y_coord_);
+  auto cone_orientation = GetOrientation();
+  auto cone_left_boundary = OrientedAngle(cone_orientation - vision_angle_ / 2);
+  auto cone_right_boundary =
+      OrientedAngle(cone_orientation + vision_angle_ / 2);
+
+  Creature *closest_enemy = nullptr;
+  double smallest_distance_enemy = std::numeric_limits<double>::max();
+
+  std::queue<std::pair<int, int>> cells_queue;
+  std::set<std::pair<int, int>> visited_cells;
+
+  cells_queue.push({x_grid, y_grid});
+  visited_cells.insert({x_grid, y_grid});
+
+  size_t processed_cells = 0;
+
+  while (!cells_queue.empty()) {
+    auto [x, y] = cells_queue.front();
+    cells_queue.pop();
+    ++processed_cells;
+
+    for (Entity *entity : grid[x][y]) {
+      Creature *creature = dynamic_cast<Creature *>(entity);
+
+      if (creature && creature->GetState() == Entity::states::Alive && Compatible(*creature) == 0) {
+        auto point = Point(entity->GetCoordinates());
+
+        auto direction = OrientedAngle(cone_center, point);
+
+        double distance = point.dist(cone_center);
+
+        bool is_in_field_of_view = (direction.IsInsideCone(
+            cone_left_boundary, cone_right_boundary));
+
+        bool is_on_edge = (direction.AngleDistanceToCone(cone_left_boundary, cone_right_boundary) <= M_PI/2) && (distance * sin(direction.AngleDistanceToCone(cone_left_boundary, cone_right_boundary)) <= creature->GetSize() + settings::engine::EPS);
+
+        if (is_in_field_of_view) {
+          bool is_within_vision_radius =
+              distance <= vision_radius_ + creature->GetSize() + settings::engine::EPS;
+          if (is_within_vision_radius && distance < smallest_distance_enemy) {
+            smallest_distance_enemy = distance;
+            closest_enemy = creature;
+            break;
+          }
+        }
+
+        if (is_on_edge) {
+          bool is_within_vision_radius =
+              (distance * cos(direction.AngleDistanceToCone(cone_left_boundary, cone_right_boundary)) <= vision_radius_ + settings::engine::EPS);
+          if (is_within_vision_radius && distance < smallest_distance_enemy) {
+            smallest_distance_enemy = distance;
+            closest_enemy = creature;
+            break;
+          }
+        }
+      }
+    }
+    if (closest_enemy) {
+      break;
+    }
+
+           //assert(processed_cells <= max_cells_to_find_food && "processed_cells exceeded max_cells_to_find_food in GetClosestFoodInSight");
+    if (processed_cells > max_cells_to_find_food){
+      break;
+    }
+
+    for (int dx = -1; dx <= 1; ++dx) {
+      for (int dy = -1; dy <= 1; ++dy) {
+        if (dx * dx + dy * dy != 1) continue;
+        int nx = x + dx, ny = y + dy;
+        if (0 <= nx && nx < grid_width && 0 <= ny && ny < grid_height &&
+            !visited_cells.count({nx, ny})) {
+          if (IsGridCellPotentiallyInsideCone(
+                  Point(nx * grid_cell_size, ny * grid_cell_size),
+                  grid_cell_size, cone_center, vision_radius_,
+                  cone_left_boundary, cone_right_boundary)) {
+            visited_cells.insert({nx, ny});
+            cells_queue.push({nx, ny});
+          }
+        }
+      }
+    }
+  }
+  return closest_enemy;
+}
+
+void Creature::ProcessVisionEnemies(std::vector<std::vector<std::vector<Entity *>>> &grid,
+                       double grid_cell_size, double width, double height)
+{
+  Creature *closeEnemy = GetClosestEnemyInSight(grid, grid_cell_size);
+
+  if (closeEnemy){
+    distance_enemy_ = this->GetDistance(*closeEnemy, width, height) - (*closeEnemy).GetSize();
+    orientation_enemy_ = this->GetRelativeOrientation(*closeEnemy);
+    enemy_size_ = closeEnemy->GetSize();
+  }
+  else {
+    distance_enemy_ = vision_radius_;
+    orientation_enemy_ = remainder(GetRandomFloat(orientation_- vision_angle_/2, orientation_+ vision_angle_/2), 2*M_PI);
+    enemy_size_ = -1;
+  }
+
 }
 
 /*!

@@ -750,6 +750,7 @@ double Genome::CompatibilityBetweenGenomes(const Genome& other) const {
     return compatibility_distance;
 }
 
+
 Genome minimallyViableGenome() {
   int start_id = neat::Neuron::next_id_ - 1;
   Genome genome(SETTINGS.environment.input_neurons,
