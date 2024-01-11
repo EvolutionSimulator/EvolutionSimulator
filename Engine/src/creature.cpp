@@ -199,21 +199,23 @@ void Creature::UpdateEnergy(double deltaTime) {
  * while for males can mate past kMinProducingAge with falling probability.
  */
 void Creature::UpdateMatingDesire(){
-    if (age_<settings::compatibility::kMinReproducingAge){
+    double min_reproducing_age = mutable_.GetMaturityAge();
+    double max_repdroducing_age_ = 700;
+    if (age_ < min_reproducing_age){
         mating_desire_=false;
         return;
     }
     if (gender_ == 1) {
-        // For females, desire to mate is high at young age and decays over time until age 50
-        if (age_ >= settings::compatibility::kMaxReproducingAge){
+        // For females, desire to mate is high at young age and decays over time until age 700
+        if (age_ >= max_repdroducing_age_){
             mating_desire_ = false;
             return;
         }
-        double probability = 1 - static_cast<double>(age_-settings::compatibility::kMinReproducingAge) / (settings::compatibility::kMaxReproducingAge-settings::compatibility::kMinReproducingAge);
+        double probability = 1 - static_cast<double>(age_-min_reproducing_age) / (1.5*max_repdroducing_age_);
         mating_desire_ = (rand() % 100) < (probability * 100);
     } else{
         // For males, desire to mate is high at young age, and there is no age limit
-        double probability = 1-static_cast<double>(age_-settings::compatibility::kMinReproducingAge) / 5; //5 SHOULD BE REPLACED BY MAX AGE
+        double probability = 1-static_cast<double>(age_-min_reproducing_age) / 1000; //5 SHOULD BE REPLACED BY MAX AGE
         mating_desire_ = (rand() % 100) < (probability * 100);
 }
 }
