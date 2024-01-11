@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
   ui_->setupUi(this);
   ui_->graphMenu->addItem("Graphs");               // Index 0
   ui_->graphMenu->addItem("Creatures Over Time");  // Index 1
+  ui_->graphMenu->addItem("Creatures Size Over Time");  // Index 2
   //Add image as icon use region as mask to make the icon circular
   QRect rect(2,2,45,45);
   qDebug() << rect.size();
@@ -191,6 +192,46 @@ void MainWindow::DrawCreaturesOverTimeGraph() {
     connect(dialog, &QDialog::finished, dialog, &QObject::deleteLater);
     dialog->exec();
   }
+}void MainWindow::DrawCreaturesSizeOverTimeGraph() {
+  if (engine_->GetSimulation()) {
+    // Get the creature count over time from the simulation data
+    std::vector<int> creatureCountOverTime = engine_->GetSimulation()->GetSimulationData()->GetCreatureSizeOverTime();
+
+    // Check if there's any data to display
+    if (creatureCountOverTime.empty()) {
+        qDebug() << "No data to display.";
+        return;
+    }
+
+    // Create a new line series
+    QLineSeries *series = new QLineSeries();
+
+    // Add data points to the series
+    for (size_t i = 0; i < creatureCountOverTime.size(); ++i) {
+        series->append(i, creatureCountOverTime[i]);
+    }
+
+    // Create a chart and add the series to it
+    QChart *chart = new QChart();
+    chart->addSeries(series);
+    chart->createDefaultAxes();
+
+    // Create a chart view with the chart
+    QChartView *chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+
+    // Create a dialog to display the graph
+    QDialog *dialog = new QDialog(this);
+    dialog->setWindowTitle("Creature Count Over Time");
+    QVBoxLayout *layout = new QVBoxLayout(dialog);
+    layout->addWidget(chartView);
+    dialog->setLayout(layout);
+    dialog->resize(800, 600);
+
+    // Show the dialog modally and connect it to delete later
+    connect(dialog, &QDialog::finished, dialog, &QObject::deleteLater);
+    dialog->exec();
+  }
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event) {
@@ -213,6 +254,10 @@ void MainWindow::handleDropdownSelection(int index) {
     if (index == 1) {
         qDebug() << "Calling DrawCreaturesOverTimeGraph";
         DrawCreaturesOverTimeGraph();
+    }
+    if (index == 2) {
+        qDebug() << "Calling DrawCreaturesOverTimeGraph";
+        DrawCreaturesSizeOverTimeGraph();
     }
 }
 
