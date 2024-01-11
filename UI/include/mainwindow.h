@@ -32,6 +32,7 @@ QT_END_NAMESPACE  //
   void DisplayGraph();
   void ChangeFriction(int value);
   void DrawCreaturesOverTimeGraph();
+  void DrawCreaturesSizeOverTimeGraph();
   void handleDropdownSelection(int index);
 
 
