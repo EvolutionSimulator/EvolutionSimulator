@@ -93,10 +93,11 @@ class SimulationCanvas : public QSFMLCanvas {
   sf::Texture eyes_texture_;
   sf::Texture tail_texture_;
   sf::Shader color_shader_;
-
   sf::Texture food_density_texture_;
   sf::Shader food_density_shader_;
-
+  sf::Texture health_texture_;
+  sf::Texture energy_texture_;
+  sf::Shader shader_;
   bool isDragging = false;
   sf::Vector2f initialClickPosition;
   bool isClicking = false;
