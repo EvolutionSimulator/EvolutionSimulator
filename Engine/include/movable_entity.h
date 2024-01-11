@@ -25,10 +25,10 @@ class MovableEntity : public Entity {
   void SetRotationalVelocity(double rotational_velocity);
 
   double GetForwardFriction() const;
-  double GetEffectiveAccelerationAngle() const;
-  double GetEffectiveForwardAcceleration() const;
+  virtual double GetEffectiveAccelerationAngle() const;
+  virtual double GetEffectiveForwardAcceleration() const;
   double GetRotationalFriction() const;
-  double GetEffectiveRotationalAcceleration() const;
+  virtual double GetEffectiveRotationalAcceleration() const;
 
   void UpdateVelocities(double deltaTime);
   void Move(double deltaTime, const double kMapWidth, const double kMapHeight);
