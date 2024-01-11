@@ -176,6 +176,8 @@ void MainWindow::DisplayGraph() {
   QChart *chart = new QChart();
   chart->addSeries(series);
   chart->createDefaultAxes();
+  chart->axes(Qt::Horizontal).first()->setTitleText("Time Elapsed");
+  chart->axes(Qt::Vertical).first()->setTitleText("Number of Creatures in the Simulation");
 
   // Create a chart view with the chart
   QChartView *chartView = new QChartView(chart);
@@ -215,6 +217,8 @@ void MainWindow::DrawCreaturesOverTimeGraph() {
     QChart *chart = new QChart();
     chart->addSeries(series);
     chart->createDefaultAxes();
+    chart->axes(Qt::Horizontal).first()->setTitleText("Time Elapsed");
+    chart->axes(Qt::Vertical).first()->setTitleText("Number of Creatures in the Simulation");
 
     // Create a chart view with the chart
     QChartView *chartView = new QChartView(chart);
@@ -232,7 +236,8 @@ void MainWindow::DrawCreaturesOverTimeGraph() {
     connect(dialog, &QDialog::finished, dialog, &QObject::deleteLater);
     dialog->exec();
   }
-}void MainWindow::DrawCreaturesSizeOverTimeGraph() {
+}
+void MainWindow::DrawCreaturesSizeOverTimeGraph() {
   if (engine_->GetSimulation()) {
     // Get the creature count over time from the simulation data
     std::vector<int> creatureCountOverTime = engine_->GetSimulation()->GetSimulationData()->GetCreatureSizeOverTime();
@@ -255,6 +260,8 @@ void MainWindow::DrawCreaturesOverTimeGraph() {
     QChart *chart = new QChart();
     chart->addSeries(series);
     chart->createDefaultAxes();
+    chart->axes(Qt::Horizontal).first()->setTitleText("Time Elapsed");
+    chart->axes(Qt::Vertical).first()->setTitleText("Average Size of Creatures in the Simulation");
 
     // Create a chart view with the chart
     QChartView *chartView = new QChartView(chart);
