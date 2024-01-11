@@ -384,8 +384,11 @@
       <height>25</height>
      </rect>
     </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
     <property name="styleSheet">
-     <string notr="true">QSlider { background-color: blue; }</string>
+     <string notr="true"/>
     </property>
     <property name="minimum">
      <number>5</number>
@@ -400,14 +403,18 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>340</x>
-      <y>40</y>
+      <x>330</x>
+      <y>50</y>
       <width>91</width>
       <height>16</height>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">QLabel { background-color: blue }</string>
+     <string notr="true">QLabel {
+    background: transparent;
+    color: white;
+    border: 2px solid blue;
+}</string>
     </property>
     <property name="text">
      <string>Friction Slider</string>
@@ -417,13 +424,16 @@
     <property name="geometry">
      <rect>
       <x>470</x>
-      <y>30</y>
+      <y>20</y>
       <width>58</width>
       <height>16</height>
      </rect>
     </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
     <property name="styleSheet">
-     <string notr="true">QLabel { background-color: blue }</string>
+     <string notr="true"/>
     </property>
     <property name="text">
      <string/>
