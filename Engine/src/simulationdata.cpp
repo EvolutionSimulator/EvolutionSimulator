@@ -249,7 +249,7 @@ void SimulationData::UpdateAllFood(double deltaTime){
           meat.Rot(deltaTime);
       } else if (food.GetType() == Food::plant) {
           Plant& plant = dynamic_cast<Plant &> (food);
-          plant.Grow(deltaTime);
+          plant.Plant::Grow(deltaTime);
       }
   }
 }

@@ -831,7 +831,7 @@ void Creature::Bite(Food* food)
   //Check how much food the creature can eat, depending on bite strength and fullness of stomach
   double available_space = std::max(stomach_capacity_ - stomach_fullness_, 0.0);
   double area_to_eat = std::min(M_PI*pow(bite_strength_,2), available_space);
-                                area_to_eat = std::max(area_to_eat,0.0);
+  area_to_eat = std::max(area_to_eat,0.0);
   double food_to_eat = std::sqrt(area_to_eat);
 
   // Check if creature eats the whole food or a part of it
@@ -844,7 +844,7 @@ void Creature::Bite(Food* food)
   else
   {
     double initial_food_size = food->GetSize();
-    double new_radius = std::sqrt(M_PI * pow(initial_food_size,2) - M_PI * pow(food_to_eat,2));
+    double new_radius = std::sqrt(pow(initial_food_size,2) - pow(food_to_eat,2));
     food->SetSize(new_radius);
     SetStomachFullness(GetStomachFullness()+ M_PI*pow(food_to_eat, 2));
     max_nutrition =  food->GetNutritionalValue() * food_to_eat;
@@ -877,6 +877,8 @@ void Creature::Bite(Creature* creature)
 
   const double damage = M_PI*pow(bite_strength_,2)*settings::physical_constraints::kBiteDamageRatio;
   creature->SetHealth(creature->GetHealth()-damage);
+
+  SetEnergy(GetEnergy()+bite_strength_*settings::physical_constraints::kBiteEnergyConsumptionRatio/10);
 }
 
 void Creature::Parasite(Creature* host)
