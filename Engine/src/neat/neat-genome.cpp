@@ -761,6 +761,7 @@ double Genome::CompatibilityBetweenGenomes(const Genome& other) const {
 }
 
 
+
 Genome minimallyViableGenome() {
   int start_id = neat::Neuron::next_id_ - 1;
   Genome genome(SETTINGS.environment.input_neurons,
@@ -781,6 +782,42 @@ Genome minimallyViableGenome() {
   Link slow_rotation(start_id + 5,
                      start_id + SETTINGS.environment.input_neurons + 3, -0.1);
   genome.AddLink(slow_rotation);
+  return genome;
+}
+
+
+Genome predatorGenome(){
+  int start_id = neat::Neuron::next_id_ - 1;
+  Genome genome(SETTINGS.environment.input_neurons,
+                SETTINGS.environment.output_neurons);
+
+  Link constant_acceleration(start_id + 1, start_id +SETTINGS.environment.input_neurons+1, 1);
+  genome.AddLink(constant_acceleration);
+
+  Link digest(start_id +1, start_id +SETTINGS.environment.input_neurons+5, 1);
+  Link stop_digesting(start_id +6, start_id +SETTINGS.environment.input_neurons+5, -1);
+  genome.AddLink(digest);
+  genome.AddLink(stop_digesting);
+
+  Link orient_towards_enemy(start_id +12, start_id +SETTINGS.environment.input_neurons+3, 1);
+  genome.AddLink(orient_towards_enemy);
+
+  Neuron BiteManager(NeuronType::kHidden, 1);
+  BiteManager.SetActivation(ActivationType::sigmoid);
+  int id = BiteManager.GetId();
+  genome.AddNeuron(BiteManager);
+
+  Link distance_bite(start_id +8, id, -1);
+  Link activation_bite(id, start_id +SETTINGS.environment.input_neurons+6, 1);
+  genome.AddLink(distance_bite);
+  genome.AddLink(activation_bite);
+
+  Link slow_rotation(start_id +5, start_id +SETTINGS.environment.input_neurons+3, -0.1);
+  genome.AddLink(slow_rotation);
+
+  Link grow(start_id +15, start_id + SETTINGS.environment.input_neurons + 4, +1);
+  genome.AddLink(grow);
+
   return genome;
 }
 }  // namespace neat
