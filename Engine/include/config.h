@@ -61,7 +61,7 @@ constexpr double kPlantProportion = 0.5; /* PlantProportion + MeatProportion = 1
 constexpr double kRotFactor = 5.0;
 >>>>>>> c4092f3 (Add optimization, fix shader, apply rot and grow)
 constexpr double kGridCellSize = 50.0;
-constexpr int kMinCreatureSize = 2;
+constexpr int kMinCreatureSize = 4.0;
 constexpr double kReproductionThreshold = 0.80;
 constexpr double kReproductionCooldown = 10;
 constexpr int kInputNeurons = 15;
