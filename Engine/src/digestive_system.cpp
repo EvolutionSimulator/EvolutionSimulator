@@ -73,7 +73,7 @@ void DigestiveSystem::Digest(double deltaTime)
  *
  * @param food The food the creature bites into.
  */
-void DigestiveSystem::Bite(Food* food)
+void DigestiveSystem::Bite(std::shared_ptr<Food> food)
 {
   //Reset eating cooldown, makes creature stop to bite
   eating_cooldown_ = mutable_.GetEatingSpeed();
@@ -105,10 +105,10 @@ void DigestiveSystem::Bite(Food* food)
   }
 
          // Herbivore/carnivore multiplier
-  if (Plant *plant = dynamic_cast<Plant *>(food)) {
+  if (std::shared_ptr<Plant> plant = std::dynamic_pointer_cast<Plant>(food)) {
     max_nutrition = max_nutrition * 2 * (1 - mutable_.GetDiet());
   }
-  else if (Meat *meat = dynamic_cast<Meat *>(food)) {
+  else if (std::shared_ptr<Meat> meat = std::dynamic_pointer_cast<Meat>(food)) {
     max_nutrition = max_nutrition * 2 * mutable_.GetDiet();
   }
 

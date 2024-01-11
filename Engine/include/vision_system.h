@@ -28,7 +28,7 @@ public:
           double grid_cell_size) const;
   std::shared_ptr<Food> GetClosestMeatInSight(std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
           double grid_cell_size) const;
-  bool IsInSight(Entity *entity);
+  bool IsInSight(std::shared_ptr<Entity> entity);
 
 protected:
   double distance_plant_;       /*!< Distance to the nearest plant source. */

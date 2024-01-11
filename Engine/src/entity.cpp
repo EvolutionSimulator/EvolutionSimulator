@@ -3,7 +3,6 @@
 #include <cassert>
 #include <cmath>
 #include <random>
-#include <stdexcept>
 
 #include "environment.h"
 #include "geometry_primitives.h"
@@ -162,9 +161,9 @@ void Entity::RandomInitialization(const double world_width,
  * @return The shortest distance between this entity and another, considering
  * map boundaries.
  */
-double Entity::GetDistance(const Entity &other_entity, const double kMapWidth,
+double Entity::GetDistance(const std::shared_ptr<Entity> other_entity, const double kMapWidth,
                            const double kMapHeight) const {
-  std::pair<double, double> other_coordinates = other_entity.GetCoordinates();
+  std::pair<double, double> other_coordinates = other_entity->GetCoordinates();
 
   // Use std::hypot for optimized distance calculation
   const double x_diff = fabs(x_coord_ - other_coordinates.first);
@@ -181,10 +180,10 @@ double Entity::GetDistance(const Entity &other_entity, const double kMapWidth,
  *
  * @return The relative orientation angle in radians between [-pi,pi].
  */
-double Entity::GetRelativeOrientation(const Entity &other_entity) const {
+double Entity::GetRelativeOrientation(const std::shared_ptr<Entity> other_entity) const {
   // assumes orientation = 0 is the x axis
   return (OrientedAngle(Point(GetCoordinates()),
-                        Point(other_entity.GetCoordinates())) -
+                        Point(other_entity->GetCoordinates())) -
           OrientedAngle(orientation_))
       .GetAngle();
 }
@@ -227,14 +226,14 @@ void Entity::SetState(Entity::states state) { state_ = state; }
  * @param kMapWidth Width of the map, used for position adjustments.
  * @param kMapHeight Height of the map, used for position adjustments.
  */
-void Entity::OnCollision(Entity &other_entity, double const kMapWidth,
+void Entity::OnCollision(std::shared_ptr<Entity> other_entity, double const kMapWidth,
                          double const kMapHeight) {
   // Check if the entity is colliding with itself
-  if (this == &other_entity) return;
+  if (this->id_ == other_entity->GetID()) return;
 
   // Get the coordinates and size of the other entity
-  std::pair<double, double> other_coordinates = other_entity.GetCoordinates();
-  double other_size = other_entity.GetSize();
+  std::pair<double, double> other_coordinates = other_entity->GetCoordinates();
+  double other_size = other_entity->GetSize();
 
   // Calculate the distance between the two entities
   double distance = GetDistance(other_entity, kMapWidth, kMapHeight);
@@ -254,7 +253,7 @@ void Entity::OnCollision(Entity &other_entity, double const kMapWidth,
   this->SetCoordinates(x_coord_ + x_overlap*std::pow(size_, 2)/total_size,
                        y_coord_ + y_overlap*std::pow(size_, 2)/total_size,
                        kMapWidth, kMapHeight);
-  other_entity.SetCoordinates(other_coordinates.first - x_overlap*std::pow(other_size, 2)/total_size,
+  other_entity->SetCoordinates(other_coordinates.first - x_overlap*std::pow(other_size, 2)/total_size,
                               other_coordinates.second - y_overlap*std::pow(other_size, 2)/total_size,
                               kMapWidth, kMapHeight);
 

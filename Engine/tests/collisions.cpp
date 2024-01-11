@@ -142,13 +142,13 @@ TEST(CollisionTests, CollisionCircleLine) {
  * Euclidean distance between entities when wrap-around is not applicable.
  */
 TEST(CollisionTests, GetDistance_NoWrapAround) {
-  Entity e1(10.0, 10.0, 10.0);
-  Entity e2(13.0, 14.0, 3.0);
+  std::shared_ptr<Entity> e1 = std::make_shared<Entity>(10.0, 10.0, 10.0);
+  std::shared_ptr<Entity> e2 = std::make_shared<Entity>(13.0, 14.0, 3.0);
   double mapWidth = 100;
   int mapHeight = 100;
 
   double expectedDistance = std::hypot(3, 4);
-  ASSERT_NEAR(e1.GetDistance(e2, mapWidth, mapHeight), expectedDistance, 1e-6);
+  ASSERT_NEAR(e1->GetDistance(e2, mapWidth, mapHeight), expectedDistance, 1e-6);
 }
 
 /*!
@@ -160,13 +160,13 @@ TEST(CollisionTests, GetDistance_NoWrapAround) {
  * the X-axis of the map.
  */
 TEST(CollisionTests, GetDistance_WrapAroundXCoordinate) {
-  Entity e1(1.0, 10.0, 2.0);
-  Entity e2(99.0, 10.0, 5.0);
+  std::shared_ptr<Entity> e1 = std::make_shared<Entity>(1.0, 10.0, 2.0);
+  std::shared_ptr<Entity> e2 = std::make_shared<Entity>(99.0, 10.0, 5.0);
   double mapWidth = 100;
   int mapHeight = 100;
 
   double expectedDistance = 2;
-  ASSERT_NEAR(e1.GetDistance(e2, mapWidth, mapHeight), expectedDistance, 1e-6);
+  ASSERT_NEAR(e1->GetDistance(e2, mapWidth, mapHeight), expectedDistance, 1e-6);
 }
 
 /*!
@@ -178,13 +178,13 @@ TEST(CollisionTests, GetDistance_WrapAroundXCoordinate) {
  * the Y-axis of the map.
  */
 TEST(CollisionTests, GetDistance_WrapAroundYCoordinate) {
-  Entity e1(10.0, 1.0, 3.0);
-  Entity e2(10.0, 99.0, 2.0);
+  std::shared_ptr<Entity> e1 = std::make_shared<Entity>(10.0, 1.0, 3.0);
+  std::shared_ptr<Entity> e2 = std::make_shared<Entity>(10.0, 99.0, 2.0);
   double mapWidth = 100;
   int mapHeight = 100;
 
   double expectedDistance = 2;
-  ASSERT_NEAR(e1.GetDistance(e2, mapWidth, mapHeight), expectedDistance, 1e-6);
+  ASSERT_NEAR(e1->GetDistance(e2, mapWidth, mapHeight), expectedDistance, 1e-6);
 }
 
 /*!
@@ -196,13 +196,13 @@ TEST(CollisionTests, GetDistance_WrapAroundYCoordinate) {
  * both the X-axis and Y-axis of the map.
  */
 TEST(CollisionTests, GetDistance_WrapAroundBothCoordinates) {
-  Entity e1(1.0, 1.0, 2.0);
-  Entity e2(99.0, 99.0, 3.0);
+  std::shared_ptr<Entity> e1 = std::make_shared<Entity>(1.0, 1.0, 2.0);
+  std::shared_ptr<Entity> e2 = std::make_shared<Entity>(99.0, 99.0, 3.0);
   double mapWidth = 100;
   int mapHeight = 100;
 
   double expectedDistance = std::hypot(2, 2);
-  ASSERT_NEAR(e1.GetDistance(e2, mapWidth, mapHeight), expectedDistance, 1e-6);
+  ASSERT_NEAR(e1->GetDistance(e2, mapWidth, mapHeight), expectedDistance, 1e-6);
 }
 
 /*!
@@ -218,45 +218,45 @@ TEST(CollisionTests, CheckCollisionWithEntity) {
   const double kMapHeight = 50.0;
 
   // Create two entities for testing
-  Entity entity1;
-  Entity entity2;
+  std::shared_ptr<Entity> entity1;
+  std::shared_ptr<Entity> entity2;
 
   // Set coordinates and size for entity1
-  entity1.SetCoordinates(1.0, 2.0, kMapWidth, kMapHeight);
-  entity1.SetSize(2.0);
+  entity1->SetCoordinates(1.0, 2.0, kMapWidth, kMapHeight);
+  entity1->SetSize(2.0);
 
   // Set coordinates and size for entity2
-  entity2.SetCoordinates(4.0, 6.0, kMapWidth, kMapHeight);
-  entity2.SetSize(3.0);
+  entity2->SetCoordinates(4.0, 6.0, kMapWidth, kMapHeight);
+  entity2->SetSize(3.0);
 
   // Entities are expected to collide
-  EXPECT_TRUE(entity1.CheckCollisionWithEntity(tolerance, entity2));
+  EXPECT_TRUE(entity1->CheckCollisionWithEntity(tolerance, entity2));
 
   // Move entity2 away, no collision expected
-  entity2.SetCoordinates(10.0, 10.0, kMapWidth, kMapHeight);
-  EXPECT_FALSE(entity1.CheckCollisionWithEntity(tolerance, entity2));
+  entity2->SetCoordinates(10.0, 10.0, kMapWidth, kMapHeight);
+  EXPECT_FALSE(entity1->CheckCollisionWithEntity(tolerance, entity2));
 
   // Entities with one inside the other, expected to collide
-  entity1.SetCoordinates(1.0, 2.0, kMapWidth, kMapHeight);
-  entity1.SetSize(5.0);
-  entity2.SetCoordinates(4.0, 6.0, kMapWidth, kMapHeight);
-  entity2.SetSize(2.0);
-  EXPECT_TRUE(entity1.CheckCollisionWithEntity(tolerance, entity2));
+  entity1->SetCoordinates(1.0, 2.0, kMapWidth, kMapHeight);
+  entity1->SetSize(5.0);
+  entity2->SetCoordinates(4.0, 6.0, kMapWidth, kMapHeight);
+  entity2->SetSize(2.0);
+  EXPECT_TRUE(entity1->CheckCollisionWithEntity(tolerance, entity2));
 
   // Entities with combined radii, expected to collide
-  entity1.SetCoordinates(1.0, 2.0, kMapWidth, kMapHeight);
-  entity1.SetSize(2.0);
-  entity2.SetCoordinates(4.0, 6.0, kMapWidth, kMapHeight);
-  entity2.SetSize(3.0);
-  EXPECT_TRUE(entity1.CheckCollisionWithEntity(tolerance, entity2));
+  entity1->SetCoordinates(1.0, 2.0, kMapWidth, kMapHeight);
+  entity1->SetSize(2.0);
+  entity2->SetCoordinates(4.0, 6.0, kMapWidth, kMapHeight);
+  entity2->SetSize(3.0);
+  EXPECT_TRUE(entity1->CheckCollisionWithEntity(tolerance, entity2));
 
   // Entities with coordinates outside of bounds, expected to be wrapped within
   // bounds
-  entity1.SetCoordinates(90.0, 55.0, kMapWidth, kMapHeight);
-  entity1.SetSize(4.0);
-  entity2.SetCoordinates(90.0, 60.0, kMapWidth, kMapHeight);
-  entity2.SetSize(3.0);
-  EXPECT_TRUE(entity1.CheckCollisionWithEntity(tolerance, entity2));
+  entity1->SetCoordinates(90.0, 55.0, kMapWidth, kMapHeight);
+  entity1->SetSize(4.0);
+  entity2->SetCoordinates(90.0, 60.0, kMapWidth, kMapHeight);
+  entity2->SetSize(3.0);
+  EXPECT_TRUE(entity1->CheckCollisionWithEntity(tolerance, entity2));
 }
 
 /*!
@@ -274,57 +274,57 @@ TEST(CollisionTests, OnCollisionWithFood) {
   // Create a Creature and Food for testing
   neat::Genome genome(2, 3);
   Mutable mutables;
-  Creature creature(genome, mutables);
-  Plant food(1.0);
+  std::shared_ptr<Creature> creature = std::make_shared<Creature>(genome, mutables);
+  std::shared_ptr<Plant> food = std::make_shared<Plant>(1.0);
 
   // Case 1: Food is alive, and Creature collides with it
-  food.SetState(Entity::Alive);
-  food.SetNutritionalValue(3.0);
-  food.SetSize(10.0);
+  food->SetState(Entity::Alive);
+  food->SetNutritionalValue(3.0);
+  food->SetSize(10.0);
 
-  creature.SetMaxEnergy(100.0);
-  creature.SetEnergy(80.0);
-  creature.OnCollision(food, 100, 100);
+  creature->SetMaxEnergy(100.0);
+  creature->SetEnergy(80.0);
+  creature->OnCollision(food, 100, 100);
 
   // Expected result: Creature's energy increases to the max, and food
   // decreases in size
-  EXPECT_EQ(creature.GetEnergy(), 100.0);
-  EXPECT_NEAR(food.GetSize(), 10.0/3, 0.01);
+  EXPECT_EQ(creature->GetEnergy(), 100.0);
+  EXPECT_NEAR(food->GetSize(), 10.0/3, 0.01);
 
   // Case 2: Food is dead, and Creature collides with it
-  food.SetState(Entity::Dead);
-  food.SetNutritionalValue(3.0);
-  creature.SetEnergy(30.0);
-  creature.OnCollision(food, 100, 100);
+  food->SetState(Entity::Dead);
+  food->SetNutritionalValue(3.0);
+  creature->SetEnergy(30.0);
+  creature->OnCollision(food, 100, 100);
 
   // Expected result: Creature's energy remains unchanged, and food is still
   // dead
-  EXPECT_EQ(creature.GetEnergy(), 30.0);
-  EXPECT_EQ(food.GetState(), Entity::Dead);
+  EXPECT_EQ(creature->GetEnergy(), 30.0);
+  EXPECT_EQ(food->GetState(), Entity::Dead);
 
   // Case 3: Food is alive, but Creature has zero energy
-  creature.SetEnergy(30.0);
+  creature->SetEnergy(30.0);
 
-  food.SetState(Entity::Alive);
-  food.SetNutritionalValue(3.0);
-  food.SetSize(10.0);
+  food->SetState(Entity::Alive);
+  food->SetNutritionalValue(3.0);
+  food->SetSize(10.0);
 
-  creature.OnCollision(food, 100, 100);
+  creature->OnCollision(food, 100, 100);
 
   // Expected result: Creature's energy increases by nutritional value times size,
   // and food is dead
-  EXPECT_EQ(creature.GetEnergy(), 60.0);
-  EXPECT_EQ(food.GetState(), Entity::Dead);
+  EXPECT_EQ(creature->GetEnergy(), 60.0);
+  EXPECT_EQ(food->GetState(), Entity::Dead);
 
   // Case 4: Food is dead, Creature has non-zero energy, and Creature collides
   // again
-  double initialEnergy = creature.GetEnergy();
-  creature.OnCollision(food, 100, 100);
+  double initialEnergy = creature->GetEnergy();
+  creature->OnCollision(food, 100, 100);
 
   // Expected result: Creature's energy remains unchanged, and food is still
   // dead
-  EXPECT_EQ(creature.GetEnergy(), initialEnergy);
-  EXPECT_EQ(food.GetState(), Entity::Dead);
+  EXPECT_EQ(creature->GetEnergy(), initialEnergy);
+  EXPECT_EQ(food->GetState(), Entity::Dead);
 }
 
 /*!
@@ -336,24 +336,24 @@ TEST(CollisionTests, OnCollisionWithFood) {
  * outside the creature's reach.
  */
 TEST(CollisionTests, OnCollisionWithEntity) {
-  Entity entity1, entity2;
+  std::shared_ptr<Entity> entity1, entity2;
   double kMapWidth = 100.0, kMapHeight = 100.0;
 
   // Set initial coordinates and sizes
-  entity1.SetCoordinates(50.0, 50.0, kMapWidth, kMapHeight);
-  entity1.SetSize(10.0);
-  entity2.SetCoordinates(60.0, 60.0, kMapWidth, kMapHeight);
-  entity2.SetSize(10.0);
-  EXPECT_TRUE(entity1.CheckCollisionWithEntity(0.0, entity2));
+  entity1->SetCoordinates(50.0, 50.0, kMapWidth, kMapHeight);
+  entity1->SetSize(10.0);
+  entity2->SetCoordinates(60.0, 60.0, kMapWidth, kMapHeight);
+  entity2->SetSize(10.0);
+  EXPECT_TRUE(entity1->CheckCollisionWithEntity(0.0, entity2));
 
   // Call OnCollision
-  entity1.OnCollision(entity2, kMapWidth, kMapHeight);
+  entity1->OnCollision(entity2, kMapWidth, kMapHeight);
 
   // Check if the distance between the entities is greater than the sum of their
   // sizes
-  double distance = entity1.GetDistance(entity2, kMapWidth, kMapHeight);
-  double sum_of_sizes = entity1.GetSize() + entity2.GetSize();
-  EXPECT_FALSE(entity1.CheckCollisionWithEntity(0.0, entity2));
+  double distance = entity1->GetDistance(entity2, kMapWidth, kMapHeight);
+  double sum_of_sizes = entity1->GetSize() + entity2->GetSize();
+  EXPECT_FALSE(entity1->CheckCollisionWithEntity(0.0, entity2));
 }
 
 /*!
@@ -363,22 +363,22 @@ TEST(CollisionTests, OnCollisionWithEntity) {
  * interactions with food entities and their positioning within the simulation
  * environment.
  */
-class CreatureTest : public ::testing::Test {
- protected:
-  // Helper function to set up the grid for testing
-  std::vector<std::vector<std::vector<Entity*>>> CreateTestGrid() {
-    std::vector<std::vector<std::vector<Entity*>>> grid;
-    grid.assign(100, std::vector<std::vector<Entity*>>(100));
+// class CreatureTest : public ::testing::Test {
+//  protected:
+//   // Helper function to set up the grid for testing
+//   std::vector<std::vector<std::vector<Entity*>>> CreateTestGrid() {
+//     std::vector<std::vector<std::vector<Entity*>>> grid;
+//     grid.assign(100, std::vector<std::vector<Entity*>>(100));
 
-    Food* food1 = new Plant(3.6, 4.9, 5.0);
-    Food* food2 = new Plant(9.2, 7.1, 8.0);
+//     Food* food1 = new Plant(3.6, 4.9, 5.0);
+//     Food* food2 = new Plant(9.2, 7.1, 8.0);
 
-    grid[3][4].push_back(food1);
-    grid[9][7].push_back(food2);
+//     grid[3][4].push_back(food1);
+//     grid[9][7].push_back(food2);
 
-    return grid;
-  }
-};
+//     return grid;
+//   }
+// };
 
 // TEST_F(CreatureTest, GetClosestFood_EmptyGrid) {
 //   // Create a Creature with a mock genome
