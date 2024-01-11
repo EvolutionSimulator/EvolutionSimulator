@@ -81,6 +81,9 @@ class Creature : public MovableEntity {
           double grid_cell_size) const;
   Food *GetClosestMeatInSight(std::vector<std::vector<std::vector<Entity *>>> &grid,
           double grid_cell_size) const;
+  Creature *GetClosestEnemyInSight(
+      std::vector<std::vector<std::vector<Entity *>>> &grid,
+      double grid_cell_size);
   bool IsInSight(Entity *entity);
 
 
@@ -131,6 +134,9 @@ class Creature : public MovableEntity {
   int closest_meat_id_;      /*! Id of the closest meat to show in the UI */
   double orientation_meat_;   /*!< Orientation relative to the nearest meat
                                  source. */
+  double distance_enemy_;  /*!< Distance to the nearest enemy creature. */
+  double orientation_enemy_; /*!< Orientation relative to the nearest enemy creature. */
+  double enemy_size_; /*! Size of the closest enemy*/
 
   std::vector<double>
       neuron_data_; /*!< Neuron data used in the neural network. */

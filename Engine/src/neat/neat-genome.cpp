@@ -654,17 +654,17 @@ double Genome::CompatibilityBetweenGenomes(const Genome& other) const {
 
 
 Genome minimallyViableGenome(){
-  Genome genome(settings::environment::kInputNeurons, 6);
+  Genome genome(settings::environment::kInputNeurons, settings::environment::kOutputNeurons);
 
-  Link constant_acceleration(1, 13, 1);
+  Link constant_acceleration(1, settings::environment::kInputNeurons+1, 1);
   genome.AddLink(constant_acceleration);
 
-  Link digest(1, 18, 1);
-  Link stop_digesting(6, 18, -1);
+  Link digest(1, settings::environment::kInputNeurons+6, 1);
+  Link stop_digesting(6, settings::environment::kInputNeurons+6, -1);
   genome.AddLink(digest);
   genome.AddLink(stop_digesting);
 
-  Link orient_towards_food(7, 15, 1);
+  Link orient_towards_food(7, settings::environment::kInputNeurons+3, 1);
   genome.AddLink(orient_towards_food);
 
   Neuron BiteManager(NeuronType::kHidden, 1);
@@ -673,11 +673,11 @@ Genome minimallyViableGenome(){
   genome.AddNeuron(BiteManager);
 
   Link distance_bite(8, id, -1);
-  Link activation_bite(id, 17, 1);
+  Link activation_bite(id, settings::environment::kInputNeurons+5, 1);
   genome.AddLink(distance_bite);
   genome.AddLink(activation_bite);
 
-  Link slow_rotation(5, 15, -0.1);
+  Link slow_rotation(5, settings::environment::kInputNeurons+3, -0.1);
   genome.AddLink(slow_rotation);
 
   return genome;
