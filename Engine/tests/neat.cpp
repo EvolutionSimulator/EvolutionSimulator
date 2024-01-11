@@ -1,9 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "neat/neat-genome.h"
-#include "neat/neat-link.h"
 #include "neat/neat-neural-network.h"
-#include "neat/neat-neuron.h"
 
 /*!
  * @file neat.cpp

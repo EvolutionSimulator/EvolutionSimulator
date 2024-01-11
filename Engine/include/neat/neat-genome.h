@@ -48,8 +48,10 @@ namespace neat {
     void MutateChangeWeight();
     void MutateChangeBias();
     void MutateActivationFunction();
-    void MutateActivateBrainModule(BrainModule module);
-    void MutateDisableBrainModule(BrainModule module);
+    void MutateActivateBrainModule();
+    void MutateDisableBrainModule();
+
+    std::vector<BrainModule> GetModules();
 
     bool FindNeuronById(int targetId, Neuron& foundNeuron) const;
 
@@ -69,6 +71,8 @@ namespace neat {
              std::unordered_set<int>& visiting) const;
     std::vector<BrainModule> modules_; /*! A vector of BrainModule objects
                                          representing the modules activated. */
+
+    std::vector<BrainModule> AvailableModules = {BrainModule(3, 0, 1)};
   };
 
 

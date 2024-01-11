@@ -158,6 +158,7 @@ void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
   }
   think_count = 0;
   ProcessVisionFood(grid, GridCellSize, width, height);
+
   neuron_data_.at(0) = 1;
   neuron_data_.at(1) = energy_;
   neuron_data_.at(2) = GetVelocity();
@@ -170,6 +171,15 @@ void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
   neuron_data_.at(9) = orientation_meat_;
   neuron_data_.at(10) = distance_meat_;
   neuron_data_.at(11) = meat_size_;
+
+
+  for (BrainModule module : GetGenome().GetModules()){
+    if (module.GetModuleId() == 1){ //Geolocation Module
+        int i  = module.GetFirstInputId();
+
+    }
+  }
+
   std::vector<double> output = brain_.Activate(neuron_data_);
   SetAcceleration(std::tanh(output.at(0))*mutable_.GetMaxForce());
   SetAccelerationAngle(std::tanh(output.at(1)) * M_PI);
