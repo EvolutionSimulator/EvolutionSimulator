@@ -340,16 +340,14 @@ Mutable Creature::GetMutable() const {return mutable_;}
  * @param kMapHeight Height of the map.
  */
 void Creature::OnCollision(Entity &other_entity, double const kMapWidth, double const kMapHeight) {
-  if (other_entity.GetState() == Entity::Alive && eating_cooldown_ == 0.0 && biting_ == 1) {
+  if (other_entity.GetState() == Entity::Alive && eating_cooldown_ == 0.0 && biting_ == 1 && IsInSight(&other_entity)) {
+
     SetEnergy(GetEnergy()-bite_strength_*settings::physical_constraints::kBiteEnergyConsumptionRatio);
+
     if (Food* food_entity = dynamic_cast<Food*>(&other_entity)) {
-        if (IsInSight(food_entity)) {
             Bite(food_entity);
-        }
     } else if (Creature* creature_entity = dynamic_cast<Creature*>(&other_entity)) {
-        if (IsInSight(creature_entity)) {
             Bite(creature_entity);
-        }
     }
   }
   MovableEntity::OnCollision(other_entity, kMapWidth, kMapHeight);
@@ -772,7 +770,13 @@ void Creature::SetStomachFullness(const double& new_fullness) {
   if (new_fullness > stomach_capacity_) {
     stomach_fullness_ = stomach_capacity_;
   } else {
+    if (new_fullness < 0)
+    {
+      stomach_fullness_ = 0;
+    }
+    else {
     stomach_fullness_ = new_fullness;
+    }
   }
 };
 double Creature::GetEmptinessPercent() const {return 100 * (1 - stomach_fullness_/stomach_capacity_);};
@@ -805,7 +809,7 @@ void Creature::Digest(double deltaTime)
   // Empties out the stomach space
   stomach_acid_ -= quantity;
   potential_energy_in_stomach_ -= quantity * avg_nutritional_value;
-  stomach_fullness_ -= quantity;
+  SetStomachFullness(GetStomachFullness() - quantity);
 }
 
 /*!
@@ -826,21 +830,23 @@ void Creature::Bite(Food* food)
 
   //Check how much food the creature can eat, depending on bite strength and fullness of stomach
   double available_space = std::max(stomach_capacity_ - stomach_fullness_, 0.0);
-  double food_to_eat = std::sqrt(std::min(M_PI*pow(bite_strength_,2), available_space));
+  double area_to_eat = std::min(M_PI*pow(bite_strength_,2), available_space);
+                                area_to_eat = std::max(area_to_eat,0.0);
+  double food_to_eat = std::sqrt(area_to_eat);
 
   // Check if creature eats the whole food or a part of it
   if (food_to_eat >= food->GetSize())
   {
     max_nutrition = food->GetNutritionalValue() * food->GetSize();
-    stomach_fullness_ += M_PI*pow(food->GetSize(), 2);
+    SetStomachFullness(GetStomachFullness()+  M_PI*pow(food->GetSize(), 2));
     food->Eat();
   }
   else
   {
     double initial_food_size = food->GetSize();
-    double new_radius = std::sqrt(pow(initial_food_size,2) - pow(food_to_eat,2));
+    double new_radius = std::sqrt(M_PI * pow(initial_food_size,2) - M_PI * pow(food_to_eat,2));
     food->SetSize(new_radius);
-    stomach_fullness_ += M_PI*pow(food_to_eat, 2);
+    SetStomachFullness(GetStomachFullness()+ M_PI*pow(food_to_eat, 2));
     max_nutrition =  food->GetNutritionalValue() * food_to_eat;
   }
 
@@ -854,10 +860,6 @@ void Creature::Bite(Food* food)
 
   //Add nutrition to stomach, make sure capacity is not surpassed
   potential_energy_in_stomach_ += max_nutrition;
-  if (stomach_fullness_ > stomach_capacity_)
-  {
-    stomach_fullness_ = stomach_capacity_;
-  }
 }
 
 /*!
