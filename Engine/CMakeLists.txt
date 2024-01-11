@@ -63,6 +63,8 @@ add_library(Engine STATIC
   include/config.h
   include/digestive_system.h
   src/digestive_system.cpp
+  include/reproductive_system.h
+  src/reproductive_system.cpp
 )
 
 add_subdirectory(tests)

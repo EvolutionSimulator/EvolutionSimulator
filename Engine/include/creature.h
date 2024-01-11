@@ -9,6 +9,7 @@
 #include "alive_entity.h"
 #include "vision_system.h"
 #include "digestive_system.h"
+#include "reproductive_system.h"
 #include "mutable.h"
 
 /*!
@@ -34,7 +35,7 @@
  * for and consuming food, and managing its energy and health. The class also
  * supports evolutionary features like reproduction and genetic inheritance.
  */
-class Creature : virtual public MovableEntity, virtual public AliveEntity, virtual public VisionSystem, virtual public DigestiveSystem {
+class Creature : virtual public MovableEntity, virtual public AliveEntity, virtual public VisionSystem, virtual public DigestiveSystem, virtual public ReproductiveSystem {
  public:
   Creature(neat::Genome genome, Mutable mutable_);
 
@@ -46,20 +47,12 @@ class Creature : virtual public MovableEntity, virtual public AliveEntity, virtu
   void OnCollision(Entity &other_entity, double const kMapWidth,
                    double const kMapHeight) override;
 
-  bool Fit();
-  void Reproduced();
-
   void Grow(double energy);
   void Think(std::vector<std::vector<std::vector<Entity *> > > &grid,
              double GridCellSize, double deltaTime, double width, double height);
-
   bool Compatible(const Creature& other_creature);
 
  protected:
-  bool fit_; /*!< Indicates whether the creature is fit in the evolutionary
-                sense. */
-  double reproduction_cooldown_; /*!< Cooldown period before the creature can
-                                    reproduce again. */
   int think_count; /*! Keeps track so that creatures think every 5 loops */
 };
 
