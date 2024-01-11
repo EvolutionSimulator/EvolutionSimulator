@@ -82,6 +82,7 @@ namespace neat {
 Genome Crossover(const Genome& dominant, const Genome& recessive);
 
 Genome minimallyViableGenome();
+//NOT WORKING
 Genome predatorGenome();
 }  // namespace neat
 
