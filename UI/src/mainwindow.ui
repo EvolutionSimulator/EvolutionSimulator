@@ -349,26 +349,6 @@
      <string>Density of Food:</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="graphButton">
-    <property name="geometry">
-     <rect>
-      <x>100</x>
-      <y>20</y>
-      <width>80</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">QPushButton {
-    background: transparent;
-    color: white;
-    border: 2px solid blue;
-}</string>
-    </property>
-    <property name="text">
-     <string>GRAPH</string>
-    </property>
-   </widget>
    <widget class="QSpinBox" name="densityCreature">
     <property name="geometry">
      <rect>
@@ -447,6 +427,16 @@
     </property>
     <property name="text">
      <string/>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="graphMenu">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>20</y>
+      <width>103</width>
+      <height>32</height>
+     </rect>
     </property>
    </widget>
   </widget>
