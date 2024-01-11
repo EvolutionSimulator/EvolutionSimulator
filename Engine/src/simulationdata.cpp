@@ -294,6 +294,7 @@ void SimulationData::InitializeCreatures() {
         for (int i = 0; i < 40; i++) {
           mutables.Mutate();
         }
+        mutables.SetBabySize(8.0);
         Creature new_creature(predator_genome, mutables);
         new_creature.RandomInitialization(world_width, world_height);
         creatures_.emplace_back(new_creature);
@@ -301,6 +302,7 @@ void SimulationData::InitializeCreatures() {
     }
   }
   */
+
 }
 
 /*!
