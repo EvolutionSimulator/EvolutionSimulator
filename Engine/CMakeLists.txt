@@ -44,6 +44,8 @@ add_library(Engine STATIC
   include/neat/brain_module.h src/neat/brain_module.cpp
 
   include/mutable.h src/mutable.cpp
+  include/grabbing_entity.h src/grabbing_entity.cpp
+
 
 
   include/data_accessor.h
