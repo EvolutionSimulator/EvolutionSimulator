@@ -1,10 +1,11 @@
 #include "core/engine.h"
 
 #include <cmath>
+#include <thread>
 
 #include "simulation/simulation.h"
 
-Engine::Engine() : simulation_(new Simulation()) { }
+Engine::Engine() : simulation_(new Simulation()), engine_speed_(1.0) { }
 
 Engine::~Engine() {
   delete simulation_;
@@ -21,6 +22,8 @@ void Engine::Run() {
   engine_start_time_ = timer::now();
   last_update_time_ = engine_start_time_;
   last_fixed_update_time_ = engine_start_time_;
+  auto time_since_fixed_update = std::chrono::duration<double>(0);
+  auto fixed_update_interval_duration = std::chrono::duration<double>(kFixedUpdateInterval);
 
   simulation_->Start();
 
@@ -31,33 +34,25 @@ void Engine::Run() {
     timer::time_point current_time = timer::now();
     double speed = engine_speed_;
 
-    // time since last FixedUpdate call
-    double fixed_update_delta =
-        std::chrono::duration<double>(current_time - last_fixed_update_time_)
-            .count();
-
     // time since last Update call
-    double update_delta =
-        std::chrono::duration<double>(current_time - last_update_time_).count();
+    auto update_delta =
+        std::chrono::duration<double>(current_time - last_update_time_) *
+        speed;
 
-    // we calculate how many times we should call FixedUpdate using the time
-    // since last execution
-    int fixed_update_steps =
-        std::floor(fixed_update_delta / kFixedUpdateInterval * speed);
-    for (int i = 0; i < fixed_update_steps; i++) {
-      simulation_->FixedUpdate(kFixedUpdateInterval);
-    }
-
-    simulation_->Update(update_delta * speed);
+    if (update_delta.count() > 0.25)
+      update_delta = std::chrono::duration<double>(0.25);
 
     last_update_time_ = current_time;
-    // we increment lastFixedUpdateTime_ by the (update interval) * (number of
-    // times we called it during this cycle)
-    auto duration_to_add =
-        std::chrono::duration_cast<timer::time_point::duration>(
-            std::chrono::duration<double>(
-                fixed_update_steps * kFixedUpdateInterval / speed));
-    last_fixed_update_time_ += duration_to_add;
+    time_since_fixed_update += update_delta;
+
+    simulation_->Update(update_delta.count() * speed);
+
+    while (time_since_fixed_update.count() >= kFixedUpdateInterval) {
+      simulation_->FixedUpdate(kFixedUpdateInterval);
+      time_since_fixed_update -= fixed_update_interval_duration;
+    }
+
+    std::this_thread::yield();
   }
 }
 

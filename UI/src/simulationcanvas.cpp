@@ -75,6 +75,7 @@ void SimulationCanvas::OnInit()
 }
 
 void SimulationCanvas::OnUpdate() {
+  // std::cout << "Updating canvas..." << std::endl;
   auto data = simulation_->GetSimulationData();
   RenderSimulation(data);
 

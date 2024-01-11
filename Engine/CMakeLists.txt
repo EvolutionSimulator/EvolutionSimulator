@@ -54,6 +54,7 @@ add_library(Engine STATIC
   include/simulation/creature_manager.h src/simulation/creature_manager.cpp
   include/simulation/collision_manager.h src/simulation/collision_manager.cpp
   include/entities/mutable.h src/entities/mutable.cpp
+  include/core/synchronization_primitives.h
 
 )
 

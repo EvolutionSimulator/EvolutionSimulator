@@ -25,7 +25,7 @@ class Engine {
   const double kFixedUpdateInterval =
       SETTINGS.engine.fixed_update_interval;  // how often FixedUpdate is
                                               // called
-  double engine_speed_ = 2.0;
+  double engine_speed_;
 
   Simulation* simulation_;
   volatile bool running_ = false;

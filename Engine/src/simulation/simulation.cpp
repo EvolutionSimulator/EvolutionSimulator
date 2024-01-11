@@ -44,11 +44,11 @@ void Simulation::FixedUpdate(double deltaTime) {
 }
 
 DataAccessor<SimulationData> Simulation::GetSimulationData() {
-  return DataAccessor<SimulationData>(*data_, data_mutex_);
+  return DataAccessor<SimulationData>(*data_, data_sync_);
 }
 
 DataAccessor<Environment> Simulation::GetEnvironment() {
-  return DataAccessor<Environment>(environment_, environment_mutex_);
+  return DataAccessor<Environment>(environment_, environment_sync_);
 }
 
 // Function to stop the simulation

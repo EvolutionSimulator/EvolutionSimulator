@@ -10,6 +10,7 @@
 #include "simulation/environment.h"
 #include "simulation/food_manager.h"
 #include "simulation/simulation_data.h"
+#include "core/synchronization_primitives.h"
 
 class Simulation {
  public:
@@ -35,7 +36,7 @@ class Simulation {
   CreatureManager creature_manager_;
   CollisionManager collision_manager_;
 
-  std::recursive_mutex data_mutex_;
-  std::recursive_mutex environment_mutex_;
+  SynchronizationPrimitives data_sync_;
+  SynchronizationPrimitives environment_sync_;
   bool is_running_;
 };
