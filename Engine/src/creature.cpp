@@ -122,6 +122,8 @@ double Creature::GetHealth() const { return health_; }
 void Creature::SetHealth(double health) {
   if (health > mutable_.GetIntegrity() * pow(size_, 2)) {
     health_ = mutable_.GetIntegrity() * pow(size_, 2);
+  } else if (health<=0) {
+    Dies();
   } else {
     health_ = health;
   }
@@ -337,16 +339,17 @@ Mutable Creature::GetMutable() const {return mutable_;}
  * @param kMapWidth Width of the map.
  * @param kMapHeight Height of the map.
  */
-void Creature::OnCollision(Entity &other_entity, double const kMapWidth,
-                           double const kMapHeight) {
-  if (Food *food = dynamic_cast<Food *>(&other_entity)) {
-    if (food->GetState() == Entity::Alive && eating_cooldown_ == 0.0 && biting_ == 1) {
-      {
-        if (IsFoodInSight(food))
-        {
-          Bite(food);
+void Creature::OnCollision(Entity &other_entity, double const kMapWidth, double const kMapHeight) {
+  if (other_entity.GetState() == Entity::Alive && eating_cooldown_ == 0.0 && biting_ == 1) {
+    SetEnergy(GetEnergy()-bite_strength_*settings::physical_constraints::kBiteEnergyConsumptionRatio);
+    if (Food* food_entity = dynamic_cast<Food*>(&other_entity)) {
+        if (IsInSight(food_entity)) {
+            Bite(food_entity);
         }
-      }
+    } else if (Creature* creature_entity = dynamic_cast<Creature*>(&other_entity)) {
+        if (IsInSight(creature_entity)) {
+            Bite(creature_entity);
+        }
     }
   }
   MovableEntity::OnCollision(other_entity, kMapWidth, kMapHeight);
@@ -765,6 +768,13 @@ Food *Creature::GetClosestFoodInSight(
 
 double Creature::GetStomachCapacity() const {return stomach_capacity_;};
 double Creature::GetStomachFullness() const {return stomach_fullness_;};
+void Creature::SetStomachFullness(const double& new_fullness) {
+  if (new_fullness > stomach_capacity_) {
+    stomach_fullness_ = stomach_capacity_;
+  } else {
+    stomach_fullness_ = new_fullness;
+  }
+};
 double Creature::GetEmptinessPercent() const {return 100 * (1 - stomach_fullness_/stomach_capacity_);};
 double Creature::GetEnergyInStomach() const {return potential_energy_in_stomach_;};
 
@@ -816,13 +826,13 @@ void Creature::Bite(Food* food)
 
   //Check how much food the creature can eat, depending on bite strength and fullness of stomach
   double available_space = std::max(stomach_capacity_ - stomach_fullness_, 0.0);
-  double food_to_eat = std::sqrt(std::min(pow(bite_strength_,2), available_space));
+  double food_to_eat = std::sqrt(std::min(M_PI*pow(bite_strength_,2), available_space));
 
   // Check if creature eats the whole food or a part of it
   if (food_to_eat >= food->GetSize())
   {
     max_nutrition = food->GetNutritionalValue() * food->GetSize();
-    stomach_fullness_ += pow(food->GetSize(), 2);
+    stomach_fullness_ += M_PI*pow(food->GetSize(), 2);
     food->Eat();
   }
   else
@@ -830,7 +840,7 @@ void Creature::Bite(Food* food)
     double initial_food_size = food->GetSize();
     double new_radius = std::sqrt(pow(initial_food_size,2) - pow(food_to_eat,2));
     food->SetSize(new_radius);
-    stomach_fullness_ += pow(food_to_eat, 2);
+    stomach_fullness_ += M_PI*pow(food_to_eat, 2);
     max_nutrition =  food->GetNutritionalValue() * food_to_eat;
   }
 
@@ -850,6 +860,35 @@ void Creature::Bite(Food* food)
   }
 }
 
+/*!
+ * @brief Handles the biting of another creature.
+ *
+ * @details Adds the food it bites to the stomach (increasing fulness and potential
+ * energy). Decreases food size/deletes food that gets bitten.
+ *
+ * @param food The food the creature bites into.
+ */
+void Creature::Bite(Creature* creature)
+{
+  //Reset eating cooldown, makes creature stop to bite
+  eating_cooldown_ = mutable_.GetEatingSpeed();
+
+  const double damage = M_PI*pow(bite_strength_,2)*settings::physical_constraints::kBiteDamageRatio;
+  creature->SetHealth(creature->GetHealth()-damage);
+}
+
+void Creature::Parasite(Creature* host)
+{
+  // Parasites are assumed to be attached to the host and to have a biting size smaller than the host
+  SetEnergy(GetEnergy()-bite_strength_*settings::physical_constraints::kBiteEnergyConsumptionRatio);
+  const double nutrition = settings::environment::kMeatNutritionalValue * M_PI*pow(bite_strength_,2) * 2 * mutable_.GetDiet();
+  SetEnergy(GetEnergy()+nutrition);
+  SetStomachFullness(GetStomachFullness()+M_PI*pow(bite_strength_,2));
+
+  const double damage = std::min(M_PI*pow(bite_strength_,2)*settings::physical_constraints::kBiteDamageRatio, host->GetHealth());
+  host->SetHealth(host->GetHealth()-damage);
+}
+
 void Creature::AddAcid(double quantity)
 {
   double initial_acid = stomach_acid_;
@@ -859,15 +898,15 @@ void Creature::AddAcid(double quantity)
 
 double Creature::GetAcid() const {return stomach_acid_; };
 
-bool Creature::IsFoodInSight(Food *food)
+bool Creature::IsInSight(Entity *entity)
 {
   auto cone_center = Point(x_coord_, y_coord_);
   auto cone_orientation = GetOrientation();
   auto cone_left_boundary = OrientedAngle(cone_orientation - vision_angle_ / 2);
   auto cone_right_boundary =
       OrientedAngle(cone_orientation + vision_angle_ / 2);
-  auto food_point = Point(food->GetCoordinates());
-  auto food_direction = OrientedAngle(cone_center, food_point);
+  auto entity_point = Point(entity->GetCoordinates());
+  auto entity_direction = OrientedAngle(cone_center, entity_point);
 
-  return food_direction.IsInsideCone(cone_left_boundary, cone_right_boundary);
+  return entity_direction.IsInsideCone(cone_left_boundary, cone_right_boundary);
 }

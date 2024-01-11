@@ -81,7 +81,7 @@ class Creature : public MovableEntity {
           double grid_cell_size) const;
   Food *GetClosestMeatInSight(std::vector<std::vector<std::vector<Entity *>>> &grid,
           double grid_cell_size) const;
-  bool IsFoodInSight(Food *food);
+  bool IsInSight(Entity *entity);
 
 
   void Grow(double energy);
@@ -92,6 +92,8 @@ class Creature : public MovableEntity {
   int GetFoodID() const;
   void Digest(double deltaTime);
   void Bite(Food *food);
+  void Bite(Creature* creature);
+  void Parasite(Creature* host);
   void AddAcid(double quantity);
 
 
@@ -101,6 +103,7 @@ class Creature : public MovableEntity {
 
   double GetStomachCapacity() const;
   double GetStomachFullness() const;
+  void SetStomachFullness(const double& new_fullness);
   double GetEmptinessPercent() const;
   double GetAcid() const;
   double GetEnergyInStomach() const;

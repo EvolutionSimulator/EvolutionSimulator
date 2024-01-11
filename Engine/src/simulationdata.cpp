@@ -236,6 +236,7 @@ void SimulationData::ReproduceTwoCreatures(Creature& creature1, Creature& creatu
  }
 }
 
+
 /*!
  * @brief Updates all the food entities (meat rots) and plants grow
  *
