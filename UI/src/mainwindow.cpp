@@ -13,7 +13,8 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui_(new Ui::MainWindow), friction_coefficient(0.0), lastRecordedTime_(0.0) {
   ui_->setupUi(this);
-
+  ui_->graphMenu->addItem("Graphs");               // Index 0
+  ui_->graphMenu->addItem("Creatures Over Time");  // Index 1
   //Add image as icon use region as mask to make the icon circular
   QRect rect(2,2,45,45);
   qDebug() << rect.size();
@@ -37,8 +38,7 @@ MainWindow::MainWindow(QWidget *parent)
           SLOT(ChangeCreatureDensity(int)));
   connect(ui_->restartButton, &QPushButton::clicked, this,
           &MainWindow::RestartSimulation);
-  connect(ui_->graphButton, &QPushButton::clicked, this,
-          &MainWindow::DrawCreaturesOverTimeGraph);
+  connect(ui_->graphMenu, SIGNAL(currentIndexChanged(int)), this, SLOT(handleDropdownSelection(int)));
   updateTimer = new QTimer(this);
   connect(updateTimer, SIGNAL(timeout()), this, SLOT(recordCreatureCount()));
   updateTimer->start(1000);  // Set the interval to 1000 milliseconds (1 second)
@@ -204,3 +204,15 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
         QMainWindow::keyPressEvent(event); // Pass other events to the base class
     }
 }
+
+void MainWindow::handleDropdownSelection(int index) {
+    // Here, you can call the function corresponding to the selected item
+    qDebug() << "Dropdown selection changed to index:" << index;
+
+    // Check if the selected index is 1, then call DrawCreaturesOverTimeGraph
+    if (index == 1) {
+        qDebug() << "Calling DrawCreaturesOverTimeGraph";
+        DrawCreaturesOverTimeGraph();
+    }
+}
+
