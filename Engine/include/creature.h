@@ -104,6 +104,7 @@ class Creature : public MovableEntity {
   double GetEmptinessPercent() const;
   double GetAcid() const;
   double GetEnergyInStomach() const;
+  int GetGender() const;
 
  protected:
   double max_energy_;
@@ -148,6 +149,23 @@ class Creature : public MovableEntity {
   double eating_cooldown_; /*! How much time it has to wait to bite - mutable*/
   double stomach_acid_; /*! Added when digestion occurs */
   bool biting_; /*! Indicates whether creature is biting or not*/
+
+  int gender_;
+};
+
+class Egg : public MovableEntity {
+ public:
+  Egg(neat::Genome genome, Mutable mutable_, std::pair<double,double> coords);
+  void Break();
+  Creature Hatch();
+ protected:
+  int incubation_time_;
+  double age_;
+  double size_;
+  bool fertilized_;
+  neat::Genome genome_;
+  Mutable mutables_;
+  std::pair<double,double> coordinates_;
 };
 
 std::vector<Food *> get_food_at_distance(

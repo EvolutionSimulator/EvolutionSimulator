@@ -50,6 +50,8 @@ Creature::Creature(neat::Genome genome, Mutable mutables)
     energy_ = mutables.GetEnergyDensity() * pow(size_, 2);
     stomach_capacity_ = mutables.GetStomachCapacityFactor() * pow(size_, 2);
     bite_strength_ = mutables.GetGeneticStrength() * size_;
+    gender_ = rand() % 2;
+    std::cout <<mutables.GetBabySize() << std::endl;
 }
 
 
@@ -113,6 +115,15 @@ void Creature::BalanceHealthEnergy() {
  * @return double The current health level of the creature.
  */
 double Creature::GetHealth() const { return health_; }
+
+/*!
+ * @brief Retrieves the gender of the creature.
+ *
+ * @details This method returns the creature's gender
+ *
+ * @return Takes a value of 0 (male) or 1 (female)
+ */
+int Creature::GetGender() const { return gender_;}
 
 /*!
  * @brief Sets the health level of the creature.
@@ -208,7 +219,11 @@ void Creature::Reproduced() {
 bool Creature::Compatible(const Creature& other_creature){
   double brain_distance = this->GetGenome().CompatibilityBetweenGenomes(other_creature.GetGenome());
   double mutable_distance = this->GetMutable().CompatibilityBetweenMutables(other_creature.GetMutable());
-  return brain_distance + mutable_distance < settings::compatibility::kCompatibilityThreshold;
+  std::pair<double, double> C1 = this->GetCoordinates();
+  std::pair<double, double> C2 = other_creature.GetCoordinates();
+  double physical_distance = sqrt(pow(C1.first-C2.first, 2) + pow(C1.second-C2.second, 2));
+  bool gender_difference = (this->GetGender() + other_creature.GetGender() == 1) ? true : false;
+  return (gender_difference && (brain_distance + mutable_distance < settings::compatibility::kCompatibilityThreshold)) && physical_distance < settings::compatibility::kCompatibilityDistance;
 }
 
 /*!
@@ -870,4 +885,33 @@ bool Creature::IsFoodInSight(Food *food)
   auto food_direction = OrientedAngle(cone_center, food_point);
 
   return food_direction.IsInsideCone(cone_left_boundary, cone_right_boundary);
+}
+
+
+
+/*!
+ * @class Egg
+ * @brief Represents the eggs produced from reproduction between creatures,
+ * that stores the traits of the offspring to hatch.
+ *
+ * @details This class stores the attributes of the offspring that are necessary
+ * for Creature initialization. Furthermore stores attributes that dictate behaviour
+ * of the egg prior to hatching, such as size_ as they can be consumed.
+ */
+Egg::Egg(neat::Genome genome, Mutable mutables, std::pair<double,double> coord):
+    genome_(genome),
+    mutables_(mutables){
+    size_=mutables.GetBabySize();
+    age_=0;
+    incubation_time_=mutables.GetMaturityAge();
+    fertilized_=true; //FOR NOW WE SAY THAT THE EGG IS FERTILIZED BY DEFAULT, CHANGES IF NOT FERTILIZED UPON BEING LAYED
+    coordinates_ = coord;
+}
+
+void Egg::Break(){
+    SetState(Dead);
+}
+
+Creature Egg::Hatch(){
+    return Creature(genome_,mutables_);
 }
