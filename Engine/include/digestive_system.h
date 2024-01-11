@@ -14,6 +14,9 @@ public:
   double GetAcid() const;
   double GetEnergyInStomach() const;
 
+  void SetStomachFullness(double value);
+  void SetAcid(double value);
+
   void Digest(double deltaTime);
   void Bite(Food *food);
   void AddAcid(double quantity);

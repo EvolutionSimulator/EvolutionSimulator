@@ -60,9 +60,9 @@ void DigestiveSystem::Digest(double deltaTime)
   }
 
          // Empties out the stomach space
-  stomach_acid_ -= quantity;
+  SetAcid(GetAcid() - quantity);
   potential_energy_in_stomach_ -= quantity * avg_nutritional_value;
-  stomach_fullness_ -= quantity;
+  SetStomachFullness(GetStomachFullness() - quantity);
 }
 
 /*!
@@ -83,13 +83,16 @@ void DigestiveSystem::Bite(Food* food)
 
          //Check how much food the creature can eat, depending on bite strength and fullness of stomach
   double available_space = std::max(stomach_capacity_ - stomach_fullness_, 0.0);
-  double food_to_eat = std::sqrt(std::min(pow(bite_strength_,2), available_space));
+
+  double area_to_eat = std::min(M_PI*pow(bite_strength_,2), available_space);
+  area_to_eat = std::max(area_to_eat,0.0);
+  double food_to_eat = std::sqrt(area_to_eat);
 
          // Check if creature eats the whole food or a part of it
   if (food_to_eat >= food->GetSize())
   {
     max_nutrition = food->GetNutritionalValue() * food->GetSize();
-    stomach_fullness_ += pow(food->GetSize(), 2);
+    SetStomachFullness(GetStomachFullness()+  M_PI*pow(food->GetSize(), 2));
     food->Eat();
   }
   else
@@ -97,7 +100,7 @@ void DigestiveSystem::Bite(Food* food)
     double initial_food_size = food->GetSize();
     double new_radius = std::sqrt(pow(initial_food_size,2) - pow(food_to_eat,2));
     food->SetSize(new_radius);
-    stomach_fullness_ += pow(food_to_eat, 2);
+    SetStomachFullness(GetStomachFullness()+ M_PI*pow(food_to_eat, 2));
     max_nutrition =  food->GetNutritionalValue() * food_to_eat;
   }
 
@@ -111,10 +114,6 @@ void DigestiveSystem::Bite(Food* food)
 
          //Add nutrition to stomach, make sure capacity is not surpassed
   potential_energy_in_stomach_ += max_nutrition;
-  if (stomach_fullness_ > stomach_capacity_)
-  {
-    stomach_fullness_ = stomach_capacity_;
-  }
 }
 
 void DigestiveSystem::AddAcid(double quantity)
@@ -124,3 +123,26 @@ void DigestiveSystem::AddAcid(double quantity)
   SetEnergy(GetEnergy() - (stomach_acid_ - initial_acid)/SETTINGS.physical_constraints.d_acid_to_energy);
 }
 
+void DigestiveSystem::SetStomachFullness(double value)
+{
+  if (value > stomach_capacity_)
+  {
+    stomach_fullness_ = stomach_capacity_;
+  }
+  else{
+    if (value < 0) { stomach_fullness_ = 0;}
+    else { stomach_fullness_ = value; }
+  }
+}
+
+void DigestiveSystem::SetAcid(double value)
+{
+  if (value > stomach_capacity_)
+  {
+    stomach_acid_ = stomach_capacity_;
+  }
+  else{
+    if (value < 0) { stomach_acid_ = 0;}
+    else { stomach_acid_ = value; }
+  }
+}
