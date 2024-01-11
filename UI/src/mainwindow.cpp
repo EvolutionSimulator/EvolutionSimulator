@@ -14,6 +14,10 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui_(new Ui::MainWindow), friction_coefficient(0.0), lastRecordedTime_(0.0) {
   ui_->setupUi(this);
 
+  InitializeEngine();
+  PauseSimulation();
+  RunSimulation();
+
   //Add image as icon use region as mask to make the icon circular
   QRect rect(2,2,45,45);
   qDebug() << rect.size();
@@ -61,13 +65,19 @@ MainWindow::~MainWindow() {
     engine_->Stop();
     engine_thread_.join();
   }
-
+  
   delete ui_;
 }
 
-void MainWindow::SetEngine(Engine *engine) {
-  engine_ = engine;
-  ui_->canvas->SetSimulation(engine_->GetSimulation());
+void MainWindow::InitializeEngine()
+{
+  if (!engine_) {
+    std::cout << "Creating new engine..." << std::endl;
+    int width = sf::VideoMode::getDesktopMode().width;
+    int height = sf::VideoMode::getDesktopMode().height;
+    engine_ = new Engine(width, height);
+    ui_->canvas->SetSimulation(engine_->GetSimulation());
+  }
 }
 
 void MainWindow::ChangeFoodDensity(int value) {
@@ -82,39 +92,66 @@ void MainWindow::ChangeCreatureDensity(int value) {
 }
 
 void MainWindow::RunSimulation() {
-  if (!engine_thread_.joinable()) {
+  if (engine_ && !engine_thread_.joinable()) {
+    std::cout << "Starting engine on a separate thread..." << std::endl;
     engine_thread_ = std::thread(&Engine::Run, engine_);
   }
 }
 
-void MainWindow::ToggleSimulation() {
-  if (engine_thread_.joinable()) {
+void MainWindow::PauseSimulation()
+{
+  if (engine_) {
+    engine_->Pause();
+  }
+}
+
+void MainWindow::ResumeSimulation()
+{
+  if (engine_) {
+    engine_->Resume();
+  }
+}
+
+void MainWindow::KillEngine()
+{
+  if (engine_) {
+    std::cout << "Stopping engine..." << std::endl;
     engine_->Stop();
+  }
+
+  if (engine_thread_.joinable()) {
+    std::cout << "Joining engine thread..." << std::endl;
     engine_thread_.join();
+  }
+
+  std::cout << "Deleting engine..." << std::endl;
+  delete engine_;
+  std::cout << "Engine deleted." << std::endl;
+  engine_ = nullptr;
+}
+
+void MainWindow::ToggleSimulation() {
+  if (engine_->IsPaused()) {
+    engine_->Resume();
     //change icon of button
-    QPixmap pixMap2(":/Resources/Run.png");
+    QPixmap pixMap2(":/Resources/Pause.png");
     QIcon icon2(pixMap2);
     ui_->runButton->setIcon(icon2);
   } else {
-    engine_thread_ = std::thread(&Engine::Run, engine_);
+    engine_->Pause();
     //change icon of button
-    QPixmap pixMap2(":/Resources/Pause.png");
+    QPixmap pixMap2(":/Resources/Run.png");
     QIcon icon2(pixMap2);
     ui_->runButton->setIcon(icon2);
   }
 }
 
 void MainWindow::RestartSimulation() {
-  if (engine_thread_.joinable()) {
-    engine_->Stop();
-    engine_thread_.join();
-  }
-  // Create a new instance of the Engine and set it in the UI
-  int width = sf::VideoMode::getDesktopMode().width;
-  int height = sf::VideoMode::getDesktopMode().height;
-  Engine *newEngine = new Engine(width, height, food_density, creature_density);
-  SetEngine(newEngine);
-  engine_thread_ = std::thread(&Engine::Run, engine_);
+  KillEngine();
+
+  InitializeEngine();
+
+  RunSimulation();
 }
 
 double ExampleGraphFunction(double x) { return x * x; }
