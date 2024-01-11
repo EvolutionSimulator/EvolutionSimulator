@@ -2,14 +2,6 @@
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>800</width>
-    <height>1066</height>
-   </rect>
-  </property>
   <property name="palette">
    <palette>
     <active>
@@ -79,6 +71,9 @@
   </property>
   <property name="autoFillBackground">
    <bool>true</bool>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="SimulationCanvas" name="canvas" native="true">
@@ -306,7 +301,7 @@
    <widget class="QSpinBox" name="densityFood">
     <property name="geometry">
      <rect>
-      <x>550</x>
+      <x>620</x>
       <y>40</y>
       <width>42</width>
       <height>22</height>
@@ -319,7 +314,7 @@
    <widget class="QPushButton" name="restartButton">
     <property name="geometry">
      <rect>
-      <x>190</x>
+      <x>290</x>
       <y>20</y>
       <width>80</width>
       <height>24</height>
@@ -339,11 +334,32 @@
    <widget class="QLineEdit" name="lineEdit">
     <property name="geometry">
      <rect>
-      <x>550</x>
+      <x>620</x>
       <y>20</y>
       <width>113</width>
       <height>21</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 5px;
+}
+
+QPushButton:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+QPushButton:pressed {
+    background-color: #367e3a; /* Even darker green on press */
+}</string>
     </property>
     <property name="text">
      <string>Density of Food:</string>
@@ -352,7 +368,7 @@
    <widget class="QSpinBox" name="densityCreature">
     <property name="geometry">
      <rect>
-      <x>680</x>
+      <x>740</x>
       <y>40</y>
       <width>42</width>
       <height>22</height>
@@ -365,9 +381,9 @@
    <widget class="QLineEdit" name="lineEdit_2">
     <property name="geometry">
      <rect>
-      <x>680</x>
+      <x>740</x>
       <y>20</y>
-      <width>113</width>
+      <width>141</width>
       <height>21</height>
      </rect>
     </property>
@@ -378,7 +394,7 @@
    <widget class="QSlider" name="frictionCoefficientSpinBox">
     <property name="geometry">
      <rect>
-      <x>290</x>
+      <x>380</x>
       <y>20</y>
       <width>160</width>
       <height>25</height>
@@ -403,7 +419,7 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>330</x>
+      <x>420</x>
       <y>50</y>
       <width>91</width>
       <height>16</height>
@@ -423,7 +439,7 @@
    <widget class="QLabel" name="frictionLabel">
     <property name="geometry">
      <rect>
-      <x>470</x>
+      <x>550</x>
       <y>20</y>
       <width>58</width>
       <height>16</height>
@@ -442,9 +458,9 @@
    <widget class="QComboBox" name="graphMenu">
     <property name="geometry">
      <rect>
-      <x>70</x>
+      <x>40</x>
       <y>20</y>
-      <width>103</width>
+      <width>241</width>
       <height>32</height>
      </rect>
     </property>
