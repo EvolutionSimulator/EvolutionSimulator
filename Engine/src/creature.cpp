@@ -184,7 +184,7 @@ void Creature::Update(double deltaTime, double const kMapWidth,
  */
 void Creature::OnCollision(Entity &other_entity, double const kMapWidth, double const kMapHeight) {
   if (other_entity.GetState() == Entity::Alive && eating_cooldown_ == 0.0 && biting_ == 1 && IsInSight(&other_entity)) {
-    SetEnergy(GetEnergy()-bite_strength_*SETTINGS.physical_constraints.d_bite_energy_consumption_ratio);
+    SetEnergy(GetEnergy() - bite_strength_ * SETTINGS.physical_constraints.d_bite_energy_consumption_ratio);
     if (Food* food_entity = dynamic_cast<Food*>(&other_entity)) {
       DigestiveSystem::Bite(food_entity);
     } else if (Creature* creature_entity = dynamic_cast<Creature*>(&other_entity)) {
@@ -424,10 +424,10 @@ void Creature::Bite(Creature* creature)
   //Reset eating cooldown, makes creature stop to bite
   eating_cooldown_ = mutable_.GetEatingSpeed();
 
-  //Bite logic
+  //Bite logic - inflict damage, add energy
   const double damage = M_PI*pow(bite_strength_,2)*SETTINGS.physical_constraints.d_bite_damage_ratio;
-  SetEnergy(GetEnergy()-bite_strength_*SETTINGS.physical_constraints.d_bite_energy_consumption_ratio);
   creature->SetHealth(creature->GetHealth()-damage);
+  SetEnergy(GetEnergy()+bite_strength_*SETTINGS.physical_constraints.d_bite_energy_consumption_ratio/10);
 }
 
 
