@@ -45,9 +45,13 @@ SimulationCanvas::SimulationCanvas(QWidget* Parent)
   // Set the fixed size with the scaled dimensions
   setFixedSize(scaledWidth, scaledHeight);
 
-  InitializeFont();
-  InitializeSprites();
-  InitializeShader();
+  InitializeFile(font_, ":/Resources/font.ttf");
+  InitializeFile(color_shader_, ":/Shaders/colorShift.frag");
+  InitializeFile(food_density_shader_, ":/Shaders/densityShader.frag");
+  InitializeFile(creature_texture_, ":/Resources/Creature_base.png");
+  InitializeFile(eyes_texture_, ":/Resources/Creature_eyes.png");
+  InitializeFile(tail_texture_, ":/Resources/Creature_tails.png");
+  InitializeFile(food_texture_, ":/Resources/Food_32x32.png");
 
   trackButton_.setSize(sf::Vector2f(100, 30));         // Example size
   trackButton_.setFillColor(sf::Color(100, 100, 200)); // Example color
@@ -59,170 +63,98 @@ SimulationCanvas::SimulationCanvas(QWidget* Parent)
   std::cout << "SimulationCanvas created" << std::endl;
 }
 
-void SimulationCanvas::InitializeShader(){
-  QFile resourceFile1(":/Shaders/colorShift.frag");
-  if (!resourceFile1.open(QIODevice::ReadOnly)) {
-    qDebug() << "Failed to open shader resource!";
-    return;
-  }
-
-  // Generate a unique temporary filename
-  QString tempFileName1 = "temp_shader_" + QUuid::createUuid().toString(QUuid::WithoutBraces)
-          + ".frag";
-  QString tempFilePath1 = QDir::temp().absoluteFilePath(tempFileName1);
-  qDebug() << "Temporary file path:" << tempFilePath1;
-
-  QFile tempFile1(tempFilePath1);
-  if (tempFile1.exists()) {
-    qDebug() << "Temporary file already exists. Deleting...";
-    if (!tempFile1.remove()) {
-      qDebug() << "Failed to remove existing temporary file.";
+void SimulationCanvas::InitializeFile(sf::Shader& ValueSaved, std::string path){
+    QString qPath = QString::fromStdString(path);
+    QFile resourceFile(qPath);
+    if (!resourceFile.open(QIODevice::ReadOnly)) {
+      qDebug() << "Failed to open resource!";
       return;
     }
-  }
 
-  if (!resourceFile1.copy(tempFilePath1)) {
-    qDebug() << "Failed to copy color shader to temporary file!";
-    qDebug() << "Error:" << resourceFile1.errorString();
-    return;
-  }
-  resourceFile1.close();
-  if (!color_shader_.loadFromFile(tempFilePath1.toStdString(), sf::Shader::Fragment)) {
-    qDebug() << "Failed to load color shader from file!";
-    QFile::remove(tempFilePath1);
-    return;
-  }
-  // Clean up the temporary file after use
-  QFile::remove(tempFilePath1);
+    QString tempFileName = "temp_" + QUuid::createUuid().toString(QUuid::WithoutBraces)
+            + ".frag";
+    QString tempFilePath = QDir::temp().absoluteFilePath(tempFileName);
+    qDebug() << "Temporary file path:" << tempFilePath;
 
-  QFile resourceFile2(":/Shaders/densityShader.frag");
-  if (!resourceFile2.open(QIODevice::ReadOnly)) {
-    qDebug() << "Failed to open shader resource!";
-    return;
-  }
+    QFile tempFile(tempFilePath);
+    if (tempFile.exists()) {
+      qDebug() << "Temporary file already exists. Deleting...";
+      if (!tempFile.remove()) {
+        qDebug() << "Failed to remove existing temporary file.";
+        return;
+      }
+    }
 
-  // Generate a unique temporary filename
-  QString tempFileName2 = "temp_shader_" + QUuid::createUuid().toString(QUuid::WithoutBraces)
-          + ".frag";
-  QString tempFilePath2 = QDir::temp().absoluteFilePath(tempFileName2);
-  qDebug() << "Temporary file path:" << tempFilePath2;
-
-  QFile tempFile2(tempFilePath2);
-  if (tempFile2.exists()) {
-    qDebug() << "Temporary file already exists. Deleting...";
-    if (!tempFile2.remove()) {
-      qDebug() << "Failed to remove existing temporary file.";
+    if (!resourceFile.copy(tempFilePath)) {
+      qDebug() << "Failed to copy to temporary file!";
+      qDebug() << "Error:" << resourceFile.errorString();
       return;
     }
-  }
+    resourceFile.close();
 
-  if (!resourceFile2.copy(tempFilePath2)) {
-    qDebug() << "Failed to copy density shader to temporary file!";
-    qDebug() << "Error:" << resourceFile2.errorString();
-    return;
-  }
-  resourceFile2.close();
-  if (!food_density_shader_.loadFromFile(tempFilePath2.toStdString(), sf::Shader::Fragment)) {
-    qDebug() << "Failed to load density shader from file!";
-    QFile::remove(tempFilePath2);
-    return;
-  }
-  // Clean up the temporary file after use
-  QFile::remove(tempFilePath2);
-}
-
-
-void SimulationCanvas::InitializeFont(){
-  QFile resourceFile(":/Resources/font.ttf");
-  if (!resourceFile.open(QIODevice::ReadOnly)) {
-    qDebug() << "Failed to open font resource!";
-    return;
-  }
-
-  // Generate a unique temporary filename
-  QString tempFileName = "temp_font_" + QUuid::createUuid().toString(QUuid::WithoutBraces)
-          + ".ttf";
-  QString tempFilePath = QDir::temp().absoluteFilePath(tempFileName);
-  qDebug() << "Temporary file path:" << tempFilePath;
-
-  QFile tempFile(tempFilePath);
-  if (tempFile.exists()) {
-    qDebug() << "Temporary file already exists. Deleting...";
-    if (!tempFile.remove()) {
-      qDebug() << "Failed to remove existing temporary file.";
-      return;
+    if (!ValueSaved.loadFromFile(tempFilePath.toStdString(), sf::Shader::Fragment)) {
+        qDebug() << "Failed to load from file!";
+        QFile::remove(tempFilePath);
+        return;
     }
-  }
 
-  if (!resourceFile.copy(tempFilePath)) {
-    qDebug() << "Failed to copy font to temporary file!";
-    qDebug() << "Error:" << resourceFile.errorString();
-    return;
-  }
-  resourceFile.close();
 
-  if (!font_.loadFromFile(tempFilePath.toStdString())) {
-    qDebug() << "Failed to load font from file!";
+    // Clean up the temporary file after use
     QFile::remove(tempFilePath);
-    return;
-  }
-  // Clean up the temporary file after use
-  QFile::remove(tempFilePath);
 }
 
-void SimulationCanvas::InitializeSprites(){
-    //Base Creature texture
+void SimulationCanvas::InitializeFile(sf::Font& ValueSaved, std::string path){
+    QString qPath = QString::fromStdString(path);
+    QFile resourceFile(qPath);
+    if (!resourceFile.open(QIODevice::ReadOnly)) {
+      qDebug() << "Failed to open resource!";
+      return;
+    }
+
+    QString tempFileName = "temp_" + QUuid::createUuid().toString(QUuid::WithoutBraces)
+            + ".frag";
+    QString tempFilePath = QDir::temp().absoluteFilePath(tempFileName);
+    qDebug() << "Temporary file path:" << tempFilePath;
+
+    QFile tempFile(tempFilePath);
+    if (tempFile.exists()) {
+      qDebug() << "Temporary file already exists. Deleting...";
+      if (!tempFile.remove()) {
+        qDebug() << "Failed to remove existing temporary file.";
+        return;
+      }
+    }
+
+    if (!resourceFile.copy(tempFilePath)) {
+      qDebug() << "Failed to copy to temporary file!";
+      qDebug() << "Error:" << resourceFile.errorString();
+      return;
+    }
+    resourceFile.close();
+
+    if (!ValueSaved.loadFromFile(tempFilePath.toStdString())){
+        qDebug() << "Failed to load from file!";
+        QFile::remove(tempFilePath);
+        return;
+    }
+
+
+    // Clean up the temporary file after use
+    QFile::remove(tempFilePath);
+}
+
+void SimulationCanvas::InitializeFile(sf::Texture& ValueSaved, std::string path){
     QPixmap creaturePixmap;
-    if (!creaturePixmap.load(":/Resources/Creature_base.png")) {
-      qDebug() << "Failed to load QPixmap from path:" << ":/Resources/Creature_base.png";
+    QString qPath = QString::fromStdString(path);
+    if (!creaturePixmap.load(qPath)) {
+      qDebug() << "Failed to load QPixmap from path:" << path;
     }
 
     QImage creatureqImage = creaturePixmap.toImage().convertToFormat(QImage::Format_RGBA8888);
     sf::Image creaturesfImage;
     creaturesfImage.create(creatureqImage.width(), creatureqImage.height(), reinterpret_cast<const sf::Uint8*>(creatureqImage.bits()));
 
-    if (!creature_texture_.loadFromImage(creaturesfImage)) {
-      qDebug() << "Failed to create sf::Texture from sf::Image";
-    }
-    //Eyes texture
-    QPixmap eyesPixmap;
-    if (!eyesPixmap.load(":/Resources/Creature_eyes.png")) {
-      qDebug() << "Failed to load QPixmap from path:" << ":/Resources/Creature_eyes.png";
-    }
-
-    QImage eyesqImage = eyesPixmap.toImage().convertToFormat(QImage::Format_RGBA8888);
-    sf::Image eyessfImage;
-    eyessfImage.create(eyesqImage.width(), eyesqImage.height(), reinterpret_cast<const sf::Uint8*>(eyesqImage.bits()));
-
-    if (!eyes_texture_.loadFromImage(eyessfImage)) {
-      qDebug() << "Failed to create sf::Texture from sf::Image";
-    }
-
-    //Tail texture
-    QPixmap tailPixmap;
-    if (!tailPixmap.load(":/Resources/Creature_tails.png")) {
-      qDebug() << "Failed to load QPixmap from path:" << ":/Resources/Creature_tails.png";
-    }
-
-    QImage tailqImage = tailPixmap.toImage().convertToFormat(QImage::Format_RGBA8888);
-    sf::Image tailsfImage;
-    tailsfImage.create(tailqImage.width(), tailqImage.height(), reinterpret_cast<const sf::Uint8*>(tailqImage.bits()));
-
-    if (!tail_texture_.loadFromImage(tailsfImage)) {
-      qDebug() << "Failed to create sf::Texture from sf::Image";
-    }
-
-    //Medium food texture
-    QPixmap foodPixmap;
-    if (!foodPixmap.load(":/Resources/Food_32x32.png")) {
-      qDebug() << "Failed to load QPixmap from path:" << ":/Resources/Food_32x32.png";
-    }
-
-    QImage foodqImage = foodPixmap.toImage().convertToFormat(QImage::Format_RGBA8888);
-    sf::Image foodsfImage;
-    foodsfImage.create(foodqImage.width(), foodqImage.height(), reinterpret_cast<const sf::Uint8*>(foodqImage.bits()));
-
-    if (!food_texture_.loadFromImage(foodsfImage)) {
+    if (!ValueSaved.loadFromImage(creaturesfImage)) {
       qDebug() << "Failed to create sf::Texture from sf::Image";
     }
 }
