@@ -183,16 +183,12 @@ void Creature::Update(double deltaTime, double const kMapWidth,
  * @param kMapHeight Height of the map.
  */
 void Creature::OnCollision(Entity &other_entity, double const kMapWidth, double const kMapHeight) {
-  if (other_entity.GetState() == Entity::Alive && eating_cooldown_ == 0.0 && biting_ == 1) {
+  if (other_entity.GetState() == Entity::Alive && eating_cooldown_ == 0.0 && biting_ == 1 && IsInSight(&other_entity)) {
     SetEnergy(GetEnergy()-bite_strength_*SETTINGS.physical_constraints.d_bite_energy_consumption_ratio);
     if (Food* food_entity = dynamic_cast<Food*>(&other_entity)) {
-        if (IsInSight(food_entity)) {
-            DigestiveSystem::Bite(food_entity);
-        }
+      DigestiveSystem::Bite(food_entity);
     } else if (Creature* creature_entity = dynamic_cast<Creature*>(&other_entity)) {
-        if (IsInSight(creature_entity)) {
             Bite(creature_entity);
-        }
     }
   }
   MovableEntity::OnCollision(other_entity, kMapWidth, kMapHeight);
