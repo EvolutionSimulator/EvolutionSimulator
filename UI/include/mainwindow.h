@@ -32,6 +32,8 @@ QT_END_NAMESPACE  //
   void DisplayGraph();
   void ChangeFriction(int value);
   void DrawCreaturesOverTimeGraph();
+  void handleDropdownSelection(int index);
+
 
  private:
   double friction_coefficient;
