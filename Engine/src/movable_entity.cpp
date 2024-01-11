@@ -255,7 +255,7 @@ void MovableEntity::Rotate(double deltaTime) {
  * @param kMapWidth Width of the map for collision calculations.
  * @param kMapHeight Height of the map for collision calculations.
  */
-void MovableEntity::OnCollision(Entity &other_entity, double const kMapWidth,
+void MovableEntity::OnCollision(std::shared_ptr<Entity> other_entity, double const kMapWidth,
                                 double const kMapHeight) {
   Entity::OnCollision(other_entity, kMapWidth, kMapHeight);
 }

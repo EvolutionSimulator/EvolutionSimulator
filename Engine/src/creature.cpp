@@ -115,12 +115,12 @@ void Creature::UpdateMatingDesire() {
  * than the compatibility threshold, indicating compatibility; otherwise returns
  * `false`.
  */
-bool Creature::Compatible(const Creature &other_creature) {
-  if (this == &other_creature) return false;
+bool Creature::Compatible(const std::shared_ptr<Creature>other_creature) {
+  if (this->GetID() == other_creature->GetID()) return false;
   double brain_distance =
-      this->GetGenome().CompatibilityBetweenGenomes(other_creature.GetGenome());
+      this->GetGenome().CompatibilityBetweenGenomes(other_creature->GetGenome());
   double mutable_distance = this->GetMutable().CompatibilityBetweenMutables(
-      other_creature.GetMutable());
+      other_creature->GetMutable());
   double physical_distance =
       this->GetDistance(other_creature, SETTINGS.environment.map_width,
                         SETTINGS.environment.map_height);
@@ -182,12 +182,12 @@ void Creature::Update(double deltaTime, double const kMapWidth,
  * @param kMapWidth Width of the map.
  * @param kMapHeight Height of the map.
  */
-void Creature::OnCollision(Entity &other_entity, double const kMapWidth, double const kMapHeight) {
-  if (other_entity.GetState() == Entity::Alive && eating_cooldown_ == 0.0 && biting_ == 1 && IsInSight(&other_entity)) {
+void Creature::OnCollision(std::shared_ptr<Entity>other_entity, double const kMapWidth, double const kMapHeight) {
+  if (other_entity->GetState() == Entity::Alive && eating_cooldown_ == 0.0 && biting_ == 1 && IsInSight(other_entity)) {
     SetEnergy(GetEnergy() - bite_strength_ * SETTINGS.physical_constraints.d_bite_energy_consumption_ratio);
-    if (Food* food_entity = dynamic_cast<Food*>(&other_entity)) {
+    if (std::shared_ptr<Food> food_entity = std::dynamic_pointer_cast<Food>(other_entity)) {
       DigestiveSystem::Bite(food_entity);
-    } else if (Creature* creature_entity = dynamic_cast<Creature*>(&other_entity)) {
+    } else if (std::shared_ptr<Creature>creature_entity = std::dynamic_pointer_cast<Creature>(other_entity)) {
             Bite(creature_entity);
     }
   }
@@ -215,6 +215,8 @@ void Creature::Think(std::vector<std::vector<std::vector<std::shared_ptr<Entity>
   think_count_ = 0;
   // To allow creatures to use a module it should be included below
   ProcessVisionFood(grid, GridCellSize, width, height);
+  ProcessVisionEnemies(grid, GridCellSize, width, height);
+
   if (neuron_data_.size() == 0) return;
   neuron_data_.at(0) = 1;
   neuron_data_.at(1) = energy_;
@@ -252,6 +254,8 @@ void Creature::Think(std::vector<std::vector<std::vector<std::shared_ptr<Entity>
      //No module with outputs atm but they should be used as with the input
   }
 }
+
+
 
 /*!
  * @brief Manages the creature's growth based on energy consumption.
@@ -412,6 +416,135 @@ std::vector<Food *> get_food_at_distance(
 }
 
 /*!
+ * @brief Finds the closest enemy creature within the creature's line of sight.
+ *
+ * @details Performs a breadth-first search (BFS) on the grid cells within the creature's
+ * field of view to locate the closest enemy creature. A creature is considered an enemy if it
+ * is not compatible with it.
+ *
+ * @param grid A 3-dimensional vector representing the environmental grid where each cell contains entities.
+ * @param grid_cell_size The size of each square cell in the grid.
+ *
+ * @return A pointer to the closest food entity within the line of sight; nullptr if no food is found.
+ */
+std::shared_ptr<Creature> Creature::GetClosestEnemyInSight(
+    std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
+    double grid_cell_size){
+  int grid_width = grid.size();
+  int grid_height = grid[0].size();
+
+  int x_grid = static_cast<int>(x_coord_ / grid_cell_size);
+  int y_grid = static_cast<int>(y_coord_ / grid_cell_size);
+
+         //temporary fix multiply by 4
+  int max_cells_to_find_food = 4 * M_PI * pow(vision_radius_ + 2 * sqrt(2) * grid_cell_size + SETTINGS.environment.max_food_size, 2) / (grid_cell_size * grid_cell_size);
+
+  auto cone_center = Point(x_coord_, y_coord_);
+  auto cone_orientation = GetOrientation();
+  auto cone_left_boundary = OrientedAngle(cone_orientation - vision_angle_ / 2);
+  auto cone_right_boundary =
+      OrientedAngle(cone_orientation + vision_angle_ / 2);
+
+  std::shared_ptr<Creature> closest_enemy = nullptr;
+  double smallest_distance_enemy = std::numeric_limits<double>::max();
+
+  std::queue<std::pair<int, int>> cells_queue;
+  std::set<std::pair<int, int>> visited_cells;
+
+  cells_queue.push({x_grid, y_grid});
+  visited_cells.insert({x_grid, y_grid});
+
+  size_t processed_cells = 0;
+
+  while (!cells_queue.empty()) {
+    auto [x, y] = cells_queue.front();
+    cells_queue.pop();
+    ++processed_cells;
+
+    for (std::shared_ptr<Entity> entity : grid[x][y]) {
+      std::shared_ptr<Creature> creature = std::dynamic_pointer_cast<Creature>(entity);
+
+      if (creature && creature->GetState() == Entity::states::Alive && Compatible(creature) == 0) {
+        auto point = Point(entity->GetCoordinates());
+
+        auto direction = OrientedAngle(cone_center, point);
+
+        double distance = point.dist(cone_center);
+
+        bool is_in_field_of_view = (direction.IsInsideCone(
+            cone_left_boundary, cone_right_boundary));
+
+        bool is_on_edge = (direction.AngleDistanceToCone(cone_left_boundary, cone_right_boundary) <= M_PI/2) && (distance * sin(direction.AngleDistanceToCone(cone_left_boundary, cone_right_boundary)) <= creature->GetSize() + SETTINGS.engine.eps);
+
+        if (is_in_field_of_view) {
+          bool is_within_vision_radius =
+              distance <= vision_radius_ + creature->GetSize() + SETTINGS.engine.eps;
+          if (is_within_vision_radius && distance < smallest_distance_enemy) {
+            smallest_distance_enemy = distance;
+            closest_enemy = creature;
+            break;
+          }
+        }
+
+        if (is_on_edge) {
+          bool is_within_vision_radius =
+              (distance * cos(direction.AngleDistanceToCone(cone_left_boundary, cone_right_boundary)) <= vision_radius_ + SETTINGS.engine.eps);
+          if (is_within_vision_radius && distance < smallest_distance_enemy) {
+            smallest_distance_enemy = distance;
+            closest_enemy = creature;
+            break;
+          }
+        }
+      }
+    }
+    if (closest_enemy) {
+      break;
+    }
+
+           //assert(processed_cells <= max_cells_to_find_food && "processed_cells exceeded max_cells_to_find_food in GetClosestFoodInSight");
+    if (processed_cells > max_cells_to_find_food){
+      break;
+    }
+
+    for (int dx = -1; dx <= 1; ++dx) {
+      for (int dy = -1; dy <= 1; ++dy) {
+        if (dx * dx + dy * dy != 1) continue;
+        int nx = x + dx, ny = y + dy;
+        if (0 <= nx && nx < grid_width && 0 <= ny && ny < grid_height &&
+            !visited_cells.count({nx, ny})) {
+          if (IsGridCellPotentiallyInsideCone(
+                  Point(nx * grid_cell_size, ny * grid_cell_size),
+                  grid_cell_size, cone_center, vision_radius_,
+                  cone_left_boundary, cone_right_boundary)) {
+            visited_cells.insert({nx, ny});
+            cells_queue.push({nx, ny});
+          }
+        }
+      }
+    }
+  }
+  return closest_enemy;
+}
+
+void Creature::ProcessVisionEnemies(std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
+                       double grid_cell_size, double width, double height)
+{
+  std::shared_ptr<Creature> closeEnemy = GetClosestEnemyInSight(grid, grid_cell_size);
+
+  if (closeEnemy){
+    distance_enemy_ = this->GetDistance(closeEnemy, width, height) - closeEnemy->GetSize();
+    orientation_enemy_ = this->GetRelativeOrientation(closeEnemy);
+    enemy_size_ = closeEnemy->GetSize();
+  }
+  else {
+    distance_enemy_ = vision_radius_;
+    orientation_enemy_ = remainder(GetRandomFloat(orientation_- vision_angle_/2, orientation_+ vision_angle_/2), 2*M_PI);
+    enemy_size_ = -1;
+  }
+
+}
+
+/*!
  * @brief Handles the biting of the creature.
  *
  * @details Adds the food it bites to the stomach (increasing fulness and potential
@@ -419,7 +552,7 @@ std::vector<Food *> get_food_at_distance(
  *
  * @param food The food the creature bites into.
  */
-void Creature::Bite(Creature* creature)
+void Creature::Bite(std::shared_ptr<Creature> creature)
 {
   //Reset eating cooldown, makes creature stop to bite
   eating_cooldown_ = mutable_.GetEatingSpeed();

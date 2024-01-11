@@ -33,11 +33,11 @@ void CollisionManager::CheckCollisions(EntityGrid& entity_grid) {
             entity_grid.GetNeighbours({col, row}, layer_number);
         for (const std::pair<int, int> neighbour : neighbours) {
           for (auto entity2 : grid[neighbour.first][neighbour.second]) {
-            if (entity1->CheckCollisionWithEntity(tolerance, *entity2)) {
+            if (entity1->CheckCollisionWithEntity(tolerance, entity2)) {
               if (entity1 != entity2) {
                 #pragma omp critical
                 {
-                  entity1->OnCollision(*entity2, SETTINGS.environment.map_width,
+                  entity1->OnCollision(entity2, SETTINGS.environment.map_width,
                                        SETTINGS.environment.map_height);
                 }
               }

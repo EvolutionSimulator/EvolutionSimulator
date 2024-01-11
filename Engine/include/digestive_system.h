@@ -18,7 +18,7 @@ public:
   void SetAcid(double value);
 
   void Digest(double deltaTime);
-  void Bite(Food *food);
+  void Bite(std::shared_ptr<Food> food);
   void AddAcid(double quantity);
   void Eats(double nutritional_value);
 

@@ -54,16 +54,21 @@ class Creature : virtual public MovableEntity,
               std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
               double GridCellSize, double frictional_coefficient);
 
-  void OnCollision(Entity &other_entity, double const kMapWidth,
+  void OnCollision(std::shared_ptr<Entity>other_entity, double const kMapWidth,
                    double const kMapHeight) override;
 
   void Grow(double energy);
   void Think(std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
              double GridCellSize, double deltaTime, double width, double height);
 
-  void Bite(Creature* creature);
-  bool Compatible(const Creature& other_creature);
-  void Parasite(Creature* host);
+  void Bite(std::shared_ptr<Creature> creature);
+  bool Compatible(const std::shared_ptr<Creature> other_creature);
+
+  std::shared_ptr<Creature> GetClosestEnemyInSight(
+      std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
+      double grid_cell_size);
+  void ProcessVisionEnemies(std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
+                            double grid_cell_size, double width, double height);
 
   bool GetMatingDesire() const;
 
@@ -71,6 +76,12 @@ class Creature : virtual public MovableEntity,
   int think_count_; /*! Keeps track so that creatures think every 5 loops */
   bool mating_desire_; /*! Indicates whether creature currently wants to mate <-
                         TO BE INTEGRATED INTO REPRODUCTIVE SYSTEM*/
+
+
+  double distance_enemy_;  /*!< Distance to the nearest enemy creature. */
+  double orientation_enemy_; /*!< Orientation relative to the nearest enemy creature. */
+  double enemy_size_; /*! Size of the closest enemy*/
+
 };
 
 std::vector<Food *> get_food_at_distance(

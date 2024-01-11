@@ -163,7 +163,7 @@ std::shared_ptr<Food> VisionSystem::GetClosestFoodInSight(
 }
 
 
-bool VisionSystem::IsInSight(Entity *entity)
+bool VisionSystem::IsInSight(std::shared_ptr<Entity> entity)
 {
   auto cone_center = Point(x_coord_, y_coord_);
   auto cone_orientation = GetOrientation();
@@ -196,8 +196,8 @@ void VisionSystem::ProcessVisionFood(
   std::shared_ptr<Food> closeMeat = GetClosestMeatInSight(grid, GridCellSize);
 
   if (closePlant){
-        distance_plant_ = this->GetDistance(*closePlant, width, height) - (*closePlant).GetSize();
-        orientation_plant_ = this->GetRelativeOrientation(*closePlant);
+        distance_plant_ = this->GetDistance(closePlant, width, height) - closePlant->GetSize();
+        orientation_plant_ = this->GetRelativeOrientation(closePlant);
         closest_plant_ = closePlant;
         plant_size_ = closePlant->GetSize();
   }
@@ -209,8 +209,8 @@ void VisionSystem::ProcessVisionFood(
   }
 
   if (closeMeat){
-        distance_meat_ = this->GetDistance(*closeMeat, width, height) - (*closeMeat).GetSize();
-        orientation_meat_ = this->GetRelativeOrientation(*closeMeat);
+        distance_meat_ = this->GetDistance(closeMeat, width, height) - closeMeat->GetSize();
+        orientation_meat_ = this->GetRelativeOrientation(closeMeat);
         closest_meat_ = closeMeat;
         meat_size_ = closeMeat->GetSize();
   }

@@ -2,6 +2,7 @@
 #define ENTITY_H
 
 #include <vector>
+#include <memory>
 
 #include "collision_functions.h"
 
@@ -37,17 +38,17 @@ class Entity {
   states GetState() const;
   void SetState(states state);
 
-  virtual void OnCollision(Entity &otherEntity, double const kMapWidth,
+  virtual void OnCollision(std::shared_ptr<Entity> otherEntity, double const kMapWidth,
                            double const kMapHeight);
-  double GetDistance(const Entity &otherEntity, double const kMapWidth,
+  double GetDistance(const std::shared_ptr<Entity> otherEntity, double const kMapWidth,
                      double const kMapHeight) const;
   bool CheckCollisionWithEntity(const double tolerance,
-                                const Entity &otherEntity) const {
+                                const std::shared_ptr<Entity> otherEntity) const {
     return CollisionCircleCircle(tolerance, GetCoordinates(), GetSize(),
-                                 otherEntity.GetCoordinates(),
-                                 otherEntity.GetSize());
+                                 otherEntity->GetCoordinates(),
+                                 otherEntity->GetSize());
   }
-  double GetRelativeOrientation(const Entity &otherEntity) const;
+  double GetRelativeOrientation(const std::shared_ptr<Entity> otherEntity) const;
 
   int GetID() const;
 

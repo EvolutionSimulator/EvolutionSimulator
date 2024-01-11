@@ -94,7 +94,7 @@ void CreatureManager::ReproduceCreatures(SimulationData& data,
       data.new_reproduce_.pop();
       //If these two creatures are compatible reproduce them otherwise
       //save the creature in a temporary queue for the next pairing round
-      if (creature1->Compatible(*creature2) and
+      if (creature1->Compatible(creature2) and
           creature1->MaleReproductiveSystem::ReadyToProcreate() and
           creature2->FemaleReproductiveSystem::ReadyToProcreate()) {
         std::cerr << "Reproducing creatures" << std::endl;
