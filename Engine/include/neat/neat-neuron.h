@@ -31,9 +31,10 @@ class Neuron {
   void SetInactive();
   void SetActivation(ActivationType activation);
 
- private:
   static int next_id_; /*! Static variable used to assign unique IDs to new
                           neurons. */
+
+ private:
   int id_;             /*! Unique identifier for the neuron. */
   NeuronType type_;    /*! Type of the neuron (input, output, hidden). */
   ActivationType activation_; /*! Activation function of the neuron. */

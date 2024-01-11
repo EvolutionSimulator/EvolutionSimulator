@@ -283,6 +283,24 @@ void SimulationData::InitializeCreatures() {
       }
     }
   }
+  /*
+  neat::Genome predator_genome = neat::predatorGenome();
+  for (double x = 0; x < world_width; x += 2.0) {
+    for (double y = 0; y < world_height; y += 2.0) {
+      if (std::rand() / (RAND_MAX + 1.0) < creature_density / 3) {
+        //neat::Genome genome(settings::environment::kInputNeurons,
+        //                    settings::environment::kOutputNeurons);
+        Mutable mutables;
+        for (int i = 0; i < 40; i++) {
+          mutables.Mutate();
+        }
+        Creature new_creature(predator_genome, mutables);
+        new_creature.RandomInitialization(world_width, world_height);
+        creatures_.emplace_back(new_creature);
+      }
+    }
+  }
+  */
 }
 
 /*!

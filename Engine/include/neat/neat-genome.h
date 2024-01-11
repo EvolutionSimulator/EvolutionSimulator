@@ -70,6 +70,7 @@ namespace neat {
 Genome Crossover(const Genome& dominant, const Genome& recessive);
 
 Genome minimallyViableGenome();
+Genome predatorGenome();
 }  // namespace neat
 
 #endif  // NEATGENOME_H
