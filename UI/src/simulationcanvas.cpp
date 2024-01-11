@@ -381,7 +381,7 @@ sf::VertexArray createGradientCircle(float radius, const sf::Color& centerColor,
 // use this to process the simulation data and render it on the screen
 void SimulationCanvas::RenderSimulation(DataAccessor<SimulationData> data) {
   clear(sf::Color(20, 22, 69));
-
+  /*
   // Create a full-screen rectangle
   double mapWidth = data->GetEnvironment().GetMapWidth();
   double mapHeight = data->GetEnvironment().GetMapHeight();
@@ -407,7 +407,7 @@ void SimulationCanvas::RenderSimulation(DataAccessor<SimulationData> data) {
       draw(background, backgroundState);
     }
   }
-
+  */
   // Iterate through food and load the corresponding sprite
   // Note that we are assuming to be working with a sprite sheet of 256x256 per sprite
 
