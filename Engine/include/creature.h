@@ -8,6 +8,7 @@
 #include "movable_entity.h"
 #include "alive_entity.h"
 #include "vision_system.h"
+#include "digestive_system.h"
 #include "mutable.h"
 
 /*!
@@ -33,12 +34,11 @@
  * for and consuming food, and managing its energy and health. The class also
  * supports evolutionary features like reproduction and genetic inheritance.
  */
-class Creature : virtual public MovableEntity, virtual public AliveEntity, virtual public VisionSystem {
+class Creature : virtual public MovableEntity, virtual public AliveEntity, virtual public VisionSystem, virtual public DigestiveSystem {
  public:
   Creature(neat::Genome genome, Mutable mutable_);
 
   void UpdateEnergy(double deltaTime);
-
   void Update(double deltaTime, double const kMapWidth, double const kMapHeight,
               std::vector<std::vector<std::vector<Entity *> > > &grid,
               double GridCellSize, double frictional_coefficient);
@@ -49,35 +49,18 @@ class Creature : virtual public MovableEntity, virtual public AliveEntity, virtu
   bool Fit();
   void Reproduced();
 
-  void Eats(double nutritional_value);
   void Grow(double energy);
   void Think(std::vector<std::vector<std::vector<Entity *> > > &grid,
              double GridCellSize, double deltaTime, double width, double height);
-  void Digest(double deltaTime);
-  void Bite(Food *food);
-  void AddAcid(double quantity);
 
   bool Compatible(const Creature& other_creature);
-
-  double GetStomachCapacity() const;
-  double GetStomachFullness() const;
-  double GetEmptinessPercent() const;
-  double GetAcid() const;
-  double GetEnergyInStomach() const;
 
  protected:
   bool fit_; /*!< Indicates whether the creature is fit in the evolutionary
                 sense. */
   double reproduction_cooldown_; /*!< Cooldown period before the creature can
                                     reproduce again. */
-  double stomach_capacity_; /*!< The stomach capacity (area) - mutable proportional to size squared */
-  double stomach_fullness_; /*!< How much the stomach is filled (area) */
-  double potential_energy_in_stomach_; /*! Energy to be gained in the stomach */
-  double bite_strength_; /*! How much radius of things it can bite - - mutable proportional to size */
-  double eating_cooldown_; /*! How much time it has to wait to bite - mutable*/
-  double stomach_acid_; /*! Added when digestion occurs */
-  bool biting_; /*! Indicates whether creature is biting or not*/
-  int think_count;
+  int think_count; /*! Keeps track so that creatures think every 5 loops */
 };
 
 std::vector<Food *> get_food_at_distance(

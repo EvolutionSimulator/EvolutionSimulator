@@ -61,6 +61,8 @@ add_library(Engine STATIC
   include/geometry_primitives.h src/geometry_primitives.cpp
   include/collisions.h src/collisions.cpp
   include/config.h
+  include/digestive_system.h
+  src/digestive_system.cpp
 )
 
 add_subdirectory(tests)
