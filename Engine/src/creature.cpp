@@ -472,6 +472,7 @@ int Creature::GetFoodID() const {
  */
 void Creature::Grow(double energy) {
   double size = GetSize() + energy * mutable_.GetGrowthFactor();
+//  std::cout << "Size difference: "<< size - GetSize() << "Energy: " << energy << "Growth Factor: " << mutable_.GetGrowthFactor() << std::endl;
   (size > mutable_.GetMaxSize()) ? SetSize(mutable_.GetMaxSize()) : SetSize(size);
   SetEnergy(GetEnergy() - energy);
   stomach_capacity_ = mutable_.GetStomachCapacityFactor() * pow(size_, 2);

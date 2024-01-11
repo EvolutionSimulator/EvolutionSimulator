@@ -106,10 +106,20 @@ void SimulationData::UpdateAllCreatures(double deltaTime) {
   }
   world_time_ += deltaTime;
 
+
   // Store the creature count when the time increases by a second
   if (static_cast<int>(world_time_) > static_cast<int>(lastRecordedTime_)) {
     lastRecordedTime_ = world_time_;
     creatureCountOverTime_.push_back(creatures_.size());
+    double total_creature_size = 0;
+//    std::cout << "Average Creature Size at Time " << static_cast<int>(world_time_) << ": " << creatures_.size() << std::endl;
+    for (Creature& creature : creatures_) {
+      total_creature_size += creature.GetSize();
+    }
+    if (creatures_.size() > 0) {
+      double average_size = total_creature_size / creatures_.size();
+      creatureSizeOverTime_.push_back(average_size);
+    }
   }
 }
 
@@ -481,4 +491,8 @@ void SimulationData::CheckCollisions() {
 
 std::vector<int> SimulationData::GetCreatureCountOverTime() const {
   return creatureCountOverTime_;
+}
+
+std::vector<int> SimulationData::GetCreatureSizeOverTime() const {
+  return creatureSizeOverTime_;
 }
