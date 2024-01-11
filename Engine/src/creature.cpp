@@ -179,6 +179,9 @@ void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
   neuron_data_.at(9) = orientation_meat_;
   neuron_data_.at(10) = distance_meat_;
   neuron_data_.at(11) = meat_size_;
+  neuron_data_.at(12) = orientation_enemy_;
+  neuron_data_.at(13) = distance_enemy_;
+  neuron_data_.at(14) = enemy_size_;
 
 
   for (BrainModule module : GetGenome().GetModules()){

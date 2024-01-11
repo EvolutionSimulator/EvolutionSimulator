@@ -65,7 +65,7 @@ class Settings {
     int min_creature_size = 2;
     double reproduction_threshold = 0.80;
     double reproduction_cooldown = 10;
-    int input_neurons = 12;
+    int input_neurons = 15;
     int output_neurons = 6;
     double max_nutritional_value = 5;
     double default_lifespan = 30;
