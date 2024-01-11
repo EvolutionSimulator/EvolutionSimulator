@@ -371,6 +371,7 @@ void Creature::OnCollision(Entity &other_entity, double const kMapWidth,
 void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
                      double GridCellSize, double deltaTime, double width, double height) {
   // Not pretty but we'll figure out a better way in the future
+  // To allow creatures to use a module it should be included below
   ProcessVisionFood(grid, GridCellSize, width, height);
   neuron_data_.at(0) = energy_;
   neuron_data_.at(1) = GetVelocity();
