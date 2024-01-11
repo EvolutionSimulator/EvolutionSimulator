@@ -39,11 +39,14 @@ class SimulationCanvas : public QSFMLCanvas {
 
   void zoom(float factor, sf::Vector2f& zoomPoint);
 
-  void InitializeFont();
-  void InitializeSprites();
-  void InitializeShader();
+  void InitializeFile(sf::Shader& ValueSaved, std::string path);
+  void InitializeFile(sf::Font& ValueSaved, std::string path);
+  void InitializeFile(sf::Texture& ValueSaved, std::string path);
+
 
   void UpdateFoodDensityTexture(double width, double height);
+
+  template<typename Type> void InitializeFile(Type& ValueSaved, std::string path);
 
   protected:
   void mousePressEvent(QMouseEvent *event) override;
