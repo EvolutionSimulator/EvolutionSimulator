@@ -594,8 +594,6 @@ std::string SimulationCanvas::formatCreatureInfo(const Creature& creature) {
   return ss.str();
 }
 
-
-
 void SimulationCanvas::DrawVisionCone(sf::RenderTarget& target, const Creature& creature) {
 
   double visionRadius = creature.GetVisionRadius();

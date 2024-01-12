@@ -9,6 +9,7 @@
 #include <QVBoxLayout>
 #include "QtWidgets/qslider.h"
 
+#include <QDockWidget>
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
@@ -51,11 +52,23 @@ MainWindow::MainWindow(QWidget *parent)
   QIcon icon3(pixMap3);
   ui_->runButton->setIcon(icon);
   ui_->restartButton->setIcon(icon3);
+
+  qDebug() << rect.size();
+  qDebug() << ui_->configurationButton->size();
+  qDebug() << region.boundingRect().size();
+  ui_->configurationButton->setMask(region);
+  QPixmap pixMap2(":/Resources/Configuration.png");
+  QIcon icon2(pixMap2);
+  ui_->configurationButton->setIcon(icon2);
   QSize size(50, 50);
+
   ui_->runButton->setIconSize(size);
+  ui_->configurationButton->setIconSize(size);
   ui_->restartButton->setIconSize(size);
   connect(ui_->runButton, &QPushButton::clicked, this,
           &MainWindow::ToggleSimulation);
+  connect(ui_->configurationButton, &QPushButton::clicked, this,
+          &MainWindow::ShowConfigScreen);
   ui_->densityFood->setMinimum(1);
   ui_->densityFood->setMaximum(1000);
   connect(ui_->densityFood, SIGNAL(valueChanged(int)), this,
@@ -82,6 +95,7 @@ void MainWindow::ChangeFriction(int value) {
 
   ui_->frictionLabel->setText(QString::number(friction_coefficient, 'f', 2));  // Display with 2 decimal places
 }
+
 
 MainWindow::~MainWindow() {
   if (engine_thread_.joinable()) {
@@ -168,6 +182,83 @@ void MainWindow::ToggleSimulation() {
     QIcon icon2(pixMap2);
     ui_->runButton->setIcon(icon2);
   }
+}
+
+void MainWindow::ShowConfigScreen(){
+
+    if (engine_thread_.joinable()) {
+        engine_->Stop();
+        engine_thread_.join();
+        //change icon of button
+        QPixmap pixMap2(":/Resources/Run.png");
+        QIcon icon2(pixMap2);
+        ui_->runButton->setIcon(icon2);
+    }
+
+    double initial_creature_density = engine_->GetEnvironment().GetCreatureDensity();
+
+    // Create a new QDialog (config dialog)
+    QDialog* configDialog = new QDialog(this);
+    configDialog->setWindowTitle("Configuration");
+
+    // Get the size of the main window
+    QSize mainWindowSize = size();
+    /*
+    // Set the size of the configuration dialog based on the main window size
+    int dialogWidth = mainWindowSize.width() / 2;
+    int dialogHeight = mainWindowSize.height() / 2;
+    configDialog->resize(dialogWidth, dialogHeight);
+*/
+
+    //Create layouts
+    QVBoxLayout* mainLayout = new QVBoxLayout(configDialog);
+    QVBoxLayout* titleLayout = new QVBoxLayout();
+    QVBoxLayout* contentLayout = new QVBoxLayout();
+
+    mainLayout->addLayout(titleLayout);
+    mainLayout->addLayout(contentLayout);
+
+    QLabel* titleLabel = new QLabel("<html><h1><b>Configuration Options</b></h1></html>", configDialog);
+    QLabel* speedLabel = new QLabel("Simulation Speed:", configDialog);
+    QLabel* foodDLabel = new QLabel("Food density:", configDialog);
+    QLabel* frictionLabel = new QLabel("Friction:", configDialog);
+
+    QSlider* speedSlider = new QSlider(Qt::Horizontal, configDialog);
+    speedSlider-> setMinimum(0);
+    speedSlider-> setMaximum(5);
+    speedSlider-> setSingleStep(1);
+    speedSlider->setTickPosition(QSlider::TicksBelow);
+
+    QSlider* foodDSlider = new QSlider(Qt::Horizontal, configDialog);
+    QSlider* frictionSlider = new QSlider(Qt::Horizontal, configDialog);
+
+    titleLayout->addWidget(titleLabel, Qt::AlignTop | Qt::AlignHCenter);
+    contentLayout->addWidget(speedLabel);
+    contentLayout->addWidget(speedSlider);
+
+    contentLayout->addWidget(foodDLabel);
+    contentLayout->addWidget(foodDSlider);
+
+    contentLayout->addWidget(frictionLabel);
+    contentLayout->addWidget(frictionSlider);
+
+
+    titleLayout->setContentsMargins(20,5,20,20);
+    contentLayout->setContentsMargins(20,5,20,5);
+    mainLayout->setContentsMargins(5,5,5,5);
+
+/*    connect(speedSlider, &QSlider::valueChanged, this, &MainWindow::ChangeSpeed);*/
+
+    connect(foodDSlider, &QSlider::valueChanged, this, &MainWindow::ChangeFoodDensity);
+    connect(frictionSlider, &QSlider::valueChanged, this, &MainWindow::ChangeFriction);
+
+
+
+
+
+    // Show the configuration dialog modally
+    configDialog->setLayout(mainLayout);
+    configDialog->exec();
 }
 
 void MainWindow::RestartSimulation() {
