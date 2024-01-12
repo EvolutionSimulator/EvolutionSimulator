@@ -7,6 +7,7 @@
 	<file>Resources/Creature_base.png</file>
 	<file>Resources/Creature_eyes.png</file>
 	<file>Resources/Creature_tails.png</file>
-	<file>Shaders/colorShift.frag</file>
+        <file>Resources/Egg.png</file>
+        <file>Shaders/colorShift.frag</file>
     </qresource>
 </RCC>

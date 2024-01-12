@@ -84,6 +84,7 @@ class SimulationCanvas : public QSFMLCanvas {
   double scale_x_;
   double scale_y_;
   sf::Texture food_texture_;
+  sf::Texture egg_texture_;
   sf::Texture creature_texture_;
   sf::Texture eyes_texture_;
   sf::Texture tail_texture_;

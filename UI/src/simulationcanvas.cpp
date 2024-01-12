@@ -191,6 +191,20 @@ void SimulationCanvas::InitializeSprites(){
     if (!food_texture_.loadFromImage(foodsfImage)) {
       qDebug() << "Failed to create sf::Texture from sf::Image";
     }
+
+
+    QPixmap eggPixmap;
+    if (!eggPixmap.load(":/Resources/Egg.png")) {
+        qDebug() << "Failed to load QPixmap from path:" << ":/Resources/Egg.png";
+    }
+
+    QImage eggqImage = eggPixmap.toImage().convertToFormat(QImage::Format_RGBA8888);
+    sf::Image eggsfImage;
+    eggsfImage.create(eggqImage.width(), eggqImage.height(), reinterpret_cast<const sf::Uint8*>(eggqImage.bits()));
+
+    if (!egg_texture_.loadFromImage(eggsfImage)) {
+        qDebug() << "Failed to create sf::Texture from sf::Image";
+    }
 }
 void SimulationCanvas::SetSimulation(Simulation* simulation) {
   simulation_ = simulation;
@@ -401,13 +415,20 @@ void SimulationCanvas::RenderSimulation(SimulationData* data) {
 
     if (food.GetType() == Food::type::plant) {
       foodSprite.setTextureRect(sf::IntRect(0, spriteIndex * 256, 256, 256));
+      foodSprite.setScale(food.GetSize()/128.0f, food.GetSize()/128.0f);
+
     } else if (food.GetType() == Food::type::meat) {
       foodSprite.setTextureRect(sf::IntRect(256, spriteIndex * 256, 256, 256));
+      foodSprite.setScale(food.GetSize()/128.0f, food.GetSize()/128.0f);
+
+    } else if (food.GetType() == Food::type::egg) {
+        foodSprite.setTexture(egg_texture_);
+        foodSprite.setScale(food.GetSize()/50.0f, food.GetSize()/50.0f);
+
     }
     spriteIndex = spriteIndex == 2 ? 0 : spriteIndex+1;
     foodSprite.setOrigin(128.0f, 128.0f);
 
-    foodSprite.setScale(food.GetSize()/128.0f, food.GetSize()/128.0f);
     std::pair<double, double> foodCoordinates = food.GetCoordinates();
     sf::Transform foodTransform;
     foodTransform.translate(foodCoordinates.first, foodCoordinates.second);
