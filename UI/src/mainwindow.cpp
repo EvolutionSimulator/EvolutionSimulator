@@ -76,7 +76,7 @@ void MainWindow::InitializeEngine()
     int width = sf::VideoMode::getDesktopMode().width;
     int height = sf::VideoMode::getDesktopMode().height;
     engine_ = new Engine(width, height);
-    // engine_->SetSpeed(10);
+    engine_->SetSpeed(10);
     ui_->canvas->SetSimulation(engine_->GetSimulation());
   }
 }

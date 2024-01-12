@@ -55,6 +55,8 @@ SimulationCanvas::SimulationCanvas(QWidget* Parent)
   trackButtonText_.setString("Track");
   trackButtonText_.setCharacterSize(15);
   trackButtonText_.setFillColor(sf::Color::White);
+
+  std::cout << "SimulationCanvas created" << std::endl;
 }
 
 void SimulationCanvas::InitializeShader(){

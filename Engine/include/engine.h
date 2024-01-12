@@ -31,8 +31,8 @@ class Engine {
       settings::engine::kFixedUpdateInterval;  // how often FixedUpdate is
                                                // called
   Simulation* simulation_;
-  bool running_ = false;
-  bool paused_ = false;
+  volatile bool running_ = false;
+  volatile bool paused_ = false;
 
   double engine_speed_;
 

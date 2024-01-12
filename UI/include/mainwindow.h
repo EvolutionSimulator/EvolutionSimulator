@@ -43,7 +43,7 @@ QT_END_NAMESPACE  //
   double food_density = 0.001;
   Ui::MainWindow* ui_;  // Pointer to all UI widgets
 
-  Engine* engine_;  // Pointer to the simulation engine
+  Engine* engine_ = nullptr;  // Pointer to the simulation engine
 
   std::thread engine_thread_;  // Thread for running the simulation engine
 
