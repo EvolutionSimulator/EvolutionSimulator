@@ -80,11 +80,7 @@ void MainWindow::ChangeFriction(int value) {
   engine_->GetEnvironment().SetFrictionalCoefficient(friction_coefficient);
   engine_->UpdateEnvironment();
 
-  // Update the QLabel to display the current value
   ui_->frictionLabel->setText(QString::number(friction_coefficient, 'f', 2));  // Display with 2 decimal places
-  //ui_->frictionCoefficientSpinBox->setVisible(true);
-
-  //ui_->frictionCoefficientSpinBox->update();
 }
 
 MainWindow::~MainWindow() {
@@ -311,33 +307,3 @@ void MainWindow::handleDropdownSelection(int index) {
         DrawCreaturesSizeOverTimeGraph();
     }
 }
-
-void MainWindow::ClearResidue() {
-    if (ui_->frictionCoefficientSpinBox) {
-        // Remove the old slider widget
-        QWidget* oldSlider = ui_->frictionCoefficientSpinBox->findChild<QWidget*>("qt_slider_handle");
-        if (oldSlider) {
-            oldSlider->setVisible(false);
-            delete oldSlider;
-        }
-
-        // Hide only the horizontal slider handle
-        QString styleSheet = "QSlider::handle:horizontal { width: 0px; }";
-        ui_->frictionCoefficientSpinBox->setStyleSheet(styleSheet);
-
-        // Force a repaint for the slider widget
-        ui_->frictionCoefficientSpinBox->update();
-    }
-}
-
-void MainWindow::on_frictionCoefficientSpinBox_valueChanged(int value)
-{
-    ui_->frictionCoefficientSpinBox->update();
-}
-
-
-void MainWindow::on_frictionCoefficientSpinBox_sliderMoved(int position)
-{
-    ui_->frictionCoefficientSpinBox->update();
-}
-
