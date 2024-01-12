@@ -2,13 +2,12 @@
 #define EGG_H
 
 #include "creature.h"
-#include "movable_entity.h"
 #include "mutable.h"
 #include "neat/neat-genome.h"
 
-class Egg : public MovableEntity, public Food {
+class Egg : public Food {
 public:
-    Egg(neat::Genome genome, Mutable mutable_, std::pair<double,double> coords);
+    Egg(neat::Genome genome, Mutable mutable_, const double x_coord, const double y_coord);
     void Break();
     Creature Hatch();
 protected:

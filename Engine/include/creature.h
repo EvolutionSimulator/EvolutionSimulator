@@ -153,21 +153,6 @@ class Creature : public MovableEntity {
   int gender_;
 };
 
-class Egg : public MovableEntity {
- public:
-  Egg(neat::Genome genome, Mutable mutable_, std::pair<double,double> coords);
-  void Break();
-  Creature Hatch();
- protected:
-  int incubation_time_;
-  double age_;
-  double size_;
-  bool fertilized_;
-  neat::Genome genome_;
-  Mutable mutables_;
-  std::pair<double,double> coordinates_;
-};
-
 std::vector<Food *> get_food_at_distance(
     std::vector<std::vector<std::vector<Entity *>>> &grid, int i_creature,
     int j_creature, int grid_distance);
