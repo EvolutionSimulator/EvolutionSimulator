@@ -39,13 +39,6 @@ QT_END_NAMESPACE  //
   void DrawCreaturesSizeOverTimeGraph();
   void handleDropdownSelection(int index);
 
-  void ClearResidue();
-
-
-  void on_frictionCoefficientSpinBox_valueChanged(int value);
-
-  void on_frictionCoefficientSpinBox_sliderMoved(int position);
-
   private:
   double friction_coefficient;
   double creature_density = 0.001;
