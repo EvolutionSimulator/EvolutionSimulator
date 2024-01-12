@@ -4,6 +4,7 @@
 #include <thread>
 
 #include "QtCharts/qlineseries.h"
+#include "QtWidgets/qslider.h"
 #include "engine.h"
 
 QT_BEGIN_NAMESPACE  //
@@ -29,14 +30,19 @@ QT_END_NAMESPACE  //
   void ChangeCreatureDensity(int value);
   void ToggleSimulation();
   void RestartSimulation();
-  void DisplayGraph();
   void ChangeFriction(int value);
   void DrawCreaturesOverTimeGraph();
   void DrawCreaturesSizeOverTimeGraph();
   void handleDropdownSelection(int index);
 
+  void ClearResidue();
 
- private:
+
+  void on_frictionCoefficientSpinBox_valueChanged(int value);
+
+  void on_frictionCoefficientSpinBox_sliderMoved(int position);
+
+  private:
   double friction_coefficient;
   double creature_density = 0.001;
   double food_density = 0.001;
@@ -48,5 +54,6 @@ QT_END_NAMESPACE  //
 
   double lastRecordedTime_;
   QTimer *updateTimer;
+  QSlider* slider;
 
 };
