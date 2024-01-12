@@ -12,6 +12,8 @@
 #include <random>
 #include <set>
 
+#include "settings.h"
+
 namespace neat {
 
 /*!
@@ -201,27 +203,27 @@ void Genome::Mutate() {
   std::mt19937 gen(rd());
   std::uniform_real_distribution<> uniform(0.0, 1.0);
 
-  if (uniform(gen) < settings::neat::kAddNeuronMutationRate) {
+  if (uniform(gen) < SETTINGS.neat.add_neuron_mutation_rate) {
     MutateAddNeuron();
   }
 
-  if (uniform(gen) < settings::neat::kAddLinkMutationRate) {
+  if (uniform(gen) < SETTINGS.neat.add_link_mutation_rate) {
     MutateAddLink();
   }
   /* Removing things can mess up the cycles
-    if (uniform(gen) < settings::neat::kRemoveNeuronMutationRate) {
+    if (uniform(gen) < SETTINGS.neat.remove_neuron_mutation_rate) {
       MutateRemoveNeuron();
     }
 
-    if (uniform(gen) < settings::neat::kRemoveLinkMutationRate) {
+    if (uniform(gen) < SETTINGS.neat.remove_link_mutation_rate) {
       MutateRemoveLink();
     }
   */
-  if (uniform(gen) < settings::neat::kChangeWeightMutationRate) {
+  if (uniform(gen) < SETTINGS.neat.change_weight_mutation_rate) {
     MutateChangeWeight();
   }
 
-  if (uniform(gen) < settings::neat::kChangeBiasMutationRate) {
+  if (uniform(gen) < SETTINGS.neat.change_bias_mutation_rate) {
     MutateChangeBias();
   }
 }
@@ -312,17 +314,17 @@ void Genome::MutateChangeWeight() {
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_real_distribution<> uniform(0.0, 1.0);
-  std::normal_distribution<> dis(0.0, settings::neat::kStandardDeviationWeight);
+  std::normal_distribution<> dis(0.0, SETTINGS.neat.standard_deviation_weight);
 
   for (Link& link : links_) {
-    if (uniform(gen) < settings::neat::kWeightMutationRate) {
+    if (uniform(gen) < SETTINGS.neat.weight_mutation_rate) {
       double delta = dis(gen);
       link.SetWeight(link.GetWeight() + delta);
 
-      if (link.GetWeight() > settings::neat::kMaxWeight) {
-        link.SetWeight(settings::neat::kMaxWeight);
-      } else if (link.GetWeight() < settings::neat::kMinWeight) {
-        link.SetWeight(settings::neat::kMinWeight);
+      if (link.GetWeight() > SETTINGS.neat.max_weight) {
+        link.SetWeight(SETTINGS.neat.max_weight);
+      } else if (link.GetWeight() < SETTINGS.neat.min_weight) {
+        link.SetWeight(SETTINGS.neat.min_weight);
       }
     }
   }
@@ -338,16 +340,16 @@ void Genome::MutateChangeBias() {
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_real_distribution<> uniform(0.0, 1.0);
-  std::normal_distribution<> dis(0.0, settings::neat::kStandardDeviationWeight);
+  std::normal_distribution<> dis(0.0, SETTINGS.neat.standard_deviation_weight);
 
   for (Neuron& neuron : neurons_) {
-    if (uniform(gen) < settings::neat::kBiasMutationRate) {
+    if (uniform(gen) < SETTINGS.neat.bias_mutation_rate) {
       double delta = dis(gen);
       neuron.SetBias(neuron.GetBias() + delta);
-      if (neuron.GetBias() > settings::neat::kMaxBias) {
-        neuron.SetBias(settings::neat::kMaxBias);
-      } else if (neuron.GetBias() < settings::neat::kMinBias) {
-        neuron.SetBias(settings::neat::kMinBias);
+      if (neuron.GetBias() > SETTINGS.neat.max_bias) {
+        neuron.SetBias(SETTINGS.neat.max_bias);
+      } else if (neuron.GetBias() < SETTINGS.neat.min_bias) {
+        neuron.SetBias(SETTINGS.neat.min_bias);
       }
     }
   }
@@ -646,39 +648,39 @@ double Genome::CompatibilityBetweenGenomes(const Genome& other) const {
 
   // Compute compatibility score based on shared neurons, shared links, and weight similarities
   // Use a formula that considers these factors and assigns a higher score to more compatible genomes
-  double compatibility_score = settings::compatibility::kWeightSharedNeurons * (maxNeurons - shared_neurons.size())
-                              + settings::compatibility::kWeightSharedLinks * (maxLinks - shared_link_pairs.size())
-                              + settings::compatibility::kAverageWeightSharedLinks * total_weight_similarity;
+  double compatibility_score = SETTINGS.compatibility.weight_shared_neurons * (maxNeurons - shared_neurons.size())
+                              + SETTINGS.compatibility.weight_shared_links * (maxLinks - shared_link_pairs.size())
+                              + SETTINGS.compatibility.average_weight_shared_links * total_weight_similarity;
   return compatibility_score;
 }
 
 Genome minimallyViableGenome() {
   int start_id = neat::Neuron::next_id_ - 1;
-  Genome genome(settings::environment::kInputNeurons,
-                settings::environment::kOutputNeurons);
+  Genome genome(SETTINGS.environment.input_neurons,
+                SETTINGS.environment.output_neurons);
   Link constant_acceleration(
-      start_id + 1, start_id + settings::environment::kInputNeurons + 1, 1);
+      start_id + 1, start_id + SETTINGS.environment.input_neurons + 1, 1);
   genome.AddLink(constant_acceleration);
-  Link digest(start_id + 1, start_id + settings::environment::kInputNeurons + 6,
+  Link digest(start_id + 1, start_id + SETTINGS.environment.input_neurons + 6,
               1);
   Link stop_digesting(start_id + 6,
-                      start_id + settings::environment::kInputNeurons + 6, -1);
+                      start_id + SETTINGS.environment.input_neurons + 6, -1);
   genome.AddLink(digest);
   genome.AddLink(stop_digesting);
   Link orient_towards_food(
-      start_id + 7, start_id + settings::environment::kInputNeurons + 3, 1);
+      start_id + 7, start_id + SETTINGS.environment.input_neurons + 3, 1);
   genome.AddLink(orient_towards_food);
   Neuron BiteManager(NeuronType::kHidden, 1);
   BiteManager.SetActivation(ActivationType::sigmoid);
   int id = BiteManager.GetId();
   genome.AddNeuron(BiteManager);
   Link distance_bite(start_id + 8, id, -1);
-  Link activation_bite(id, start_id + settings::environment::kInputNeurons + 5,
+  Link activation_bite(id, start_id + SETTINGS.environment.input_neurons + 5,
                        1);
   genome.AddLink(distance_bite);
   genome.AddLink(activation_bite);
   Link slow_rotation(start_id + 5,
-                     start_id + settings::environment::kInputNeurons + 3, -0.1);
+                     start_id + SETTINGS.environment.input_neurons + 3, -0.1);
   genome.AddLink(slow_rotation);
   return genome;
 }

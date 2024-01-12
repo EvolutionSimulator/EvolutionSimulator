@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <cmath>
 
-#include "config.h"
+#include "settings.h"
 
 /*!
  * @brief Constructs a Point using individual x and y coordinates.
@@ -135,5 +135,5 @@ double OrientedAngle::AngleDistanceToCone(
 double OrientedAngle::IsInsideCone(const OrientedAngle &left_boundary,
                                    const OrientedAngle &right_boundary) const {
   return AngleDistanceToCone(left_boundary, right_boundary) <
-         settings::engine::EPS;
+         SETTINGS.engine.eps;
 }

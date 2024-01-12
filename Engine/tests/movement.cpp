@@ -1,5 +1,5 @@
 #include "movable_entity.h"
-#include "config.h"
+#include "settings.h"
 #include <gtest/gtest.h>
 #include "math.h"
 
@@ -49,7 +49,7 @@ TEST(EffectiveAngle, NoAcceleration) {
 TEST(EffectiveAngle, AlignedAcceleration){
     MovableEntity creature1;
     creature1.SetSize(10);
-    creature1.SetAcceleration(11 * settings::environment::kFrictionalCoefficient);
+    creature1.SetAcceleration(11 * SETTINGS.environment.frictional_coefficient);
     creature1.SetAccelerationAngle(0);
     creature1.SetVelocity(10);
     creature1.SetVelocityAngle(0);
@@ -58,7 +58,7 @@ TEST(EffectiveAngle, AlignedAcceleration){
 
     ASSERT_NEAR(positive_angle1, 0, 1e-6);
 
-    creature1.SetAcceleration(9 * settings::environment::kFrictionalCoefficient);
+    creature1.SetAcceleration(9 * SETTINGS.environment.frictional_coefficient);
 
     positive_angle1 = positive_angle_mod(creature1.GetEffectiveAccelerationAngle());
 
@@ -66,7 +66,7 @@ TEST(EffectiveAngle, AlignedAcceleration){
 
     MovableEntity creature2;
     creature2.SetSize(10);
-    creature2.SetAcceleration(21 * settings::environment::kFrictionalCoefficient);
+    creature2.SetAcceleration(21 * SETTINGS.environment.frictional_coefficient);
     creature2.SetAccelerationAngle(0.5 * M_PI);
     creature2.SetVelocity(10);
     creature2.SetVelocityAngle(0.5 * M_PI);
@@ -75,7 +75,7 @@ TEST(EffectiveAngle, AlignedAcceleration){
 
     ASSERT_NEAR(positive_angle2, 0.5 * M_PI, 1e-6);
 
-    creature2.SetAcceleration(10 * settings::environment::kFrictionalCoefficient);
+    creature2.SetAcceleration(10 * SETTINGS.environment.frictional_coefficient);
 
     positive_angle2 = positive_angle_mod(creature2.GetEffectiveAccelerationAngle());
 

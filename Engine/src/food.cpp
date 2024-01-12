@@ -2,6 +2,8 @@
 
 #include "cstdlib"
 #include "environment.h"
+#include "settings.h"
+
 /*!
  * @brief Default constructor for Food.
  *
@@ -9,7 +11,7 @@
  * value.
  */
 Food::Food(const double nutritional_value)
-    : Entity(std::rand() % settings::environment::kMaxFoodSize),
+    : Entity(std::rand() % SETTINGS.environment.max_food_size),
       nutritional_value_(size_ * nutritional_value) {
   // Constructor implementation
 }
@@ -22,7 +24,7 @@ Food::Food(const double nutritional_value)
  */
 Food::Food(const double x_coord, const double y_coord, const double nutritional_value)
     : Entity(x_coord, y_coord,
-             std::rand() % settings::environment::kMaxFoodSize),
+             std::rand() % SETTINGS.environment.max_food_size),
       nutritional_value_(size_ * nutritional_value) {}
 
 /*!
@@ -71,19 +73,19 @@ double Food::GetNutritionalValue() const { return nutritional_value_; }
 Food::type Food::GetType() const { return type_;}
 
 Plant::Plant()
-    : Food(settings::environment::kPlantNutritionalValue) {
+    : Food(SETTINGS.environment.plant_nutritional_value) {
     type_ = plant;
 }
 Plant::Plant(double x_coord, double y_coord)
-    : Food(x_coord, y_coord, settings::environment::kPlantNutritionalValue) {
+    : Food(x_coord, y_coord, SETTINGS.environment.plant_nutritional_value) {
     type_ = plant;
 }
 Plant::Plant(double x_coord, double y_coord, double size)
-    : Food(x_coord, y_coord, size, settings::environment::kPlantNutritionalValue){
+    : Food(x_coord, y_coord, size, SETTINGS.environment.plant_nutritional_value){
     type_ = plant;
 }
 Plant::Plant(double size)
-    : Food(size, settings::environment::kPlantNutritionalValue){
+    : Food(size, SETTINGS.environment.plant_nutritional_value){
     type_ = plant;
 }
 
@@ -98,9 +100,9 @@ Plant::Plant(double size)
 
 void Plant::Grow(double deltaTime) {
   double updated_nutritional_value =
-      GetNutritionalValue() + settings::environment::kPhotosynthesisFactor;
+      GetNutritionalValue() + SETTINGS.environment.photosynthesis_factor;
   if (updated_nutritional_value <=
-      settings::environment::kMaxNutritionalValue) {
+      SETTINGS.environment.max_nutritional_value) {
     SetNutritionalValue(updated_nutritional_value);
   }
 
@@ -117,19 +119,19 @@ void Plant::Grow(double deltaTime) {
 }
 
 Meat::Meat()
-    : Food(settings::environment::kPlantNutritionalValue) {
+    : Food(SETTINGS.environment.plant_nutritional_value) {
     type_ = meat;
 }
 Meat::Meat(double x_coord, double y_coord)
-    : Food(x_coord, y_coord, settings::environment::kPlantNutritionalValue) {
+    : Food(x_coord, y_coord, SETTINGS.environment.plant_nutritional_value) {
     type_ = meat;
 }
 Meat::Meat(double x_coord, double y_coord, double size)
-    : Food(x_coord, y_coord, size, settings::environment::kPlantNutritionalValue){
+    : Food(x_coord, y_coord, size, SETTINGS.environment.plant_nutritional_value){
     type_ = meat;
 }
 Meat::Meat(double size)
-    : Food(size, settings::environment::kPlantNutritionalValue){
+    : Food(size, SETTINGS.environment.plant_nutritional_value){
     type_ = meat;
 }
 
@@ -141,7 +143,7 @@ Meat::Meat(double size)
  */
 void Meat::Rot() {
   double updated_nutritional_value =
-      GetNutritionalValue() - settings::environment::kRotFactor;
+      GetNutritionalValue() - SETTINGS.environment.rot_factor;
   if (updated_nutritional_value < 0) {
     SetState(Entity::Dead);
     return;

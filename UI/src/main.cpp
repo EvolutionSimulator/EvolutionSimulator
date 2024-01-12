@@ -9,6 +9,8 @@
 #include "qsfmlcanvas.h"
 
 int main(int argc, char *argv[]) {
+  SETTINGS.LoadFromFile("./settings.json");
+
   QApplication app(argc, argv);
   MainWindow window;
 

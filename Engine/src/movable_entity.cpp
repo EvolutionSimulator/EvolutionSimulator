@@ -1,6 +1,6 @@
 #include "movable_entity.h"
 
-#include "config.h"
+#include "settings.h"
 #include "math.h"
 #include "geometry_primitives.h"
 
@@ -172,7 +172,7 @@ double MovableEntity::GetEffectiveForwardAcceleration() const {
  */
 double MovableEntity::GetRotationalFriction() const {
   return GetRotationalVelocity() * GetSize() *
-         settings::environment::kFrictionalCoefficient;
+         SETTINGS.environment.frictional_coefficient;
 }
 
 /*!
