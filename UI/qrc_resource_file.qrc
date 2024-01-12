@@ -3,7 +3,6 @@
         <file>Resources/font.ttf</file>
         <file>Resources/Run.png</file>
         <file>Resources/Pause.png</file>
-
         <file>Resources/Food_32x32.png</file>
         <file>Resources/Creature_base.png</file>
         <file>Resources/Creature_eyes.png</file>
@@ -13,14 +12,5 @@
         <file>Resources/down.png</file>
         <file>Resources/down2.png</file>
         <file>Resources/graph-wiki_ver_1.png</file>
-
-	<file>Resources/Food_32x32.png</file>
-	<file>Resources/Creature_base.png</file>
-	<file>Resources/Creature_eyes.png</file>
-	<file>Resources/Creature_tails.png</file>
-	<file>Resources/Health.png</file>
-	<file>Resources/Energy.png</file>
-
-	<file>Shaders/colorShift.frag</file>
     </qresource>
 </RCC>

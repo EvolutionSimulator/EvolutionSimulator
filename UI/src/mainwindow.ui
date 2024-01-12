@@ -89,9 +89,6 @@
   <property name="animated">
    <bool>true</bool>
   </property>
-  <property name="styleSheet">
-   <string notr="true"/>
-  </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="SimulationCanvas" name="canvas" native="true">
     <property name="geometry">
@@ -320,8 +317,8 @@
    </widget>
    <widget class="QSpinBox" name="densityFood">
     <property name="geometry">
-     <rect.
-      <x>620</x>
+     <rect>
+      <x>610</x>
       <y>40</y>
       <width>42</width>
       <height>22</height>
@@ -385,7 +382,6 @@ QPushButton:pressed {
      <string>Density of Creature:</string>
     </property>
    </widget>
-
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
