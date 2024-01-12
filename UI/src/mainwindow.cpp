@@ -7,6 +7,7 @@
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QChart>
 #include <QVBoxLayout>
+#include "QtWidgets/qslider.h"
 
 #include "ui_mainwindow.h"
 
@@ -18,25 +19,43 @@ MainWindow::MainWindow(QWidget *parent)
   PauseSimulation();
   RunSimulation();
 
-  ui_->graphMenu->addItem("Graphs");               // Index 0
-  ui_->graphMenu->addItem("Creatures Over Time");  // Index 1
-  ui_->graphMenu->addItem("Creatures Size Over Time");  // Index 2
+  // Assuming you have a QComboBox named 'yourComboBoxName' in your UI
+  QComboBox *comboBox = ui_->graphMenu;
+
+  // Load the original image
+  QPixmap originalPixmap(":/Resources/graph-wiki_ver_1.png");
+
+  // Scale the image to a desired size (e.g., 20x20 pixels)
+  QPixmap scaledPixmap = originalPixmap.scaled(20, 20, Qt::KeepAspectRatio);
+
+  // Set the scaled image as the down arrow icon
+  comboBox->setIconSize(scaledPixmap.size());
+  comboBox->addItem(QIcon(scaledPixmap), "Graphs");
+  comboBox->addItem("# Creatures Over Time");
+  comboBox->addItem("Creatures Size Over Time");
+  // Add more items as needed
 
   //Add image as icon use region as mask to make the icon circular
   QRect rect(2,2,45,45);
+  QRect rect3(2,2,46,45);
   qDebug() << rect.size();
   qDebug() << ui_->runButton->size();
   QRegion region(rect, QRegion::Ellipse);
+  QRegion region3(rect3, QRegion::Ellipse);
   qDebug() << region.boundingRect().size();
   ui_->runButton->setMask(region);
+  ui_->restartButton->setMask(region3);
   QPixmap pixMap(":/Resources/Run.png");
+  QPixmap pixMap3(":/Resources/Restart.png");
   QIcon icon(pixMap);
+  QIcon icon3(pixMap3);
   ui_->runButton->setIcon(icon);
+  ui_->restartButton->setIcon(icon3);
   QSize size(50, 50);
   ui_->runButton->setIconSize(size);
+  ui_->restartButton->setIconSize(size);
   connect(ui_->runButton, &QPushButton::clicked, this,
           &MainWindow::ToggleSimulation);
-
   ui_->densityFood->setMinimum(1);
   ui_->densityFood->setMaximum(1000);
   connect(ui_->densityFood, SIGNAL(valueChanged(int)), this,
@@ -52,6 +71,8 @@ MainWindow::MainWindow(QWidget *parent)
   connect(ui_->frictionCoefficientSpinBox, SIGNAL(valueChanged(double)), this,
           SLOT(ChangeFrictionCoefficient(double)));
   connect(ui_->frictionCoefficientSpinBox, &QSlider::valueChanged, this, &MainWindow::ChangeFriction);
+
+  ui_ -> frictionCoefficientSpinBox->setTracking(true);
 }
 
 void MainWindow::ChangeFriction(int value) {
@@ -61,6 +82,9 @@ void MainWindow::ChangeFriction(int value) {
 
   // Update the QLabel to display the current value
   ui_->frictionLabel->setText(QString::number(friction_coefficient, 'f', 2));  // Display with 2 decimal places
+  //ui_->frictionCoefficientSpinBox->setVisible(true);
+
+  //ui_->frictionCoefficientSpinBox->update();
 }
 
 MainWindow::~MainWindow() {
@@ -158,41 +182,6 @@ void MainWindow::RestartSimulation() {
   RunSimulation();
 }
 
-double ExampleGraphFunction(double x) { return x * x; }
-
-// This function is not complete, it is just an example of how to display a
-// graph
-void MainWindow::DisplayGraph() {
-  // Create a new line series
-  QLineSeries *series = new QLineSeries();
-
-  // Add data points to the series
-  for (double x = 0.0; x <= 10.0; x += 1.0) {
-    double y = ExampleGraphFunction(x);
-    series->append(x, y);
-  }
-
-  // Create a chart and add the series to it
-  QChart *chart = new QChart();
-  chart->addSeries(series);
-  chart->createDefaultAxes();
-  chart->axes(Qt::Horizontal).first()->setTitleText("Time Elapsed");
-  chart->axes(Qt::Vertical).first()->setTitleText("Number of Creatures in the Simulation");
-
-  // Create a chart view with the chart
-  QChartView *chartView = new QChartView(chart);
-  chartView->setRenderHint(QPainter::Antialiasing);
-
-  QDialog *dialog = new QDialog(this); // 'this' sets MainWindow as the parent
-  dialog->setWindowTitle("Graph Display");
-  QVBoxLayout *layout = new QVBoxLayout(dialog);
-  layout->addWidget(chartView);
-  dialog->setLayout(layout);
-  dialog->resize(800, 600);
-
-  dialog->show();
-}
-
 
 void MainWindow::DrawCreaturesOverTimeGraph() {
   if (engine_->GetSimulation()) {
@@ -269,7 +258,7 @@ void MainWindow::DrawCreaturesSizeOverTimeGraph() {
 
     // Create a dialog to display the graph
     QDialog *dialog = new QDialog(this);
-    dialog->setWindowTitle("Creature Count Over Time");
+    dialog->setWindowTitle("Average Creature Size Over Time");
     QVBoxLayout *layout = new QVBoxLayout(dialog);
     layout->addWidget(chartView);
     dialog->setLayout(layout);
@@ -306,5 +295,34 @@ void MainWindow::handleDropdownSelection(int index) {
         qDebug() << "Calling DrawCreaturesOverTimeGraph";
         DrawCreaturesSizeOverTimeGraph();
     }
+}
+
+void MainWindow::ClearResidue() {
+    if (ui_->frictionCoefficientSpinBox) {
+        // Remove the old slider widget
+        QWidget* oldSlider = ui_->frictionCoefficientSpinBox->findChild<QWidget*>("qt_slider_handle");
+        if (oldSlider) {
+            oldSlider->setVisible(false);
+            delete oldSlider;
+        }
+
+        // Hide only the horizontal slider handle
+        QString styleSheet = "QSlider::handle:horizontal { width: 0px; }";
+        ui_->frictionCoefficientSpinBox->setStyleSheet(styleSheet);
+
+        // Force a repaint for the slider widget
+        ui_->frictionCoefficientSpinBox->update();
+    }
+}
+
+void MainWindow::on_frictionCoefficientSpinBox_valueChanged(int value)
+{
+    ui_->frictionCoefficientSpinBox->update();
+}
+
+
+void MainWindow::on_frictionCoefficientSpinBox_sliderMoved(int position)
+{
+    ui_->frictionCoefficientSpinBox->update();
 }
 

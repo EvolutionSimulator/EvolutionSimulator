@@ -30,11 +30,6 @@ class SimulationCanvas : public QSFMLCanvas {
   void SetSimulation(Simulation* simulation);
   Simulation* GetSimulation();
 
-  void DrawGraph(sf::RenderWindow& window, double (*graphFunction)(double),
-                 double xMin, double xMax, double yMin, double yMax);
-
-  // New function declaration for drawing the number of creatures over time
-  void DrawCreatureCountOverTime(sf::RenderWindow &window, const std::vector<Creature> &creatures);
   void DrawVisionCone(sf::RenderTarget& target, const Creature& creature);
 
   void zoom(float factor, sf::Vector2f& zoomPoint);
