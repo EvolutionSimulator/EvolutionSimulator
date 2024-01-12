@@ -5,7 +5,7 @@
 #include <cmath>
 #include <stdexcept>
 #include <vector>
-
+#include "egg.h"
 #include "collisions.h"
 #include "config.h"
 #include "food.h"
@@ -216,10 +216,18 @@ void SimulationData::ReproduceTwoCreatures(Creature& creature1, Creature& creatu
            MutableCrossover(creature1.GetMutable(), creature2.GetMutable());
    new_mutable.Mutate();
    new_mutable.Mutate();
-   Creature new_creature(new_genome, new_mutable);
-   new_creature.RandomInitialization(world_width, world_height);
-   new_creature.SetGeneration(creature1.GetGeneration() + 1);
-   AddCreature(new_creature);
+   if (creature1.GetGender() == 1) {
+       Egg new_egg(new_genome, new_mutable,creature1.GetCoordinates().first , creature1.GetCoordinates().second);
+       new_egg.SetGeneration(creature1.GetGeneration() + 1);
+       food_entities_.push_back(new_egg);
+
+   } else {
+       Egg new_egg(new_genome, new_mutable,creature2.GetCoordinates().first , creature2.GetCoordinates().second);
+       new_egg.SetGeneration(creature2.GetGeneration() + 1);
+       food_entities_.push_back(new_egg);
+
+   }
+
  } else {
    neat::Genome new_genome =
            neat::Crossover(creature2.GetGenome(), creature1.GetGenome());
@@ -229,10 +237,17 @@ void SimulationData::ReproduceTwoCreatures(Creature& creature1, Creature& creatu
            MutableCrossover(creature2.GetMutable(), creature1.GetMutable());
    new_mutable.Mutate();
    new_mutable.Mutate();
-   Creature new_creature(new_genome, new_mutable);
-   new_creature.RandomInitialization(world_width, world_height);
-   new_creature.SetGeneration(creature2.GetGeneration() + 1);
-   AddCreature(new_creature);
+   if (creature1.GetGender() == 1) {
+       Egg new_egg(new_genome, new_mutable,creature1.GetCoordinates().first , creature1.GetCoordinates().second);
+       new_egg.SetGeneration(creature1.GetGeneration() + 1);
+       food_entities_.push_back(new_egg);
+
+   } else {
+       Egg new_egg(new_genome, new_mutable,creature2.GetCoordinates().first , creature2.GetCoordinates().second);
+       new_egg.SetGeneration(creature2.GetGeneration() + 1);
+       food_entities_.push_back(new_egg);
+
+   }
  }
 }
 
