@@ -12,6 +12,14 @@ int main(int argc, char *argv[]) {
   QApplication app(argc, argv);
   MainWindow window;
 
+#ifdef DEBUG
+  std::cout << "Running in debug mode." << std::endl;
+#endif
+
+#ifdef NDEBUG
+  std::cout << "Running in release mode." << std::endl;
+#endif
+
   window.showFullScreen();
 
   int result = app.exec();
