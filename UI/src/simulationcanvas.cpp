@@ -259,30 +259,8 @@ void SimulationCanvas::OnUpdate()
       energyBar.setFillColor(sf::Color::Green);  // Color of the energy bar
       energyBarOutline.setFillColor(sf::Color::Black);
       // Position the energy bar - adjust as needed
-      energyBarOutline.setPosition(panelPosition.x + 40, 123);
-      energyBar.setPosition(panelPosition.x + 40, 123);
-
-      //Energy texture
-      QPixmap energyPixmap;
-      if (!energyPixmap.load(":/Resources/Energy.png")) {
-          qDebug() << "Failed to load QPixmap from path:" << ":/Resources/Energy.png";
-      }
-
-      QImage energyqImage = energyPixmap.toImage().convertToFormat(QImage::Format_RGBA8888);
-      sf::Image energysfImage;
-      energysfImage.create(energyqImage.width(), energyqImage.height(), reinterpret_cast<const sf::Uint8*>(energyqImage.bits()));
-
-
-      if (!energy_texture_.loadFromImage(energysfImage)) {
-          qDebug() << "Failed to create sf::Texture from sf::Image";
-      }
-
-      sf::Sprite energySprite;
-      energySprite.setTexture(energy_texture_);
-      energySprite.setScale(0.04f,0.04f);
-      energySprite.setPosition(panelPosition.x + 10, 117);
-
-      draw(energySprite);
+      energyBarOutline.setPosition(panelPosition.x + 65, 123);
+      energyBar.setPosition(panelPosition.x + 65, 123);
       draw(energyBarOutline);
       draw(energyBar);
 
@@ -298,31 +276,8 @@ void SimulationCanvas::OnUpdate()
       healthBar.setFillColor(sf::Color::Red);  // Color of the energy bar
       healthBarOutline.setFillColor(sf::Color::Black);
       // Position the energy bar - adjust as needed
-      healthBarOutline.setPosition(panelPosition.x + 40, 105);
-      healthBar.setPosition(panelPosition.x + 40, 105);
-
-      //Health texture
-      QPixmap healthPixmap;
-      if (!healthPixmap.load(":/Resources/Health.png")) {
-          qDebug() << "Failed to load QPixmap from path:" << ":/Resources/Health.png";
-      }
-
-      QImage healthqImage = healthPixmap.toImage().convertToFormat(QImage::Format_RGBA8888);
-      sf::Image healthsfImage;
-      healthsfImage.create(healthqImage.width(), healthqImage.height(), reinterpret_cast<const sf::Uint8*>(healthqImage.bits()));
-
-
-      if (!health_texture_.loadFromImage(healthsfImage)) {
-          qDebug() << "Failed to create sf::Texture from sf::Image";
-      }
-
-      sf::Sprite healthSprite;
-      healthSprite.setTexture(health_texture_);
-      healthSprite.setScale(0.7f,0.7f);
-      healthSprite.setPosition(panelPosition.x + 10, 100);
-
-      draw(healthSprite);
-
+      healthBarOutline.setPosition(panelPosition.x + 65, 105);
+      healthBar.setPosition(panelPosition.x + 65, 105);
       draw(healthBarOutline);
       draw(healthBar);
 
@@ -521,150 +476,6 @@ void SimulationCanvas::RenderSimulation(SimulationData* data) {
   }
 }
 
-void SimulationCanvas::DrawGraph(sf::RenderWindow& window,
-                                 double (*graphFunction)(double), double xMin,
-                                 double xMax, double yMin, double yMax) {
-  // Set the coordinate system to match the window dimensions
-  window.setView(
-      sf::View(sf::FloatRect(0, 0, window.getSize().x, window.getSize().y)));
-
-  // Render the graph within the box
-  sf::VertexArray line(sf::LinesStrip);
-  double scaleFactor = 0.6;  // Adjust as needed
-
-  // Calculate the starting x-coordinate to center the graph
-  double startX = (window.getSize().x - scaleFactor * window.getSize().x) / 2;
-
-  // Calculate the starting y-coordinate to center the graph vertically within
-  // the box
-  double startY = (window.getSize().y - scaleFactor * window.getSize().y) / 2;
-
-  // Calculate the x-increment based on the range and resolution
-  double xIncrement = (xMax - xMin) / (scaleFactor * window.getSize().x);
-
-  for (double x = xMin; x <= xMax; x += xIncrement) {
-    double y = graphFunction(x);
-
-    // Map graph coordinates to window coordinates
-    double mappedX =
-        startX + (x - xMin) / (xMax - xMin) * scaleFactor * window.getSize().x;
-    double mappedY =
-        startY + (y - yMin) / (yMax - yMin) * scaleFactor * window.getSize().y;
-
-    // Draw points
-    line.append(sf::Vertex(sf::Vector2f(mappedX, mappedY), sf::Color::Blue));
-  }
-
-  // Draw a square black border around the graph area
-  sf::RectangleShape borderRect;
-  borderRect.setSize(sf::Vector2f(scaleFactor * window.getSize().x,
-                                  scaleFactor * window.getSize().y));
-  borderRect.setOutlineColor(sf::Color::Black);
-  borderRect.setOutlineThickness(2.0);
-  borderRect.setPosition(sf::Vector2f(startX, startY));  // Adjust as needed
-  window.draw(borderRect);
-
-  // Draw the graph
-  window.draw(line);
-}
-
-void SimulationCanvas::DrawCreatureCountOverTime(
-    sf::RenderWindow& window, const std::vector<Creature>& creatures) {
-  // Set the coordinate system to match the window dimensions
-  window.setView(
-      sf::View(sf::FloatRect(0, 0, window.getSize().x, window.getSize().y)));
-
-  // Render the creature count over time graph within the box
-  sf::VertexArray line(sf::LinesStrip);
-  double scaleFactor = 0.6;  // Adjust as needed
-
-  // Calculate the starting x-coordinate to center the graph
-  double startX = (window.getSize().x - scaleFactor * window.getSize().x) / 2;
-
-  // Calculate the starting y-coordinate to center the graph vertically within
-  // the box
-  double startY = (window.getSize().y - scaleFactor * window.getSize().y) / 2;
-
-  // Declaration for left ticks
-  sf::VertexArray leftTicks(sf::Lines);
-
-  // Declaration for bottom ticks
-  sf::VertexArray bottomTicks(sf::Lines);
-
-  // Calculate the x-increment based on the range and resolution
-  double xIncrement = 1.0;  // Assuming a time step of 1, adjust as needed
-
-  for (std::size_t i = 0; i < creatures.size(); ++i) {
-    // Use creatures.size() directly to get the count
-    double creatureCount = creatures.size();
-
-    // Map graph coordinates to window coordinates
-    double mappedX = startX + i * xIncrement / creatures.size() * scaleFactor *
-                                  window.getSize().x;
-    double mappedY = startY + (creatureCount - 0.0) / (creatures.size() - 0.0) *
-                                  scaleFactor * window.getSize().y;
-
-    // Draw points
-    line.append(sf::Vertex(sf::Vector2f(mappedX, mappedY), sf::Color::Blue));
-  }
-
-  // Draw a square black border around the graph area
-  sf::RectangleShape borderRect;
-  borderRect.setSize(sf::Vector2f(scaleFactor * window.getSize().x,
-                                  scaleFactor * window.getSize().y));
-  borderRect.setOutlineColor(sf::Color::Black);
-  borderRect.setOutlineThickness(2.0);
-  borderRect.setPosition(sf::Vector2f(startX, startY));  // Adjust as needed
-  window.draw(borderRect);
-
-  int numTicks = 5;         // Adjust as needed
-  double tickLength = 5.0;  // Adjust as needed
-
-  // Draw ticks on the left and add labels
-  for (double y = startY; y <= startY + scaleFactor * window.getSize().y;
-       y += scaleFactor * window.getSize().y / numTicks) {
-    leftTicks.append(
-        sf::Vertex(sf::Vector2f(startX - tickLength, y), sf::Color::Black));
-    leftTicks.append(sf::Vertex(sf::Vector2f(startX, y), sf::Color::Black));
-
-    // Add labels
-    sf::Text label;
-    label.setCharacterSize(12);
-    label.setFillColor(sf::Color::Black);
-    label.setString(std::to_string(static_cast<int>(
-        (y - startY) / (scaleFactor * window.getSize().y) * creatures.size())));
-    label.setPosition(startX - tickLength - 30, y - 6);  // Adjust as needed
-    window.draw(label);
-  }
-
-  // Draw ticks on the bottom and add labels
-  for (double x = startX; x <= startX + scaleFactor * window.getSize().x;
-       x += scaleFactor * window.getSize().x / numTicks) {
-    bottomTicks.append(
-        sf::Vertex(sf::Vector2f(x, startY + scaleFactor * window.getSize().y),
-                   sf::Color::Black));
-    bottomTicks.append(sf::Vertex(
-        sf::Vector2f(x, startY + scaleFactor * window.getSize().y + tickLength),
-        sf::Color::Black));
-
-    // Add labels
-    sf::Text label;
-    label.setCharacterSize(12);
-    label.setFillColor(sf::Color::Black);
-    label.setString(std::to_string(static_cast<int>(
-        (x - startX) / (scaleFactor * window.getSize().x) * creatures.size())));
-    label.setPosition(x - 15,
-                      startY + scaleFactor * window.getSize().y + tickLength);
-    window.draw(label);
-  }
-
-  // Draw the ticks
-  window.draw(leftTicks);
-  window.draw(bottomTicks);
-
-  // Draw the graph
-  window.draw(line);
-}
 
 void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
   // Adjust coordinates for screen scaling
@@ -759,8 +570,8 @@ std::string SimulationCanvas::formatCreatureInfo(const Creature& creature) {
   ss << "Size: " << creature.GetSize() << "\n";
   ss << "Age: " << creature.GetAge() << "\n";
   ss << "Generation: " << creature.GetGeneration() << "\n";
-  ss << "\n";
-  ss << "\n";
+  ss << "Health: " <<"\n";
+  ss << "Energy: " << "\n";
   ss << "Velocity: " << round_double(creature.GetVelocity(), 2) << "\n";
   ss << "Rot. Velocity: " << round_double(creature.GetRotationalVelocity(), 2) << "\n\n";
   ss << "Stomach capacity: " << creature.GetStomachCapacity() << "\n\n";
