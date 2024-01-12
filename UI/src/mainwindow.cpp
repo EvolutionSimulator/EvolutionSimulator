@@ -69,12 +69,6 @@ MainWindow::MainWindow(QWidget *parent)
           &MainWindow::ToggleSimulation);
   connect(ui_->configurationButton, &QPushButton::clicked, this,
           &MainWindow::ShowConfigScreen);
-  ui_->densityFood->setMinimum(1);
-  ui_->densityFood->setMaximum(1000);
-  connect(ui_->densityFood, SIGNAL(valueChanged(int)), this,
-          SLOT(ChangeFoodDensity(int)));
-  connect(ui_->densityCreature, SIGNAL(valueChanged(int)), this,
-          SLOT(ChangeCreatureDensity(int)));
   connect(ui_->restartButton, &QPushButton::clicked, this,
           &MainWindow::RestartSimulation);
   connect(ui_->graphMenu, SIGNAL(currentIndexChanged(int)), this, SLOT(handleDropdownSelection(int)));
@@ -84,7 +78,6 @@ MainWindow::MainWindow(QWidget *parent)
   connect(ui_->frictionCoefficientSpinBox, SIGNAL(valueChanged(double)), this,
           SLOT(ChangeFrictionCoefficient(double)));
   connect(ui_->frictionCoefficientSpinBox, &QSlider::valueChanged, this, &MainWindow::ChangeFriction);
-
   ui_ -> frictionCoefficientSpinBox->setTracking(true);
 }
 
@@ -137,6 +130,8 @@ void MainWindow::ChangeFoodDensity(int value) {
   engine_->UpdateEnvironment(); // Apply the updated density
   ui_->canvas->UpdateFoodDensityTexture(engine_->GetEnvironment().GetMapWidth(),
                                         engine_->GetEnvironment().GetMapHeight());
+  ui_->foodDensityLabel->clear();
+  ui_->foodDensityLabel->setText("Food density: " + QString::number(value));
 }
 
 void MainWindow::ChangeCreatureDensity(int value) {
