@@ -9,5 +9,9 @@
         <file>Resources/Creature_tails.png</file>
         <file>Shaders/colorShift.frag</file>
         <file>Shaders/densityShader.frag</file>
+        <file>Resources/Restart.png</file>
+        <file>Resources/down.png</file>
+        <file>Resources/down2.png</file>
+        <file>Resources/graph-wiki_ver_1.png</file>
     </qresource>
 </RCC>
