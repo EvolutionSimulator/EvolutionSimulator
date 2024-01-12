@@ -5,7 +5,7 @@
 #include "mutable.h"
 #include "neat/neat-genome.h"
 
-class Egg : public Food {
+class Egg : public Food, public Creature {
 public:
     Egg(neat::Genome genome, Mutable mutable_, const double x_coord, const double y_coord);
     void Break();
@@ -15,8 +15,6 @@ protected:
     double age_;
     double size_;
     bool fertilized_;
-    neat::Genome genome_;
-    Mutable mutables_;
     std::pair<double,double> coordinates_;
 };
 
