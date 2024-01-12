@@ -35,7 +35,6 @@ Creature::Creature(neat::Genome genome, Mutable mutables)
       mutable_(mutables),
       brain_(neat::NeuralNetwork(genome)),
       genome_(genome),
-      neuron_data_(settings::environment::kInputNeurons, 0),
       vision_radius_(mutables.GetVisionFactor()),
       vision_angle_(settings::physical_constraints::kVisionARratio
                     / mutables.GetVisionFactor()),
@@ -44,6 +43,11 @@ Creature::Creature(neat::Genome genome, Mutable mutables)
     size_ = mutables.GetBabySize();
     health_ = mutables.GetIntegrity() * pow(size_, 2);
     energy_ = mutables.GetEnergyDensity() * pow(size_, 2);
+    int neural_inputs = 0;
+    for (BrainModule module : genome.GetModules()){
+        neural_inputs += module.GetInputNeuronIds().size();
+    }
+    neuron_data_ = std::vector<double>(neural_inputs, 0.0);
 }
 
 
@@ -383,8 +387,10 @@ void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
 
   for (BrainModule module : GetGenome().GetModules()){
     if (module.GetModuleId() == 1){ //Geolocation Module
-        int i  = module.GetFirstInputId();
-
+        int i  = module.GetFirstInputIndex();
+        neuron_data_.at(i) = x_coord_;
+        neuron_data_.at(i + 1) = y_coord_;
+        neuron_data_.at(i + 2) = orientation_;
     }
   }
 
@@ -394,6 +400,11 @@ void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
   SetAccelerationAngle(std::tanh(output.at(1)) * M_PI);
   SetRotationalAcceleration(std::tanh(output.at(2))*mutable_.GetMaxForce());
   Grow(std::max(std::tanh(output.at(3)) * deltaTime, 0.0));
+
+
+ for (BrainModule module : GetGenome().GetModules()){
+     //No module with outputs atm but they should be used as with the input
+ }
 }
 
 /*!
