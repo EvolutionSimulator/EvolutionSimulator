@@ -4,20 +4,20 @@ BrainModule::BrainModule(int input, int output, int module_id)
     : input_neuron_ids_(input, 0), output_neuron_ids_(output, 0),
       module_id_(module_id) { }
 
-int BrainModule::GetFirstInputId() {
-    return first_input_id_;
+int BrainModule::GetFirstInputIndex() {
+    return first_input_index_;
 }
 
-void BrainModule::SetFirstInputId(const int id) {
-    first_input_id_ = id;
+void BrainModule::SetFirstInputIndex(const int index) {
+    first_input_index_ = index;
 }
 
-int BrainModule::GetFirstOutputId() {
-    return first_output_id_;
+int BrainModule::GetFirstOutputIndex() {
+    return first_output_index_;
 }
 
-void BrainModule::SetFirstOutputId(const int id) {
-    first_output_id_ = id;
+void BrainModule::SetFirstOutputIndex(const int index) {
+    first_output_index_ = index;
 }
 
 std::vector<int> BrainModule::GetInputNeuronIds() {
