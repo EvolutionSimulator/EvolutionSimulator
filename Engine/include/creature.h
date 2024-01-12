@@ -148,6 +148,7 @@ class Creature : public MovableEntity {
   double eating_cooldown_; /*! How much time it has to wait to bite - mutable*/
   double stomach_acid_; /*! Added when digestion occurs */
   bool biting_; /*! Indicates whether creature is biting or not*/
+  int think_count;
 };
 
 std::vector<Food *> get_food_at_distance(
