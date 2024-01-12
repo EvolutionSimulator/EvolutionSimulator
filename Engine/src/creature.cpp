@@ -50,6 +50,7 @@ Creature::Creature(neat::Genome genome, Mutable mutables)
     energy_ = mutables.GetEnergyDensity() * pow(size_, 2);
     stomach_capacity_ = mutables.GetStomachCapacityFactor() * pow(size_, 2);
     bite_strength_ = mutables.GetGeneticStrength() * size_;
+    think_count = GetID();
 }
 
 
@@ -365,6 +366,10 @@ void Creature::OnCollision(Entity &other_entity, double const kMapWidth,
 void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
                      double GridCellSize, double deltaTime, double width, double height) {
   // Not pretty but we'll figure out a better way in the future
+  think_count++;
+  if (think_count % 5 != 0){
+      return;
+  }
   ProcessVisionFood(grid, GridCellSize, width, height);
   neuron_data_.at(0) = 1;
   neuron_data_.at(1) = energy_;
