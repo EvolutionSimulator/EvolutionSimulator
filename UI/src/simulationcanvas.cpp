@@ -259,8 +259,30 @@ void SimulationCanvas::OnUpdate()
       energyBar.setFillColor(sf::Color::Green);  // Color of the energy bar
       energyBarOutline.setFillColor(sf::Color::Black);
       // Position the energy bar - adjust as needed
-      energyBarOutline.setPosition(panelPosition.x + 65, 123);
-      energyBar.setPosition(panelPosition.x + 65, 123);
+      energyBarOutline.setPosition(panelPosition.x + 40, 123);
+      energyBar.setPosition(panelPosition.x + 40, 123);
+
+      //Energy texture
+      QPixmap energyPixmap;
+      if (!energyPixmap.load(":/Resources/Energy.png")) {
+          qDebug() << "Failed to load QPixmap from path:" << ":/Resources/Energy.png";
+      }
+
+      QImage energyqImage = energyPixmap.toImage().convertToFormat(QImage::Format_RGBA8888);
+      sf::Image energysfImage;
+      energysfImage.create(energyqImage.width(), energyqImage.height(), reinterpret_cast<const sf::Uint8*>(energyqImage.bits()));
+
+
+      if (!energy_texture_.loadFromImage(energysfImage)) {
+          qDebug() << "Failed to create sf::Texture from sf::Image";
+      }
+
+      sf::Sprite energySprite;
+      energySprite.setTexture(energy_texture_);
+      energySprite.setScale(0.04f,0.04f);
+      energySprite.setPosition(panelPosition.x + 10, 117);
+
+      draw(energySprite);
       draw(energyBarOutline);
       draw(energyBar);
 
@@ -276,8 +298,31 @@ void SimulationCanvas::OnUpdate()
       healthBar.setFillColor(sf::Color::Red);  // Color of the energy bar
       healthBarOutline.setFillColor(sf::Color::Black);
       // Position the energy bar - adjust as needed
-      healthBarOutline.setPosition(panelPosition.x + 65, 105);
-      healthBar.setPosition(panelPosition.x + 65, 105);
+      healthBarOutline.setPosition(panelPosition.x + 40, 105);
+      healthBar.setPosition(panelPosition.x + 40, 105);
+
+      //Health texture
+      QPixmap healthPixmap;
+      if (!healthPixmap.load(":/Resources/Health.png")) {
+          qDebug() << "Failed to load QPixmap from path:" << ":/Resources/Health.png";
+      }
+
+      QImage healthqImage = healthPixmap.toImage().convertToFormat(QImage::Format_RGBA8888);
+      sf::Image healthsfImage;
+      healthsfImage.create(healthqImage.width(), healthqImage.height(), reinterpret_cast<const sf::Uint8*>(healthqImage.bits()));
+
+
+      if (!health_texture_.loadFromImage(healthsfImage)) {
+          qDebug() << "Failed to create sf::Texture from sf::Image";
+      }
+
+      sf::Sprite healthSprite;
+      healthSprite.setTexture(health_texture_);
+      healthSprite.setScale(0.7f,0.7f);
+      healthSprite.setPosition(panelPosition.x + 10, 100);
+
+      draw(healthSprite);
+
       draw(healthBarOutline);
       draw(healthBar);
 
@@ -570,8 +615,8 @@ std::string SimulationCanvas::formatCreatureInfo(const Creature& creature) {
   ss << "Size: " << creature.GetSize() << "\n";
   ss << "Age: " << creature.GetAge() << "\n";
   ss << "Generation: " << creature.GetGeneration() << "\n";
-  ss << "Health: " <<"\n";
-  ss << "Energy: " << "\n";
+  ss << "\n";
+  ss << "\n";
   ss << "Velocity: " << round_double(creature.GetVelocity(), 2) << "\n";
   ss << "Rot. Velocity: " << round_double(creature.GetRotationalVelocity(), 2) << "\n\n";
   ss << "Stomach capacity: " << creature.GetStomachCapacity() << "\n\n";
