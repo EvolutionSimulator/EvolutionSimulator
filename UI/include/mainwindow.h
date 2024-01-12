@@ -38,6 +38,7 @@ QT_END_NAMESPACE  //
   void DrawCreaturesOverTimeGraph();
   void DrawCreaturesSizeOverTimeGraph();
   void handleDropdownSelection(int index);
+  void ShowConfigScreen();
 
   private:
   double friction_coefficient;
