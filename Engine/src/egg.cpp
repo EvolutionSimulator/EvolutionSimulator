@@ -10,7 +10,7 @@
  * of the egg prior to hatching, such as size_ as they can be consumed.
  */
 Egg::Egg(neat::Genome genome, Mutable mutables, const double x_coord, const double y_coord)
-  : Food(x_coord, y_coord, mutables.GetBabySize(), settings::environment::kPlantNutritionalValue),
+  : Food(x_coord, y_coord, mutables.GetBabySize(), settings::environment::kEggNutritionalValue),
   genome_(genome) {
   type_ = egg;
   mutables_ = mutables;
