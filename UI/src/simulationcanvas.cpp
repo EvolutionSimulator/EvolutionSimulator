@@ -16,9 +16,6 @@
 
 SimulationCanvas::SimulationCanvas(QWidget* Parent)
     : QSFMLCanvas(Parent), showInfoPanel(false) {
-  render_lambda_ = [this](SimulationData* data) {
-    this->RenderSimulation(data);
-  };
   //Load textures for the sprites
   QPixmap pixmap;
   if (!pixmap.load(":/Resources/Pause.png")) {
@@ -208,7 +205,6 @@ void SimulationCanvas::OnInit()
 
 void SimulationCanvas::OnUpdate()
 {
-  simulation_->ProcessData(render_lambda_);
   RenderSimulation(simulation_->GetSimulationData());
 
   // Check if a creature is selected and draw the red border if true
@@ -389,12 +385,13 @@ sf::VertexArray createGradientCircle(float radius, const sf::Color& centerColor,
 }
 
 // use this to process the simulation data and render it on the screen
-void SimulationCanvas::RenderSimulation(SimulationData* data) {
+void SimulationCanvas::RenderSimulation(DataAccessor<SimulationData> data) {
   clear(sf::Color(20, 22, 69));
 
   // Iterate through food and load the corresponding sprite
   // Note that we are assuming to be working with a sprite sheet of 256x256 per sprite
   int spriteIndex = 0;
+
   for (const auto& food : data->food_entities_) {
     sf::Sprite foodSprite;
     foodSprite.setTexture(food_texture_);
@@ -645,7 +642,8 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
   if (showInfoPanel && trackButton_.getGlobalBounds().contains(mousePos)) {
     qDebug() << "Track Button Clicked";
     if (selectedCreatureInfo) {
-      const auto& creatures = simulation_->GetSimulationData()->creatures_;
+      auto data = simulation_->GetSimulationData();
+      const auto& creatures = data->creatures_;
       auto it = std::find_if(creatures.begin(), creatures.end(), [this](const Creature& c) {
           return c.GetID() == selectedCreatureInfo->id;
       });
@@ -658,7 +656,9 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
     }
   }
 
-  for (const auto& creature : simulation_->GetSimulationData()->creatures_) {
+  auto data = simulation_->GetSimulationData();
+
+  for (const auto& creature : data->creatures_) {
     auto [creatureX, creatureY] = creature.GetCoordinates();
     float creatureSize = creature.GetSize();
     sf::Vector2f creaturePos(creatureX, creatureY);
