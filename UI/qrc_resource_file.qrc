@@ -13,7 +13,5 @@
         <file>Resources/down.png</file>
         <file>Resources/down2.png</file>
         <file>Resources/graph-wiki_ver_1.png</file>
-	<file>Resources/Health.png</file>
-	<file>Resources/Energy.png</file>
     </qresource>
 </RCC>
