@@ -2,8 +2,9 @@
 
 #include <cmath>
 
-#include "config.h"
+#include "settings.h"
 #include "geometry_primitives.h"
+
 /*!
  * @file collision_utils.cpp
  * @brief Collision Detection and Distance Calculation Utilities.
@@ -164,19 +165,19 @@ bool IsGridCellPotentiallyInsideCone(Point grid_point, double grid_cell_size,
                                      Point cone_center, double cone_radius,
                                      OrientedAngle cone_left_boundary,
                                      OrientedAngle cone_right_boundary) {
-  auto EPS = settings::engine::EPS;
+  auto EPS = SETTINGS.engine.eps;
   double distance = grid_point.dist(cone_center);
   if (distance < EPS) {
     return true;
   }
   double max_distance_in_cell = sqrt(2) * grid_cell_size;
-  if (distance > cone_radius + max_distance_in_cell + settings::environment::kMaxFoodSize + EPS) {
+  if (distance > cone_radius + max_distance_in_cell + SETTINGS.environment.max_food_size + EPS) {
     return false;
   }
   OrientedAngle cell_relative_angle(cone_center, grid_point);
   double angle_distance = cell_relative_angle.AngleDistanceToCone(
       cone_left_boundary, cone_right_boundary);
-  if (sin(angle_distance) > (max_distance_in_cell+ settings::environment::kMaxFoodSize) / distance + EPS) {
+  if (sin(angle_distance) > (max_distance_in_cell+ SETTINGS.environment.max_food_size) / distance + EPS) {
     return false;
   }
   return true;

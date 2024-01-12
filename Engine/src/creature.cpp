@@ -6,7 +6,7 @@
 #include <set>
 
 #include "collisions.h"
-#include "config.h"
+#include "settings.h"
 
 /*!
  * @brief Construct a new Creature object.
@@ -25,20 +25,20 @@
  * - Energy: 100
  * - Brain (Neural Network): Constructed from the provided genome.
  * - Neuron Data: Initialized with zeros (size equal to
- * `settings::environment::kInputNeurons`).
+ * `SETTINGS.environment.input_neurons`).
  * - Reproduction Cooldown: Set to
- * `settings::environment::kReproductionCooldown`.
+ * `SETTINGS.environment.reproduction_cooldown`.
  * - Age: 0
- * - Stomach capacity: area of creature * settings::environment::kDStomachCapacityFactor
+ * - Stomach capacity: area of creature * SETTINGS.environment.d_stomach_capacity_factor
  */
 Creature::Creature(neat::Genome genome, Mutable mutables)
     : MovableEntity(),
       mutable_(mutables),
       brain_(neat::NeuralNetwork(genome)),
       genome_(genome),
-      neuron_data_(settings::environment::kInputNeurons, 0),
+      neuron_data_(SETTINGS.environment.input_neurons, 0),
       vision_radius_(mutables.GetVisionFactor()),
-      vision_angle_(settings::physical_constraints::kVisionARratio
+      vision_angle_(SETTINGS.physical_constraints.vision_ar_ratio
                     / mutables.GetVisionFactor()),
       age_(0),
       reproduction_cooldown_ (mutables.GetMaturityAge()),
@@ -179,7 +179,7 @@ void Creature::UpdateEnergy(double deltaTime) {
  * @return true if the creature is fit for reproduction, false otherwise.
  */
 bool Creature::Fit() {
-  if (energy_ > settings::environment::kReproductionThreshold * max_energy_ &&
+  if (energy_ > SETTINGS.environment.reproduction_threshold * max_energy_ &&
       reproduction_cooldown_ == 0.0 && age_ < 700) {
     return true;
   }
@@ -208,7 +208,7 @@ void Creature::Reproduced() {
 bool Creature::Compatible(const Creature& other_creature){
   double brain_distance = this->GetGenome().CompatibilityBetweenGenomes(other_creature.GetGenome());
   double mutable_distance = this->GetMutable().CompatibilityBetweenMutables(other_creature.GetMutable());
-  return brain_distance + mutable_distance < settings::compatibility::kCompatibilityThreshold;
+  return brain_distance + mutable_distance < SETTINGS.compatibility.compatibility_threshold;
 }
 
 /*!
@@ -515,11 +515,11 @@ void Creature::Grow(double energy) {
 
 //   Food *closest_food = closest_food_entities.front();
 //   double smallest_distance =
-//       GetDistance(*closest_food, settings::environment::kMapWidth,
-//                   settings::environment::kMapHeight);
+//       GetDistance(*closest_food, SETTINGS.environment.map_width,
+//                   SETTINGS.environment.map_height);
 //   for (Food *&food : closest_food_entities) {
-//     double distance = GetDistance(*food, settings::environment::kMapWidth,
-//                                   settings::environment::kMapHeight);
+//     double distance = GetDistance(*food, SETTINGS.environment.map_width,
+//                                   SETTINGS.environment.map_height);
 //     if (distance < smallest_distance) {
 //       closest_food = food;
 //       smallest_distance = distance;
@@ -674,7 +674,7 @@ Food *Creature::GetClosestFoodInSight(
   int y_grid = static_cast<int>(y_coord_ / grid_cell_size);
 
   //temporary fix multiply by 4
-  int max_cells_to_find_food = M_PI * pow(vision_radius_ + 2 * sqrt(2) * grid_cell_size + settings::environment::kMaxFoodSize, 2) / (grid_cell_size * grid_cell_size);
+  int max_cells_to_find_food = M_PI * pow(vision_radius_ + 2 * sqrt(2) * grid_cell_size + SETTINGS.environment.max_food_size, 2) / (grid_cell_size * grid_cell_size);
 
   auto cone_center = Point(x_coord_, y_coord_);
   auto cone_orientation = GetOrientation();
@@ -711,11 +711,11 @@ Food *Creature::GetClosestFoodInSight(
         bool is_in_field_of_view = (food_direction.IsInsideCone(
             cone_left_boundary, cone_right_boundary));
 
-        bool is_on_edge = (food_direction.AngleDistanceToCone(cone_left_boundary, cone_right_boundary) <= M_PI/2) && (distance * sin(food_direction.AngleDistanceToCone(cone_left_boundary, cone_right_boundary)) <= food->GetSize() + settings::engine::EPS);
+        bool is_on_edge = (food_direction.AngleDistanceToCone(cone_left_boundary, cone_right_boundary) <= M_PI/2) && (distance * sin(food_direction.AngleDistanceToCone(cone_left_boundary, cone_right_boundary)) <= food->GetSize() + SETTINGS.engine.eps);
 
         if (is_in_field_of_view) {
           bool is_within_vision_radius =
-              distance <= vision_radius_ + food->GetSize() + settings::engine::EPS;
+              distance <= vision_radius_ + food->GetSize() + SETTINGS.engine.eps;
           if (is_within_vision_radius && distance < smallest_distance_food) {
             smallest_distance_food = distance;
             closest_food = food;
@@ -725,7 +725,7 @@ Food *Creature::GetClosestFoodInSight(
 
         if (is_on_edge) {
           bool is_within_vision_radius =
-              (distance * cos(food_direction.AngleDistanceToCone(cone_left_boundary, cone_right_boundary)) <= vision_radius_ + settings::engine::EPS);
+              (distance * cos(food_direction.AngleDistanceToCone(cone_left_boundary, cone_right_boundary)) <= vision_radius_ + SETTINGS.engine.eps);
           if (is_within_vision_radius && distance < smallest_distance_food) {
             smallest_distance_food = distance;
             closest_food = food;
@@ -783,7 +783,7 @@ void Creature::Digest(double deltaTime)
   double quantity = std::min(deltaTime * settings::physical_constraints::KDDigestionRate, stomach_acid_);
   quantity = std::min(quantity,  stomach_fullness_);
 
-  if (quantity < settings::engine::EPS || stomach_fullness_ < settings::engine::EPS) { return; };
+  if (quantity < SETTINGS.engine.eps || stomach_fullness_ < SETTINGS.engine.eps) { return; };
   double avg_nutritional_value = potential_energy_in_stomach_ / stomach_fullness_;
 
   // Digests the food, increasing energy

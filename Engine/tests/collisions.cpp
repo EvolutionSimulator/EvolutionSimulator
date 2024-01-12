@@ -11,6 +11,7 @@
 #include "simulationdata.h"
 
 #include "geometry_primitives.h"
+#include "settings.h"
 
 /*!
  * @file collisions.cpp
@@ -540,12 +541,12 @@ TEST(SimulationDataTest, GridInitialization) {
   int expectedNumCellsX =
       static_cast<int>(
           std::ceil(static_cast<double>(environment.GetMapWidth()) /
-                    settings::environment::kGridCellSize)) +
+                    SETTINGS.environment.grid_cell_size)) +
       1;
   int expectedNumCellsY =
       static_cast<int>(
           std::ceil(static_cast<double>(environment.GetMapHeight()) /
-                    settings::environment::kGridCellSize)) +
+                    SETTINGS.environment.grid_cell_size)) +
       1;
 
   EXPECT_EQ(simData.GetGrid().size(), expectedNumCellsX);
@@ -637,15 +638,15 @@ TEST(SimulationDataTest, CorrectEntityPlacementInGrid) {
 
   auto creatureCoordinates = creature_1.GetCoordinates();
   int creatureGridX = static_cast<int>(creatureCoordinates.first /
-                                       settings::environment::kGridCellSize);
+                                       SETTINGS.environment.grid_cell_size);
   int creatureGridY = static_cast<int>(creatureCoordinates.second /
-                                       settings::environment::kGridCellSize);
+                                       SETTINGS.environment.grid_cell_size);
 
   auto foodCoordinates = food_1.GetCoordinates();
   int foodGridX = static_cast<int>(foodCoordinates.first /
-                                   settings::environment::kGridCellSize);
+                                   SETTINGS.environment.grid_cell_size);
   int foodGridY = static_cast<int>(foodCoordinates.second /
-                                   settings::environment::kGridCellSize);
+                                   SETTINGS.environment.grid_cell_size);
 
   EXPECT_NE(simData.GetGrid()[creatureGridX][creatureGridY].empty(), true);
   EXPECT_NE(simData.GetGrid()[foodGridX][foodGridY].empty(), true);
@@ -729,16 +730,16 @@ TEST(GetNeighboursTest, CenterOutsideGrid) {
 
 TEST(OrientedAngleTest, Normalize) {
   OrientedAngle angle1(3 * M_PI);
-  EXPECT_NEAR(angle1.GetAngle(), -M_PI, settings::engine::EPS);
+  EXPECT_NEAR(angle1.GetAngle(), -M_PI, SETTINGS.engine.eps);
 
   OrientedAngle angle2(-4 * M_PI);
-  EXPECT_NEAR(angle2.GetAngle(), 0.0, settings::engine::EPS);
+  EXPECT_NEAR(angle2.GetAngle(), 0.0, SETTINGS.engine.eps);
 
   OrientedAngle angle3(7 * M_PI / 4);
-  EXPECT_NEAR(angle3.GetAngle(), -M_PI/4, settings::engine::EPS);
+  EXPECT_NEAR(angle3.GetAngle(), -M_PI/4, SETTINGS.engine.eps);
 
   OrientedAngle angle4(-11 * M_PI / 6);
-  EXPECT_NEAR(angle4.GetAngle(), M_PI/6, settings::engine::EPS);
+  EXPECT_NEAR(angle4.GetAngle(), M_PI/6, SETTINGS.engine.eps);
 }
 
 TEST(OrientedAngleTest, IsInsideCone_1) {
@@ -759,8 +760,8 @@ TEST(OrientedAngleTest, IsInsideCone_2) {
   OrientedAngle left_boundary(3 * M_PI / 2);
   OrientedAngle right_boundary(M_PI / 2);
 
-  EXPECT_NEAR(left_boundary.GetAngle(), -M_PI/2, settings::engine::EPS);
-  EXPECT_NEAR(right_boundary.GetAngle(), M_PI/2, settings::engine::EPS);
+  EXPECT_NEAR(left_boundary.GetAngle(), -M_PI/2, SETTINGS.engine.eps);
+  EXPECT_NEAR(right_boundary.GetAngle(), M_PI/2, SETTINGS.engine.eps);
 
   OrientedAngle insideAngle1(0);
   EXPECT_TRUE(insideAngle1.IsInsideCone(left_boundary, right_boundary));
@@ -778,8 +779,8 @@ TEST(OrientedAngleTest, IsInsideCone_2) {
   EXPECT_FALSE(outsideAngle1.IsInsideCone(left_boundary, right_boundary));
 
   OrientedAngle outsideAngle2(5 * M_PI / 4);
-  EXPECT_NEAR(outsideAngle2.GetAngle(), -3*M_PI/4, settings::engine::EPS);
-  EXPECT_NEAR(outsideAngle2.AngleDistanceToCone(left_boundary, right_boundary), M_PI/4, settings::engine::EPS);
+  EXPECT_NEAR(outsideAngle2.GetAngle(), -3*M_PI/4, SETTINGS.engine.eps);
+  EXPECT_NEAR(outsideAngle2.AngleDistanceToCone(left_boundary, right_boundary), M_PI/4, SETTINGS.engine.eps);
   EXPECT_FALSE(outsideAngle2.IsInsideCone(left_boundary, right_boundary));
 }
 
@@ -792,7 +793,7 @@ TEST(OrientedAngleTest, IsInsideCone_3) {
 
   OrientedAngle outsideAngle2(7 * M_PI / 4);
   EXPECT_FALSE(outsideAngle2.IsInsideCone(left_boundary, right_boundary));
-  EXPECT_NEAR(outsideAngle2.AngleDistanceToCone(left_boundary, right_boundary), M_PI/4, settings::engine::EPS);
+  EXPECT_NEAR(outsideAngle2.AngleDistanceToCone(left_boundary, right_boundary), M_PI/4, SETTINGS.engine.eps);
 
   OrientedAngle onLeftBoundary(M_PI / 2);
   EXPECT_TRUE(onLeftBoundary.IsInsideCone(left_boundary, right_boundary));

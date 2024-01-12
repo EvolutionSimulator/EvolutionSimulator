@@ -1,6 +1,7 @@
 #include <creature.h>
 #include <gtest/gtest.h>
 #include "geometry_primitives.h"
+#include "settings.h"
 
 /*!
  * @file creature.cpp
@@ -23,9 +24,9 @@ TEST(CreatureTests, CreatureConstructor) {
   Mutable mutables;
   Creature creature(genome, mutables);
 
-  double size = settings::physical_constraints::kDBabySize;
-  double initial_health = settings::physical_constraints::kDIntegrity * pow(size, 2);
-  double initial_energy = settings::physical_constraints::kDEnergyDensity * pow(size, 2);
+  double size = SETTINGS.physical_constraints.d_baby_size;
+  double initial_health = SETTINGS.physical_constraints.d_integrity * pow(size, 2);
+  double initial_energy = SETTINGS.physical_constraints.d_energy_density * pow(size, 2);
 
   EXPECT_EQ(creature.GetEnergy(), initial_energy);
   EXPECT_EQ(creature.GetHealth(), initial_health);

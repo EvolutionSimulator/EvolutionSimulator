@@ -2,6 +2,16 @@ cmake_minimum_required(VERSION 3.16)
 
 project(Engine LANGUAGES CXX)
 
+include(FetchContent)
+
+FetchContent_Declare(
+  json
+  GIT_REPOSITORY https://github.com/nlohmann/json.git
+  GIT_TAG v3.11.3
+)
+
+FetchContent_MakeAvailable(json)
+
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -40,6 +50,7 @@ add_library(Engine STATIC
   include/mutable.h src/mutable.cpp
   include/data_accessor.h
   include/synchronization_primitives.h
+  include/settings.h src/settings.cpp
 
 )
 
@@ -48,3 +59,5 @@ add_subdirectory(tests)
 target_include_directories(Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(Engine PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_compile_definitions(Engine PRIVATE Engine_LIBRARY)
+
+target_link_libraries(Engine PRIVATE nlohmann_json::nlohmann_json)

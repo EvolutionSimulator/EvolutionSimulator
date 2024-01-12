@@ -1,5 +1,5 @@
 #include "mutable.h"
-#include "config.h"
+#include "settings.h"
 #include "math.h"
 #include <random>
 #include <algorithm>
@@ -11,19 +11,19 @@
  *          settings::physical_constraints namespace.
  */
 Mutable::Mutable()
-  : energy_density_(settings::physical_constraints::kDEnergyDensity),
-    energy_loss_(settings::physical_constraints::kDEnergyLoss),
-    integrity_(settings::physical_constraints::kDIntegrity),
-    strafing_difficulty_(settings::physical_constraints::kDStrafingDifficulty),
-    max_size_(settings::physical_constraints::kDMaxSize),
-    baby_size_(settings::physical_constraints::kDBabySize),
-    max_force_(settings::physical_constraints::kDMaxForce),
-    growth_factor_(settings::physical_constraints::kDGrowthFactor),
+  : energy_density_(SETTINGS.physical_constraints.d_energy_density),
+    energy_loss_(SETTINGS.physical_constraints.d_energy_loss),
+    integrity_(SETTINGS.physical_constraints.d_integrity),
+    strafing_difficulty_(SETTINGS.physical_constraints.d_strafing_difficulty),
+    max_size_(SETTINGS.physical_constraints.d_max_size),
+    baby_size_(SETTINGS.physical_constraints.d_baby_size),
+    max_force_(SETTINGS.physical_constraints.d_max_force),
+    growth_factor_(SETTINGS.physical_constraints.d_growth_factor),
     color_(0.5f),
-    stomach_capacity_factor_(settings::physical_constraints::kDStomachCapacity),
-    diet_(settings::physical_constraints::kDDiet),
-    eating_speed_(settings::physical_constraints::KDEatingCooldown),
-    genetic_strength_(settings::physical_constraints::KDGeneticStrength){
+    stomach_capacity_factor_(SETTINGS.physical_constraints.d_stomach_capacity),
+    diet_(SETTINGS.physical_constraints.d_diet),
+    eating_speed_(SETTINGS.physical_constraints.d_eating_cooldown),
+    genetic_strength_(SETTINGS.physical_constraints.d_genetic_strength){
   UpdateReproduction();
 }
 
@@ -69,33 +69,33 @@ void Mutable::Mutate() {
   std::uniform_real_distribution<> uniform(0.0, 1.0);
 
   //Energy Density
-  if (uniform(gen) < settings::physical_constraints::kMutationRate){
+  if (uniform(gen) < SETTINGS.physical_constraints.mutation_rate){
     std::normal_distribution<> dis(0.0,
-            settings::physical_constraints::kDEnergyDensity/20);
+            SETTINGS.physical_constraints.d_energy_density/20);
     double delta = dis(gen);
     energy_density_ += delta;
-    if (energy_density_ > settings::physical_constraints::kMaxEnergyDensity) {
-        energy_density_ = settings::physical_constraints::kMaxEnergyDensity;
+    if (energy_density_ > SETTINGS.physical_constraints.max_energy_density) {
+        energy_density_ = SETTINGS.physical_constraints.max_energy_density;
     } else if (energy_density_ < 0) {
         energy_density_ = 0;
     }
   }
 
   //Energy Loss
-  if (uniform(gen) < settings::physical_constraints::kMutationRate){
+  if (uniform(gen) < SETTINGS.physical_constraints.mutation_rate){
     std::normal_distribution<> dis(0.0,
-            settings::physical_constraints::kDEnergyLoss/20);
+            SETTINGS.physical_constraints.d_energy_loss/20);
     double delta = dis(gen);
     energy_loss_ += delta;
-    if (energy_loss_ < settings::physical_constraints::kMinEnergyLoss) {
-        energy_loss_ = settings::physical_constraints::kMinEnergyLoss;
+    if (energy_loss_ < SETTINGS.physical_constraints.min_energy_loss) {
+        energy_loss_ = SETTINGS.physical_constraints.min_energy_loss;
     }
   }
 
   //Integrity
-  if (uniform(gen) < settings::physical_constraints::kMutationRate){
+  if (uniform(gen) < SETTINGS.physical_constraints.mutation_rate){
     std::normal_distribution<> dis(0.0,
-            settings::physical_constraints::kDEnergyDensity/20);
+            SETTINGS.physical_constraints.d_energy_density/20);
     double delta = dis(gen);
     integrity_ += delta;
     if (integrity_ < 0) {
@@ -105,9 +105,9 @@ void Mutable::Mutate() {
 
 
   //Strafing Difficulty
-  if (uniform(gen) < settings::physical_constraints::kMutationRate){
+  if (uniform(gen) < SETTINGS.physical_constraints.mutation_rate){
     std::normal_distribution<> dis(0.0,
-            settings::physical_constraints::kDStrafingDifficulty/20);
+            SETTINGS.physical_constraints.d_strafing_difficulty/20);
     double delta = dis(gen);
     strafing_difficulty_ += delta;
     if (strafing_difficulty_ < 0) {
@@ -116,33 +116,33 @@ void Mutable::Mutate() {
   }
 
   //Max Size
-  if (uniform(gen) < settings::physical_constraints::kMutationRate){
+  if (uniform(gen) < SETTINGS.physical_constraints.mutation_rate){
     std::normal_distribution<> dis(0.0,
-            settings::physical_constraints::kDMaxSize/20);
+            SETTINGS.physical_constraints.d_max_size/20);
     double delta = dis(gen);
     max_size_ += delta;
-    if (max_size_ < settings::environment::kMinCreatureSize) {
-        max_size_ = settings::environment::kMinCreatureSize;
+    if (max_size_ < SETTINGS.environment.min_creature_size) {
+        max_size_ = SETTINGS.environment.min_creature_size;
     }
   }
 
   //Baby Size
-  if (uniform(gen) < settings::physical_constraints::kMutationRate){
+  if (uniform(gen) < SETTINGS.physical_constraints.mutation_rate){
     std::normal_distribution<> dis(0.0,
-            settings::physical_constraints::kDBabySize/20);
+            SETTINGS.physical_constraints.d_baby_size/20);
     double delta = dis(gen);
     baby_size_ += delta;
-    if (baby_size_ < settings::environment::kMinCreatureSize) {
-        baby_size_ = settings::environment::kMinCreatureSize;
+    if (baby_size_ < SETTINGS.environment.min_creature_size) {
+        baby_size_ = SETTINGS.environment.min_creature_size;
     } else if (baby_size_ > max_size_) {
         baby_size_ = max_size_;
     }
   }
 
   //Max Force
-  if (uniform(gen) < settings::physical_constraints::kMutationRate){
+  if (uniform(gen) < SETTINGS.physical_constraints.mutation_rate){
     std::normal_distribution<> dis(0.0,
-            settings::physical_constraints::kDMaxForce/20);
+            SETTINGS.physical_constraints.d_max_force/20);
     double delta = dis(gen);
     max_force_ += delta;
     if (max_force_ < 0) {
@@ -151,9 +151,9 @@ void Mutable::Mutate() {
   }
 
   //Growth Factor
-  if (uniform(gen) < settings::physical_constraints::kMutationRate){
+  if (uniform(gen) < SETTINGS.physical_constraints.mutation_rate){
     std::normal_distribution<> dis(0.0,
-            settings::physical_constraints::kDMaxForce/20);
+            SETTINGS.physical_constraints.d_max_force/20);
     double delta = dis(gen);
     growth_factor_ += delta;
     if (growth_factor_ < 0) {
@@ -162,20 +162,20 @@ void Mutable::Mutate() {
   }
 
   //Vision Factor
-  if (uniform(gen) < settings::physical_constraints::kMutationRate){
+  if (uniform(gen) < SETTINGS.physical_constraints.mutation_rate){
     std::normal_distribution<> dis(0.0,
-            settings::physical_constraints::kDVisionFactor/20);
+            SETTINGS.physical_constraints.d_vision_factor/20);
     double delta = dis(gen);
     vision_factor_ += delta;
-    if (settings::physical_constraints::kVisionARratio/vision_factor_ > 2* M_PI) {
-        vision_factor_ = settings::physical_constraints::kVisionARratio/(2* M_PI);
+    if (SETTINGS.physical_constraints.vision_ar_ratio/vision_factor_ > 2* M_PI) {
+        vision_factor_ = SETTINGS.physical_constraints.vision_ar_ratio/(2* M_PI);
     }
   }
 
   //Color
-  if (uniform(gen) < settings::physical_constraints::kMutationRate){
+  if (uniform(gen) < SETTINGS.physical_constraints.mutation_rate){
       std::normal_distribution<> dis(0.0,
-            settings::physical_constraints::kColorMutationFactor);
+            SETTINGS.physical_constraints.color_mutation_factor);
       float delta = dis(gen);
       color_ += delta;
       if (color_ > 1){
@@ -186,9 +186,9 @@ void Mutable::Mutate() {
   }
 
   //Stomach capacity
-  if (uniform(gen) < settings::physical_constraints::kMutationRate){
+  if (uniform(gen) < SETTINGS.physical_constraints.mutation_rate){
     std::normal_distribution<> dis(0.0,
-                                   settings::physical_constraints::kDStomachCapacity/20);
+                                   SETTINGS.physical_constraints.d_stomach_capacity/20);
     double delta = dis(gen);
     stomach_capacity_factor_ += delta;
     if (stomach_capacity_factor_ < 1.0) {
@@ -197,9 +197,9 @@ void Mutable::Mutate() {
   }
 
   //Diet
-  if (uniform(gen) < settings::physical_constraints::kMutationRate){
+  if (uniform(gen) < SETTINGS.physical_constraints.mutation_rate){
     std::normal_distribution<> dis(0.0,
-                                   settings::physical_constraints::kDDiet/10);
+                                   SETTINGS.physical_constraints.d_diet/10);
     double delta = dis(gen);
     diet_ += delta;
     if (diet_ < 0.1) {
@@ -211,9 +211,9 @@ void Mutable::Mutate() {
   }
 
   //Genetic Strength
-  if (uniform(gen) < settings::physical_constraints::kMutationRate){
+  if (uniform(gen) < SETTINGS.physical_constraints.mutation_rate){
     std::normal_distribution<> dis(0.0,
-                                   settings::physical_constraints::KDGeneticStrength/10);
+                                   SETTINGS.physical_constraints.d_genetic_strength/10);
     double delta = dis(gen);
     genetic_strength_ += delta;
     if (genetic_strength_  < 0.2) {
@@ -326,39 +326,39 @@ double Mutable::CompatibilityBetweenMutables(const Mutable& other_mutable) {
   double distance = 0;
   // Energy Density
   distance += fabs(other_mutable.GetEnergyDensity() - this->GetEnergyDensity())
-              / settings::physical_constraints::kDEnergyDensity;
+              / SETTINGS.physical_constraints.d_energy_density;
 
   // Energy Loss
   distance += fabs(other_mutable.GetEnergyLoss() - this->GetEnergyLoss())
-              / settings::physical_constraints::kDEnergyLoss;
+              / SETTINGS.physical_constraints.d_energy_loss;
 
   // Integrity
   distance += fabs(other_mutable.GetIntegrity() - this->GetIntegrity())
-              / settings::physical_constraints::kDIntegrity;
+              / SETTINGS.physical_constraints.d_integrity;
 
   // Strafing Difficulty
   distance += fabs(other_mutable.GetStrafingDifficulty() - this->GetStrafingDifficulty())
-              / settings::physical_constraints::kDStrafingDifficulty;
+              / SETTINGS.physical_constraints.d_strafing_difficulty;
 
   // Max Size
   distance += fabs(other_mutable.GetMaxSize() - this->GetMaxSize())
-              / settings::physical_constraints::kDMaxSize;
+              / SETTINGS.physical_constraints.d_max_size;
 
   // Baby Size
   distance += fabs(other_mutable.GetBabySize() - this->GetBabySize())
-              / settings::physical_constraints::kDBabySize;
+              / SETTINGS.physical_constraints.d_baby_size;
 
   // Max Force
   distance += fabs(other_mutable.GetMaxForce() - this->GetMaxForce())
-              / settings::physical_constraints::kDMaxForce;
+              / SETTINGS.physical_constraints.d_max_force;
 
   // Growth Factor
   distance += fabs(other_mutable.GetGrowthFactor() - this->GetGrowthFactor())
-              / settings::physical_constraints::kDGrowthFactor;
+              / SETTINGS.physical_constraints.d_growth_factor;
 
   // Vision Factor
   distance += fabs(other_mutable.GetVisionFactor() - this->GetVisionFactor())
-              / settings::physical_constraints::kDVisionFactor;
+              / SETTINGS.physical_constraints.d_vision_factor;
 
-  return distance * settings::compatibility::kMutablesCompatibility;
+  return distance * SETTINGS.compatibility.mutables_compatibility;
 }
