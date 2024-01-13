@@ -52,7 +52,7 @@ void Engine::Run() {
     last_update_time_ = current_time;
     time_since_fixed_update += update_delta;
 
-    simulation_->Update(update_delta.count() * speed);
+    simulation_->Update(update_delta.count());
 
     while (time_since_fixed_update.count() >= kFixedUpdateInterval) {
       simulation_->FixedUpdate(kFixedUpdateInterval);
