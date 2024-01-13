@@ -284,7 +284,6 @@ Mutable MutableCrossover(const Mutable &dominant, const Mutable &recessive) {
                         recessive.GetMaxSize() )/3);
   crossover.SetBabySize((2*dominant.GetBabySize() +
                          recessive.GetBabySize() )/3);
-  std::cout << (2*dominant.GetBabySize() + recessive.GetBabySize() )/3 << std::endl;
   crossover.SetMaxForce((2*dominant.GetMaxForce() +
                          recessive.GetMaxForce() )/3);
   crossover.SetGrowthFactor((2*dominant.GetGrowthFactor() +
