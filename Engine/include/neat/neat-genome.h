@@ -30,6 +30,7 @@ namespace neat {
 
     void AddNeuron(const Neuron& neuron);
     void AddLink(const Link& link);
+    void SetModules(const std::vector<BrainModule>& modules);
 
     void DisableNeuron(int id);  // don't use this for now
     void DisableLink(int id);
@@ -51,7 +52,7 @@ namespace neat {
     void MutateActivateBrainModule();
     void MutateDisableBrainModule();
 
-    std::vector<BrainModule> GetModules();
+    std::vector<BrainModule> GetModules() const;
 
     bool FindNeuronById(int targetId, Neuron& foundNeuron) const;
 

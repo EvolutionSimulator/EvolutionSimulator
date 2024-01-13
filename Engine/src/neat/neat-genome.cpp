@@ -101,6 +101,10 @@ neuron.GetId()==link.GetOutId()){ DisableLink(link.GetId());
 }
 */
 
+void Genome::SetModules(const std::vector<BrainModule>& modules) {
+  modules_ = modules;
+}
+
 /*!
  * @brief Disables a link in the Genome by its ID.
  *
@@ -557,6 +561,8 @@ Genome Crossover(const Genome& dominant, const Genome& recessive) {
       offspring.AddLink(CrossoverLink(dominant_link, recessive_link.value()));
     }
   }
+  std::vector<BrainModule> modules_dominant = dominant.GetModules();
+  offspring.SetModules(modules_dominant);
 
   // Return the new Genome that is a combination of both parents.
   return offspring;
@@ -611,19 +617,19 @@ void Genome::MutateActivateBrainModule(){
 
   int input_size = module.GetInputNeuronIds().size();
   std::vector<int> input_ids(input_size, 0);
-  for (int i = 0; i < module.GetInputNeuronIds().size(); i++){
-    if (i == 0) module.SetFirstInputId(GetInputCount());
-    AddNeuron(Neuron(NeuronType::kInput, 0));
-    input_ids.at(i) = neurons_.back().GetId();
+  for (int i = 0; i < module.GetInputNeuronIds().size(); i++) {
+      if (i == 0) module.SetFirstInputIndex(GetInputCount());
+      AddNeuron(Neuron(NeuronType::kInput, 0));
+      input_ids.at(i) = neurons_.back().GetId();
   }
   module.SetInputNeuronIds(input_ids);
 
   int output_size = module.GetOutputNeuronIds().size();
   std::vector<int> output_ids(output_size, 0);
-  for (int i = 0; i < module.GetOutputNeuronIds().size(); i++){
-    if (i == 0) module.SetFirstOutputId(GetOutputCount());
-    AddNeuron(Neuron(NeuronType::kOutput, 0));
-    output_ids.at(i) = neurons_.back().GetId();
+  for (int i = 0; i < module.GetOutputNeuronIds().size(); i++) {
+      if (i == 0) module.SetFirstOutputIndex(GetOutputCount());
+      AddNeuron(Neuron(NeuronType::kOutput, 0));
+      output_ids.at(i) = neurons_.back().GetId();
   }
   module.SetOutputNeuronIds(output_ids);
 }
@@ -654,7 +660,7 @@ void Genome::MutateDisableBrainModule(){
  *
  * @return A vector of BrainModule objects representing the modules currently in the genome.
  */
-std::vector<BrainModule> Genome::GetModules(){ return modules_; }
+std::vector<BrainModule> Genome::GetModules() const { return modules_; }
 
 /*!
  * @brief Finds a neuron in the Genome by its ID.
@@ -674,70 +680,75 @@ bool Genome::FindNeuronById(int targetId, Neuron& foundNeuron) const{
 }
 
 /*!
- * @brief Calculates the compatibility score between this Genome and another Genome.
+ * @brief Calculates the compatibility distance between this Genome and another
+ * Genome.
  *
- * This method computes a score based on the shared neurons, shared links, and weight
- * similarities between the two genomes, following a specific compatibility formula.
+ * This method computes a distance based on the disjoint/excess neurons and
+ * links, and weight difference between the two genomes, following a formula
+ * from the paper.
  *
  * @param other A reference to another Genome object to compare with.
- * @return The calculated compatibility score.
+ * @return The calculated compatibility distance.
  */
 double Genome::CompatibilityBetweenGenomes(const Genome& other) const {
-  // Identify shared neurons
-  int maxNeurons = std::min(this->neurons_.size(), other.neurons_.size());
-  std::unordered_map<int, Neuron> shared_neurons;
-  for (const Neuron& neuron : neurons_) {
-      Neuron neuronCopy = neuron; // Make a copy of the neuron
-      if (other.FindNeuronById(neuron.GetId(), neuronCopy)) {
-          shared_neurons.insert(std::make_pair(neuron.GetId(), neuronCopy));
-      }
-  }
+    double average_weight_difference = 0;
+    // Count shared neurons and their differences in bias
+    // std::unordered_map<int, Neuron> shared_neurons;
+    int Nshared_neurons = 0;  // number of neurons that appear in both genomes
+    for (const Neuron& neuron : neurons_) {
+        Neuron other_neuron(neuron.GetType(),
+                            0);  // corresponding neuron of the other genome, if
+                                 // it exists
+        if (other.FindNeuronById(neuron.GetId(), other_neuron)) {
+            Nshared_neurons++;
+            // add a relative difference in biases (a number between 0 and 2)
+            average_weight_difference +=
+                abs(neuron.GetBias() - other_neuron.GetBias()) /
+                std::max(abs(neuron.GetBias()), abs(other_neuron.GetBias()));
+        }
+    }
 
-  // Identify shared links
-  int maxLinks = std::min(this->links_.size(), other.links_.size());
-  std::set<std::pair<int, int>> shared_link_pairs;
-  Genome& non_const_this = const_cast<Genome&>(*this);
+    // Count shared links and their weight differences
+    // std::set<std::pair<int, int>> shared_link_pairs;
+    // Genome& non_const_this = const_cast<Genome&>(*this);
+    int Nshared_links = 0;
+    for (const Link& link : links_) {
+        for (const Link& other_link : other.GetLinks()) {
+            if (link.GetId() == other_link.GetId()) {
+        Nshared_links++;
+        // add a relative difference in weights (a number between 0 and 2)
+        average_weight_difference +=
+            abs(link.GetWeight() - other_link.GetWeight()) /
+            std::max(abs(link.GetWeight()), abs(other_link.GetWeight()));
+        break;
+            }
+        }
+    }
+    average_weight_difference =
+        average_weight_difference / (double)(Nshared_neurons + Nshared_links);
 
-  for (const Link& link : links_) {
-      if (non_const_this.HasLink(link.GetInId(), link.GetOutId()) && link.IsActive()) {
-          shared_link_pairs.insert(std::make_pair(link.GetInId(), link.GetOutId()));
-      }
-  }
+    int Ndisjoint_neurons =
+        neurons_.size() + other.neurons_.size() - 2 * Nshared_neurons;
+    int normalizing_factor_neurons =
+        std::max(neurons_.size(), other.neurons_.size());
+    double normalized_disjoint_neurons =
+        (double)Ndisjoint_neurons / (double)normalizing_factor_neurons;
 
-  // Calculate weight similarities for shared links
-  double total_weight_similarity = 0.0;
-  for (const std::pair<int, int>& link_pair : shared_link_pairs) {
-      // Search for the link in the first genome
-      const Link* link1 = nullptr;
-      for (const Link& link : links_) {
-          if (link.GetInId() == link_pair.first && link.GetOutId() == link_pair.second) {
-              link1 = &link;
-              break;
-          }
-      }
-
-      // Search for the link in the other genome
-      const Link* link2 = nullptr;
-      for (const Link& other_link : other.GetLinks()) {
-          if (other_link.GetInId() == link_pair.first && other_link.GetOutId() == link_pair.second) {
-              link2 = &other_link;
-              break;
-          }
-      }
-
-      if (link1 && link2) {
-          // Calculate weight similarity using the absolute difference
-          double weight_similarity = std::abs(link1->GetWeight() - link2->GetWeight());
-          total_weight_similarity += weight_similarity;
-      }
-  }
-
-  // Compute compatibility score based on shared neurons, shared links, and weight similarities
-  // Use a formula that considers these factors and assigns a higher score to more compatible genomes
-  double compatibility_score = SETTINGS.compatibility.weight_shared_neurons * (maxNeurons - shared_neurons.size())
-                              + SETTINGS.compatibility.weight_shared_links * (maxLinks - shared_link_pairs.size())
-                              + SETTINGS.compatibility.average_weight_shared_links * total_weight_similarity;
-  return compatibility_score;
+    int Ndisjoint_links =
+        links_.size() + other.links_.size() - 2 * Nshared_links;
+    int normalizing_factor_links = std::max(links_.size(), other.links_.size());
+    double normalized_disjoint_links =
+        (double)Ndisjoint_links / (double)normalizing_factor_links;
+    // Compute compatibility distance based on disjoint/excess neurons and
+    // links, and average weight difference.
+    double compatibility_distance =
+        settings::compatibility::kWeightSharedNeurons *
+            normalized_disjoint_neurons +
+        settings::compatibility::kWeightSharedLinks *
+            normalized_disjoint_links +
+        settings::compatibility::kAverageWeightSharedLinks *
+            average_weight_difference;
+    return compatibility_distance;
 }
 
 Genome minimallyViableGenome() {
