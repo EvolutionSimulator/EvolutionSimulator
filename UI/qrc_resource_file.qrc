@@ -18,5 +18,7 @@
 	<file>Resources/Creature_tails.png</file>
 	<file>Shaders/colorShift.frag</file>
 	<file>Resources/Configuration.png</file>
+	<file>Resources/Health.png</file>
+	<file>Resources/Energy.png</file>
     </qresource>
 </RCC>
