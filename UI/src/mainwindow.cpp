@@ -182,9 +182,8 @@ void MainWindow::ToggleSimulation() {
 
 void MainWindow::ShowConfigScreen(){
 
-    if (engine_thread_.joinable()) {
-        engine_->Stop();
-        engine_thread_.join();
+  if (!engine_->IsPaused()) {
+        engine_->Pause();
         //change icon of button
         QPixmap pixMap2(":/Resources/Run.png");
         QIcon icon2(pixMap2);
@@ -255,6 +254,8 @@ void MainWindow::ShowConfigScreen(){
     // Show the configuration dialog modally
     configDialog->setLayout(mainLayout);
     configDialog->exec();
+
+    engine_->Resume();
 }
 
 void MainWindow::RestartSimulation() {

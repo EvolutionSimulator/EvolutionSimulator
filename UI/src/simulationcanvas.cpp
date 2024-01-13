@@ -683,7 +683,7 @@ void SimulationCanvas::mouseMoveEvent(QMouseEvent* event) {
         float distance = sqrt(pow(currentMousePosition.x - initialClickPosition.x, 2) +
                               pow(currentMousePosition.y - initialClickPosition.y, 2));
 
-        if (distance > settings::ui::KDraggingSensitivity) {
+        if (distance > SETTINGS.ui.dragging_sensitivity) {
       qDebug() << "Switched to dragging";
       isDragging = true;
       isClicking = false;

@@ -781,7 +781,7 @@ double Creature::GetEnergyInStomach() const {return potential_energy_in_stomach_
 void Creature::Digest(double deltaTime)
 {
 
-  double quantity = std::min(deltaTime * settings::physical_constraints::KDDigestionRate, stomach_acid_);
+  double quantity = std::min(deltaTime * SETTINGS.physical_constraints.d_digestion_rate, stomach_acid_);
   quantity = std::min(quantity,  stomach_fullness_);
 
   if (quantity < SETTINGS.engine.eps || stomach_fullness_ < SETTINGS.engine.eps) { return; };
@@ -855,7 +855,7 @@ void Creature::AddAcid(double quantity)
 {
   double initial_acid = stomach_acid_;
   stomach_acid_ = std::min(stomach_capacity_, stomach_acid_ + quantity);
-  SetEnergy(GetEnergy() - (stomach_acid_ - initial_acid)/settings::physical_constraints::KDAcidToEnergy);
+  SetEnergy(GetEnergy() - (stomach_acid_ - initial_acid)/SETTINGS.physical_constraints.d_acid_to_energy);
 }
 
 double Creature::GetAcid() const {return stomach_acid_; };
