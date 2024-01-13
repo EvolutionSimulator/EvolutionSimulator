@@ -98,9 +98,9 @@ double GrabbingEntity::GetTotalRotAccel() {
         cc_distance * entity->GetAcceleration() *
         sin(GetOrientation() + GetAccelerationAngle() - cc_angle);
     double torque1 =
-        -(cc_distance - entity->GetSize()) * rotational_acceleration_ / 2;
+        -(cc_distance - entity->GetSize()) * (rotational_acceleration_ / entity->GetSize()) / 2;
     double torque2 =
-        (cc_distance + entity->GetSize()) * rotational_acceleration_ / 2;
+        (cc_distance + entity->GetSize()) * (rotational_acceleration_ / entity->GetSize()) / 2;
     total_rot_accel +=
         entity->GetSize() * (torque1 + torque2 + forward_componenet);
   }
