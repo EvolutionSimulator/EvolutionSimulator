@@ -36,8 +36,10 @@ std::pair<double, double> GrabbingEntity::GetCentreOfMass() {
   std::unordered_set<MovableEntity*> entities = GetEntities();
   std::pair<double, double> centre_of_mass = {0, 0};
   for (auto& entity : entities) {
-    centre_of_mass.first += entity->GetCoordinates().first;
-    centre_of_mass.second += entity->GetCoordinates().second;
+    centre_of_mass.first +=
+        entity->GetCoordinates().first * pow(entity->GetSize(), 2);
+    centre_of_mass.second +=
+        entity->GetCoordinates().second * pow(entity->GetSize(), 2);
   }
   double total_mass = GetTotalMass();
   centre_of_mass.first /= total_mass;
