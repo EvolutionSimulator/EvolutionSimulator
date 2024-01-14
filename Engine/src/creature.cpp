@@ -522,7 +522,7 @@ void Creature::Bite(Creature* creature)
  */
 void Creature::Grab(Entity* entity){
     this->SetGrabbedEntity(dynamic_cast<MovableEntity*>(entity));
-    dynamic_cast<GrabbingEntity*>(entity)->AddToGrabbingEntities(this);
+    //dynamic_cast<GrabbingEntity*>(entity)->AddToGrabbingEntities(this);
     SetEnergy(GetEnergy() - entity->GetSize());
     this->UpdateEntityVelocities();
 }
