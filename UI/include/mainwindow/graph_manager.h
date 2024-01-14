@@ -10,6 +10,7 @@ class GraphManager : public QObject {
 
 public:
   explicit GraphManager(QWidget* parent, Engine* engine);
+  void DrawGraph(std::vector<int> data, const QString& graphTitle);
 
 public slots:
   void DrawCreaturesOverTimeGraph();
