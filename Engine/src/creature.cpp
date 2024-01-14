@@ -1,4 +1,5 @@
 #include "creature.h"
+#include "grabbing_entity.h"
 
 #include <algorithm>
 #include <cassert>
@@ -23,7 +24,7 @@
  *
  */
 Creature::Creature(neat::Genome genome, Mutable mutables)
-    : MovableEntity(),
+    : GrabbingEntity(),
       AliveEntity(genome, mutables),
       VisionSystem(genome, mutables),
       DigestiveSystem(genome, mutables),
@@ -122,7 +123,7 @@ void Creature::Update(double deltaTime, double const kMapWidth,
  * @brief Handles the collision of the creature with another entity.
  *
  * @details Processes the interaction when the creature collides with another
- * entity. If the entity is food, the creature consumes it. Otherwise, standard
+ * entity. If the creature is hungry, the creature consumes it, if the creature wants to grab it, it does so. Otherwise, standard
  * collision handling is performed.
  *
  * @param other_entity The entity the creature collides with.
@@ -138,8 +139,11 @@ void Creature::OnCollision(Entity &other_entity, double const kMapWidth, double 
     if (Food* food_entity = dynamic_cast<Food*>(&other_entity)) {
       DigestiveSystem::Bite(food_entity);
     } else if (Creature* creature_entity = dynamic_cast<Creature*>(&other_entity)) {
-            Bite(creature_entity);
+      Bite(creature_entity);
     }
+  }
+  if (grabbing_ && IsInSight(&other_entity) && !(this->GetGrabbedEntity())){ //checking if the creature wants to bite, has the entity in sight and if he is not already grabbing something
+      Grab(&other_entity);
   }
   MovableEntity::OnCollision(other_entity, kMapWidth, kMapHeight);
 }
@@ -200,6 +204,7 @@ void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
   Grow(std::max(std::tanh(output.at(3)) * deltaTime, 0.0));
   AddAcid(std::max(std::tanh(output.at(4)) * 10.0, 0.0));
   biting_ = std::tanh(output.at(5)) > 0 ? 0 : 1;
+  // grabbing_ = std::tanh(output.at(6)) > 0 ? 0 : 1;
 }
 
 
@@ -504,5 +509,23 @@ void Creature::Bite(Creature* creature)
   creature->SetHealth(creature->GetHealth()-damage);
   SetEnergy(GetEnergy()+bite_strength_*SETTINGS.physical_constraints.d_bite_energy_consumption_ratio/10);
 }
+
+/*!
+ * @brief Handles the grabbing of another creature.
+ *
+ * @details Sets the entity the creature grabs as the grabbed entity.
+ * Adds the creature to the set of entities that grabs the grabbed entity.
+ * Decreases energy (depending on grabbed entity size).
+ * Updates the velocity.
+ *
+ * @param entity The entity the creature bites into.
+ */
+void Creature::Grab(Entity* entity){
+    this->SetGrabbedEntity(dynamic_cast<MovableEntity*>(entity));
+    dynamic_cast<GrabbingEntity*>(entity)->AddToGrabbingEntities(this);
+    SetEnergy(GetEnergy() - entity->GetSize());
+    this->UpdateEntityVelocities();
+}
+
 
 

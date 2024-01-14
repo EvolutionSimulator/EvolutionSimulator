@@ -10,6 +10,7 @@
 #include "vision_system.h"
 #include "digestive_system.h"
 #include "reproductive_system.h"
+#include "grabbing_entity.h"
 #include "mutable.h"
 
 /*!
@@ -35,7 +36,7 @@
  * for and consuming food, and managing its energy and health. The class also
  * supports evolutionary features like reproduction and genetic inheritance.
  */
-class Creature : virtual public MovableEntity, virtual public AliveEntity, virtual public VisionSystem, virtual public DigestiveSystem, virtual public ReproductiveSystem {
+class Creature : virtual public AliveEntity,  virtual public GrabbingEntity, virtual public VisionSystem, virtual public DigestiveSystem, virtual public ReproductiveSystem {
  public:
   Creature(neat::Genome genome, Mutable mutable_);
 
@@ -52,6 +53,8 @@ class Creature : virtual public MovableEntity, virtual public AliveEntity, virtu
              double GridCellSize, double deltaTime, double width, double height);
 
   void Bite(Creature* creature);
+  void Grab(Entity *entity);
+
   bool Compatible(const Creature& other_creature);
 
   Creature *GetClosestEnemyInSight(
