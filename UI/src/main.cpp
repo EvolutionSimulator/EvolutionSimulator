@@ -5,7 +5,7 @@
 #include <iostream>
 #include <thread>
 
-#include "mainwindow.h"
+#include "mainwindow/mainwindow.h"
 #include "qsfmlcanvas.h"
 
 int main(int argc, char *argv[]) {

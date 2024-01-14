@@ -6,6 +6,7 @@
 #include "QtCharts/qlineseries.h"
 #include "QtWidgets/qslider.h"
 #include "engine.h"
+#include "graph_manager.h"
 
 QT_BEGIN_NAMESPACE  //
     namespace Ui {
@@ -35,9 +36,6 @@ QT_END_NAMESPACE  //
       int value);  // Make sure this is under 'private slots:'
   void ChangeCreatureDensity(int value);
   void ChangeFriction(int value);
-  void DrawCreaturesOverTimeGraph();
-  void DrawCreaturesSizeOverTimeGraph();
-  void handleDropdownSelection(int index);
   void ShowConfigScreen();
 
   private:
@@ -53,5 +51,6 @@ QT_END_NAMESPACE  //
   double lastRecordedTime_;
   QTimer *updateTimer;
   QSlider* slider;
+  GraphManager* graph_manager_;
 
 };

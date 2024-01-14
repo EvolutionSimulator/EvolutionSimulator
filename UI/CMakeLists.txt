@@ -34,13 +34,15 @@ endif()
 qt_add_executable(UI
     MANUAL_FINALIZATION
     src/main.cpp
-    src/mainwindow.cpp include/mainwindow.h
-    src/mainwindow.ui
+    src/mainwindow/mainwindow.cpp include/mainwindow/mainwindow.h
+    src/mainwindow/mainwindow.ui
     include/qsfmlcanvas.h src/qsfmlcanvas.cpp
     include/simulationcanvas.h src/simulationcanvas.cpp
     ${UI_RESOURCES}
     include/creaturetracker.h
     src/creaturetracker.cpp
+    include/mainwindow/graph_manager.h
+    src/mainwindow/graph_manager.cpp
 
 
 
