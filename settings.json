@@ -70,7 +70,7 @@
     "d_vision_factor": 200,
     "vision_radius": 200,
     "vision_angle": 3.141592653589793,
-    "vision_ar_ratio": 1047.197551196598,
+    "vision_ar_ratio": 209.43,
     "color_mutation_factor": 0.05,
     "d_stomach_capacity": 2,
     "d_diet": 0.5,

@@ -20,11 +20,8 @@ MainWindow::MainWindow(QWidget *parent)
 
   //Add image as icon use region as mask to make the icon circular
   QRect rect(2,2,45,45);
-  qDebug() << rect.size();
-  qDebug() << ui_->runButton->size();
   QRegion region(rect, QRegion::Ellipse);
   qDebug() << region.boundingRect().size();
-  ui_->runButton->setMask(region);
   QPixmap pixMap(":/Resources/Run.png");
   QIcon icon(pixMap);
   ui_->runButton->setIcon(icon);
@@ -76,7 +73,7 @@ void MainWindow::InitializeEngine()
     int width = sf::VideoMode::getDesktopMode().width;
     int height = sf::VideoMode::getDesktopMode().height;
     engine_ = new Engine(width, height);
-    engine_->SetSpeed(10);
+    //engine_->SetSpeed(10);
     ui_->canvas->SetSimulation(engine_->GetSimulation());
   }
   // If this function changes change the kMaxFoodDensityColor in config.h as for a correct shade of the backgroung we need this measure
