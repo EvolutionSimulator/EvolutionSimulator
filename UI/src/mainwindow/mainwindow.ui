@@ -102,6 +102,24 @@
     <property name="styleSheet">
      <string notr="true"/>
     </property>
+    <widget class="QLineEdit" name="foodDensityLabel">
+     <property name="geometry">
+      <rect>
+       <x>670</x>
+       <y>30</y>
+       <width>141</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(0, 0, 0);
+border-color: rgb(0, 0, 0);
+background-color: rgb(255, 255, 255);</string>
+     </property>
+     <property name="text">
+      <string>Food Density:</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QPushButton" name="runButton">
     <property name="geometry">
@@ -313,20 +331,6 @@
     </property>
     <property name="text">
      <string/>
-    </property>
-   </widget>
-
-   <widget class="QLineEdit" name="lineEdit_2">
-    <property name="geometry">
-     <rect>
-      <x>670</x>
-      <y>20</y>
-      <width>141</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Density of Creature:</string>
     </property>
    </widget>
    <widget class="QLabel" name="label">
@@ -1153,35 +1157,15 @@ background-color: rgb(20, 22, 69)
                      }</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="foodDensityLabel">
-    <property name="geometry">
-     <rect>
-      <x>820</x>
-      <y>20</y>
-      <width>141</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">color: rgb(0, 0, 0);
-border-color: rgb(0, 0, 0);
-background-color: rgb(255, 255, 255);</string>
-    </property>
-    <property name="text">
-     <string>Food Density:</string>
-    </property>
-   </widget>
    <zorder>canvas</zorder>
    <zorder>frame</zorder>
    <zorder>runButton</zorder>
-   <zorder>lineEdit_2</zorder>
    <zorder>label</zorder>
    <zorder>frictionLabel</zorder>
    <zorder>restartButton</zorder>
    <zorder>frictionCoefficientSpinBox</zorder>
    <zorder>graphMenu</zorder>
    <zorder>configurationButton</zorder>
-   <zorder>foodDensityLabel</zorder>
   </widget>
  </widget>
  <customwidgets>

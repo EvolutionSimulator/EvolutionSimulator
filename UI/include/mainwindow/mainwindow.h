@@ -7,6 +7,7 @@
 #include "QtWidgets/qslider.h"
 #include "engine.h"
 #include "graph_manager.h"
+#include "config_manager.h"
 
 QT_BEGIN_NAMESPACE  //
     namespace Ui {
@@ -21,7 +22,11 @@ QT_END_NAMESPACE  //
   MainWindow(QWidget* parent = nullptr);
   ~MainWindow();
 
+  void SetUpConnections();
+  void DrawUI();
+
   void InitializeEngine();
+  void InitializeEngineWithDensities(double food_density, double creature_density);
 
   void keyPressEvent(QKeyEvent *event) override; // Add this line
 
@@ -32,25 +37,20 @@ QT_END_NAMESPACE  //
   void KillEngine();
   void ToggleSimulation();
   void RestartSimulation();
-  void ChangeFoodDensity(
-      int value);  // Make sure this is under 'private slots:'
-  void ChangeCreatureDensity(int value);
-  void ChangeFriction(int value);
-  void ShowConfigScreen();
+
+  void handleUIUpdateForConfigScreen(double food_density, double friction_coefficient);
+  void handleRestartSimulationRequested(double food_density, double creature_density);
 
   private:
-  double friction_coefficient;
-  double creature_density = 0.001;
-  double food_density = 5e-5;
+
   Ui::MainWindow* ui_;  // Pointer to all UI widgets
-
   Engine* engine_ = nullptr;  // Pointer to the simulation engine
-
   std::thread engine_thread_;  // Thread for running the simulation engine
 
   double lastRecordedTime_;
   QTimer *updateTimer;
-  QSlider* slider;
+
   GraphManager* graph_manager_;
+  ConfigManager* config_manager_;
 
 };
