@@ -193,7 +193,8 @@ void Creature::OnCollision(std::shared_ptr<Entity>other_entity, double const kMa
             Bite(creature_entity);
     }
   }
-  if (grabbing_ && IsInSight(other_entity) && !(this->GetGrabbedEntity())){ //checking if the creature wants to bite, has the entity in sight and if he is not already grabbing something
+  if (other_entity->GetState() == Entity::Alive && grabbing_ && IsInSight(other_entity) && !(this->GetGrabbedEntity())){
+    //checking if the creature wants to grab, has the entity in sight and if he is not already grabbing something
       Grab(other_entity);
   }
   MovableEntity::OnCollision(other_entity, kMapWidth, kMapHeight);
@@ -583,18 +584,13 @@ void Creature::Bite(std::shared_ptr<Creature> creature)
  *
  * @param entity The entity the creature bites into.
  */
-<<<<<<< HEAD
 void Creature::Grab(std::shared_ptr<Entity> entity){
     this->SetGrabbedEntity(std::dynamic_pointer_cast<MovableEntity>(entity));
     std::dynamic_pointer_cast<GrabbingEntity>(entity)->AddToGrabbingEntities(std::make_shared<MovableEntity>(*this));
-=======
-void Creature::Grab(Entity* entity){
-    this->SetGrabbedEntity(dynamic_cast<MovableEntity*>(entity));
-    //dynamic_cast<GrabbingEntity*>(entity)->AddToGrabbingEntities(this);
->>>>>>> 9a06fe4 (Fixing bugs)
     SetEnergy(GetEnergy() - entity->GetSize());
     this->UpdateEntityVelocities();
 }
+
 
 
 
