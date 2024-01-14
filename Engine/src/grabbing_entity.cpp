@@ -7,7 +7,7 @@ GrabbingEntity::GrabbingEntity() {
   // Constructor implementation
 }
 
-double GrabbingEntity::GetEffectiveAccelerationAngle() const {}
+/*double GrabbingEntity::GetEffectiveAccelerationAngle() const {}
 
 double GrabbingEntity::GetEffectiveForwardAcceleration() const {
   // Implementation
@@ -15,7 +15,7 @@ double GrabbingEntity::GetEffectiveForwardAcceleration() const {
 
 double GrabbingEntity::GetEffectiveRotationalAcceleration() const {
   // Implementation
-}
+}*/
 
 std::unordered_set<std::shared_ptr<MovableEntity>> GrabbingEntity::GetEntities() {
   std::unordered_set<std::shared_ptr<MovableEntity>> entities;

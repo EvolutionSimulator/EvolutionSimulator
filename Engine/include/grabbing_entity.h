@@ -7,9 +7,9 @@
 class GrabbingEntity : virtual public MovableEntity {
  public:
   GrabbingEntity();
-  double GetEffectiveAccelerationAngle() const override;
+  /*double GetEffectiveAccelerationAngle() const override;
   double GetEffectiveForwardAcceleration() const override;
-  double GetEffectiveRotationalAcceleration() const override;
+  double GetEffectiveRotationalAcceleration() const override;*/
 
   std::unordered_set<std::shared_ptr<MovableEntity>> GetEntities();
   std::pair<double, double> GetCentreOfMass();
