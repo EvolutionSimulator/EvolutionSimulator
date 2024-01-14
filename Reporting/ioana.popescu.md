@@ -29,5 +29,13 @@
 - implemented biting logic: bite strength, eating cooldown, etc.
 - integrated digestion into the neural network, mutables and collisions, added tests
 
+# Week 6
+- Added stomach with shaders in the UI
+- Coordinated attack project, assigning tasks and double checking people’s implementations in Bite and Grab
+- Found the bug and made restart crash (in the way we define the minimal viable genomes) and tried to implement an artificial predator genome
+- Helped with the refactor of the Creature class
+- Refactored MainWindow and fixed configuration screen
+
+
 
 
