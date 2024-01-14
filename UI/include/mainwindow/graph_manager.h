@@ -16,9 +16,6 @@ public slots:
   void DrawCreaturesSizeOverTimeGraph();
   void handleDropdownSelection(int index);
 
-signals:
-  void someEventHappened(); // Example signal
-
 private:
   QWidget* parent_;
   Engine* engine_;

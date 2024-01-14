@@ -43,6 +43,8 @@ qt_add_executable(UI
     src/creaturetracker.cpp
     include/mainwindow/graph_manager.h
     src/mainwindow/graph_manager.cpp
+    include/mainwindow/config_manager.h
+    src/mainwindow/config_manager.cpp
 
 
 

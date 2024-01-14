@@ -13,7 +13,7 @@
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), ui_(new Ui::MainWindow), friction_coefficient(0.0), lastRecordedTime_(0.0) {
+    : QMainWindow(parent), ui_(new Ui::MainWindow), lastRecordedTime_(0.0) {
   ui_->setupUi(this);
 
   InitializeEngine();
@@ -21,75 +21,13 @@ MainWindow::MainWindow(QWidget *parent)
   RunSimulation();
 
   graph_manager_ = new GraphManager(this, engine_);
+  config_manager_ = new ConfigManager(this, engine_);
 
-  // Assuming you have a QComboBox named 'yourComboBoxName' in your UI
-  QComboBox *comboBox = ui_->graphMenu;
+  DrawUI();
+  SetUpConnections();
 
-  // Load the original image
-  QPixmap originalPixmap(":/Resources/graph-wiki_ver_1.png");
-
-  // Scale the image to a desired size (e.g., 20x20 pixels)
-  QPixmap scaledPixmap = originalPixmap.scaled(20, 20, Qt::KeepAspectRatio);
-
-  // Set the scaled image as the down arrow icon
-  comboBox->setIconSize(scaledPixmap.size());
-  comboBox->addItem(QIcon(scaledPixmap), "Graphs");
-  comboBox->addItem("# Creatures Over Time");
-  comboBox->addItem("Creatures Size Over Time");
-  // Add more items as needed
-
-  //Add image as icon use region as mask to make the icon circular
-  QRect rect(2,2,45,45);
-  QRect rect3(2,2,46,45);
-  qDebug() << rect.size();
-  qDebug() << ui_->runButton->size();
-  QRegion region(rect, QRegion::Ellipse);
-  QRegion region3(rect3, QRegion::Ellipse);
-  qDebug() << region.boundingRect().size();
-  ui_->runButton->setMask(region);
-  ui_->restartButton->setMask(region3);
-  QPixmap pixMap(":/Resources/Run.png");
-  QPixmap pixMap3(":/Resources/Restart.png");
-  QIcon icon(pixMap);
-  QIcon icon3(pixMap3);
-  ui_->runButton->setIcon(icon);
-  ui_->restartButton->setIcon(icon3);
-
-  qDebug() << rect.size();
-  qDebug() << ui_->configurationButton->size();
-  qDebug() << region.boundingRect().size();
-  ui_->configurationButton->setMask(region);
-  QPixmap pixMap2(":/Resources/Configuration.png");
-  QIcon icon2(pixMap2);
-  ui_->configurationButton->setIcon(icon2);
-  QSize size(50, 50);
-
-  ui_->runButton->setIconSize(size);
-  ui_->configurationButton->setIconSize(size);
-  ui_->restartButton->setIconSize(size);
-  connect(ui_->runButton, &QPushButton::clicked, this,
-          &MainWindow::ToggleSimulation);
-  connect(ui_->configurationButton, &QPushButton::clicked, this,
-          &MainWindow::ShowConfigScreen);
-  connect(ui_->restartButton, &QPushButton::clicked, this,
-          &MainWindow::RestartSimulation);
-  connect(ui_->graphMenu, SIGNAL(currentIndexChanged(int)), graph_manager_, SLOT(handleDropdownSelection(int)));
-  updateTimer = new QTimer(this);
-  connect(updateTimer, SIGNAL(timeout()), this, SLOT(recordCreatureCount()));
-  updateTimer->start(1000);  // Set the interval to 1000 milliseconds (1 second)
-  connect(ui_->frictionCoefficientSpinBox, SIGNAL(valueChanged(double)), this,
-          SLOT(ChangeFrictionCoefficient(double)));
-  connect(ui_->frictionCoefficientSpinBox, &QSlider::valueChanged, this, &MainWindow::ChangeFriction);
-  ui_ -> frictionCoefficientSpinBox->setTracking(true);
 }
 
-void MainWindow::ChangeFriction(int value) {
-  double friction_coefficient = static_cast<double>(value) / 100.0;  // Scale slider value to be in the range 0.05 to 0.20
-  engine_->GetEnvironment().SetFrictionalCoefficient(friction_coefficient);
-  engine_->UpdateEnvironment();
-
-  ui_->frictionLabel->setText(QString::number(friction_coefficient, 'f', 2));  // Display with 2 decimal places
-}
 
 
 MainWindow::~MainWindow() {
@@ -108,7 +46,6 @@ void MainWindow::InitializeEngine()
     int width = sf::VideoMode::getDesktopMode().width;
     int height = sf::VideoMode::getDesktopMode().height;
     engine_ = new Engine(width, height);
-    //engine_->SetSpeed(10);
     ui_->canvas->SetSimulation(engine_->GetSimulation());
   }
   // If this function changes change the kMaxFoodDensityColor in config.h as for a correct shade of the backgroung we need this measure
@@ -122,24 +59,18 @@ void MainWindow::InitializeEngine()
                                         engine_->GetEnvironment().GetMapHeight());
 }
 
-void MainWindow::ChangeFoodDensity(int value) {
-  food_density = static_cast<double>(value) / 100000.0;     // Convert to density
-  auto food_density_function = [this](double x, double y) {
-      return x * y * 2 / (ui_->canvas->GetSimulation()->GetSimulationData()->GetEnvironment().GetMapWidth() *
-                          ui_->canvas->GetSimulation()->GetSimulationData()->GetEnvironment().GetMapHeight()) * food_density;
-  };
-  engine_->GetEnvironment().SetFoodDensity(food_density_function); // Update the density
-  engine_->UpdateEnvironment(); // Apply the updated density
-  ui_->canvas->UpdateFoodDensityTexture(engine_->GetEnvironment().GetMapWidth(),
-                                        engine_->GetEnvironment().GetMapHeight());
-  ui_->foodDensityLabel->clear();
-  ui_->foodDensityLabel->setText("Food density: " + QString::number(value));
+
+void MainWindow::InitializeEngineWithDensities(double food_density, double creature_density)
+{
+  if (!engine_) {
+    std::cout << "Creating new engine..." << std::endl;
+    int width = sf::VideoMode::getDesktopMode().width;
+    int height = sf::VideoMode::getDesktopMode().height;
+    engine_ = new Engine(width, height, food_density, creature_density);
+    ui_->canvas->SetSimulation(engine_->GetSimulation());
+  }
 }
 
-void MainWindow::ChangeCreatureDensity(int value) {
-  creature_density = static_cast<double>(value) / 10000.0; // Convert to density
-  RestartSimulation(); // restart simulation with new creature density
-}
 
 void MainWindow::RunSimulation() {
   if (engine_ && !engine_thread_.joinable()) {
@@ -196,93 +127,20 @@ void MainWindow::ToggleSimulation() {
   }
 }
 
-void MainWindow::ShowConfigScreen(){
 
-  if (!engine_->IsPaused()) {
-        engine_->Pause();
-        //change icon of button
-        QPixmap pixMap2(":/Resources/Run.png");
-        QIcon icon2(pixMap2);
-        ui_->runButton->setIcon(icon2);
-    }
-
-    double initial_creature_density = engine_->GetEnvironment().GetCreatureDensity();
-
-    // Create a new QDialog (config dialog)
-    QDialog* configDialog = new QDialog(this);
-    configDialog->setWindowTitle("Configuration");
-
-    // Get the size of the main window
-    QSize mainWindowSize = size();
-    /*
-    // Set the size of the configuration dialog based on the main window size
-    int dialogWidth = mainWindowSize.width() / 2;
-    int dialogHeight = mainWindowSize.height() / 2;
-    configDialog->resize(dialogWidth, dialogHeight);
-*/
-
-    //Create layouts
-    QVBoxLayout* mainLayout = new QVBoxLayout(configDialog);
-    QVBoxLayout* titleLayout = new QVBoxLayout();
-    QVBoxLayout* contentLayout = new QVBoxLayout();
-
-    mainLayout->addLayout(titleLayout);
-    mainLayout->addLayout(contentLayout);
-
-    QLabel* titleLabel = new QLabel("<html><h1><b>Configuration Options</b></h1></html>", configDialog);
-    QLabel* speedLabel = new QLabel("Simulation Speed:", configDialog);
-    QLabel* foodDLabel = new QLabel("Food density:", configDialog);
-    QLabel* frictionLabel = new QLabel("Friction:", configDialog);
-
-    QSlider* speedSlider = new QSlider(Qt::Horizontal, configDialog);
-    speedSlider-> setMinimum(0);
-    speedSlider-> setMaximum(5);
-    speedSlider-> setSingleStep(1);
-    speedSlider->setTickPosition(QSlider::TicksBelow);
-
-    QSlider* foodDSlider = new QSlider(Qt::Horizontal, configDialog);
-    QSlider* frictionSlider = new QSlider(Qt::Horizontal, configDialog);
-
-    titleLayout->addWidget(titleLabel, Qt::AlignTop | Qt::AlignHCenter);
-    contentLayout->addWidget(speedLabel);
-    contentLayout->addWidget(speedSlider);
-
-    contentLayout->addWidget(foodDLabel);
-    contentLayout->addWidget(foodDSlider);
-
-    contentLayout->addWidget(frictionLabel);
-    contentLayout->addWidget(frictionSlider);
-
-
-    titleLayout->setContentsMargins(20,5,20,20);
-    contentLayout->setContentsMargins(20,5,20,5);
-    mainLayout->setContentsMargins(5,5,5,5);
-
-/*    connect(speedSlider, &QSlider::valueChanged, this, &MainWindow::ChangeSpeed);*/
-
-    connect(foodDSlider, &QSlider::valueChanged, this, &MainWindow::ChangeFoodDensity);
-    connect(frictionSlider, &QSlider::valueChanged, this, &MainWindow::ChangeFriction);
-
-
-
-
-
-    // Show the configuration dialog modally
-    configDialog->setLayout(mainLayout);
-    configDialog->exec();
-
-    engine_->Resume();
-}
 
 void MainWindow::RestartSimulation() {
   KillEngine();
-
   InitializeEngine();
-
   RunSimulation();
 }
 
 
+void MainWindow::handleRestartSimulationRequested(double food_density, double creature_density) {
+  KillEngine();
+  InitializeEngineWithDensities(food_density, creature_density);
+  RunSimulation();
+}
 
 
 void MainWindow::keyPressEvent(QKeyEvent *event) {
@@ -297,3 +155,75 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
     }
 }
 
+
+void MainWindow::handleUIUpdateForConfigScreen(double food_density, double friction_coefficient){
+    ui_->foodDensityLabel->clear();
+    ui_->foodDensityLabel->setText("Food density: " + QString::number(food_density));
+    ui_->frictionLabel->setText(QString::number(friction_coefficient, 'f', 2));
+}
+
+void MainWindow::SetUpConnections()
+{
+    // Connect configuration menu signals
+    connect(config_manager_, &ConfigManager::UpdateUIForConfigScreen, this, &MainWindow::handleUIUpdateForConfigScreen);
+    connect(config_manager_, &ConfigManager::RestartSimulationRequested, this, &MainWindow::handleRestartSimulationRequested);
+    connect(config_manager_, &ConfigManager::ToggleSimulation, this, &MainWindow::ToggleSimulation);
+
+    // Connect buttons
+    connect(ui_->runButton, &QPushButton::clicked, this,
+            &MainWindow::ToggleSimulation);
+    connect(ui_->restartButton, &QPushButton::clicked, this,
+            &MainWindow::RestartSimulation);
+    connect(ui_->configurationButton, &QPushButton::clicked, config_manager_,
+            &ConfigManager::ShowConfigScreen);
+
+    // Connect graph logic
+    connect(ui_->graphMenu, SIGNAL(currentIndexChanged(int)), graph_manager_, SLOT(handleDropdownSelection(int)));
+    updateTimer = new QTimer(this);
+    connect(updateTimer, SIGNAL(timeout()), this, SLOT(recordCreatureCount()));
+    updateTimer->start(1000);  // Set the interval to 1000 milliseconds (1 second)
+
+    // Connect friction slider on main UI
+    connect(ui_->frictionCoefficientSpinBox, SIGNAL(valueChanged(double)), this,
+            SLOT(ChangeFrictionCoefficient(double)));
+    connect(ui_->frictionCoefficientSpinBox, &QSlider::valueChanged, config_manager_, &ConfigManager::ChangeFriction);
+    ui_ -> frictionCoefficientSpinBox->setTracking(true);
+
+}
+
+void MainWindow::DrawUI()
+{
+    // Draw graph menu
+    QComboBox *comboBox = ui_->graphMenu;
+    QPixmap originalPixmap(":/Resources/graph-wiki_ver_1.png");
+    QPixmap scaledPixmap = originalPixmap.scaled(20, 20, Qt::KeepAspectRatio);
+    comboBox->setIconSize(scaledPixmap.size());
+    comboBox->addItem(QIcon(scaledPixmap), "Graphs");
+    comboBox->addItem("Number of Creatures Over Time");
+    comboBox->addItem("Creatures Size Over Time");
+
+    // Set up run, restart
+    QRect rect(2,2,45,45);
+    QRect rect3(2,2,46,45);
+    QRegion region(rect, QRegion::Ellipse);
+    QRegion region3(rect3, QRegion::Ellipse);
+    ui_->runButton->setMask(region);
+    ui_->restartButton->setMask(region3);
+    QPixmap pixMap(":/Resources/Run.png");
+    QPixmap pixMap3(":/Resources/Restart.png");
+    QIcon icon(pixMap);
+    QIcon icon3(pixMap3);
+    ui_->runButton->setIcon(icon);
+    ui_->restartButton->setIcon(icon3);
+
+    //Set up config buttons
+    ui_->configurationButton->setMask(region);
+    QPixmap pixMap2(":/Resources/Configuration.png");
+    QIcon icon2(pixMap2);
+    ui_->configurationButton->setIcon(icon2);
+    QSize size(50, 50);
+
+    ui_->runButton->setIconSize(size);
+    ui_->configurationButton->setIconSize(size);
+    ui_->restartButton->setIconSize(size);
+}
