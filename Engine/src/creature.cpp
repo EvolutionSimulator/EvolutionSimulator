@@ -32,7 +32,7 @@ Creature::Creature(neat::Genome genome, Mutable mutables)
     size_ = mutables.GetBabySize();
     health_ = mutables.GetIntegrity() * pow(size_, 2);
     energy_ = mutables.GetEnergyDensity() * pow(size_, 2);
-    int neural_inputs = 0;
+    int neural_inputs = settings::environment::kInputNeurons;
     for (BrainModule module : genome.GetModules()){
         neural_inputs += module.GetInputNeuronIds().size();
     }
