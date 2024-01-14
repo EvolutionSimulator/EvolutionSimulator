@@ -1,4 +1,5 @@
 #include "grabbing_entity.h"
+#include "creature.h"
 
 #include <math.h>
 
@@ -109,4 +110,16 @@ double GrabbingEntity::GetTotalRotAccel() {
 
 void GrabbingEntity::UpdateEntityVelocities() {
   // Implementation
+}
+
+MovableEntity* GrabbingEntity::GetGrabbedEntity(){
+    return grabbed_entity_;
+}
+
+void GrabbingEntity::SetGrabbedEntity(MovableEntity *movable_entity){
+    grabbed_entity_ = movable_entity;
+}
+
+void GrabbingEntity::AddToGrabbingEntities(MovableEntity *movable_entity){
+    grabbing_entities_.insert(movable_entity);
 }

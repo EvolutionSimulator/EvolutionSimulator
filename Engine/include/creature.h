@@ -6,6 +6,7 @@
 #include "config.h"
 #include "food.h"
 #include "movable_entity.h"
+#include "grabbing_entity.h"
 #include "neat/neat-neural-network.h"
 #include "mutable.h"
 
@@ -32,7 +33,7 @@
  * for and consuming food, and managing its energy and health. The class also
  * supports evolutionary features like reproduction and genetic inheritance.
  */
-class Creature : public MovableEntity {
+class Creature : virtual public GrabbingEntity {
  public:
   Creature(neat::Genome genome, Mutable mutable_);
 
@@ -95,7 +96,8 @@ class Creature : public MovableEntity {
   int GetFoodID() const;
   void Digest(double deltaTime);
   void Bite(Food *food);
-  void Bite(Creature* creature);
+  void Bite(Creature *creature);
+  void Grab(Entity *entity);
   void Parasite(Creature* host);
   void AddAcid(double quantity);
 
@@ -156,7 +158,9 @@ class Creature : public MovableEntity {
   double bite_strength_; /*! How much radius of things it can bite - - mutable proportional to size */
   double eating_cooldown_; /*! How much time it has to wait to bite - mutable*/
   double stomach_acid_; /*! Added when digestion occurs */
-  bool biting_; /*! Indicates whether creature is biting or not*/
+  bool biting_;  /*! Indicates whether creature is biting or not*/
+  bool grabbing_;  /*! Indicates whether creature is grabbing or not*/
+
 };
 
 std::vector<Food *> get_food_at_distance(

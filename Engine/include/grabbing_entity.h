@@ -21,6 +21,11 @@ class GrabbingEntity : virtual public MovableEntity {
   double GetTotalForwardAccelAngle();
   double GetTotalRotAccel();
 
+  void SetGrabbedEntity(MovableEntity *movable_entity); //Setting the entity i am grabbing as my grabbed entity
+  void AddToGrabbingEntities(MovableEntity *movable_entity_); //Adding the entity that is grabbing me to the set of my grabbing entities
+
+  MovableEntity* GetGrabbedEntity();
+
  private:
   MovableEntity* grabbed_entity_{nullptr};
   std::unordered_set<MovableEntity*>
