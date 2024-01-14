@@ -1,4 +1,5 @@
 #include "creature.h"
+#include "grabbing_entity.h"
 
 #include <algorithm>
 #include <cassert>
@@ -26,6 +27,7 @@
 Creature::Creature(neat::Genome genome, Mutable mutables)
     : Entity(),
       MovableEntity(),
+      GrabbingEntity(),
       AliveEntity(genome, mutables),
       VisionSystem(genome, mutables),
       DigestiveSystem(genome, mutables),
@@ -175,7 +177,7 @@ void Creature::Update(double deltaTime, double const kMapWidth,
  * @brief Handles the collision of the creature with another entity.
  *
  * @details Processes the interaction when the creature collides with another
- * entity. If the entity is food, the creature consumes it. Otherwise, standard
+ * entity. If the creature is hungry, the creature consumes it, if the creature wants to grab it, it does so. Otherwise, standard
  * collision handling is performed.
  *
  * @param other_entity The entity the creature collides with.
@@ -190,6 +192,9 @@ void Creature::OnCollision(std::shared_ptr<Entity>other_entity, double const kMa
     } else if (std::shared_ptr<Creature>creature_entity = std::dynamic_pointer_cast<Creature>(other_entity)) {
             Bite(creature_entity);
     }
+  }
+  if (grabbing_ && IsInSight(other_entity) && !(this->GetGrabbedEntity())){ //checking if the creature wants to bite, has the entity in sight and if he is not already grabbing something
+      Grab(other_entity);
   }
   MovableEntity::OnCollision(other_entity, kMapWidth, kMapHeight);
 }
@@ -256,6 +261,8 @@ void Creature::Think(std::vector<std::vector<std::vector<std::shared_ptr<Entity>
   for (BrainModule& module : GetGenome().GetModules()){
      //No module with outputs atm but they should be used as with the input
   }
+
+  // grabbing_ = std::tanh(output.at(6)) > 0 ? 0 : 1;
 }
 
 
@@ -565,5 +572,23 @@ void Creature::Bite(std::shared_ptr<Creature> creature)
   creature->SetHealth(creature->GetHealth()-damage);
   SetEnergy(GetEnergy()+bite_strength_*SETTINGS.physical_constraints.d_bite_energy_consumption_ratio/10);
 }
+
+/*!
+ * @brief Handles the grabbing of another creature.
+ *
+ * @details Sets the entity the creature grabs as the grabbed entity.
+ * Adds the creature to the set of entities that grabs the grabbed entity.
+ * Decreases energy (depending on grabbed entity size).
+ * Updates the velocity.
+ *
+ * @param entity The entity the creature bites into.
+ */
+void Creature::Grab(std::shared_ptr<Entity> entity){
+    this->SetGrabbedEntity(std::dynamic_pointer_cast<MovableEntity>(entity));
+    std::dynamic_pointer_cast<GrabbingEntity>(entity)->AddToGrabbingEntities(std::make_shared<MovableEntity>(*this));
+    SetEnergy(GetEnergy() - entity->GetSize());
+    this->UpdateEntityVelocities();
+}
+
 
 
