@@ -613,25 +613,26 @@ void Genome::MutateActivateBrainModule(){
   std::uniform_int_distribution<int> distribution(0, AvailableModules.size() - 1);
   int randomIndex = distribution(generator);
   BrainModule module = AvailableModules.at(randomIndex);
-  modules_.push_back(module);
+
 
   int input_size = module.GetInputNeuronIds().size();
   std::vector<int> input_ids(input_size, 0);
-  for (int i = 0; i < module.GetInputNeuronIds().size(); i++) {
-      if (i == 0) module.SetFirstInputIndex(GetInputCount());
-      AddNeuron(Neuron(NeuronType::kInput, 0));
-      input_ids.at(i) = neurons_.back().GetId();
+  for (int i = 0; i < module.GetInputNeuronIds().size(); i++){
+    if (i == 0) module.SetFirstInputIndex(GetInputCount());
+    AddNeuron(Neuron(NeuronType::kInput, 0));
+    input_ids.at(i) = neurons_.back().GetId();
   }
   module.SetInputNeuronIds(input_ids);
 
   int output_size = module.GetOutputNeuronIds().size();
   std::vector<int> output_ids(output_size, 0);
-  for (int i = 0; i < module.GetOutputNeuronIds().size(); i++) {
-      if (i == 0) module.SetFirstOutputIndex(GetOutputCount());
-      AddNeuron(Neuron(NeuronType::kOutput, 0));
-      output_ids.at(i) = neurons_.back().GetId();
+  for (int i = 0; i < module.GetOutputNeuronIds().size(); i++){
+    if (i == 0) module.SetFirstOutputIndex(GetOutputCount());
+    AddNeuron(Neuron(NeuronType::kOutput, 0));
+    output_ids.at(i) = neurons_.back().GetId();
   }
   module.SetOutputNeuronIds(output_ids);
+  modules_.push_back(module);
 }
 
 /*!
