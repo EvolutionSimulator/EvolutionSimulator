@@ -63,6 +63,7 @@ private:
   double reproduction_cooldown_; /*!< Cooldown period before the creature can
                                     reproduce again. */
   double maturity_age_;
+  double gestation_ratio_to_incubation_; // TODO: implement this
   float color_;
   double stomach_capacity_factor_; /*!< Determines the stomach capacity in relation to
                             its size. */

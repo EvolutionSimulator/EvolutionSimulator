@@ -20,6 +20,8 @@ Egg::Egg(neat::Genome genome, Mutable mutables, const double x_coord,
   incubation_time_ = 1;  // TODO fix this
   fertilized_ = true;  // FOR NOW WE SAY THAT THE EGG IS FERTILIZED BY DEFAULT,
                        // CHANGES IF NOT FERTILIZED UPON BEING LAYED
+
+  // TODO calculate incubation time based on mutable complexity + (genome complexity later)
 }
 
 void Egg::SimulationUpdate() {

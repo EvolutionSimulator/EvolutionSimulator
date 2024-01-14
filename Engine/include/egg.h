@@ -7,13 +7,19 @@
 
 class Egg : public Food, public Creature {
  public:
-  Egg(neat::Genome genome, Mutable mutable_, double x_coord, double y_coord);
+  Egg();
+  Egg(neat::Genome genome, Mutable mutable_, int generation);
+  Egg(neat::Genome genome, Mutable mutable_, double coord_x, double coord_y); // TODO: remove this constructor
+  Egg(neat::Genome genome, Mutable mutable_, int generation, double coord_x, double coord_y); // TODO: remove this constructor
   void Break();
   Creature Hatch() const;
   void SimulationUpdate();
+  void SetCoordinates(double x_coord, double y_coord);
 
   double GetAge() const;
   double GetIncubationTime() const;
+
+  double GetPercentageIncubated() const;
 
  protected:
   double incubation_time_;

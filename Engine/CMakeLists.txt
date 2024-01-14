@@ -40,6 +40,9 @@ add_library(Engine STATIC
   include/mutable.h src/mutable.cpp
   include/egg.h
   src/egg.cpp
+  include/random.h
+  include/reproduction.h
+  src/reproduction.cpp
 
 )
 

@@ -28,6 +28,8 @@ struct SimulationData {
   void AddCreature(const Creature& entity);
   void RemoveCreature(const Creature& entity);
 
+  void AddEgg(const Egg& egg);
+
   void GenerateMoreFood();
   void UpdateGrid();
   void ClearGrid();

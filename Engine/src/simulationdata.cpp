@@ -144,7 +144,7 @@ void SimulationData::HatchEggs() {
     egg.SimulationUpdate();
     if (egg.GetAge() >= egg.GetIncubationTime()) {
       Creature new_creature = egg.Hatch();
-      // creatures_.emplace_back(new_creature);
+      AddCreature(new_creature);
       return true;
     }
     return false;
