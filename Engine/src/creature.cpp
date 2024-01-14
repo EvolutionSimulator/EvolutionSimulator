@@ -132,7 +132,7 @@ void Creature::Update(double deltaTime, double const kMapWidth,
  */
 
 void Creature::OnCollision(Entity &other_entity, double const kMapWidth, double const kMapHeight) {
-  if (other_entity.GetState() == Entity::Alive && eating_cooldown_ == 0.0 && biting_ == 1 && IsInSight(&other_entity)) {
+  if (other_entity.GetState() == Entity::Alive && eating_cooldown_ == 0.0 && biting_ && IsInSight(&other_entity)) {
 
     SetEnergy(GetEnergy() - bite_strength_ * SETTINGS.physical_constraints.d_bite_energy_consumption_ratio);
 
@@ -142,7 +142,8 @@ void Creature::OnCollision(Entity &other_entity, double const kMapWidth, double 
       Bite(creature_entity);
     }
   }
-  if (grabbing_ && IsInSight(&other_entity) && !(this->GetGrabbedEntity())){ //checking if the creature wants to bite, has the entity in sight and if he is not already grabbing something
+  if (other_entity.GetState() == Entity::Alive && grabbing_ && IsInSight(&other_entity) && !(this->GetGrabbedEntity())){
+    //checking if the creature wants to grab, has the entity in sight and if he is not already grabbing something
       Grab(&other_entity);
   }
   MovableEntity::OnCollision(other_entity, kMapWidth, kMapHeight);
@@ -521,10 +522,13 @@ void Creature::Bite(Creature* creature)
  * @param entity The entity the creature bites into.
  */
 void Creature::Grab(Entity* entity){
+  if (dynamic_cast<MovableEntity*>(entity))
+  {
     this->SetGrabbedEntity(dynamic_cast<MovableEntity*>(entity));
-    //dynamic_cast<GrabbingEntity*>(entity)->AddToGrabbingEntities(this);
+    dynamic_cast<GrabbingEntity*>(entity)->AddToGrabbingEntities(this);
     SetEnergy(GetEnergy() - entity->GetSize());
     this->UpdateEntityVelocities();
+  }
 }
 
 
