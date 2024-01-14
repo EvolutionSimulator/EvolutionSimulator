@@ -8,6 +8,9 @@
 #include "digestive_system.h"
 #include "food.h"
 #include "movable_entity.h"
+
+#include "grabbing_entity.h"
+
 #include "mutable.h"
 #include "neat/neat-neural-network.h"
 #include "reproduction.h"
@@ -40,6 +43,7 @@ class Creature : virtual public MovableEntity,
                  virtual public AliveEntity,
                  virtual public VisionSystem,
                  virtual public DigestiveSystem,
+                 virtual public GrabbingEntity,
                  virtual public MaleReproductiveSystem,
                  virtual public FemaleReproductiveSystem {
  public:
@@ -61,8 +65,13 @@ class Creature : virtual public MovableEntity,
   void Think(std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
              double GridCellSize, double deltaTime, double width, double height);
 
+
   void Bite(std::shared_ptr<Creature> creature);
   bool Compatible(const std::shared_ptr<Creature> other_creature);
+
+  void Grab(std::shared_ptr<Entity>entity);
+
+
 
   std::shared_ptr<Creature> GetClosestEnemyInSight(
       std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,

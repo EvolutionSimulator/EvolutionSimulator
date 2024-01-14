@@ -1,4 +1,5 @@
 #include "grabbing_entity.h"
+#include "creature.h"
 
 #include <math.h>
 
@@ -16,15 +17,14 @@ double GrabbingEntity::GetEffectiveRotationalAcceleration() const {
   // Implementation
 }
 
-std::unordered_set<MovableEntity*> GrabbingEntity::GetEntities() {
-  std::unordered_set<MovableEntity*> entities;
-  entities.insert(dynamic_cast<MovableEntity*>(this));
-  for (auto& entity : grabbing_entities_) {
-    if (entity == this) continue;
+std::unordered_set<std::shared_ptr<MovableEntity>> GrabbingEntity::GetEntities() {
+  std::unordered_set<std::shared_ptr<MovableEntity>> entities;
+  entities.insert(std::make_shared<MovableEntity>(*this));
+  for (auto entity : grabbing_entities_) {
+    if (entity->GetID() == this->GetID()) continue;
 
-    if (dynamic_cast<GrabbingEntity*>(entity) != nullptr) {
-      for (auto& entity2 :
-           dynamic_cast<GrabbingEntity*>(entity)->GetEntities()) {
+    if (std::dynamic_pointer_cast<GrabbingEntity>(entity) != nullptr) {
+      for (auto entity2 : std::dynamic_pointer_cast<GrabbingEntity>(entity)->GetEntities()) {
         entities.insert(entity2);
       }
     }
@@ -33,7 +33,7 @@ std::unordered_set<MovableEntity*> GrabbingEntity::GetEntities() {
 }
 
 std::pair<double, double> GrabbingEntity::GetCentreOfMass() {
-  std::unordered_set<MovableEntity*> entities = GetEntities();
+  std::unordered_set<std::shared_ptr<MovableEntity>> entities = GetEntities();
   std::pair<double, double> centre_of_mass = {0, 0};
   for (auto& entity : entities) {
     centre_of_mass.first +=
@@ -48,7 +48,7 @@ std::pair<double, double> GrabbingEntity::GetCentreOfMass() {
 }
 
 double GrabbingEntity::GetTotalMass() {
-  std::unordered_set<MovableEntity*> entities = GetEntities();
+  std::unordered_set<std::shared_ptr<MovableEntity>> entities = GetEntities();
   double total_mass = 0;
   for (auto& entity : entities) {
     total_mass += pow(entity->GetSize(), 2);
@@ -57,7 +57,7 @@ double GrabbingEntity::GetTotalMass() {
 }
 
 std::pair<double, double> GrabbingEntity::GetTotalForwardAccelComps() {
-  std::unordered_set<MovableEntity*> entities = GetEntities();
+  std::unordered_set<std::shared_ptr<MovableEntity>> entities = GetEntities();
   std::pair<double, double> total_forward_accel = {0, 0};
   double total_mass = GetTotalMass();
   for (auto& entity : entities) {
@@ -83,7 +83,7 @@ double GrabbingEntity::GetTotalForwardAccelAngle() {
 }
 
 double GrabbingEntity::GetTotalRotAccel() {
-  std::unordered_set<MovableEntity*> entities = GetEntities();
+  std::unordered_set<std::shared_ptr<MovableEntity>> entities = GetEntities();
   std::pair<double, double> centre_of_mass = GetCentreOfMass();
   double total_rot_accel = 0;
   for (auto& entity : entities) {
@@ -109,4 +109,16 @@ double GrabbingEntity::GetTotalRotAccel() {
 
 void GrabbingEntity::UpdateEntityVelocities() {
   // Implementation
+}
+
+std::shared_ptr<MovableEntity> GrabbingEntity::GetGrabbedEntity(){
+    return grabbed_entity_;
+}
+
+void GrabbingEntity::SetGrabbedEntity(std::shared_ptr<MovableEntity>movable_entity){
+    grabbed_entity_ = movable_entity;
+}
+
+void GrabbingEntity::AddToGrabbingEntities(std::shared_ptr<MovableEntity>movable_entity){
+    grabbing_entities_.insert(movable_entity);
 }
