@@ -56,12 +56,12 @@
      </colorrole>
     </inactive>
     <disabled>
-     <colorrole role="Base">
+     <colorrole role="WindowText">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>0</red>
-        <green>0</green>
-        <blue>0</blue>
+        <red>120</red>
+        <green>120</green>
+        <blue>120</blue>
        </color>
       </brush>
      </colorrole>
@@ -102,24 +102,6 @@
     <property name="styleSheet">
      <string notr="true"/>
     </property>
-    <widget class="QLineEdit" name="foodDensityLabel">
-     <property name="geometry">
-      <rect>
-       <x>670</x>
-       <y>30</y>
-       <width>141</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">color: rgb(0, 0, 0);
-border-color: rgb(0, 0, 0);
-background-color: rgb(255, 255, 255);</string>
-     </property>
-     <property name="text">
-      <string>Food Density:</string>
-     </property>
-    </widget>
    </widget>
    <widget class="QPushButton" name="runButton">
     <property name="geometry">
@@ -430,15 +412,6 @@ background-color: rgb(255, 255, 255);</string>
          </color>
         </brush>
        </colorrole>
-       <colorrole role="BrightText">
-        <brush brushstyle="SolidPattern">
-         <color alpha="255">
-          <red>255</red>
-          <green>255</green>
-          <blue>255</blue>
-         </color>
-        </brush>
-       </colorrole>
        <colorrole role="ButtonText">
         <brush brushstyle="SolidPattern">
          <color alpha="255">
@@ -484,27 +457,9 @@ background-color: rgb(255, 255, 255);</string>
          </color>
         </brush>
        </colorrole>
-       <colorrole role="ToolTipBase">
-        <brush brushstyle="SolidPattern">
-         <color alpha="255">
-          <red>255</red>
-          <green>255</green>
-          <blue>220</blue>
-         </color>
-        </brush>
-       </colorrole>
-       <colorrole role="ToolTipText">
-        <brush brushstyle="SolidPattern">
-         <color alpha="255">
-          <red>0</red>
-          <green>0</green>
-          <blue>0</blue>
-         </color>
-        </brush>
-       </colorrole>
        <colorrole role="PlaceholderText">
         <brush brushstyle="SolidPattern">
-         <color alpha="128">
+         <color alpha="255">
           <red>160</red>
           <green>160</green>
           <blue>160</blue>
@@ -576,15 +531,6 @@ background-color: rgb(255, 255, 255);</string>
          </color>
         </brush>
        </colorrole>
-       <colorrole role="BrightText">
-        <brush brushstyle="SolidPattern">
-         <color alpha="255">
-          <red>255</red>
-          <green>255</green>
-          <blue>255</blue>
-         </color>
-        </brush>
-       </colorrole>
        <colorrole role="ButtonText">
         <brush brushstyle="SolidPattern">
          <color alpha="255">
@@ -630,27 +576,9 @@ background-color: rgb(255, 255, 255);</string>
          </color>
         </brush>
        </colorrole>
-       <colorrole role="ToolTipBase">
-        <brush brushstyle="SolidPattern">
-         <color alpha="255">
-          <red>255</red>
-          <green>255</green>
-          <blue>220</blue>
-         </color>
-        </brush>
-       </colorrole>
-       <colorrole role="ToolTipText">
-        <brush brushstyle="SolidPattern">
-         <color alpha="255">
-          <red>0</red>
-          <green>0</green>
-          <blue>0</blue>
-         </color>
-        </brush>
-       </colorrole>
        <colorrole role="PlaceholderText">
         <brush brushstyle="SolidPattern">
-         <color alpha="128">
+         <color alpha="255">
           <red>160</red>
           <green>160</green>
           <blue>160</blue>
@@ -722,15 +650,6 @@ background-color: rgb(255, 255, 255);</string>
          </color>
         </brush>
        </colorrole>
-       <colorrole role="BrightText">
-        <brush brushstyle="SolidPattern">
-         <color alpha="255">
-          <red>255</red>
-          <green>255</green>
-          <blue>255</blue>
-         </color>
-        </brush>
-       </colorrole>
        <colorrole role="ButtonText">
         <brush brushstyle="SolidPattern">
          <color alpha="255">
@@ -776,27 +695,9 @@ background-color: rgb(255, 255, 255);</string>
          </color>
         </brush>
        </colorrole>
-       <colorrole role="ToolTipBase">
-        <brush brushstyle="SolidPattern">
-         <color alpha="255">
-          <red>255</red>
-          <green>255</green>
-          <blue>220</blue>
-         </color>
-        </brush>
-       </colorrole>
-       <colorrole role="ToolTipText">
-        <brush brushstyle="SolidPattern">
-         <color alpha="255">
-          <red>0</red>
-          <green>0</green>
-          <blue>0</blue>
-         </color>
-        </brush>
-       </colorrole>
        <colorrole role="PlaceholderText">
         <brush brushstyle="SolidPattern">
-         <color alpha="128">
+         <color alpha="255">
           <red>160</red>
           <green>160</green>
           <blue>160</blue>
@@ -1109,7 +1010,7 @@ QSlider::groove:horizontal {
      <bool>false</bool>
     </property>
     <property name="styleSheet">
-     <string notr="true">QFrame { 
+     <string notr="true">QFrame {
 background-color: rgb(20, 22, 69)
  }</string>
     </property>

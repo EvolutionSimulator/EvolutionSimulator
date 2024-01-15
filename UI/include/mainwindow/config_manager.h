@@ -21,7 +21,8 @@ public slots:
 signals:
   void RestartSimulationRequested(double food_density, double creature_density);
   void UpdateUIForConfigScreen(double food_density, double friction_coefficient);
-  void ToggleSimulation();
+  void PauseSimulation();
+  void ResumeSimulation();
 
 private:
   double creature_density_ = 0.001;
