@@ -4,7 +4,7 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "qsfmlcanvas.h"
+#include "qwidgets/qsfmlcanvas.h"
 #include "simulation.h"
 #include "info_panel.h"
 #include "texture_manager.h"

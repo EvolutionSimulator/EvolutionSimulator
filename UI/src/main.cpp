@@ -6,7 +6,7 @@
 #include <thread>
 
 #include "mainwindow/mainwindow.h"
-#include "qsfmlcanvas.h"
+#include "qwidgets/qsfmlcanvas.h"
 
 int main(int argc, char *argv[]) {
   SETTINGS.LoadFromFile("./settings.json");
