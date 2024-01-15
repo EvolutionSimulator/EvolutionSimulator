@@ -19,15 +19,14 @@ SimulationCanvas::SimulationCanvas(QWidget* Parent)
 
   selectedCreature = nullptr;
 
+  // Scale the map width and height according to the pixel ratio
   scale_x_ = 1.0/texture_.getSize().x;
   scale_y_ = 1.0/texture_.getSize().y;
-
 
   int width = sf::VideoMode::getDesktopMode().width;
   int height = sf::VideoMode::getDesktopMode().height;
   float scaleFactor = this->devicePixelRatioF(); // Get the device pixel ratio
 
-  // Scale the map width and height according to the pixel ratio
   int scaledWidth = static_cast<int>(width/scaleFactor);
   int scaledHeight = static_cast<int>(height/scaleFactor);
 
@@ -41,13 +40,6 @@ SimulationCanvas::SimulationCanvas(QWidget* Parent)
   InitializeFile(eyes_texture_, ":/Resources/Creature_eyes.png");
   InitializeFile(tail_texture_, ":/Resources/Creature_tails.png");
   InitializeFile(food_texture_, ":/Resources/Food_32x32.png");
-
-  trackButton_.setSize(sf::Vector2f(100, 30));         // Example size
-  trackButton_.setFillColor(sf::Color(100, 100, 200)); // Example color
-  trackButtonText_.setFont(font_);                     // Assuming you've already loaded a font
-  trackButtonText_.setString("Track");
-  trackButtonText_.setCharacterSize(15);
-  trackButtonText_.setFillColor(sf::Color::White);
 
   std::cout << "SimulationCanvas created" << std::endl;
 }
@@ -190,7 +182,7 @@ void SimulationCanvas::OnUpdate()
 {
   RenderSimulation(simulation_->GetSimulationData());
 
-  // Check if a creature is selected and draw the red border if true
+  // Check if a creature is selected
   if (showInfoPanel && selectedCreature) {
     // Right info panel setup
     sf::Vector2f panelSize(200, getSize().y);  // Width of 200 and full height of the canvas
@@ -526,7 +518,6 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
     if (sqrt(pow(mousePos.x - creaturePos.x, 2) + pow(mousePos.y - creaturePos.y, 2)) <= creatureSize) {
       qDebug() << "Creature Clicked: ID" << creature.GetID();
       showInfoPanel = true;
-      selectedCreatureInfo = CreatureInfo{ creature.GetID(), creatureX, creatureY, creatureSize, creature.GetFoodID()};
       selectedCreature = &creature;
       repaint();
       return;
@@ -535,7 +526,6 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
 
   qDebug() << "Click Outside, closing panel";
   showInfoPanel = false;
-  selectedCreatureInfo.reset();
   selectedCreature = nullptr;
   repaint();
 }
@@ -548,7 +538,7 @@ bool SimulationCanvas::isCreatureClicked(const sf::Vector2f& mousePos) {
 }
 
 void SimulationCanvas::displayInfoPanel() {
-  if (clickedCreaturePos) {
+  if (selectedCreature) {
     showInfoPanel = true;
   }
 }
