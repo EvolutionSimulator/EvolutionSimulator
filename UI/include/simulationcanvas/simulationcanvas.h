@@ -38,9 +38,6 @@ class SimulationCanvas : public QSFMLCanvas {
 
   Creature* selectedCreature;
 
-
-
-
   bool showInfoPanel;
   QString creatureInfo;
   QRectF panelRect;
