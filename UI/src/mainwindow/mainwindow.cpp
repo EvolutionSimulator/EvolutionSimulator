@@ -84,6 +84,9 @@ void MainWindow::PauseSimulation()
   if (engine_) {
     engine_->Pause();
   }
+  QPixmap pixMap(":/Resources/Run.png");
+  QIcon icon(pixMap);
+  ui_->runButton->setIcon(icon);
 }
 
 void MainWindow::ResumeSimulation()
@@ -91,6 +94,9 @@ void MainWindow::ResumeSimulation()
   if (engine_) {
     engine_->Resume();
   }
+  QPixmap pixMap(":/Resources/Pause.png");
+  QIcon icon(pixMap);
+  ui_->runButton->setIcon(icon);
 }
 
 void MainWindow::KillEngine()
@@ -157,8 +163,6 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
 
 
 void MainWindow::handleUIUpdateForConfigScreen(double food_density, double friction_coefficient){
-    ui_->foodDensityLabel->clear();
-    ui_->foodDensityLabel->setText("Food density: " + QString::number(food_density));
     ui_->frictionLabel->setText(QString::number(friction_coefficient, 'f', 2));
 }
 
@@ -167,7 +171,8 @@ void MainWindow::SetUpConnections()
     // Connect configuration menu signals
     connect(config_manager_, &ConfigManager::UpdateUIForConfigScreen, this, &MainWindow::handleUIUpdateForConfigScreen);
     connect(config_manager_, &ConfigManager::RestartSimulationRequested, this, &MainWindow::handleRestartSimulationRequested);
-    connect(config_manager_, &ConfigManager::ToggleSimulation, this, &MainWindow::ToggleSimulation);
+    connect(config_manager_, &ConfigManager::PauseSimulation, this, &MainWindow::PauseSimulation);
+    connect(config_manager_, &ConfigManager::ResumeSimulation, this, &MainWindow::ResumeSimulation);
 
     // Connect buttons
     connect(ui_->runButton, &QPushButton::clicked, this,

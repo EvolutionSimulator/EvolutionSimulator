@@ -33,7 +33,7 @@ void ConfigManager::ChangeFriction(int value) {
 
 void ConfigManager::ShowConfigScreen(){
 
-  emit ToggleSimulation();
+  emit PauseSimulation();
 
   double initial_creature_density = engine_->GetEnvironment().GetCreatureDensity();
 
@@ -95,7 +95,7 @@ void ConfigManager::ShowConfigScreen(){
   configDialog->setLayout(mainLayout);
   configDialog->exec();
 
-  emit ToggleSimulation();
+  emit ResumeSimulation();
 }
 
 
