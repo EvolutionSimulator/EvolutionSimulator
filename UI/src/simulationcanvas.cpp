@@ -621,45 +621,63 @@ void SimulationCanvas::DrawVisionCone(sf::RenderTarget& target, const Creature& 
 }
 
 void SimulationCanvas::wheelEvent(QWheelEvent *event) {
-    float delta = event->angleDelta().y() > 0 ? 1.1f : 0.9f;
-
-    // Adjust coordinates for screen scaling
-    float scaleFactor = this->devicePixelRatioF(); // Get the device pixel ratio from the QWidget
-
-    // Convert QPoint to sf::Vector2i and adjust for the scaling factor
+    // Use platform-independent pixelDelta for wheel events
+    QPoint pixelDelta = event->pixelDelta();
+    QPoint angleDelta = event->angleDelta();
+    float scaleFactor = this->devicePixelRatioF();
     sf::Vector2i scaledPos(static_cast<int>(event->position().x() * scaleFactor),
-                           static_cast<int>(event->position().y() * scaleFactor));
+                               static_cast<int>(event->position().y() * scaleFactor));
 
-    // Map the scaled pixel coordinates to world coordinates
-    sf::Vector2f worldPos = mapPixelToCoords(scaledPos);
-    zoom(delta, worldPos);
+    if (!pixelDelta.isNull()) {
+        // Use pixelDelta for more accurate scrolling
+        float delta = pixelDelta.y() > 0 ? 1.1f : 0.9f;
+        sf::Vector2f worldPos = mapPixelToCoords(scaledPos);
+        zoom(delta, worldPos);
+    } else if (!angleDelta.isNull()) {
+        // Use angleDelta as a fallback
+        float delta = angleDelta.y() > 0 ? 1.1f : 0.9f;
+        sf::Vector2f worldPos = mapPixelToCoords(scaledPos);
+        zoom(delta, worldPos);
+    }
 }
 
 void SimulationCanvas::zoom(float factor, sf::Vector2f& zoomPoint) {
-    //Get the current view
+    // Get the current view
     sf::View view = getView();
-    sf::Vector2f newCenter;
+
     // Check for maximum zoom
     if (zoomFactor * factor > 1) {
         zoomFactor = 1;
-        newCenter = initialViewCenter;
+        view.setCenter(initialViewCenter);
     } else {
         zoomFactor *= factor;
-        // Get the current view center
-        sf::Vector2f currentCenter = view.getCenter();
 
-        // Calculate the direction vector from current center to zoom point
-        sf::Vector2f direction = currentCenter - zoomPoint;
+        // Get the current mouse position in screen coordinates
+        sf::Vector2i mouseScreenPos = sf::Mouse::getPosition(*this);
 
-        // Decide how much of this direction to apply
-        // For a more noticeable zoom effect, you can adjust the multiplier (e.g., 0.1)
-        sf::Vector2f movement = direction * (factor - 1.0f);
+        // Convert screen coordinates to world coordinates
+        sf::Vector2f mouseWorldPosBeforeZoom = mapPixelToCoords(mouseScreenPos);
 
-        // Calculate the new center
-        newCenter = currentCenter + movement;
+        // Calculate the new center directly based on the mouse position
+        sf::Vector2f newCenter = mouseWorldPosBeforeZoom;
+
+        // Adjust the new center based on the zoom factor and direction
+        float zoomSpeed = 0.1f;
+        sf::Vector2f centerDiff = newCenter - view.getCenter();
+        if (factor > 1.0f) {
+            // Invert the direction for zooming out
+            centerDiff *= -(1.0f + 1.0f / (8*factor));
+        }
+        view.setCenter(view.getCenter() + centerDiff * zoomSpeed);
+
+        // After adjusting center, get the new mouse position in world coordinates
+        sf::Vector2f mouseWorldPosAfterZoom = mapPixelToCoords(mouseScreenPos);
+        // Adjust the center again to ensure it's relative to the mouse position
+        sf::Vector2f zoomDiff = mouseWorldPosBeforeZoom - mouseWorldPosAfterZoom;
+        view.setCenter(view.getCenter() + zoomDiff * factor);
     }
-    // Set the new center and size of the view
-    view.setCenter(newCenter);
+
+    // Set the new size of the view
     view.setSize(initialViewSize.x * zoomFactor, initialViewSize.y * zoomFactor);
 
     // Apply the new view and update
