@@ -1073,7 +1073,7 @@ background-color: rgb(20, 22, 69)
   <customwidget>
    <class>SimulationCanvas</class>
    <extends>QWidget</extends>
-   <header location="global">simulationcanvas.h</header>
+   <header location="global">simulationcanvas/simulationcanvas.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
