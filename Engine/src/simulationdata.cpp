@@ -5,9 +5,10 @@
 #include <cmath>
 #include <stdexcept>
 #include <vector>
-#include "egg.h"
+
 #include "collisions.h"
 #include "config.h"
+#include "egg.h"
 #include "food.h"
 
 /*!
@@ -18,7 +19,7 @@
  */
 
 void SimulationData::AddCreature(const Creature& creature) {
-    creatures_.push_back(creature);
+  creatures_.push_back(creature);
 }
 
 /*!
@@ -120,10 +121,12 @@ void SimulationData::UpdateAllCreatures(double deltaTime) {
 void SimulationData::GenerateMoreFood() {
   double size = food_entities_.size();
   double max_number = environment_.GetFoodDensity() *
-                      environment_.GetMapHeight() *
-                      environment_.GetMapWidth() / 100;
-  if (creatures_.size() > 300) {//temporary fix so that an abnormal number of creatures can't abuse the food generation system
-      return ;
+                      environment_.GetMapHeight() * environment_.GetMapWidth() /
+                      100;
+  if (creatures_.size() >
+      300) {  // temporary fix so that an abnormal number of creatures can't
+              // abuse the food generation system
+    return;
   }
   while (size < max_number) {
     Plant new_food = Plant();
@@ -136,121 +139,117 @@ void SimulationData::GenerateMoreFood() {
   }
 }
 
+void SimulationData::HatchEggs() {
+  std::remove_if(eggs_.begin(), eggs_.end(), [this](Egg& egg) {
+    egg.SimulationUpdate();
+    if (egg.GetAge() >= egg.GetIncubationTime()) {
+      Creature new_creature = egg.Hatch();
+      // creatures_.emplace_back(new_creature);
+      return true;
+    }
+    return false;
+  });
+}
+
 /*!
-* @brief Handles the reproduction process of creatures in the simulation.
-*
-* @details Pairs creatures by compatibility from the reproduction queue and creates offspring
-* with crossed-over genomes.
-*/
+ * @brief Handles the reproduction process of creatures in the simulation.
+ *
+ * @details Pairs creatures by compatibility from the reproduction queue and
+ * creates offspring with crossed-over genomes.
+ */
 void SimulationData::ReproduceCreatures() {
-   double world_width = environment_.GetMapWidth();
-   double world_height = environment_.GetMapHeight();
-   double max_creature_size = settings::environment::kMaxCreatureSize;
-   double min_creature_size = settings::environment::kMinCreatureSize;
+  double world_width = environment_.GetMapWidth();
+  double world_height = environment_.GetMapHeight();
+  double max_creature_size = settings::environment::kMaxCreatureSize;
+  double min_creature_size = settings::environment::kMinCreatureSize;
 
-   std::queue<Creature> not_reproduced;
-   std::queue<Creature> temp_queue;
+  std::queue<Creature> not_reproduced;
+  std::queue<Creature> temp_queue;
 
-   while (!reproduce_.empty()) {
-       Creature creature1 = reproduce_.front();
-       reproduce_.pop();
-       bool paired = false;
+  while (!reproduce_.empty()) {
+    Creature creature1 = reproduce_.front();
+    reproduce_.pop();
+    bool paired = false;
 
-       // Attempt to pair creature1 with a compatible new creature
-       while (!new_reproduce_.empty() && !paired) {
-           Creature creature2 = new_reproduce_.front();
-           new_reproduce_.pop();
-           //If these two creatures are compatible reproduce them otherwise
-           //save the creature in a temporary queue for the next pairing round
-           if (creature1.Compatible(creature2)) {
-               ReproduceTwoCreatures(creature1, creature2);
-               paired = true;
-           } else {
-               temp_queue.push(creature2); // Save for next round
-           }
-       }
+    // Attempt to pair creature1 with a compatible new creature
+    while (!new_reproduce_.empty() && !paired) {
+      Creature creature2 = new_reproduce_.front();
+      new_reproduce_.pop();
+      // If these two creatures are compatible reproduce them otherwise
+      // save the creature in a temporary queue for the next pairing round
+      if (creature1.Compatible(creature2)) {
+        ReproduceTwoCreatures(creature1, creature2);
+        paired = true;
+      } else {
+        temp_queue.push(creature2);  // Save for next round
+      }
+    }
 
-       // If the creature wasn't paired add it to not_reproduced
-       if (!paired) {
-           not_reproduced.push(creature1);
-       }
+    // If the creature wasn't paired add it to not_reproduced
+    if (!paired) {
+      not_reproduced.push(creature1);
+    }
 
-       // Refill newCreatures with unpaired creatures for next attempt
-       while (!temp_queue.empty()) {
-           new_reproduce_.push(temp_queue.front());
-           temp_queue.pop();
-       }
-   }
+    // Refill newCreatures with unpaired creatures for next attempt
+    while (!temp_queue.empty()) {
+      new_reproduce_.push(temp_queue.front());
+      temp_queue.pop();
+    }
+  }
 
-   // Refill reproduce_ with creatures for the next iteration
-   while (!new_reproduce_.empty()) {
-       reproduce_.push(new_reproduce_.front());
-       new_reproduce_.pop();
-   }
+  // Refill reproduce_ with creatures for the next iteration
+  while (!new_reproduce_.empty()) {
+    reproduce_.push(new_reproduce_.front());
+    new_reproduce_.pop();
+  }
 
-   // Refill reproduce_ with the remaining creatures
-   while (!not_reproduced.empty()) {
-       reproduce_.push(not_reproduced.front());
-       not_reproduced.pop();
-   }
+  // Refill reproduce_ with the remaining creatures
+  while (!not_reproduced.empty()) {
+    reproduce_.push(not_reproduced.front());
+    not_reproduced.pop();
+  }
 }
 
 /*!
-*  @brief Reproduces two creatures and adds a descendant to the simulation
-*
-*  @details Takes two creatures and uses the crossover functions for genomes and
-*  mutables to create a child creature out of the previous two. We take as the dominant
-*  creature for the algorithms that that has the highest energy at the moment of reproduction
-*/
-void SimulationData::ReproduceTwoCreatures(Creature& creature1, Creature& creature2){
- double world_width = environment_.GetMapWidth();
- double world_height = environment_.GetMapHeight();
- double energy1 = creature1.GetEnergy();
- double energy2 = creature2.GetEnergy();
- if (energy1 > energy2) {
-   neat::Genome new_genome =
-           neat::Crossover(creature1.GetGenome(), creature2.GetGenome());
-   new_genome.Mutate();
-   new_genome.Mutate();
-   Mutable new_mutable =
-           MutableCrossover(creature1.GetMutable(), creature2.GetMutable());
-   new_mutable.Mutate();
-   new_mutable.Mutate();
-   if (creature1.GetGender() == 1) {
-       Egg new_egg(new_genome, new_mutable,creature1.GetCoordinates().first , creature1.GetCoordinates().second);
-       new_egg.SetGeneration(creature1.GetGeneration() + 1);
-       food_entities_.push_back(new_egg);
-
-   } else {
-       Egg new_egg(new_genome, new_mutable,creature2.GetCoordinates().first , creature2.GetCoordinates().second);
-       new_egg.SetGeneration(creature2.GetGeneration() + 1);
-       food_entities_.push_back(new_egg);
-
-   }
-
- } else {
-   neat::Genome new_genome =
-           neat::Crossover(creature2.GetGenome(), creature1.GetGenome());
-   new_genome.Mutate();
-   new_genome.Mutate();
-   Mutable new_mutable =
-           MutableCrossover(creature2.GetMutable(), creature1.GetMutable());
-   new_mutable.Mutate();
-   new_mutable.Mutate();
-   if (creature1.GetGender() == 1) {
-       Egg new_egg(new_genome, new_mutable,creature1.GetCoordinates().first , creature1.GetCoordinates().second);
-       new_egg.SetGeneration(creature1.GetGeneration() + 1);
-       food_entities_.push_back(new_egg);
-
-   } else {
-       Egg new_egg(new_genome, new_mutable,creature2.GetCoordinates().first , creature2.GetCoordinates().second);
-       new_egg.SetGeneration(creature2.GetGeneration() + 1);
-       food_entities_.push_back(new_egg);
-
-   }
- }
+ *  @brief Reproduces two creatures and adds a descendant to the simulation
+ *
+ *  @details Takes two creatures and uses the crossover functions for genomes
+ * and mutables to create a child creature out of the previous two. We take as
+ * the dominant creature for the algorithms that that has the highest energy at
+ * the moment of reproduction
+ */
+void SimulationData::ReproduceTwoCreatures(Creature& creature1,
+                                           Creature& creature2) {
+  double world_width = environment_.GetMapWidth();
+  double world_height = environment_.GetMapHeight();
+  double energy1 = creature1.GetEnergy();
+  double energy2 = creature2.GetEnergy();
+  if (energy2 > energy1) {
+    std::swap(energy1, energy2);
+    std::swap(creature1, creature2);
+  }
+  if (energy1 > energy2) {
+    neat::Genome new_genome =
+        neat::Crossover(creature1.GetGenome(), creature2.GetGenome());
+    new_genome.Mutate();
+    new_genome.Mutate();
+    Mutable new_mutable =
+        MutableCrossover(creature1.GetMutable(), creature2.GetMutable());
+    new_mutable.Mutate();
+    new_mutable.Mutate();
+    if (creature1.GetGender() == 1) {
+      Egg new_egg(new_genome, new_mutable, creature1.GetCoordinates().first,
+                  creature1.GetCoordinates().second);
+      new_egg.SetGeneration(creature1.GetGeneration() + 1);
+      eggs_.push_back(new_egg);
+    } else {
+      Egg new_egg(new_genome, new_mutable, creature2.GetCoordinates().first,
+                  creature2.GetCoordinates().second);
+      new_egg.SetGeneration(creature2.GetGeneration() + 1);
+      eggs_.push_back(new_egg);
+    }
+  }
 }
-
 
 /*!
  * @brief Initializes creatures randomly on the map, mutating their genome
@@ -269,8 +268,8 @@ void SimulationData::InitializeCreatures() {
   for (double x = 0; x < world_width; x += 2.0) {
     for (double y = 0; y < world_height; y += 2.0) {
       if (std::rand() / (RAND_MAX + 1.0) < creature_density) {
-        //neat::Genome genome(settings::environment::kInputNeurons,
-        //                    settings::environment::kOutputNeurons);
+        // neat::Genome genome(settings::environment::kInputNeurons,
+        //                     settings::environment::kOutputNeurons);
         Mutable mutables;
         for (int i = 0; i < 40; i++) {
           mutables.Mutate();
@@ -339,15 +338,14 @@ void SimulationData::ClearGrid() {
  * @param cellSize Size of the grid cells.
  */
 
-void UpdateGridFood(
-    std::vector<Food>& foods,
-    std::vector<std::vector<std::vector<Entity*>>>& entityGrid,
-    double cellSize) {
+void UpdateGridFood(std::vector<Food>& foods,
+                    std::vector<std::vector<std::vector<Entity*>>>& entityGrid,
+                    double cellSize) {
   foods.erase(std::remove_if(foods.begin(), foods.end(),
-                                [](const Food& food) {
-                                    return food.GetState() != Entity::Alive;
-                                }),
-                 foods.end());
+                             [](const Food& food) {
+                               return food.GetState() != Entity::Alive;
+                             }),
+              foods.end());
 
   for (Food& entity : foods) {
     std::pair<double, double> coordinates = entity.GetCoordinates();
@@ -357,7 +355,6 @@ void UpdateGridFood(
     entityGrid[gridX][gridY].push_back(&entity);
   }
 }
-
 
 /*!
  * @brief Function that turns the dead creatures to meat from their
@@ -371,26 +368,27 @@ void UpdateGridFood(
 
 void UpdateGridCreature(
     std::vector<Creature>& creatures,
-    std::vector<std::vector<std::vector<Entity*>>>& entityGrid,
-    double cellSize,
+    std::vector<std::vector<std::vector<Entity*>>>& entityGrid, double cellSize,
     std::vector<Food>& food) {
-    creatures.erase(std::remove_if(creatures.begin(), creatures.end(),
-                                  [&food](const Creature& entity) {
-                                      if (entity.GetState() == Entity::Dead) {
-                                      food.emplace_back(Meat(entity.GetCoordinates().first, entity.GetCoordinates().second, entity.GetSize()));
-                                      }
-                                      return entity.GetState() != Entity::Alive;
-                                  }),
-                   creatures.end());
-    for (Creature& creature : creatures) {
-        std::pair<double, double> coordinates = creature.GetCoordinates();
-        int gridX = static_cast<int>(coordinates.first / cellSize);
-        int gridY = static_cast<int>(coordinates.second / cellSize);
+  creatures.erase(
+      std::remove_if(creatures.begin(), creatures.end(),
+                     [&food](const Creature& entity) {
+                       if (entity.GetState() == Entity::Dead) {
+                         food.emplace_back(Meat(entity.GetCoordinates().first,
+                                                entity.GetCoordinates().second,
+                                                entity.GetSize()));
+                       }
+                       return entity.GetState() != Entity::Alive;
+                     }),
+      creatures.end());
+  for (Creature& creature : creatures) {
+    std::pair<double, double> coordinates = creature.GetCoordinates();
+    int gridX = static_cast<int>(coordinates.first / cellSize);
+    int gridY = static_cast<int>(coordinates.second / cellSize);
 
-        entityGrid[gridX][gridY].push_back(&creature);
-    }
+    entityGrid[gridX][gridY].push_back(&creature);
+  }
 }
-
 
 /*!
  * @brief Removes creatures with a state of 'Dead' from a given queue.
@@ -422,10 +420,9 @@ void UpdateQueue(std::queue<Creature>& reproduce) {
  */
 void SimulationData::UpdateGrid() {
   ClearGrid();
-    UpdateGridCreature(creatures_, grid_,
-                               settings::environment::kGridCellSize, food_entities_);
-  UpdateGridFood(food_entities_, grid_,
-                           settings::environment::kGridCellSize);
+  UpdateGridCreature(creatures_, grid_, settings::environment::kGridCellSize,
+                     food_entities_);
+  UpdateGridFood(food_entities_, grid_, settings::environment::kGridCellSize);
   UpdateQueue(reproduce_);
 }
 
@@ -438,7 +435,8 @@ void SimulationData::UpdateGrid() {
  * @param center The center cell coordinates.
  * @param layer_number The number of layers around the center cell to include.
  *
- * @return A vector of pairs representing the coordinates of neighboring cells.
+ * @return A vector of pairs representing the coordinates of neighboring
+ * cells.
  */
 std::vector<std::pair<int, int>> GetNeighbours(
     const int& num_rows, const int& num_cols, const std::pair<int, int>& center,
@@ -463,9 +461,9 @@ std::vector<std::pair<int, int>> GetNeighbours(
  */
 void SimulationData::CheckCollisions() {
   double tolerance = settings::environment::kTolerance;
-  int num_rows = static_cast<int>(std::ceil(
-                     static_cast<double>(environment_.GetMapWidth()) /
-                     settings::environment::kGridCellSize)) +
+  int num_rows = static_cast<int>(
+                     std::ceil(static_cast<double>(environment_.GetMapWidth()) /
+                               settings::environment::kGridCellSize)) +
                  1;
   int num_cols = static_cast<int>(std::ceil(
                      static_cast<double>(environment_.GetMapHeight()) /

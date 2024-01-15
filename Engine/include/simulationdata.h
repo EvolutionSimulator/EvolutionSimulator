@@ -4,15 +4,18 @@
 #include <vector>
 
 #include "creature.h"
+#include "egg.h"
 #include "environment.h"
 #include "food.h"
-
 
 struct SimulationData {
  public:
   std::vector<int> GetCreatureCountOverTime() const;
   explicit SimulationData(myEnvironment::Environment& env)
-      : environment_(env), creatures_(), food_entities_(), lastRecordedTime_(0.0){
+      : environment_(env),
+        creatures_(),
+        food_entities_(),
+        lastRecordedTime_(0.0) {
     InitializeFood();
     InitializeCreatures();
     InitializeGrid();
@@ -40,11 +43,14 @@ struct SimulationData {
   void SetEnvironment(myEnvironment::Environment& environment);
   std::vector<std::vector<std::vector<Entity*>>> GetGrid();
 
+  void HatchEggs();
+
   void ReproduceCreatures();
   void ReproduceTwoCreatures(Creature& creature1, Creature& creature2);
 
   std::vector<Creature> creatures_;
   std::vector<Food> food_entities_;
+  std::vector<Egg> eggs_;
   std::queue<Creature> reproduce_;
   std::queue<Creature> new_reproduce_;
 
