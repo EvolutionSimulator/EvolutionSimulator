@@ -497,10 +497,10 @@ void SimulationData::CheckCollisions() {
   }
 }
 
-std::vector<int> SimulationData::GetCreatureCountOverTime() const {
+std::vector<double> SimulationData::GetCreatureCountOverTime() const {
   return creatureCountOverTime_;
 }
 
-std::vector<int> SimulationData::GetCreatureSizeOverTime() const {
+std::vector<double> SimulationData::GetCreatureSizeOverTime() const {
   return creatureSizeOverTime_;
 }

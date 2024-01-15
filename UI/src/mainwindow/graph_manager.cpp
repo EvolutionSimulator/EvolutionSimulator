@@ -16,7 +16,7 @@ GraphManager::GraphManager(QWidget* parent, Engine *engine) :
 
 
 
-void GraphManager::DrawGraph(std::vector<int> data, const QString& graphTitle) {
+void GraphManager::DrawGraph(std::vector<double> data, const QString& graphTitle) {
 
   if (data.empty()) {
     qDebug() << "No data to display.";
