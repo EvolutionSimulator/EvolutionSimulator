@@ -42,7 +42,7 @@ struct SimulationData {
   void ReproduceCreatures();
   void ReproduceTwoCreatures(Creature& creature1, Creature& creature2);
 
-  std::vector<double> GetCreatureCountOverTime() const;
+  std::vector<int> GetCreatureCountOverTime() const;
   std::vector<double> GetCreatureSizeOverTime() const;
 
   std::vector<Creature> creatures_;
@@ -56,7 +56,7 @@ struct SimulationData {
   double lastRecordedTime_;
   myEnvironment::Environment& environment_;
   std::vector<std::vector<std::vector<Entity*>>> grid_;
-  std::vector<double> creatureCountOverTime_;
+  std::vector<int> creatureCountOverTime_;
   std::vector<double> creatureSizeOverTime_;
 };
 
