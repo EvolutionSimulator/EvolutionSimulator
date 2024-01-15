@@ -7,6 +7,7 @@
 #include <QtCharts/QChartView>
 #include <QDialog>
 #include <QVBoxLayout>
+#include <QValueAxis>
 
 GraphManager::GraphManager(QWidget* parent, Engine *engine) :
                                                               QObject(nullptr),
@@ -33,6 +34,11 @@ void GraphManager::DrawGraph(std::vector<double> data, const QString& graphTitle
   chart->createDefaultAxes();
   chart->axes(Qt::Horizontal).first()->setTitleText("Time Elapsed");
   chart->axes(Qt::Vertical).first()->setTitleText(graphTitle);
+
+  QValueAxis *axisY = qobject_cast<QValueAxis*>(chart->axes(Qt::Vertical).first());
+  if (axisY) {
+    axisY->setRange(0.0, 4.0/3.0 * axisY->max()); // Set the minimum to 0.0 and keep the current maximum
+  }
 
   QChartView* chartView = new QChartView(chart);
   chartView->setRenderHint(QPainter::Antialiasing);
