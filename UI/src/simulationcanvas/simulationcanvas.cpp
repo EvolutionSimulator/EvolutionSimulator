@@ -14,14 +14,12 @@
 
 
 SimulationCanvas::SimulationCanvas(QWidget* Parent)
-    : QSFMLCanvas(Parent), showInfoPanel(false), texture_manager_(TextureManager()) {
+    : QSFMLCanvas(Parent),
+      texture_manager_(TextureManager()),
+      info_panel_(InfoPanel(this, &texture_manager_, simulation_))
+{
 
-  selectedCreature = nullptr;
-
-  // Scale the map width and height according to the pixel ratio
-  scale_x_ = 1.0/texture_manager_.texture_.getSize().x;
-  scale_y_ = 1.0/texture_manager_.texture_.getSize().y;
-
+ // Scale the map width and height according to the pixel ratio
   int width = sf::VideoMode::getDesktopMode().width;
   int height = sf::VideoMode::getDesktopMode().height;
   float scaleFactor = this->devicePixelRatioF(); // Get the device pixel ratio
@@ -81,121 +79,18 @@ void SimulationCanvas::OnUpdate()
   RenderSimulation(simulation_->GetSimulationData());
 
   // Check if a creature is selected
-  if (showInfoPanel && selectedCreature) {
-    // Right info panel setup
-    sf::Vector2f panelSize(200, getSize().y);  // Width of 200 and full height of the canvas
-    sf::Vector2f panelPosition(getSize().x - panelSize.x, 0);  // Positioned on the right side
-
-    // Info panel background
-    sf::RectangleShape panel(panelSize);
-    panel.setFillColor(sf::Color(50, 50, 20, 205));  // Semi-transparent
-    panel.setPosition(panelPosition);
-    draw(panel);
-
-    creatureInfo = QString::fromStdString(formatCreatureInfo(*selectedCreature));
-
-    // Draw the energy bar
-    float maxBarWidth = 80.0f;  // Width of the full energy bar
-    float barHeight = 10.0f;    // Height of the energy bar
-
-    float energyRatio = static_cast<float>((*selectedCreature).GetEnergy()) / static_cast<float>((*selectedCreature).GetMaxEnergy());
-    if (energyRatio < 0) {
-          energyRatio = 0;
-    }
-    float energyBarWidth = maxBarWidth * energyRatio;  // Width based on current energy
-    sf::RectangleShape energyBarOutline(sf::Vector2f(maxBarWidth, barHeight));
-    sf::RectangleShape energyBar(sf::Vector2f(energyBarWidth, barHeight));
-    energyBar.setFillColor(sf::Color::Green);  // Color of the energy bar
-    energyBarOutline.setFillColor(sf::Color::Black);
-    // Position the energy bar - adjust as needed
-    energyBarOutline.setPosition(panelPosition.x + 40, 123);
-    energyBar.setPosition(panelPosition.x + 40, 123);
-
-    sf::Sprite energySprite;
-    energySprite.setTexture(texture_manager_.energy_texture_);
-    energySprite.setScale(0.04f,0.04f);
-    energySprite.setPosition(panelPosition.x + 10, 117);
-
-    draw(energySprite);
-    draw(energyBarOutline);
-    draw(energyBar);
-
-    // Draw the health bar
-
-    float healthRatio = static_cast<float>((*selectedCreature).GetHealth()) / static_cast<float>((*selectedCreature).GetMutable().GetIntegrity() * pow((*selectedCreature).GetSize(), 2));
-    if (healthRatio < 0 ) {
-          healthRatio = 0;
-    }
-    float healthBarWidth = maxBarWidth * healthRatio;  // Width based on current energy
-    sf::RectangleShape healthBarOutline(sf::Vector2f(maxBarWidth, barHeight));
-    sf::RectangleShape healthBar(sf::Vector2f(healthBarWidth, barHeight));
-    healthBar.setFillColor(sf::Color::Red);  // Color of the energy bar
-    healthBarOutline.setFillColor(sf::Color::Black);
-    // Position the energy bar - adjust as needed
-    healthBarOutline.setPosition(panelPosition.x + 40, 105);
-    healthBar.setPosition(panelPosition.x + 40, 105);
-
-    sf::Sprite healthSprite;
-    healthSprite.setTexture(texture_manager_.health_texture_);
-    healthSprite.setScale(0.7f,0.7f);
-    healthSprite.setPosition(panelPosition.x + 10, 100);
-
-    draw(healthSprite);
-    draw(healthBarOutline);
-    draw(healthBar);
-
-
-    sf::CircleShape redCircle((*selectedCreature).GetSize()); // Adjust as needed
-    redCircle.setOutlineColor(sf::Color::Red);
-    redCircle.setOutlineThickness((*selectedCreature).GetSize()/5); // Adjust thickness as needed
-    redCircle.setFillColor(sf::Color::Transparent);
-    redCircle.setPosition((*selectedCreature).GetCoordinates().first - (*selectedCreature).GetSize(),
-                                (*selectedCreature).GetCoordinates().second - (*selectedCreature).GetSize());
-    draw(redCircle);
-
-    DrawVisionCone(*this, (*selectedCreature));
-
-    // Check if the creature's health is 0 and display the message
-    if ((*selectedCreature).GetHealth() == 0) {
-        creatureInfo = QString::fromStdString("Creature " + std::to_string((*selectedCreature).GetID()) + " is dead");
-    } else {
-              // Update the creature info normally
-              creatureInfo = QString::fromStdString(formatCreatureInfo(*selectedCreature));
-          }
-    //Get the closest food for the creature and draw a blue circle around it
-    auto food_id = (*selectedCreature).GetFoodID();
-    const auto& food_entities = simulation_->GetSimulationData()->food_entities_;
-
-    auto food_it = std::find_if(food_entities.begin(), food_entities.end(),
-                                [food_id](const Food& c) {
-                                  return c.GetID() == food_id;
-                                });
-
-    if (food_it != food_entities.end()) {
-        const Food& food = *food_it;
-
-        sf::CircleShape blueCircle(food.GetSize()); // Adjust as needed
-        blueCircle.setOutlineColor(sf::Color::Blue);
-        blueCircle.setOutlineThickness(2); // Adjust thickness as needed
-        blueCircle.setFillColor(sf::Color::Transparent);
-        blueCircle.setPosition(food.GetCoordinates().first - food.GetSize(),
-                                   food.GetCoordinates().second - food.GetSize());
-        draw(blueCircle);
-
-      }
-      // Prepare and draw the creature info text inside the panel
-      sf::Text infoText;
-      infoText.setFont(texture_manager_.font_);
-      infoText.setString(creatureInfo.toStdString());
-      infoText.setCharacterSize(15);
-      infoText.setFillColor(sf::Color::White);
-      infoText.setPosition(panelPosition.x + 10, 10);  // Adjust the Y position as needed
-      draw(infoText);
-  }else if (showInfoPanel) {
+  if (info_panel_.IsVisible() && info_panel_.GetSelectedCreature()) {
+        info_panel_.UpdateSelectedFood();
+        info_panel_.Draw();
+  }else if (info_panel_.IsVisible()) {
     std::cout << "Info panel flag is set, but no creature position is recorded."
               << std::endl;
   }
+  DrawMouseCoordinates();
+}
 
+void SimulationCanvas::DrawMouseCoordinates()
+{
   sf::Vector2i mousePixelPos = sf::Mouse::getPosition(*this);
   sf::Vector2f mousePos = mapPixelToCoords(mousePixelPos);
 
@@ -294,9 +189,6 @@ void SimulationCanvas::RenderCreatureAtPosition(const Creature& creature, const 
   eyes_sprite.setRotation(90.0f);
   tail_sprite.setRotation(90.0f);
 
-  // Use creature coordinates directly for position
-  std::pair<double, double> creatureCoordinates = creature.GetCoordinates();
-
   //Add color filter to creature
   texture_manager_.color_shader_.setUniform("hueShift", creature.GetMutable().GetColor());
 
@@ -361,16 +253,13 @@ std::vector<std::pair<double, double>> SimulationCanvas::getEntityRenderPosition
 
 
 void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
-  // Adjust coordinates for screen scaling
-  float scaleFactor = this->devicePixelRatioF(); // Get the device pixel ratio from the QWidget
 
-  // Convert QPoint to sf::Vector2i and adjust for the scaling factor
+  float scaleFactor = this->devicePixelRatioF();
   sf::Vector2i scaledPos(static_cast<int>(event->position().x() * scaleFactor),
                          static_cast<int>(event->position().y() * scaleFactor));
-
-  // Map the scaled pixel coordinates to world coordinates
   sf::Vector2f mousePos = mapPixelToCoords(scaledPos);
 
+  // Needed for differentiating clicking and dragging
   initialClickPosition = mousePos;
   isClicking = true;
 
@@ -378,6 +267,7 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
 
   auto data = simulation_->GetSimulationData();
 
+  // Checking if we need to display info panel
   for (auto& creature : data->creatures_) {
     auto [creatureX, creatureY] = creature.GetCoordinates();
     float creatureSize = creature.GetSize();
@@ -385,100 +275,22 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
 
     if (sqrt(pow(mousePos.x - creaturePos.x, 2) + pow(mousePos.y - creaturePos.y, 2)) <= creatureSize) {
       qDebug() << "Creature Clicked: ID" << creature.GetID();
-      showInfoPanel = true;
-      selectedCreature = &creature;
+      info_panel_.Show();
+      info_panel_.SetSelectedCreature(&creature);
       repaint();
       return;
     }
   }
 
   qDebug() << "Click Outside, closing panel";
-  showInfoPanel = false;
-  selectedCreature = nullptr;
+  info_panel_.Hide();
+  info_panel_.SetSelectedCreature(nullptr);
   repaint();
 }
 
 
-// Functions checking if a creature has been clicked
-bool SimulationCanvas::isCreatureClicked(const sf::Vector2f& mousePos) {
-  if (selectedCreature) {return true;}
-  return false;
-}
-
-void SimulationCanvas::displayInfoPanel() {
-  if (selectedCreature) {
-    showInfoPanel = true;
-  }
-}
-
-double round_double(double number, int decimal_places) {
-    const double multiplier = std::pow(10.0, decimal_places);
-    return std::round(number * multiplier) / multiplier;
-}
-
-// Structure of the info panel (appearing when a creature is clicked)
-std::string SimulationCanvas::formatCreatureInfo(const Creature& creature) {
-  Mutable mutables = creature.GetMutable();
-  std::stringstream ss;
-  ss << "Creature ID: " << creature.GetID() << "\n\n";
-  ss << "Size: " << creature.GetSize() << "\n";
-  ss << "Age: " << creature.GetAge() << "\n";
-  ss << "Generation: " << creature.GetGeneration() << "\n";
-  ss << "\n";
-  ss << "\n";
-  ss << "Velocity: " << round_double(creature.GetVelocity(), 2) << "\n";
-  ss << "Rot. Velocity: " << round_double(creature.GetRotationalVelocity(), 2) << "\n\n";
-  ss << "Stomach capacity: " << creature.GetStomachCapacity() << "\n\n";
-  ss << "Stomach fullness: " << creature.GetStomachFullness() << "\n\n";
-  ss << "Stomach acid: " << creature.GetAcid() << "\n\n";
-  auto [x, y] = creature.GetCoordinates();
-  ss << "(x=" << x << ", y=" << y << ")\n \n";
-  ss << "Mutables information: \n";
-  ss << "Energy density: " << mutables.GetEnergyDensity() << "\n";
-  ss << "Energy loss: " << mutables.GetEnergyLoss() << "\n";
-  ss << "Strafing diff.: " << mutables.GetStrafingDifficulty() << "\n";
-  ss << "Integrity: " << mutables.GetIntegrity() << "\n";
-  ss << "Max force: " << mutables.GetMaxForce() << "\n";
-  ss << "Max size: " << mutables.GetMaxSize() << "\n";
-  ss << "Baby size: " << mutables.GetBabySize() << "\n";
-  ss << "Rep. cooldown: " << mutables.GetReproductionCooldown() << "\n";
-  ss << "Maturity age: " << mutables.GetMaturityAge() << "\n";
-  return ss.str();
-}
-
-void SimulationCanvas::DrawVisionCone(sf::RenderTarget& target, const Creature& creature) {
-
-  double visionRadius = creature.GetVisionRadius();
-  double visionAngle = creature.GetVisionAngle();
-
-  double creatureOrientation = creature.GetOrientation();
-
-  double leftRad = creatureOrientation - visionAngle / 2.0;
-  double rightRad = creatureOrientation + visionAngle / 2.0;
-
-  auto [creatureX, creatureY] = creature.GetCoordinates();
-
-  std::vector<sf::Vertex> triangleFan;
-  triangleFan.push_back(sf::Vertex(sf::Vector2f(creatureX, creatureY), sf::Color::Transparent));
-
-  int numPoints = 30;
-  for (int i = 0; i <= numPoints; ++i) {
-    double angle = leftRad + (i * (rightRad - leftRad) / numPoints);
-    double x = creatureX + visionRadius * cos(angle);
-    double y = creatureY + visionRadius * sin(angle);
-    triangleFan.push_back(sf::Vertex(sf::Vector2f(x, y), sf::Color(255, 255, 255, 150)));
-  }
-
-  for (size_t i = 1; i < triangleFan.size() - 1; ++i) {
-    sf::VertexArray triangle(sf::Triangles, 3);
-    triangle[0] = triangleFan[0];
-    triangle[1] = triangleFan[i];
-    triangle[2] = triangleFan[i + 1];
-    target.draw(triangle);
-  }
-}
-
 void SimulationCanvas::wheelEvent(QWheelEvent *event) {
+
     // Use platform-independent pixelDelta for wheel events
     QPoint pixelDelta = event->pixelDelta();
     QPoint angleDelta = event->angleDelta();
@@ -620,3 +432,4 @@ void SimulationCanvas::resizeEvent(QResizeEvent* event) {
     view.setCenter(newSize.x / 2, newSize.y / 2);
     setView(view);
 }
+

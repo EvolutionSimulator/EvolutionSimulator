@@ -197,26 +197,26 @@ void VisionSystem::ProcessVisionFood(
   if (closePlant){
         distance_plant_ = this->GetDistance(*closePlant, width, height) - (*closePlant).GetSize();
         orientation_plant_ = this->GetRelativeOrientation(*closePlant);
-        closest_plant_id_ = closePlant->GetID();
+        closest_plant_ = closePlant;
         plant_size_ = closePlant->GetSize();
   }
   else {
       distance_plant_ = vision_radius_;
       orientation_plant_ = remainder(GetRandomFloat(orientation_- vision_angle_/2, orientation_+ vision_angle_/2), 2*M_PI);
-      closest_plant_id_ = 0;
+      closest_plant_ = nullptr;
       plant_size_ = -1;
   }
 
   if (closeMeat){
         distance_meat_ = this->GetDistance(*closeMeat, width, height) - (*closeMeat).GetSize();
         orientation_meat_ = this->GetRelativeOrientation(*closeMeat);
-        closest_meat_id_ = closeMeat->GetID();
+        closest_meat_ = closeMeat;
         meat_size_ = closeMeat->GetSize();
   }
   else {
       distance_meat_ = vision_radius_;
       orientation_meat_ = remainder(GetRandomFloat(orientation_- vision_angle_/2, orientation_+ vision_angle_/2), 2*M_PI);
-      closest_meat_id_ = 0;
+      closest_meat_ = nullptr;
       meat_size_ = -1;
   }
 }
@@ -226,9 +226,9 @@ void VisionSystem::ProcessVisionFood(
  *
  * @return The id of the closest food or -1 if there is no food in vision.
  */
-int VisionSystem::GetFoodID() const {
-  if (distance_plant_ <= distance_meat_) {return closest_plant_id_;};
-  return closest_meat_id_;
+Food *VisionSystem::GetFoodID() const {
+  if (distance_plant_ <= distance_meat_) {return closest_plant_;};
+  return closest_meat_;
 }
 
 /*!

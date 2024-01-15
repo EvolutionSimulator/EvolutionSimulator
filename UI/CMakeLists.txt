@@ -47,6 +47,8 @@ qt_add_executable(UI
     src/mainwindow/config_manager.cpp
     include/simulationcanvas/texture_manager.h
     src/simulationcanvas/texture_manager.cpp
+    include/simulationcanvas/info_panel.h
+    src/simulationcanvas/info_panel.cpp
 
 
 
