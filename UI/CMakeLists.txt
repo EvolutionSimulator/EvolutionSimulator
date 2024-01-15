@@ -37,14 +37,16 @@ qt_add_executable(UI
     src/mainwindow/mainwindow.cpp include/mainwindow/mainwindow.h
     src/mainwindow/mainwindow.ui
     include/qsfmlcanvas.h src/qsfmlcanvas.cpp
-    include/simulationcanvas.h src/simulationcanvas.cpp
+    include/simulationcanvas/simulationcanvas.h src/simulationcanvas/simulationcanvas.cpp
     ${UI_RESOURCES}
-    include/creaturetracker.h
-    src/creaturetracker.cpp
+
+
     include/mainwindow/graph_manager.h
     src/mainwindow/graph_manager.cpp
     include/mainwindow/config_manager.h
     src/mainwindow/config_manager.cpp
+    include/simulationcanvas/texture_manager.h
+    src/simulationcanvas/texture_manager.cpp
 
 
 

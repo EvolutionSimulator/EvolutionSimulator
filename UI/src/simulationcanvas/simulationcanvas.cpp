@@ -1,11 +1,10 @@
-#include "simulationcanvas.h"
+#include "simulationcanvas/simulationcanvas.h"
 #include <QDebug>
 #include <QDir>
 #include <QFile>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QUuid>
-#include "creaturetracker.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/Text.hpp>
@@ -15,13 +14,13 @@
 
 
 SimulationCanvas::SimulationCanvas(QWidget* Parent)
-    : QSFMLCanvas(Parent), showInfoPanel(false) {
+    : QSFMLCanvas(Parent), showInfoPanel(false), texture_manager_(TextureManager()) {
 
   selectedCreature = nullptr;
 
   // Scale the map width and height according to the pixel ratio
-  scale_x_ = 1.0/texture_.getSize().x;
-  scale_y_ = 1.0/texture_.getSize().y;
+  scale_x_ = 1.0/texture_manager_.texture_.getSize().x;
+  scale_y_ = 1.0/texture_manager_.texture_.getSize().y;
 
   int width = sf::VideoMode::getDesktopMode().width;
   int height = sf::VideoMode::getDesktopMode().height;
@@ -33,115 +32,14 @@ SimulationCanvas::SimulationCanvas(QWidget* Parent)
   // Set the fixed size with the scaled dimensions
   setFixedSize(scaledWidth, scaledHeight);
 
-  InitializeFile(font_, ":/Resources/font.ttf");
-  InitializeFile(color_shader_, ":/Shaders/colorShift.frag");
-  InitializeFile(food_density_shader_, ":/Shaders/densityShader.frag");
-  InitializeFile(creature_texture_, ":/Resources/Creature_base.png");
-  InitializeFile(eyes_texture_, ":/Resources/Creature_eyes.png");
-  InitializeFile(tail_texture_, ":/Resources/Creature_tails.png");
-  InitializeFile(food_texture_, ":/Resources/Food_32x32.png");
-
   std::cout << "SimulationCanvas created" << std::endl;
 }
 
-void SimulationCanvas::InitializeFile(sf::Shader& ValueSaved, std::string path){
-    QString qPath = QString::fromStdString(path);
-    QFile resourceFile(qPath);
-    if (!resourceFile.open(QIODevice::ReadOnly)) {
-      qDebug() << "Failed to open resource!";
-      return;
-    }
-
-    QString tempFileName = "temp_" + QUuid::createUuid().toString(QUuid::WithoutBraces)
-            + ".frag";
-    QString tempFilePath = QDir::temp().absoluteFilePath(tempFileName);
-    qDebug() << "Temporary file path:" << tempFilePath;
-
-    QFile tempFile(tempFilePath);
-    if (tempFile.exists()) {
-      qDebug() << "Temporary file already exists. Deleting...";
-      if (!tempFile.remove()) {
-        qDebug() << "Failed to remove existing temporary file.";
-        return;
-      }
-    }
-
-    if (!resourceFile.copy(tempFilePath)) {
-      qDebug() << "Failed to copy to temporary file!";
-      qDebug() << "Error:" << resourceFile.errorString();
-      return;
-    }
-    resourceFile.close();
-
-    if (!ValueSaved.loadFromFile(tempFilePath.toStdString(), sf::Shader::Fragment)) {
-        qDebug() << "Failed to load from file!";
-        QFile::remove(tempFilePath);
-        return;
-    }
 
 
-    // Clean up the temporary file after use
-    QFile::remove(tempFilePath);
-}
-
-void SimulationCanvas::InitializeFile(sf::Font& ValueSaved, std::string path){
-    QString qPath = QString::fromStdString(path);
-    QFile resourceFile(qPath);
-    if (!resourceFile.open(QIODevice::ReadOnly)) {
-      qDebug() << "Failed to open resource!";
-      return;
-    }
-
-    QString tempFileName = "temp_" + QUuid::createUuid().toString(QUuid::WithoutBraces)
-            + ".frag";
-    QString tempFilePath = QDir::temp().absoluteFilePath(tempFileName);
-    qDebug() << "Temporary file path:" << tempFilePath;
-
-    QFile tempFile(tempFilePath);
-    if (tempFile.exists()) {
-      qDebug() << "Temporary file already exists. Deleting...";
-      if (!tempFile.remove()) {
-        qDebug() << "Failed to remove existing temporary file.";
-        return;
-      }
-    }
-
-    if (!resourceFile.copy(tempFilePath)) {
-      qDebug() << "Failed to copy to temporary file!";
-      qDebug() << "Error:" << resourceFile.errorString();
-      return;
-    }
-    resourceFile.close();
-
-    if (!ValueSaved.loadFromFile(tempFilePath.toStdString())){
-        qDebug() << "Failed to load from file!";
-        QFile::remove(tempFilePath);
-        return;
-    }
-
-
-    // Clean up the temporary file after use
-    QFile::remove(tempFilePath);
-}
-
-void SimulationCanvas::InitializeFile(sf::Texture& ValueSaved, std::string path){
-    QPixmap creaturePixmap;
-    QString qPath = QString::fromStdString(path);
-    if (!creaturePixmap.load(qPath)) {
-      //qDebug() << "Failed to load QPixmap from path:" << path;
-    }
-
-    QImage creatureqImage = creaturePixmap.toImage().convertToFormat(QImage::Format_RGBA8888);
-    sf::Image creaturesfImage;
-    creaturesfImage.create(creatureqImage.width(), creatureqImage.height(), reinterpret_cast<const sf::Uint8*>(creatureqImage.bits()));
-
-    if (!ValueSaved.loadFromImage(creaturesfImage)) {
-      qDebug() << "Failed to create sf::Texture from sf::Image";
-    }
-}
 
 void SimulationCanvas::UpdateFoodDensityTexture(double width, double height){
-    food_density_texture_.create(width, height);
+    texture_manager_.food_density_texture_.create(width, height);
     sf::Image densityImage;
     densityImage.create(width, height, sf::Color::Black);
     // Fill the image with the density data
@@ -159,9 +57,9 @@ void SimulationCanvas::UpdateFoodDensityTexture(double width, double height){
             densityImage.setPixel(x, y, sf::Color(0, greenValue, 0));
         }
     }
-    food_density_texture_.setSmooth(true);
+    texture_manager_.food_density_texture_.setSmooth(true);
     // Load the image into the texture
-    food_density_texture_.update(densityImage);
+    texture_manager_.food_density_texture_.update(densityImage);
 }
 
 void SimulationCanvas::SetSimulation(Simulation* simulation) {
@@ -213,23 +111,8 @@ void SimulationCanvas::OnUpdate()
     energyBarOutline.setPosition(panelPosition.x + 40, 123);
     energyBar.setPosition(panelPosition.x + 40, 123);
 
-    //Energy texture
-    QPixmap energyPixmap;
-    if (!energyPixmap.load(":/Resources/Energy.png")) {
-          qDebug() << "Failed to load QPixmap from path:" << ":/Resources/Energy.png";
-    }
-
-    QImage energyqImage = energyPixmap.toImage().convertToFormat(QImage::Format_RGBA8888);
-    sf::Image energysfImage;
-    energysfImage.create(energyqImage.width(), energyqImage.height(), reinterpret_cast<const sf::Uint8*>(energyqImage.bits()));
-
-
-    if (!energy_texture_.loadFromImage(energysfImage)) {
-          qDebug() << "Failed to create sf::Texture from sf::Image";
-    }
-
     sf::Sprite energySprite;
-    energySprite.setTexture(energy_texture_);
+    energySprite.setTexture(texture_manager_.energy_texture_);
     energySprite.setScale(0.04f,0.04f);
     energySprite.setPosition(panelPosition.x + 10, 117);
 
@@ -252,23 +135,8 @@ void SimulationCanvas::OnUpdate()
     healthBarOutline.setPosition(panelPosition.x + 40, 105);
     healthBar.setPosition(panelPosition.x + 40, 105);
 
-    //Health texture
-    QPixmap healthPixmap;
-    if (!healthPixmap.load(":/Resources/Health.png")) {
-          qDebug() << "Failed to load QPixmap from path:" << ":/Resources/Health.png";
-    }
-
-    QImage healthqImage = healthPixmap.toImage().convertToFormat(QImage::Format_RGBA8888);
-    sf::Image healthsfImage;
-    healthsfImage.create(healthqImage.width(), healthqImage.height(), reinterpret_cast<const sf::Uint8*>(healthqImage.bits()));
-
-
-    if (!health_texture_.loadFromImage(healthsfImage)) {
-          qDebug() << "Failed to create sf::Texture from sf::Image";
-    }
-
     sf::Sprite healthSprite;
-    healthSprite.setTexture(health_texture_);
+    healthSprite.setTexture(texture_manager_.health_texture_);
     healthSprite.setScale(0.7f,0.7f);
     healthSprite.setPosition(panelPosition.x + 10, 100);
 
@@ -317,7 +185,7 @@ void SimulationCanvas::OnUpdate()
       }
       // Prepare and draw the creature info text inside the panel
       sf::Text infoText;
-      infoText.setFont(font_);
+      infoText.setFont(texture_manager_.font_);
       infoText.setString(creatureInfo.toStdString());
       infoText.setCharacterSize(15);
       infoText.setFillColor(sf::Color::White);
@@ -333,7 +201,7 @@ void SimulationCanvas::OnUpdate()
 
   // Prepare the text to display the mouse coordinates
   sf::Text mouseCoordsText;
-  mouseCoordsText.setFont(font_);
+  mouseCoordsText.setFont(texture_manager_.font_);
   std::ostringstream ss;
   ss << "(X: " << mousePos.x << " Y: " << mousePos.y << ")";
   mouseCoordsText.setString(ss.str());
@@ -374,7 +242,7 @@ void SimulationCanvas::RenderSimulation(DataAccessor<SimulationData> data) {
 
 void SimulationCanvas::RenderFoodAtPosition(const Food& food, const std::pair<double, double>& position){
   sf::Sprite foodSprite;
-  foodSprite.setTexture(food_texture_);
+  foodSprite.setTexture(texture_manager_.food_texture_);
   int spriteIndex = food.GetID() % 3;
   if (food.GetType() == Food::type::plant) {
     foodSprite.setTextureRect(sf::IntRect(0, spriteIndex * 256, 256, 256));
@@ -394,9 +262,9 @@ void SimulationCanvas::RenderCreatureAtPosition(const Creature& creature, const 
   sf::Sprite base_sprite;
   sf::Sprite eyes_sprite;
   sf::Sprite tail_sprite;
-  base_sprite.setTexture(creature_texture_);
-  eyes_sprite.setTexture(eyes_texture_);
-  tail_sprite.setTexture(tail_texture_);
+  base_sprite.setTexture(texture_manager_.creature_texture_);
+  eyes_sprite.setTexture(texture_manager_.eyes_texture_);
+  tail_sprite.setTexture(texture_manager_.tail_texture_);
 
   //Get which sprites to use depending on the characteristics of the creature
   int size_type  = std::floor((15 - creature.GetSize())/5); //size is the other way around
@@ -430,7 +298,7 @@ void SimulationCanvas::RenderCreatureAtPosition(const Creature& creature, const 
   std::pair<double, double> creatureCoordinates = creature.GetCoordinates();
 
   //Add color filter to creature
-  color_shader_.setUniform("hueShift", creature.GetMutable().GetColor());
+  texture_manager_.color_shader_.setUniform("hueShift", creature.GetMutable().GetColor());
 
   sf::Transform creatureTransform;
   creatureTransform.translate(position.first,
@@ -438,7 +306,7 @@ void SimulationCanvas::RenderCreatureAtPosition(const Creature& creature, const 
   creatureTransform.rotate(creature.GetOrientation() * 180.0f /M_PI);
 
   sf::RenderStates states;
-  states.shader = &color_shader_;
+  states.shader = &texture_manager_.color_shader_;
   states.transform = creatureTransform;
 
   draw(base_sprite, states);

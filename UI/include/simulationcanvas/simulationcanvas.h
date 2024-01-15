@@ -6,6 +6,7 @@
 
 #include "qsfmlcanvas.h"
 #include "simulation.h"
+#include "texture_manager.h"
 
 class SimulationCanvas : public QSFMLCanvas {
  Q_OBJECT
@@ -20,10 +21,6 @@ class SimulationCanvas : public QSFMLCanvas {
   void DrawVisionCone(sf::RenderTarget& target, const Creature& creature);
 
   void zoom(float factor, sf::Vector2f& zoomPoint);
-
-  void InitializeFile(sf::Shader& ValueSaved, std::string path);
-  void InitializeFile(sf::Font& ValueSaved, std::string path);
-  void InitializeFile(sf::Texture& ValueSaved, std::string path);
 
 
   void UpdateFoodDensityTexture(double width, double height);
@@ -42,7 +39,7 @@ class SimulationCanvas : public QSFMLCanvas {
   Creature* selectedCreature;
 
 
-  sf::Font font_;
+
 
   bool showInfoPanel;
   QString creatureInfo;
@@ -67,25 +64,16 @@ class SimulationCanvas : public QSFMLCanvas {
   sf::Vector2f initialViewSize;
   sf::Vector2f initialViewCenter;
 
-  sf::Texture texture_;
   double scale_x_;
   double scale_y_;
-  sf::Texture food_texture_;
-  sf::Texture creature_texture_;
-  sf::Texture eyes_texture_;
-  sf::Texture tail_texture_;
-  sf::Shader color_shader_;
-  sf::Texture food_density_texture_;
-  sf::Shader food_density_shader_;
-  sf::Texture health_texture_;
-  sf::Texture energy_texture_;
-  sf::Shader shader_;
+
   bool isDragging = false;
   sf::Vector2f initialClickPosition;
   bool isClicking = false;
   std::deque<sf::Vector2f> deltaHistory;
 
   sf::Vector2f offset_;
+  TextureManager texture_manager_;
 
 };
 
