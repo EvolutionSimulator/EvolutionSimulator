@@ -6,6 +6,7 @@
 
 #include "qsfmlcanvas.h"
 #include "simulation.h"
+#include "info_panel.h"
 #include "texture_manager.h"
 
 class SimulationCanvas : public QSFMLCanvas {
@@ -18,11 +19,6 @@ class SimulationCanvas : public QSFMLCanvas {
   void SetSimulation(Simulation* simulation);
   Simulation* GetSimulation();
 
-  void DrawVisionCone(sf::RenderTarget& target, const Creature& creature);
-
-  void zoom(float factor, sf::Vector2f& zoomPoint);
-
-
   void UpdateFoodDensityTexture(double width, double height);
 
   protected:
@@ -31,46 +27,36 @@ class SimulationCanvas : public QSFMLCanvas {
   void mouseMoveEvent(QMouseEvent* event) override;
   void mouseReleaseEvent(QMouseEvent* event) override;
   void resizeEvent(QResizeEvent* event) override;
+  void zoom(float factor, sf::Vector2f& zoomPoint);
 
   private:
+  Simulation *simulation_ = nullptr;
   virtual void OnInit() override;
   virtual void OnUpdate() override;
 
-  Creature* selectedCreature;
-
-  bool showInfoPanel;
-  QString creatureInfo;
-  QRectF panelRect;
-
+  // Rendering logic
   void RenderSimulation(DataAccessor<SimulationData> data);
   void RenderFoodAtPosition(const Food& food, const std::pair<double, double>& position);
   void RenderCreatureAtPosition(const Creature& creature, const std::pair<double, double>& position);
-
-  Simulation *simulation_ = nullptr;
-  std::function<void(SimulationData *)>
-      render_lambda_; // we will pass this to the ProcessData method of
-                      // Simulation
-
-  bool isCreatureClicked(const sf::Vector2f &mousePos);
   std::vector<std::pair<double, double>> getEntityRenderPositions(const Entity& entity);
 
-  void displayInfoPanel();
-  std::string formatCreatureInfo(const Creature &creature);
-
+  // Zoom logic
   float zoomFactor = 1.0f;
   sf::Vector2f initialViewSize;
   sf::Vector2f initialViewCenter;
 
-  double scale_x_;
-  double scale_y_;
-
+  // CLick and drag logic
   bool isDragging = false;
   sf::Vector2f initialClickPosition;
   bool isClicking = false;
   std::deque<sf::Vector2f> deltaHistory;
 
-  sf::Vector2f offset_;
+  // Textures
   TextureManager texture_manager_;
 
+  // Info panel
+  InfoPanel info_panel_;
+  void SetSelectedFood();
+  void DrawMouseCoordinates();
 };
 

@@ -20,7 +20,7 @@ public:
 
   void ProcessVisionFood(std::vector<std::vector<std::vector<Entity *>>> &grid,
                          double grid_cell_size, double width, double height);
-  int GetFoodID() const;
+  Food* GetFoodID() const;
   Food *GetClosestPlantInSight(std::vector<std::vector<std::vector<Entity *>>> &grid,
           double grid_cell_size) const;
   Food *GetClosestMeatInSight(std::vector<std::vector<std::vector<Entity *>>> &grid,
@@ -34,8 +34,8 @@ protected:
                                  source. */
   double plant_size_;          /*! Size of the closest plant*/
   double meat_size_;          /*! Size of the closest meat*/
-  int closest_plant_id_;       /*! Id of the closest plant to show in the UI */
-  int closest_meat_id_;      /*! Id of the closest meat to show in the UI */
+  Food* closest_plant_;       /*! Closest plant to show in the UI */
+  Food* closest_meat_;      /*! Closest meat to show in the UI */
   double orientation_meat_;   /*!< Orientation relative to the nearest meat
                                 source. */
   double vision_radius_; /*!< The radius within which the creature can detect
