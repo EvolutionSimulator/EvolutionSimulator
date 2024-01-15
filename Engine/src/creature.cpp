@@ -194,16 +194,14 @@ void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
   SetAccelerationAngle(std::tanh(output.at(1)) * M_PI);
   SetRotationalAcceleration(std::tanh(output.at(2))*mutable_.GetMaxForce());
   Grow(std::max(std::tanh(output.at(3)) * deltaTime, 0.0));
-<<<<<<< HEAD
   AddAcid(std::max(std::tanh(output.at(4)) * 10.0, 0.0));
   biting_ = std::tanh(output.at(5)) > 0 ? 0 : 1;
-=======
 
 
- for (BrainModule module : GetGenome().GetModules()){
+
+  for (BrainModule& module : GetGenome().GetModules()){
      //No module with outputs atm but they should be used as with the input
- }
->>>>>>> 5432eec (Add example with modules, change size of input neurons)
+  }
 }
 
 /*!
