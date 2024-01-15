@@ -1,4 +1,4 @@
-#include "qsfmlcanvas.h"
+#include "qwidgets/qsfmlcanvas.h"
 #include "config.h"
 
 QSFMLCanvas::QSFMLCanvas(QWidget* Parent) : QWidget(Parent) {

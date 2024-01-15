@@ -36,7 +36,7 @@ qt_add_executable(UI
     src/main.cpp
     src/mainwindow/mainwindow.cpp include/mainwindow/mainwindow.h
     src/mainwindow/mainwindow.ui
-    include/qsfmlcanvas.h src/qsfmlcanvas.cpp
+    include/qwidgets/qsfmlcanvas.h src/qwidgets/qsfmlcanvas.cpp
     include/simulationcanvas/simulationcanvas.h src/simulationcanvas/simulationcanvas.cpp
     ${UI_RESOURCES}
 
@@ -76,7 +76,7 @@ if(WIN32)
         VERBATIM)
 endif()
 
-target_include_directories(Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(UI PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(UI PRIVATE
     ${ENGINE_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}

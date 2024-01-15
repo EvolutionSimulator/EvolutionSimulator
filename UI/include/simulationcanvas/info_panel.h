@@ -4,7 +4,7 @@
 #include "SFML/Graphics/Font.hpp"
 #include "SFML/Graphics/RenderTarget.hpp"
 #include "creature.h"
-#include "qsfmlcanvas.h"
+#include "qwidgets/qsfmlcanvas.h"
 #include "simulation.h"
 #include "texture_manager.h"
 
