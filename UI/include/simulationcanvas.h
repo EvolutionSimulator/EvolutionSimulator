@@ -54,6 +54,7 @@ class SimulationCanvas : public QSFMLCanvas {
   virtual void OnInit() override;
   virtual void OnUpdate() override;
   std::optional<CreatureInfo> selectedCreatureInfo;
+  Creature* selectedCreature;
 
 
   sf::RenderWindow renderWindow_;

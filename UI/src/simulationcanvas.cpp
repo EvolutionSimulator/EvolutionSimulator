@@ -16,19 +16,8 @@
 
 SimulationCanvas::SimulationCanvas(QWidget* Parent)
     : QSFMLCanvas(Parent), showInfoPanel(false) {
-  //Load textures for the sprites
-  QPixmap pixmap;
-  if (!pixmap.load(":/Resources/Pause.png")) {
-    qDebug() << "Failed to load QPixmap from path:" << ":/Resources/Pause.png";
-  }
 
-  QImage qImage = pixmap.toImage().convertToFormat(QImage::Format_RGBA8888);
-  sf::Image sfImage;
-  sfImage.create(qImage.width(), qImage.height(), reinterpret_cast<const sf::Uint8*>(qImage.bits()));
-
-  if (!texture_.loadFromImage(sfImage)) {
-    qDebug() << "Failed to create sf::Texture from sf::Image";
-  }
+  selectedCreature = nullptr;
 
   scale_x_ = 1.0/texture_.getSize().x;
   scale_y_ = 1.0/texture_.getSize().y;
@@ -202,7 +191,7 @@ void SimulationCanvas::OnUpdate()
   RenderSimulation(simulation_->GetSimulationData());
 
   // Check if a creature is selected and draw the red border if true
-  if (showInfoPanel && selectedCreatureInfo) {
+  if (showInfoPanel && selectedCreature) {
     // Right info panel setup
     sf::Vector2f panelSize(200, getSize().y);  // Width of 200 and full height of the canvas
     sf::Vector2f panelPosition(getSize().x - panelSize.x, 0);  // Positioned on the right side
@@ -213,151 +202,126 @@ void SimulationCanvas::OnUpdate()
     panel.setPosition(panelPosition);
     draw(panel);
 
-    trackButton_.setPosition(panelPosition.x + 10, panelPosition.y + panelSize.y - 40);
-    trackButtonText_.setPosition(trackButton_.getPosition().x + 10, trackButton_.getPosition().y + 5);
+    creatureInfo = QString::fromStdString(formatCreatureInfo(*selectedCreature));
 
-    // Draw the track button
+    // Draw the energy bar
+    float maxBarWidth = 80.0f;  // Width of the full energy bar
+    float barHeight = 10.0f;    // Height of the energy bar
 
-    draw(trackButton_);
-    draw(trackButtonText_);
-
-    //Get the selected creature and draw the red border
-    const auto& creatures = simulation_->GetSimulationData()->creatures_;
-    auto creature_it = std::find_if(creatures.begin(), creatures.end(),
-                                    [this](const Creature& c) {
-                                        return c.GetID() == selectedCreatureInfo->id;
-                                    });
-    auto it = std::find_if(creatures.begin(), creatures.end(), [this](const Creature& c) {
-        return c.GetID() == selectedCreatureInfo->id;
-    });
-
-    if (creature_it != creatures.end()) {
-      const Creature& creature = *it;
-      creatureInfo = QString::fromStdString(formatCreatureInfo(creature));
-
-      // Draw the energy bar
-      float maxBarWidth = 80.0f;  // Width of the full energy bar
-      float barHeight = 10.0f;    // Height of the energy bar
-
-      float energyRatio = static_cast<float>(creature.GetEnergy()) / static_cast<float>(creature.GetMaxEnergy());
-      if (energyRatio < 0) {
+    float energyRatio = static_cast<float>((*selectedCreature).GetEnergy()) / static_cast<float>((*selectedCreature).GetMaxEnergy());
+    if (energyRatio < 0) {
           energyRatio = 0;
-      }
-      float energyBarWidth = maxBarWidth * energyRatio;  // Width based on current energy
-      sf::RectangleShape energyBarOutline(sf::Vector2f(maxBarWidth, barHeight));
-      sf::RectangleShape energyBar(sf::Vector2f(energyBarWidth, barHeight));
-      energyBar.setFillColor(sf::Color::Green);  // Color of the energy bar
-      energyBarOutline.setFillColor(sf::Color::Black);
-      // Position the energy bar - adjust as needed
-      energyBarOutline.setPosition(panelPosition.x + 40, 123);
-      energyBar.setPosition(panelPosition.x + 40, 123);
+    }
+    float energyBarWidth = maxBarWidth * energyRatio;  // Width based on current energy
+    sf::RectangleShape energyBarOutline(sf::Vector2f(maxBarWidth, barHeight));
+    sf::RectangleShape energyBar(sf::Vector2f(energyBarWidth, barHeight));
+    energyBar.setFillColor(sf::Color::Green);  // Color of the energy bar
+    energyBarOutline.setFillColor(sf::Color::Black);
+    // Position the energy bar - adjust as needed
+    energyBarOutline.setPosition(panelPosition.x + 40, 123);
+    energyBar.setPosition(panelPosition.x + 40, 123);
 
-      //Energy texture
-      QPixmap energyPixmap;
-      if (!energyPixmap.load(":/Resources/Energy.png")) {
+    //Energy texture
+    QPixmap energyPixmap;
+    if (!energyPixmap.load(":/Resources/Energy.png")) {
           qDebug() << "Failed to load QPixmap from path:" << ":/Resources/Energy.png";
-      }
+    }
 
-      QImage energyqImage = energyPixmap.toImage().convertToFormat(QImage::Format_RGBA8888);
-      sf::Image energysfImage;
-      energysfImage.create(energyqImage.width(), energyqImage.height(), reinterpret_cast<const sf::Uint8*>(energyqImage.bits()));
+    QImage energyqImage = energyPixmap.toImage().convertToFormat(QImage::Format_RGBA8888);
+    sf::Image energysfImage;
+    energysfImage.create(energyqImage.width(), energyqImage.height(), reinterpret_cast<const sf::Uint8*>(energyqImage.bits()));
 
 
-      if (!energy_texture_.loadFromImage(energysfImage)) {
+    if (!energy_texture_.loadFromImage(energysfImage)) {
           qDebug() << "Failed to create sf::Texture from sf::Image";
-      }
+    }
 
-      sf::Sprite energySprite;
-      energySprite.setTexture(energy_texture_);
-      energySprite.setScale(0.04f,0.04f);
-      energySprite.setPosition(panelPosition.x + 10, 117);
+    sf::Sprite energySprite;
+    energySprite.setTexture(energy_texture_);
+    energySprite.setScale(0.04f,0.04f);
+    energySprite.setPosition(panelPosition.x + 10, 117);
 
-      draw(energySprite);
-      draw(energyBarOutline);
-      draw(energyBar);
+    draw(energySprite);
+    draw(energyBarOutline);
+    draw(energyBar);
 
-      // Draw the health bar
+    // Draw the health bar
 
-      float healthRatio = static_cast<float>(creature.GetHealth()) / static_cast<float>(creature.GetMutable().GetIntegrity() * pow(creature.GetSize(), 2));
-      if (healthRatio < 0 ) {
+    float healthRatio = static_cast<float>((*selectedCreature).GetHealth()) / static_cast<float>((*selectedCreature).GetMutable().GetIntegrity() * pow((*selectedCreature).GetSize(), 2));
+    if (healthRatio < 0 ) {
           healthRatio = 0;
-      }
-      float healthBarWidth = maxBarWidth * healthRatio;  // Width based on current energy
-      sf::RectangleShape healthBarOutline(sf::Vector2f(maxBarWidth, barHeight));
-      sf::RectangleShape healthBar(sf::Vector2f(healthBarWidth, barHeight));
-      healthBar.setFillColor(sf::Color::Red);  // Color of the energy bar
-      healthBarOutline.setFillColor(sf::Color::Black);
-      // Position the energy bar - adjust as needed
-      healthBarOutline.setPosition(panelPosition.x + 40, 105);
-      healthBar.setPosition(panelPosition.x + 40, 105);
+    }
+    float healthBarWidth = maxBarWidth * healthRatio;  // Width based on current energy
+    sf::RectangleShape healthBarOutline(sf::Vector2f(maxBarWidth, barHeight));
+    sf::RectangleShape healthBar(sf::Vector2f(healthBarWidth, barHeight));
+    healthBar.setFillColor(sf::Color::Red);  // Color of the energy bar
+    healthBarOutline.setFillColor(sf::Color::Black);
+    // Position the energy bar - adjust as needed
+    healthBarOutline.setPosition(panelPosition.x + 40, 105);
+    healthBar.setPosition(panelPosition.x + 40, 105);
 
-      //Health texture
-      QPixmap healthPixmap;
-      if (!healthPixmap.load(":/Resources/Health.png")) {
+    //Health texture
+    QPixmap healthPixmap;
+    if (!healthPixmap.load(":/Resources/Health.png")) {
           qDebug() << "Failed to load QPixmap from path:" << ":/Resources/Health.png";
-      }
+    }
 
-      QImage healthqImage = healthPixmap.toImage().convertToFormat(QImage::Format_RGBA8888);
-      sf::Image healthsfImage;
-      healthsfImage.create(healthqImage.width(), healthqImage.height(), reinterpret_cast<const sf::Uint8*>(healthqImage.bits()));
+    QImage healthqImage = healthPixmap.toImage().convertToFormat(QImage::Format_RGBA8888);
+    sf::Image healthsfImage;
+    healthsfImage.create(healthqImage.width(), healthqImage.height(), reinterpret_cast<const sf::Uint8*>(healthqImage.bits()));
 
 
-      if (!health_texture_.loadFromImage(healthsfImage)) {
+    if (!health_texture_.loadFromImage(healthsfImage)) {
           qDebug() << "Failed to create sf::Texture from sf::Image";
-      }
+    }
 
-      sf::Sprite healthSprite;
-      healthSprite.setTexture(health_texture_);
-      healthSprite.setScale(0.7f,0.7f);
-      healthSprite.setPosition(panelPosition.x + 10, 100);
+    sf::Sprite healthSprite;
+    healthSprite.setTexture(health_texture_);
+    healthSprite.setScale(0.7f,0.7f);
+    healthSprite.setPosition(panelPosition.x + 10, 100);
 
-      draw(healthSprite);
-      draw(healthBarOutline);
-      draw(healthBar);
+    draw(healthSprite);
+    draw(healthBarOutline);
+    draw(healthBar);
 
-      if (selectedCreatureInfo && creature.GetID() == selectedCreatureInfo->id) {
 
-          sf::CircleShape redCircle(creature.GetSize()); // Adjust as needed
-          redCircle.setOutlineColor(sf::Color::Red);
-          redCircle.setOutlineThickness(creature.GetSize()/5); // Adjust thickness as needed
-          redCircle.setFillColor(sf::Color::Transparent);
-          redCircle.setPosition(creature.GetCoordinates().first - creature.GetSize(),
-                                creature.GetCoordinates().second - creature.GetSize());
-          draw(redCircle);
+    sf::CircleShape redCircle((*selectedCreature).GetSize()); // Adjust as needed
+    redCircle.setOutlineColor(sf::Color::Red);
+    redCircle.setOutlineThickness((*selectedCreature).GetSize()/5); // Adjust thickness as needed
+    redCircle.setFillColor(sf::Color::Transparent);
+    redCircle.setPosition((*selectedCreature).GetCoordinates().first - (*selectedCreature).GetSize(),
+                                (*selectedCreature).GetCoordinates().second - (*selectedCreature).GetSize());
+    draw(redCircle);
 
-          DrawVisionCone(*this, creature);
+    DrawVisionCone(*this, (*selectedCreature));
 
-          // Check if the creature's health is 0 and display the message
-          if (creature.GetHealth() == 0) {
-              creatureInfo = QString::fromStdString("Creature " + std::to_string(creature.GetID()) + " is dead");
-          } else {
+    // Check if the creature's health is 0 and display the message
+    if ((*selectedCreature).GetHealth() == 0) {
+        creatureInfo = QString::fromStdString("Creature " + std::to_string((*selectedCreature).GetID()) + " is dead");
+    } else {
               // Update the creature info normally
-              creatureInfo = QString::fromStdString(formatCreatureInfo(creature));
+              creatureInfo = QString::fromStdString(formatCreatureInfo(*selectedCreature));
           }
-      }
-      //Get the closest food for the creature and draw a blue circle around it
-      const auto& food_entities = simulation_->GetSimulationData()->food_entities_;
-      auto food_it = std::find_if(food_entities.begin(), food_entities.end(),
-                                      [this, creature](const Food& c) {
-                                          return c.GetID() == creature.GetFoodID();
-                                      });
-      auto it = std::find_if(food_entities.begin(), food_entities.end(), [this, creature](const Food& c) {
-          return c.GetID() == creature.GetFoodID();
-      });
+    //Get the closest food for the creature and draw a blue circle around it
+    auto food_id = (*selectedCreature).GetFoodID();
+    const auto& food_entities = simulation_->GetSimulationData()->food_entities_;
 
-      if (food_it != food_entities.end()) {
-        const Food& food = *it;
+    auto food_it = std::find_if(food_entities.begin(), food_entities.end(),
+                                [food_id](const Food& c) {
+                                  return c.GetID() == food_id;
+                                });
 
-        if (selectedCreatureInfo && food.GetID() == creature.GetFoodID()) {
+    if (food_it != food_entities.end()) {
+        const Food& food = *food_it;
 
-            sf::CircleShape blueCircle(food.GetSize()); // Adjust as needed
-            blueCircle.setOutlineColor(sf::Color::Blue);
-            blueCircle.setOutlineThickness(2); // Adjust thickness as needed
-            blueCircle.setFillColor(sf::Color::Transparent);
-            blueCircle.setPosition(food.GetCoordinates().first - food.GetSize(),
+        sf::CircleShape blueCircle(food.GetSize()); // Adjust as needed
+        blueCircle.setOutlineColor(sf::Color::Blue);
+        blueCircle.setOutlineThickness(2); // Adjust thickness as needed
+        blueCircle.setFillColor(sf::Color::Transparent);
+        blueCircle.setPosition(food.GetCoordinates().first - food.GetSize(),
                                    food.GetCoordinates().second - food.GetSize());
-            draw(blueCircle);
-        }
+        draw(blueCircle);
+
       }
       // Prepare and draw the creature info text inside the panel
       sf::Text infoText;
@@ -367,7 +331,6 @@ void SimulationCanvas::OnUpdate()
       infoText.setFillColor(sf::Color::White);
       infoText.setPosition(panelPosition.x + 10, 10);  // Adjust the Y position as needed
       draw(infoText);
-    }
   }else if (showInfoPanel) {
     std::cout << "Info panel flag is set, but no creature position is recorded."
               << std::endl;
@@ -394,64 +357,10 @@ void SimulationCanvas::OnUpdate()
   draw(mouseCoordsText);
 }
 
-sf::VertexArray createGradientCircle(float radius, const sf::Color& centerColor,
-                                     const sf::Color& edgeColor) {
-  const int points = 100;
-  sf::VertexArray circle(sf::TriangleFan, points + 2);
-
-  // Set the center of the circle at the origin (0, 0)
-  circle[0].position = sf::Vector2f(0, 0);
-  circle[0].color = centerColor;
-
-  for (int i = 1; i <= points + 1; ++i) {
-    float angle = (i - 1) * (2 * M_PI / points);
-    // The points are now calculated from the origin
-    sf::Vector2f point(radius * cos(angle), radius * sin(angle));
-
-    float dist = std::sqrt(point.x * point.x + point.y * point.y) / radius;
-    sf::Color color(
-        static_cast<sf::Uint8>(centerColor.r * (1 - dist) + edgeColor.r * dist),
-        static_cast<sf::Uint8>(centerColor.g * (1 - dist) + edgeColor.g * dist),
-        static_cast<sf::Uint8>(centerColor.b * (1 - dist) +
-                               edgeColor.b * dist));
-
-    circle[i].position = point;
-    circle[i].color = color;
-  }
-
-  return circle;
-}
-
 // use this to process the simulation data and render it on the screen
 void SimulationCanvas::RenderSimulation(DataAccessor<SimulationData> data) {
   clear(sf::Color(20, 22, 69));
-  /*
-  // Create a full-screen rectangle
-  double mapWidth = data->GetEnvironment().GetMapWidth();
-  double mapHeight = data->GetEnvironment().GetMapHeight();
-  // Apply the shader to the background
-  sf::RenderStates backgroundState;
 
-  sf::View currentView = getView();
-  sf::Vector2f viewTopLeft = currentView.getCenter() - (currentView.getSize() / 2.0f);
-  sf::Vector2f viewSize = currentView.getSize(); // View size considering the zoom
-
-  food_density_shader_.setUniform("resolution", sf::Vector2f(mapWidth, mapHeight));
-  food_density_shader_.setUniform("viewTopLeft", viewTopLeft);
-  food_density_shader_.setUniform("viewSize", viewSize);  // Updated to pass view size
-  food_density_shader_.setUniform("densityTexture", food_density_texture_);
-  food_density_shader_.setUniform("maxDensity", 1.0f);
-
-  backgroundState.shader = &food_density_shader_;
-
-  for (int xShift = -1; xShift <= 1; xShift++) {
-    for (int yShift = -1; yShift <= 1; yShift++) {
-      sf::RectangleShape background(sf::Vector2f(mapWidth, mapHeight));
-      background.setPosition(xShift * mapWidth, yShift * mapHeight);
-      draw(background, backgroundState);
-    }
-  }
-  */
   // Iterate through food and load the corresponding sprite
   // Note that we are assuming to be working with a sprite sheet of 256x256 per sprite
 
@@ -607,31 +516,9 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
 
   qDebug() << "Mouse Pressed at: " << mousePos.x << ", " << mousePos.y;
 
-  if (showInfoPanel) {
-    auto bounds = trackButton_.getGlobalBounds();
-    qDebug() << "Track Button Bounds: " << bounds.left << ", " << bounds.top << ", " << bounds.width << ", " << bounds.height;
-  }
-
-  if (showInfoPanel && trackButton_.getGlobalBounds().contains(mousePos)) {
-    qDebug() << "Track Button Clicked";
-    if (selectedCreatureInfo) {
-      auto data = simulation_->GetSimulationData();
-      const auto& creatures = data->creatures_;
-      auto it = std::find_if(creatures.begin(), creatures.end(), [this](const Creature& c) {
-          return c.GetID() == selectedCreatureInfo->id;
-      });
-
-      if (it != creatures.end()) {
-          const Creature& selectedCreature = *it;
-          CreatureTracker tracker(selectedCreature);
-          tracker.Show();
-      }
-    }
-  }
-
   auto data = simulation_->GetSimulationData();
 
-  for (const auto& creature : data->creatures_) {
+  for (auto& creature : data->creatures_) {
     auto [creatureX, creatureY] = creature.GetCoordinates();
     float creatureSize = creature.GetSize();
     sf::Vector2f creaturePos(creatureX, creatureY);
@@ -639,7 +526,8 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
     if (sqrt(pow(mousePos.x - creaturePos.x, 2) + pow(mousePos.y - creaturePos.y, 2)) <= creatureSize) {
       qDebug() << "Creature Clicked: ID" << creature.GetID();
       showInfoPanel = true;
-      selectedCreatureInfo = CreatureInfo{creature.GetID(), creatureX, creatureY, creatureSize, creature.GetFoodID()};
+      selectedCreatureInfo = CreatureInfo{ creature.GetID(), creatureX, creatureY, creatureSize, creature.GetFoodID()};
+      selectedCreature = &creature;
       repaint();
       return;
     }
@@ -648,29 +536,20 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
   qDebug() << "Click Outside, closing panel";
   showInfoPanel = false;
   selectedCreatureInfo.reset();
+  selectedCreature = nullptr;
   repaint();
 }
 
 
 // Functions checking if a creature has been clicked
 bool SimulationCanvas::isCreatureClicked(const sf::Vector2f& mousePos) {
-  for (const auto& creature : simulation_->GetSimulationData()->creatures_) {
-    auto [x, y] = creature.GetCoordinates();
-    sf::Vector2f creaturePos(x, y);
-    if (sqrt(pow(mousePos.x - creaturePos.x, 2) +
-             pow(mousePos.y - creaturePos.y, 2)) <=
-        creature.GetSize()+1) {
-      return true;
-    }
-  }
+  if (selectedCreature) {return true;}
   return false;
 }
 
 void SimulationCanvas::displayInfoPanel() {
   if (clickedCreaturePos) {
     showInfoPanel = true;
-    panelRect =
-        QRectF(clickedCreaturePos->first, clickedCreaturePos->second, 200, 100);
   }
 }
 
