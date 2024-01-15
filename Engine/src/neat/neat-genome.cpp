@@ -7,10 +7,8 @@
  */
 
 #include <algorithm>
-#include <unordered_map>
 #include <optional>
 #include <random>
-#include <set>
 #include "settings.h"
 
 namespace neat {
@@ -704,8 +702,8 @@ double Genome::CompatibilityBetweenGenomes(const Genome& other) const {
             Nshared_neurons++;
             // add a relative difference in biases (a number between 0 and 2)
             average_weight_difference +=
-                abs(neuron.GetBias() - other_neuron.GetBias()) /
-                std::max(abs(neuron.GetBias()), abs(other_neuron.GetBias()));
+                fabs(neuron.GetBias() - other_neuron.GetBias()) /
+                std::max(fabs(neuron.GetBias()), fabs(other_neuron.GetBias()));
         }
     }
 
@@ -719,8 +717,8 @@ double Genome::CompatibilityBetweenGenomes(const Genome& other) const {
         Nshared_links++;
         // add a relative difference in weights (a number between 0 and 2)
         average_weight_difference +=
-            abs(link.GetWeight() - other_link.GetWeight()) /
-            std::max(abs(link.GetWeight()), abs(other_link.GetWeight()));
+            fabs(link.GetWeight() - other_link.GetWeight()) /
+            std::max(fabs(link.GetWeight()), fabs(other_link.GetWeight()));
         break;
             }
         }
