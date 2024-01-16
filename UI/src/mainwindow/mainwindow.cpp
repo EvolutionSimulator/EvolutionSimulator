@@ -223,7 +223,7 @@ void MainWindow::DrawUI()
 
     //Set up config buttons
     ui_->configurationButton->setMask(region);
-    QPixmap pixMap2(":/Resources/Configuration.png");
+    QPixmap pixMap2(":/Resources/Config-settings.png");
     QIcon icon2(pixMap2);
     ui_->configurationButton->setIcon(icon2);
     QSize size(50, 50);
