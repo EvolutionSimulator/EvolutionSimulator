@@ -34,7 +34,6 @@ void GraphManager::DrawCreaturesVelocityOverTimeGraph() {
   DrawGraph(data, "Average Velocity of Creatures in the Simulation");
 }
 
-
 void GraphManager::handleDropdownSelection(int index) {
   qDebug() << "Dropdown selection changed to index:" << index;
 
