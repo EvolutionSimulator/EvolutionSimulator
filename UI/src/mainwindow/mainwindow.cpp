@@ -20,11 +20,7 @@ MainWindow::MainWindow(QWidget *parent)
   PauseSimulation();
   RunSimulation();
 
-  graph_manager_ = new GraphManager(this, engine_);
-  config_manager_ = new ConfigManager(this, engine_);
-
   DrawUI();
-  SetUpConnections();
 
 }
 
@@ -47,6 +43,10 @@ void MainWindow::InitializeEngine()
     int height = sf::VideoMode::getDesktopMode().height;
     engine_ = new Engine(width, height);
     ui_->canvas->SetSimulation(engine_->GetSimulation());
+
+    graph_manager_ = new GraphManager(this, engine_);
+    config_manager_ = new ConfigManager(this, engine_);
+    SetUpConnections();
   }
   // If this function changes change the kMaxFoodDensityColor in config.h as for a correct shade of the backgroung we need this measure
   auto food_density_function = [this](double x, double y) {
@@ -68,6 +68,10 @@ void MainWindow::InitializeEngineWithDensities(double food_density, double creat
     int height = sf::VideoMode::getDesktopMode().height;
     engine_ = new Engine(width, height, food_density, creature_density);
     ui_->canvas->SetSimulation(engine_->GetSimulation());
+
+    graph_manager_ = new GraphManager(this, engine_);
+    config_manager_ = new ConfigManager(this, engine_);
+    SetUpConnections();
   }
 }
 
@@ -110,6 +114,10 @@ void MainWindow::KillEngine()
     std::cout << "Joining engine thread..." << std::endl;
     engine_thread_.join();
   }
+
+  delete graph_manager_;
+  delete config_manager_;
+  delete updateTimer;
 
   std::cout << "Deleting engine..." << std::endl;
   delete engine_;
