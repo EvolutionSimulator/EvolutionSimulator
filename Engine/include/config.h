@@ -51,12 +51,16 @@ constexpr double kDefaultCreatureDensity = 5e-4;
 constexpr double kPlantNutritionalValue = 1.0;
 constexpr double kMeatNutritionalValue = 2.0;
 <<<<<<< HEAD
+<<<<<<< HEAD
 constexpr double kEggNutritionalValue = 3.0;
 constexpr double kEggIncubationTimeMultiplier = 1.0;
 constexpr double kPlantProportion =
     0.5; /* PlantProportion + MeatProportion = 1 */
 constexpr double kRotFactor = 1.0;
 =======
+=======
+constexpr double kBiteNutritionalValue = 0.01;
+>>>>>>> e1ad33d (New Tests)
 constexpr double kPlantProportion = 0.5; /* PlantProportion + MeatProportion = 1 */
 constexpr double kRotFactor = 5.0;
 >>>>>>> c4092f3 (Add optimization, fix shader, apply rot and grow)
