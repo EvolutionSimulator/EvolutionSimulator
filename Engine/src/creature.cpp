@@ -1004,13 +1004,13 @@ void Creature::Bite(Food* food)
  */
 void Creature::Bite(Creature* creature)
 {
-  //Reset eating cooldown, makes creature stop to bite
   eating_cooldown_ = mutable_.GetEatingSpeed();
 
   const double damage = M_PI*pow(bite_strength_,2)*settings::physical_constraints::kBiteDamageRatio;
   creature->SetHealth(creature->GetHealth()-damage);
 
-  SetEnergy(GetEnergy()+bite_strength_*settings::physical_constraints::kBiteEnergyConsumptionRatio/10);
+  const double nutrition = settings::environment::kBiteNutritionalValue * M_PI*pow(bite_strength_,2) * 2 * mutable_.GetDiet();
+  SetEnergy(GetEnergy()+nutrition-bite_strength_*settings::physical_constraints::kBiteEnergyConsumptionRatio/10);
 }
 
 /*!
@@ -1031,18 +1031,6 @@ void Creature::Grab(Entity* entity){
     SetEnergy(GetEnergy() - entity->GetSize());
     this->UpdateEntityVelocities();
   }
-}
-
-void Creature::Parasite(Creature* host)
-{
-  // Parasites are assumed to be attached to the host and to have a biting size smaller than the host
-  SetEnergy(GetEnergy()-bite_strength_*settings::physical_constraints::kBiteEnergyConsumptionRatio);
-  const double nutrition = settings::environment::kMeatNutritionalValue * M_PI*pow(bite_strength_,2) * 2 * mutable_.GetDiet();
-  SetEnergy(GetEnergy()+nutrition);
-  SetStomachFullness(GetStomachFullness()+M_PI*pow(bite_strength_,2));
-
-  const double damage = std::min(M_PI*pow(bite_strength_,2)*settings::physical_constraints::kBiteDamageRatio, host->GetHealth());
-  host->SetHealth(host->GetHealth()-damage);
 }
 
 void Creature::AddAcid(double quantity)
