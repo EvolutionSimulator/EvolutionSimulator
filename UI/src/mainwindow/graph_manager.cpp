@@ -24,6 +24,15 @@ void GraphManager::DrawCreaturesSizeOverTimeGraph() {
   DrawGraph(data, "Average Size of Creatures in the Simulation");
 }
 
+void GraphManager::DrawCreaturesEnergyOverTimeGraph() {
+  auto data = engine_->GetSimulation()->GetSimulationData()->GetCreatureEnergyOverTime();
+  DrawGraph(data, "Average Energy of Creatures in the Simulation");
+}
+
+void GraphManager::DrawCreaturesVelocityOverTimeGraph() {
+  auto data = engine_->GetSimulation()->GetSimulationData()->GetCreatureVelocityOverTime();
+  DrawGraph(data, "Average Velocity of Creatures in the Simulation");
+}
 
 void GraphManager::handleDropdownSelection(int index) {
   qDebug() << "Dropdown selection changed to index:" << index;
@@ -35,5 +44,13 @@ void GraphManager::handleDropdownSelection(int index) {
   if (index == 2) {
     qDebug() << "Calling DrawCreaturesOverTimeGraph";
     DrawCreaturesSizeOverTimeGraph();
+  }
+  if (index == 3) {
+    qDebug() << "Calling DrawCreaturesOverTimeGraph";
+    DrawCreaturesEnergyOverTimeGraph();
+  }
+  if (index == 4) {
+    qDebug() << "Calling DrawCreaturesOverTimeGraph";
+    DrawCreaturesVelocityOverTimeGraph();
   }
 }

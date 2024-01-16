@@ -112,13 +112,21 @@ void SimulationData::UpdateAllCreatures(double deltaTime) {
     lastRecordedTime_ = world_time_;
     creatureCountOverTime_.push_back(creatures_.size());
     double total_creature_size = 0;
+    double total_creature_energy = 0;
+    double total_creature_velocity = 0;
 //    std::cout << "Average Creature Size at Time " << static_cast<int>(world_time_) << ": " << creatures_.size() << std::endl;
     for (Creature& creature : creatures_) {
       total_creature_size += creature.GetSize();
+      total_creature_energy += creature.GetEnergy();
+      total_creature_velocity += creature.GetVelocity();
     }
     if (creatures_.size() > 0) {
       double average_size = total_creature_size / creatures_.size();
+      double average_velocity = total_creature_velocity / creatures_.size();
+      double average_energy = total_creature_energy / creatures_.size();
       creatureSizeOverTime_.push_back(average_size);
+      creatureEnergyOverTime_.push_back(average_energy);
+      creatureVelocityOverTime_.push_back(average_velocity);
     }
   }
 }
@@ -504,3 +512,12 @@ std::vector<int> SimulationData::GetCreatureCountOverTime() const {
 std::vector<double> SimulationData::GetCreatureSizeOverTime() const {
   return creatureSizeOverTime_;
 }
+
+std::vector<double> SimulationData::GetCreatureEnergyOverTime() const {
+  return creatureEnergyOverTime_;
+}
+
+std::vector<double> SimulationData::GetCreatureVelocityOverTime() const {
+  return creatureVelocityOverTime_;
+}
+

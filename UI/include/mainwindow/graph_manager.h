@@ -53,6 +53,8 @@ public:
 public slots:
   void DrawCreaturesOverTimeGraph();
   void DrawCreaturesSizeOverTimeGraph();
+  void DrawCreaturesEnergyOverTimeGraph();
+  void DrawCreaturesVelocityOverTimeGraph();
   void handleDropdownSelection(int index);
 
 private:

@@ -206,6 +206,8 @@ void MainWindow::DrawUI()
     comboBox->addItem(QIcon(scaledPixmap), "Graphs");
     comboBox->addItem("Number of Creatures Over Time");
     comboBox->addItem("Creatures Size Over Time");
+    comboBox->addItem("Creatures Energy Over Time");
+    comboBox->addItem("Creatures Velocity Over Time");
 
     // Set up run, restart
     QRect rect(2,2,45,45);
@@ -221,7 +223,7 @@ void MainWindow::DrawUI()
     ui_->runButton->setIcon(icon);
     ui_->restartButton->setIcon(icon3);
 
-    //Set up config buttons
+    //Set up config buttons new colors
     ui_->configurationButton->setMask(region);
     QPixmap pixMap2(":/Resources/Configuration.png");
     QIcon icon2(pixMap2);
