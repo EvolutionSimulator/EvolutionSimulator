@@ -102,8 +102,9 @@ class Settings {
     double d_digestion_rate = 3;
     double d_genetic_strength = 0.6;
     double d_acid_to_energy = 5; // Increase for easier survival
-    double d_bite_damage_ratio = 1;
+    double d_bite_damage_ratio = 1.0;
     double d_bite_energy_consumption_ratio = 0.01;
+    double d_bite_nutritional_value = 1.0;
   } physical_constraints;
 
   struct UISettings {

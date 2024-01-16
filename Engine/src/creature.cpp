@@ -502,13 +502,14 @@ void Creature::ProcessVisionEnemies(std::vector<std::vector<std::vector<Entity *
  */
 void Creature::Bite(Creature* creature)
 {
-  //Reset eating cooldown, makes creature stop to bite
   eating_cooldown_ = mutable_.GetEatingSpeed();
 
   //Bite logic - inflict damage, add energy
   const double damage = M_PI*pow(bite_strength_,2)*SETTINGS.physical_constraints.d_bite_damage_ratio;
   creature->SetHealth(creature->GetHealth()-damage);
-  SetEnergy(GetEnergy()+bite_strength_*SETTINGS.physical_constraints.d_bite_energy_consumption_ratio/10);
+\
+  const double nutrition = SETTINGS.physical_constraints.d_bite_nutritional_value * M_PI*pow(bite_strength_,2) * 2 * mutable_.GetDiet();
+  SetEnergy(GetEnergy()+ nutrition);
 }
 
 /*!
@@ -530,6 +531,5 @@ void Creature::Grab(Entity* entity){
     this->UpdateEntityVelocities();
   }
 }
-
 
 
