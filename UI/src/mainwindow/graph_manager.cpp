@@ -34,6 +34,26 @@ void GraphManager::DrawCreaturesVelocityOverTimeGraph() {
   DrawGraph(data, "Average Velocity of Creatures in the Simulation");
 }
 
+void GraphManager::DrawSizeEnergyScatterplot() {
+  auto data = engine_->GetSimulation()->GetSimulationData();
+
+  // Vectors to store size and energy data
+  std::vector<double> sizes;
+  std::vector<double> energies;
+
+  for (const auto& creature : data->creatures_) {
+      float creatureSize = creature.GetSize();
+      float creatureEnergy = creature.GetEnergy();
+
+      // Append size and energy data to vectors
+      sizes.push_back(creatureSize);
+      energies.push_back(creatureEnergy);
+  }
+
+  DrawScatterPlot(sizes, energies, "Scatterplot of Creature Size and Energy",
+                  "Creature Size", "Creature Energy");
+}
+
 void GraphManager::handleDropdownSelection(int index) {
   qDebug() << "Dropdown selection changed to index:" << index;
 
@@ -53,4 +73,9 @@ void GraphManager::handleDropdownSelection(int index) {
     qDebug() << "Calling DrawCreaturesOverTimeGraph";
     DrawCreaturesVelocityOverTimeGraph();
   }
+  if (index == 5) {
+    qDebug() << "Calling DrawCreaturesOverTimeGraph";
+    DrawSizeEnergyScatterplot();
+  }
+
 }

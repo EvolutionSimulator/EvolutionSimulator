@@ -37,7 +37,6 @@ QT_END_NAMESPACE  //
   void KillEngine();
   void ToggleSimulation();
   void RestartSimulation();
-
   void handleUIUpdateForConfigScreen(double food_density, double friction_coefficient);
   void handleRestartSimulationRequested(double food_density, double creature_density);
 
@@ -52,5 +51,4 @@ QT_END_NAMESPACE  //
 
   GraphManager* graph_manager_;
   ConfigManager* config_manager_;
-
 };
