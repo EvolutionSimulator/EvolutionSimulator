@@ -221,7 +221,7 @@ void MainWindow::DrawUI()
     ui_->runButton->setIcon(icon);
     ui_->restartButton->setIcon(icon3);
 
-    //Set up config buttons
+    //Set up config buttons new colors
     ui_->configurationButton->setMask(region);
     QPixmap pixMap2(":/Resources/Configuration.png");
     QIcon icon2(pixMap2);
