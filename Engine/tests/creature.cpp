@@ -295,7 +295,7 @@ TEST(CreatureTests, Digest) {
   ASSERT_LT(creature.GetStomachFullness(), initialStomachFullness);
 }
 
-TEST(CreatureTests, Bite) {
+TEST(CreatureTests, BiteFood) {
   neat::Genome genome(3, 4);
   Mutable mutables;
   Creature creature(genome, mutables);
@@ -309,6 +309,36 @@ TEST(CreatureTests, Bite) {
   ASSERT_LT(food.GetSize(), initialFoodSize);
   ASSERT_GT(creature.GetStomachFullness(), initialStomachFullness);
 }
+
+TEST(CreatureTests, BiteCreature) {
+  neat::Genome genome1(3, 4);
+  neat::Genome genome2(3, 4);
+  Mutable mutables;
+  Creature creature1(genome1, mutables);
+  Creature creature2(genome2, mutables);
+
+  double initialHealth = creature2.GetHealth();
+
+  creature1.Bite(&creature2);
+
+  ASSERT_LT(creature2.GetHealth(), initialHealth);
+}
+
+TEST(CreatureTests, Grab) {
+  neat::Genome genome(3, 4);
+  Mutable mutables;
+  Creature creature(genome, mutables);
+  Entity entity;
+
+  double initialEnergy = creature.GetEnergy();
+
+  creature.Grab(&entity);
+
+  ASSERT_EQ(creature.GetGrabbedEntity(), &entity);
+  //ASSERT_TRUE(dynamic_cast<GrabbingEntity*>(&entity)->IsBeingGrabbedBy(&creature));
+  ASSERT_LT(creature.GetEnergy(), initialEnergy);
+}
+
 
 TEST(CreatureTests, EmptinessPercent) {
   neat::Genome genome(3, 4);
