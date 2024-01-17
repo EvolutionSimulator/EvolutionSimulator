@@ -1027,7 +1027,7 @@ void Creature::Grab(Entity* entity){
   if (dynamic_cast<MovableEntity*>(entity))
   {
     this->SetGrabbedEntity(dynamic_cast<MovableEntity*>(entity));
-    dynamic_cast<GrabbingEntity*>(entity)->AddToGrabbingEntities(this);
+    dynamic_cast<GrabbingEntity*>(entity)->AddToGrabbedBy(this);
     SetEnergy(GetEnergy() - entity->GetSize());
     this->UpdateEntityVelocities();
   }
