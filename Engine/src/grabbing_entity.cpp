@@ -2,10 +2,15 @@
 
 #include <math.h>
 
+#include "config.h"
+#include "movable_entity.h"
+
 GrabbingEntity::GrabbingEntity() : MovableEntity() {}
 
-/*
 double GrabbingEntity::GetEffectiveAccelerationAngle() const {
+  if (!grabbed_entity_ && !grabbing_entities_.size()) {
+    return MovableEntity::GetEffectiveAccelerationAngle();
+  }
   double accel = GetTotalForwardAccel();
   double accel_angle = GetTotalForwardAccelAngle();
   double f = GetForwardFriction();
@@ -16,16 +21,44 @@ double GrabbingEntity::GetEffectiveAccelerationAngle() const {
 }
 
 double GrabbingEntity::GetEffectiveForwardAcceleration() const {
-  // Implementation
+  if (!grabbed_entity_ && !grabbing_entities_.size()) {
+    return MovableEntity::GetEffectiveForwardAcceleration();
+  }
+  double accel = GetTotalForwardAccel();
+  double accel_angle = GetTotalForwardAccelAngle();
+  double f = GetForwardFriction();
+  double f_angle = GetVelocityAngle() + M_PI;
+  double effective_accel =
+      sqrt(pow(accel * sin(accel_angle) + f * sin(f_angle), 2) +
+           pow(accel * cos(accel_angle) + f * cos(f_angle), 2));
+  return effective_accel;
 }
 
 double GrabbingEntity::GetEffectiveRotationalAcceleration() const {
-  // Implementation
-}*/
+  if (!grabbed_entity_ && !grabbing_entities_.size()) {
+    return MovableEntity::GetEffectiveRotationalAcceleration();
+  }
+  double rotational_accel = GetTotalRotAccel();
+  double rotational_friction = GetRotationalFriction();
+  return rotational_accel - rotational_friction;
+}
 
-double GrabbingEntity::GetForwardFriction() const {}
+double GrabbingEntity::GetForwardFriction() const {
+  if (!grabbed_entity_ && !grabbing_entities_.size()) {
+    return MovableEntity::GetForwardFriction();
+  }
+  double frictional_coefficient = settings::environment::kFrictionalCoefficient;
+  return GetVelocity() * sqrt(GetTotalMass()) * frictional_coefficient *
+         (1 + strafing_difficulty_ * fabs(sin(GetVelocityAngle())));
+}
 
-double GrabbingEntity::GetRotationalFriction() const {}
+double GrabbingEntity::GetRotationalFriction() const {
+  if (!grabbed_entity_ && !grabbing_entities_.size()) {
+    return MovableEntity::GetRotationalFriction();
+  }
+  double frictional_coefficient = settings::environment::kFrictionalCoefficient;
+  return GetRotationalVelocity() * GetTotalMass() * frictional_coefficient;
+}
 
 std::unordered_set<GrabbingEntity*> GrabbingEntity::GetGrabbedBy() const {
   std::unordered_set<GrabbingEntity*> entities;
