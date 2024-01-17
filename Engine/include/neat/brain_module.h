@@ -24,6 +24,8 @@ public:
 
     bool GetMultiple();
 
+    int GetType();
+
 private:
     int first_input_index_;
     int first_output_index_;
@@ -33,6 +35,8 @@ private:
     int module_id_; /*! Unique identifier for a type of module */
     bool multiple_; /*! Boolean that indicates if multiple instances of
                       this module can be evolved by the same creature */
+    int type_; /*! Random int that identifies the type of module if there
+                 can be multiplicity (i.e. type of pheromone) */
 };
 
 
