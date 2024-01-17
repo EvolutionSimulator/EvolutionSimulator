@@ -25,10 +25,10 @@ class MovableEntity : virtual public Entity {
       double angle);  // Angle relative to orientation of entity
   void SetRotationalVelocity(double rotational_velocity);
 
-  double GetForwardFriction() const;
+  virtual double GetForwardFriction() const;
   virtual double GetEffectiveAccelerationAngle() const;
   virtual double GetEffectiveForwardAcceleration() const;
-  double GetRotationalFriction() const;
+  virtual double GetRotationalFriction() const;
   virtual double GetEffectiveRotationalAcceleration() const;
 
   void UpdateVelocities(double deltaTime);
