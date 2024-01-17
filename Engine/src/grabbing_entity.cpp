@@ -4,7 +4,16 @@
 
 GrabbingEntity::GrabbingEntity() : MovableEntity() {}
 
-/*double GrabbingEntity::GetEffectiveAccelerationAngle() const {}
+/*
+double GrabbingEntity::GetEffectiveAccelerationAngle() const {
+  double accel = GetTotalForwardAccel();
+  double accel_angle = GetTotalForwardAccelAngle();
+  double f = GetForwardFriction();
+  double f_angle = GetVelocityAngle() + M_PI;
+  double effective_angle = atan2(accel * sin(accel_angle) + f * sin(f_angle),
+                                 accel * cos(accel_angle) + f * cos(f_angle));
+  return effective_angle;
+}
 
 double GrabbingEntity::GetEffectiveForwardAcceleration() const {
   // Implementation
@@ -29,6 +38,9 @@ std::unordered_set<std::shared_ptr<GrabbingEntity>> GrabbingEntity::GetGrabbedBy
   return entities;
 }
 
+double GrabbingEntity::GetForwardFriction() const {}
+
+double GrabbingEntity::GetRotationalFriction() const {}
 
 std::pair<double, double> GrabbingEntity::GetCentreOfMass() const {
   std::unordered_set<std::shared_ptr<GrabbingEntity>> entities = GetGrabbedBy();
@@ -44,7 +56,6 @@ std::pair<double, double> GrabbingEntity::GetCentreOfMass() const {
   centre_of_mass.second /= total_mass;
   return centre_of_mass;
 }
-
 
 double GrabbingEntity::GetTotalMass() const {
   std::unordered_set<std::shared_ptr<GrabbingEntity>> entities = GetGrabbedBy();
@@ -71,16 +82,15 @@ std::pair<double, double> GrabbingEntity::GetTotalForwardAccelComps() const {
           total_forward_accel.second / total_mass};
 }
 
-double GrabbingEntity::GetTotalForwardAccel() const{
+double GrabbingEntity::GetTotalForwardAccel() const {
   std::pair<double, double> comps = GetTotalForwardAccelComps();
   return sqrt(pow(comps.first, 2) + pow(comps.second, 2));
 }
 
-double GrabbingEntity::GetTotalForwardAccelAngle() const{
+double GrabbingEntity::GetTotalForwardAccelAngle() const {
   std::pair<double, double> comps = GetTotalForwardAccelComps();
   return atan2(comps.second, comps.first);
 }
-
 
 double GrabbingEntity::GetTotalRotAccel() const{
   std::unordered_set<std::shared_ptr<GrabbingEntity>> entities = GetGrabbedBy();
@@ -97,21 +107,21 @@ double GrabbingEntity::GetTotalRotAccel() const{
     double forward_componenet =
         cc_distance * entity->GetAcceleration() *
         sin(GetOrientation() + GetAccelerationAngle() - cc_angle);
-    double torque1 =
-        -(cc_distance - entity->GetSize()) * (rotational_acceleration_ / entity->GetSize()) / 2;
-    double torque2 =
-        (cc_distance + entity->GetSize()) * (rotational_acceleration_ / entity->GetSize()) / 2;
+    double torque1 = -(cc_distance - entity->GetSize()) *
+                     (rotational_acceleration_ / entity->GetSize()) / 2;
+    double torque2 = (cc_distance + entity->GetSize()) *
+                     (rotational_acceleration_ / entity->GetSize()) / 2;
     total_rot_accel +=
         entity->GetSize() * (torque1 + torque2 + forward_componenet);
   }
   return total_rot_accel / GetTotalMass();
 }
 
-void GrabbingEntity::UpdateEntityVelocities() {
+void GrabbingEntity::UpdateEntityVelocities() const {
   // Implementation
 }
 
-std::shared_ptr<MovableEntity> GrabbingEntity::GetGrabbedEntity(){
+std::shared_ptr<MovableEntity> GrabbingEntity::GetGrabbedEntity() const {
     return grabbed_entity_;
 }
 
