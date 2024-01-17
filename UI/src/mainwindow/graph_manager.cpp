@@ -14,6 +14,11 @@ GraphManager::GraphManager(QWidget* parent, Engine *engine) :
                                                               parent_(parent),
                                                               engine_(engine){}
 
+void GraphManager::SetEngine(Engine* engine)
+{
+  engine_ = engine;
+}
+
 void GraphManager::DrawCreaturesOverTimeGraph() {
   auto data = engine_->GetSimulation()->GetSimulationData()->GetCreatureCountOverTime();
   DrawGraph(data, "Number of Creatures in the Simulation");

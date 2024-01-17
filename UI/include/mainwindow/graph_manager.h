@@ -17,6 +17,8 @@ class GraphManager : public QObject {
 
 public:
   explicit GraphManager(QWidget* parent, Engine* engine);
+  void SetEngine(Engine* engine);
+
   template <typename T> void DrawGraph(std::vector<T> data, const QString& graphTitle) {
 
     if (data.empty()) {

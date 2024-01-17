@@ -10,6 +10,7 @@ class ConfigManager : public QObject {
 
 public:
   explicit ConfigManager(QWidget* parent, Engine* engine);
+  void SetEngine(Engine* engine);
 
 public slots:
   void ChangeFoodDensity(int value);

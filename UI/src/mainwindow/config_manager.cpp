@@ -19,6 +19,10 @@ void ConfigManager::ChangeFoodDensity(int value) {
   emit UpdateUIForConfigScreen(food_density_, friction_coefficient_);
 }
 
+void ConfigManager::SetEngine(Engine* engine)
+{
+  engine_ = engine;
+}
 
 void ConfigManager::ChangeEngineSpeed(int value) {
   engine_->SetSpeed(value);
