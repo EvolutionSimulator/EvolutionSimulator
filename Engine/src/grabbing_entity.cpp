@@ -8,7 +8,7 @@
 GrabbingEntity::GrabbingEntity() : MovableEntity() {}
 
 double GrabbingEntity::GetEffectiveAccelerationAngle() const {
-  if (!grabbed_entity_ && !grabbing_entities_.size()) {
+  if (!grabbed_entity_ && !grabbed_by_.size()) {
     return MovableEntity::GetEffectiveAccelerationAngle();
   }
   double accel = GetTotalForwardAccel();
@@ -21,7 +21,7 @@ double GrabbingEntity::GetEffectiveAccelerationAngle() const {
 }
 
 double GrabbingEntity::GetEffectiveForwardAcceleration() const {
-  if (!grabbed_entity_ && !grabbing_entities_.size()) {
+  if (!grabbed_entity_ && !grabbed_by_.size()) {
     return MovableEntity::GetEffectiveForwardAcceleration();
   }
   double accel = GetTotalForwardAccel();
@@ -35,7 +35,7 @@ double GrabbingEntity::GetEffectiveForwardAcceleration() const {
 }
 
 double GrabbingEntity::GetEffectiveRotationalAcceleration() const {
-  if (!grabbed_entity_ && !grabbing_entities_.size()) {
+  if (!grabbed_entity_ && !grabbed_by_.size()) {
     return MovableEntity::GetEffectiveRotationalAcceleration();
   }
   double rotational_accel = GetTotalRotAccel();
@@ -44,7 +44,7 @@ double GrabbingEntity::GetEffectiveRotationalAcceleration() const {
 }
 
 double GrabbingEntity::GetForwardFriction() const {
-  if (!grabbed_entity_ && !grabbing_entities_.size()) {
+  if (!grabbed_entity_ && !grabbed_by_.size()) {
     return MovableEntity::GetForwardFriction();
   }
   double frictional_coefficient = settings::environment::kFrictionalCoefficient;
@@ -53,7 +53,7 @@ double GrabbingEntity::GetForwardFriction() const {
 }
 
 double GrabbingEntity::GetRotationalFriction() const {
-  if (!grabbed_entity_ && !grabbing_entities_.size()) {
+  if (!grabbed_entity_ && !grabbed_by_.size()) {
     return MovableEntity::GetRotationalFriction();
   }
   double frictional_coefficient = settings::environment::kFrictionalCoefficient;
