@@ -2,9 +2,7 @@
 
 #include <math.h>
 
-GrabbingEntity::GrabbingEntity() {
-  // Constructor implementation
-}
+GrabbingEntity::GrabbingEntity() : MovableEntity() {}
 
 /*double GrabbingEntity::GetEffectiveAccelerationAngle() const {}
 
