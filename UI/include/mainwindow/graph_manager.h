@@ -66,7 +66,11 @@ public:
       return;
     }
 
-    QScatterSeries* series = new QScatterSeries();
+    QScatterSeries* series_red = new QScatterSeries();
+    QScatterSeries* series_blue = new QScatterSeries();
+
+    series_red->setBrush(QBrush(Qt::red));
+    series_blue->setBrush(QBrush(Qt::blue));
 
     for (size_t i = 0; i < data1.size(); ++i) {
       double x = data1[i];
@@ -78,22 +82,22 @@ public:
           y = y*-1;
           // Display negative values in red
           QPointF point(x, y);
-          series->append(point);
-          series->setBrush(QBrush(Qt::red));
+          series_red->append(point);
       } else {
           // Display positive values in their original color
-          series->append(x, y);
+          series_blue->append(x, y);
       }
     }
 
     QChart* chart = new QChart();
-    chart->addSeries(series);
+    chart->addSeries(series_blue);
+    chart->addSeries(series_red);
 
     // Set custom axis ranges with margins
-    double minX = *std::min_element(data1.begin(), data1.end()) * 0.95;
-    double maxX = *std::max_element(data1.begin(), data1.end()) * 1.1;
-    double minY = *std::min_element(data2.begin(), data2.end()) * 0.8;
-    double maxY = *std::max_element(data2.begin(), data2.end()) * 1.1;
+    double minX = 1.9;
+    double maxX = std::max(*std::max_element(data1.begin(), data1.end()), -(*std::min_element(data1.begin(), data1.end()))) * 1.1;
+    double minY = 0;
+    double maxY = std::max(*std::max_element(data2.begin(), data2.end()), -(*std::min_element(data2.begin(), data2.end()))) * 1.1;
 
     chart->createDefaultAxes();
     chart->axes(Qt::Horizontal).first()->setTitleText(xAxisLabel);
@@ -101,7 +105,8 @@ public:
     chart->axes(Qt::Horizontal).first()->setRange(minX, maxX);
     chart->axes(Qt::Vertical).first()->setRange(minY, maxY);
 
-    chart->legend()->markers(series)[0]->setVisible(false);
+    chart->legend()->markers(series_red)[0]->setVisible(false);
+    chart->legend()->markers(series_blue)[0]->setVisible(false);
 
     QChartView* chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
