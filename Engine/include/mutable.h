@@ -24,7 +24,7 @@ class Mutable {
   double GetDiet() const;
   double GetGeneticStrength() const;
   double GetEatingSpeed() const;
-  double CompatibilityBetweenMutables(const Mutable& other_mutable);
+  double GetPheromoneEmission() const;
 
   // Setters
   void SetEnergyDensity(double value);
@@ -42,6 +42,9 @@ class Mutable {
   void SetDiet(double value);
   void SetGeneticStrength(double value);
   void SetEatingSpeed(double value);
+  void SetPheromoneEmission(double value);
+
+  double CompatibilityBetweenMutables(const Mutable& other_mutable);
 
  private:
   // Any values added here need to be included in the complexity, mutation, and
@@ -63,7 +66,13 @@ class Mutable {
                             relation to its size. */
   double diet_; /*!< Determines whether a creature is herbivore or carnivore */
   double genetic_strength_; /*! Determines bite stength */
+<<<<<<< HEAD
   double eating_speed_;     /*! Determines eating and digestion cooldown */
+=======
+  double eating_speed_; /*! Determines eating and digestion cooldown */
+
+  double pheromone_emission_;/*! Determines the rate of pheromone emission */
+>>>>>>> 79742cc (Add basic structure for pheromones)
 };
 
 Mutable MutableCrossover(const Mutable& dominant, const Mutable& recessive);

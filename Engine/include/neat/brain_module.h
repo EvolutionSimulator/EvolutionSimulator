@@ -6,7 +6,7 @@
 class BrainModule
 {
 public:
-    BrainModule(int input, int output, int module_id);
+    BrainModule(int input, int output, int module_id, bool multiple = false);
 
     int GetFirstInputIndex();
     void SetFirstInputIndex(const int index);
@@ -22,6 +22,8 @@ public:
 
     int GetModuleId();
 
+    bool GetMultiple();
+
 private:
     int first_input_index_;
     int first_output_index_;
@@ -29,6 +31,8 @@ private:
     std::vector<int> output_neuron_ids_;
 
     int module_id_; /*! Unique identifier for a type of module */
+    bool multiple_; /*! Boolean that indicates if multiple instances of
+                      this module can be evolved by the same creature */
 };
 
 
