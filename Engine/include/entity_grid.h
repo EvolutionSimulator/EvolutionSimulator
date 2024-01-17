@@ -9,7 +9,7 @@ class EntityGrid {
 
   void InitializeGrid(SimulationData &data, Environment &environment);
 
-  void UpdateGrid(SimulationData &data, Environment &environment);
+  void UpdateGrid(SimulationData &data, Environment &environment, double deltaTime);
   void ClearGrid();
 
   std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> GetGrid() const;

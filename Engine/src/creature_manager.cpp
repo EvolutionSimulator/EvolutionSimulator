@@ -25,6 +25,7 @@ void CreatureManager::UpdateAllCreatures(SimulationData& data,
   }
   // Vector to store thread-local reproduce lists
   std::vector<std::vector<std::shared_ptr<Creature>>> local_reproduce_lists(omp_get_max_threads());
+  std::vector<std::vector<std::shared_ptr<Pheromone>>> local_pheromone_lists(omp_get_max_threads());
 
   #pragma omp parallel for
   for (int i = 0; i < data.creatures_.size(); ++i) {
@@ -45,6 +46,10 @@ void CreatureManager::UpdateAllCreatures(SimulationData& data,
       data.eggs_.push_back(creature->FemaleReproductiveSystem::GiveBirth(
           creature->GetCoordinates()));
     }
+    std::vector<std::shared_ptr<Pheromone>> emissions = creature->EmitPheromones(deltaTime);
+        local_pheromone_lists[omp_get_thread_num()].insert(
+            local_pheromone_lists[omp_get_thread_num()].end(),
+            emissions.begin(), emissions.end());
   }
 
   // Merge thread-local lists into the global reproduce list
@@ -52,6 +57,10 @@ void CreatureManager::UpdateAllCreatures(SimulationData& data,
     for (auto &creature : list) {
       data.new_reproduce_.push(creature);
     }
+  }
+
+  for (auto &list : local_pheromone_lists) {
+      data.pheromones_.insert(data.pheromones_.end(), list.begin(), list.end());
   }
 }
 

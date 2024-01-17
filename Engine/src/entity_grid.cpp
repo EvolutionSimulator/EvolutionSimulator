@@ -117,15 +117,36 @@ void UpdateQueue(std::queue<std::shared_ptr<Creature>> &reproduce) {
     reproduce = std::move(tempQueue);
 }
 
+void UpdateGridPheromones(
+        std::vector<std::shared_ptr<Pheromone>> pheromones,
+        std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>>& entityGrid,
+        double cellSize,
+        double deltaTime){
+    pheromones.erase(std::remove_if(pheromones.begin(), pheromones.end(),
+                                     [&deltaTime](std::shared_ptr<Pheromone> pheromone){
+                                       pheromone->SetSize(pheromone->GetSize() - deltaTime);
+                                       return pheromone->GetSize() < 0.5;
+                                    }),
+            pheromones.end());
+    for (std::shared_ptr<Pheromone> pheromone: pheromones) {
+        std::pair<double, double> coordinates = pheromone->GetCoordinates();
+        int gridX = static_cast<int>(coordinates.first / cellSize);
+        int gridY = static_cast<int>(coordinates.second / cellSize);
+
+        entityGrid[gridX][gridY].push_back(pheromone);
+    }
+}
+
 /*!
  * @brief Updates the simulation grid, removing dead entities and placing the
  * living ones.
  */
-void EntityGrid::UpdateGrid(SimulationData &data, Environment &environment) {
+void EntityGrid::UpdateGrid(SimulationData &data, Environment &environment, double deltaTime) {
     ClearGrid();
     UpdateGridCreature(data.creatures_, grid_, SETTINGS.environment.grid_cell_size, data.food_entities_);
     UpdateGridFood(data.food_entities_, grid_, SETTINGS.environment.grid_cell_size);
     UpdateQueue(data.reproduce_);
+    UpdateGridPheromones(data.pheromones_, grid_, SETTINGS.environment.grid_cell_size, deltaTime);
 }
 
 const std::vector<std::shared_ptr<Entity>> &EntityGrid::GetEntitiesAt(const int row,
