@@ -124,7 +124,7 @@ class Settings {
     double d_eating_speed = 0.6;
     double d_pheromone_emission = 0.5;
     double pheromone_detection_sensitivity = 1;
-    double pheromone_emission_rate = 1;
+    double pheromone_emission_rate = 3;
   } physical_constraints;
 
   struct UISettings {
