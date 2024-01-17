@@ -11,26 +11,26 @@ class GrabbingEntity : virtual public MovableEntity {
   double GetEffectiveForwardAcceleration() const override;
   double GetEffectiveRotationalAcceleration() const override;*/
 
-  std::unordered_set<MovableEntity*> GetEntities();
-  std::pair<double, double> GetCentreOfMass();
-  double GetTotalMass();
+  std::unordered_set<GrabbingEntity*> GetGrabbedBy() const;
+  std::pair<double, double> GetCentreOfMass() const;
+  double GetTotalMass() const;
   void UpdateEntityVelocities();
 
-  std::pair<double, double> GetTotalForwardAccelComps();
-  double GetTotalForwardAccel();
-  double GetTotalForwardAccelAngle();
-  double GetTotalRotAccel();
+  std::pair<double, double> GetTotalForwardAccelComps() const;
+  double GetTotalForwardAccel() const;
+  double GetTotalForwardAccelAngle() const;
+  double GetTotalRotAccel() const;
 
   void SetGrabbedEntity(MovableEntity *movable_entity); //Setting the entity i am grabbing as my grabbed entity
-  void AddToGrabbingEntities(MovableEntity *movable_entity_); //Adding the entity that is grabbing me to the set of my grabbing entities
+  void AddToGrabbedBy(GrabbingEntity *movable_entity_); //Adding the entity that is grabbing me to the set of my grabbing entities
 
-  MovableEntity* GetGrabbedEntity();
+  MovableEntity* GetGrabbedEntity() const;
   bool grabbing_;  /*! Indicates whether creature is grabbing or not*/
 
  private:
   MovableEntity* grabbed_entity_{nullptr};
-  std::unordered_set<MovableEntity*>
-      grabbing_entities_;  // entities that have grabbed this one
+  std::unordered_set<GrabbingEntity*>
+      grabbed_by_;  // entities that have grabbed this one
   bool affected_by_grabbed_entity_{false};
 
 };
