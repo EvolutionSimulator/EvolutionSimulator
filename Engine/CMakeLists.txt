@@ -64,6 +64,8 @@ add_library(Engine STATIC
 
   include/food.h src/food.cpp
 
+  include/pheromone.h src/pheromone.cpp
+
   include/movable_entity.h src/movable_entity.cpp
   include/alive_entity.h src/alive_entity.cpp
 

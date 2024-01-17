@@ -19,11 +19,9 @@ public:
 
 
 private:
-    std::vector<char> pheromone_types;
+    std::vector<int> pheromone_types_;
     std::vector<double> pheromone_densities_;
-    std::vector<double> emissions_;
-
-
+    std::vector<double> pheromone_emissions_;
 };
 
 #endif

@@ -1,8 +1,18 @@
 #include "neat/brain_module.h"
 
+#include <random>
+
 BrainModule::BrainModule(int input, int output, int module_id, bool multiple)
     : input_neuron_ids_(input, 0), output_neuron_ids_(output, 0),
-      module_id_(module_id), multiple_(multiple) { }
+      module_id_(module_id), multiple_(multiple) {
+    // Create a random number generator
+    std::random_device rd;  // Will be used to obtain a seed for the random number engine
+    std::mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd()
+    std::uniform_int_distribution<> dis(1, 16); // Uniform distribution between 1 and 16
+
+    // Use the distribution to generate a random number
+    type_ = dis(gen);
+}
 
 int BrainModule::GetFirstInputIndex() {
     return first_input_index_;
@@ -42,4 +52,8 @@ int BrainModule::GetModuleId() {
 
 bool BrainModule::GetMultiple() {
     return multiple_;
+}
+
+int BrainModule::GetType() {
+    return type_;
 }
