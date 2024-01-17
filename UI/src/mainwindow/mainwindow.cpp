@@ -19,7 +19,6 @@ MainWindow::MainWindow(QWidget *parent)
   InitializeEngine();
   PauseSimulation();
   RunSimulation();
-
   graph_manager_ = new GraphManager(this, engine_);
   config_manager_ = new ConfigManager(this, engine_);
 
@@ -209,6 +208,10 @@ void MainWindow::DrawUI()
     comboBox->addItem("Creatures Size Over Time");
     comboBox->addItem("Creatures Energy Over Time");
     comboBox->addItem("Creatures Velocity Over Time");
+    comboBox->addItem("Size and Energy Scatterplot");
+    connect(graph_manager_, &GraphManager::resetGraphMenuIndex, this, [this]() {
+        ui_->graphMenu->setCurrentIndex(0);
+    });
 
     // Set up run, restart
     QRect rect(2,2,45,45);

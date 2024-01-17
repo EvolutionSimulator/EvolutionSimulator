@@ -520,4 +520,3 @@ std::vector<double> SimulationData::GetCreatureEnergyOverTime() const {
 std::vector<double> SimulationData::GetCreatureVelocityOverTime() const {
   return creatureVelocityOverTime_;
 }
-
