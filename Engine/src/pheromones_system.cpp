@@ -63,7 +63,7 @@ std::vector<std::shared_ptr<Pheromone>> PheromoneSystem::EmitPheromones(double d
                     * SETTINGS.physical_constraints.d_pheromone_emission * deltaTime){
                 double x_coord = x_coord_ + nor(gen) * size_;
                 double y_coord = y_coord_ + nor(gen) * size_;
-                double size = std::sqrt(size);
+                double size = std::sqrt(size_);
                 pheromones.push_back(std::make_shared<Pheromone>(Pheromone(type, x_coord, y_coord, size)));
             }
         }
