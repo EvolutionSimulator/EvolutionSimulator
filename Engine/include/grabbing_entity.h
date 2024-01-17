@@ -11,18 +11,21 @@ class GrabbingEntity : virtual public MovableEntity {
   double GetEffectiveForwardAcceleration() const override;
   double GetEffectiveRotationalAcceleration() const override;*/
 
-  std::unordered_set<std::shared_ptr<MovableEntity>> GetEntities();
-  std::pair<double, double> GetCentreOfMass();
-  double GetTotalMass();
+
+  std::pair<double, double> GetCentreOfMass() const;
+  double GetTotalMass() const;
+
+  std::unordered_set<std::shared_ptr<GrabbingEntity>> GetGrabbedBy() const;
+
   void UpdateEntityVelocities();
 
-  std::pair<double, double> GetTotalForwardAccelComps();
-  double GetTotalForwardAccel();
-  double GetTotalForwardAccelAngle();
-  double GetTotalRotAccel();
+  std::pair<double, double> GetTotalForwardAccelComps() const;
+  double GetTotalForwardAccel() const;
+  double GetTotalForwardAccelAngle() const;
+  double GetTotalRotAccel() const;
 
   void SetGrabbedEntity(std::shared_ptr<MovableEntity> movable_entity); //Setting the entity i am grabbing as my grabbed entity
-  void AddToGrabbingEntities(std::shared_ptr<MovableEntity> movable_entity_); //Adding the entity that is grabbing me to the set of my grabbing entities
+  void AddToGrabbedBy(std::shared_ptr<GrabbingEntity> movable_entity_); //Adding the entity that is grabbing me to the set of my grabbing entities
 
   std::shared_ptr<MovableEntity> GetGrabbedEntity();
   bool grabbing_;  /*! Indicates whether creature is grabbing or not*/
@@ -30,7 +33,7 @@ class GrabbingEntity : virtual public MovableEntity {
  private:
   std::shared_ptr<MovableEntity> grabbed_entity_{nullptr};
   std::unordered_set<std::shared_ptr<MovableEntity>>
-      grabbing_entities_;  // entities that have grabbed this one
+      grabbed_by_;  // entities that have grabbed this one
   bool affected_by_grabbed_entity_{false};
 
 };

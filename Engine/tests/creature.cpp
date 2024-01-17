@@ -320,7 +320,7 @@ TEST(CreatureTests, BiteCreature) {
 
   double initialHealth = creature2.GetHealth();
 
-  creature1.Bite(&creature2);
+  creature1.Bite(std::make_shared<Creature>(creature2));
 
   ASSERT_LT(creature2.GetHealth(), initialHealth);
 }
@@ -333,9 +333,9 @@ TEST(CreatureTests, Grab) {
 
   double initialEnergy = creature.GetEnergy();
 
-  creature.Grab(&entity);
+  creature.Grab(std::make_shared<Entity>(entity));
 
-  ASSERT_EQ(creature.GetGrabbedEntity(), &entity);
+  ASSERT_EQ(creature.GetGrabbedEntity(), std::make_shared<Entity>(entity));
   //ASSERT_TRUE(dynamic_cast<GrabbingEntity*>(&entity)->IsBeingGrabbedBy(&creature));
   ASSERT_LT(creature.GetEnergy(), initialEnergy);
 }
