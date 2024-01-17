@@ -13,12 +13,13 @@
 #include <QDialog>
 #include <QVBoxLayout>
 #include "engine.h"
+#include "simulationcanvas/simulationcanvas.h"
 
 class GraphManager : public QObject {
   Q_OBJECT  // Enable signal and slot mechanism
 
 public:
-  explicit GraphManager(QWidget* parent, Engine* engine);
+  explicit GraphManager(QWidget* parent, Engine* engine, SimulationCanvas* simulationCanvas);
   void SetEngine(Engine* engine);
 
   template <typename T> void DrawGraph(std::vector<T> data, const QString& graphTitle) {
@@ -68,7 +69,21 @@ public:
     QScatterSeries* series = new QScatterSeries();
 
     for (size_t i = 0; i < data1.size(); ++i) {
-      series->append(data1[i], data2[i]);
+      double x = data1[i];
+      double y = data2[i];
+
+      // Check if the value is negative
+      if (x < 0 || y < 0) {
+          x = x*-1;
+          y = y*-1;
+          // Display negative values in red
+          QPointF point(x, y);
+          series->append(point);
+          series->setBrush(QBrush(Qt::red));
+      } else {
+          // Display positive values in their original color
+          series->append(x, y);
+      }
     }
 
     QChart* chart = new QChart();
@@ -114,6 +129,8 @@ public slots:
 private:
   QWidget* parent_;
   Engine* engine_;
+  SimulationCanvas* simulationCanvas_;
+  InfoPanel* GetInfoPanel();
 
 signals:
   void resetGraphMenuIndex();
