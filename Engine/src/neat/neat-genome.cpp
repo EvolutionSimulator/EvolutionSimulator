@@ -699,21 +699,21 @@ double Genome::CompatibilityBetweenGenomes(const Genome& other) const {
     // std::unordered_map<int, Neuron> shared_neurons;
     int Nshared_neurons = 0;  // number of neurons that appear in both genomes
     for (const Neuron& neuron : neurons_) {
-        Neuron other_neuron(neuron.GetType(),
-                            0);  // corresponding neuron of the other genome, if
-                                 // it exists
-        if (other.FindNeuronById(neuron.GetId(), other_neuron)) {
-            Nshared_neurons++;
-            // add a relative difference in biases (a number between 0 and 2)
-            if (std::max(fabs(neuron.GetBias()), fabs(other_neuron.GetBias())) == 0){
-                average_weight_difference +=
-                    fabs(neuron.GetBias() - other_neuron.GetBias());
-            } else {
-                average_weight_difference +=
-                        fabs(neuron.GetBias() - other_neuron.GetBias()) /
-                        std::max(fabs(neuron.GetBias()), fabs(other_neuron.GetBias()));
-            }
+      Neuron other_neuron(neuron.GetType(),
+                          0);  // corresponding neuron of the other genome, if
+                               // it exists
+      if (other.FindNeuronById(neuron.GetId(), other_neuron)) {
+        Nshared_neurons++;
+        // add a relative difference in biases (a number between 0 and 2)
+        if (std::max(fabs(neuron.GetBias()), fabs(other_neuron.GetBias())) == 0) {
+          average_weight_difference +=
+                  fabs(neuron.GetBias() - other_neuron.GetBias());
+        } else {
+          average_weight_difference +=
+                  fabs(neuron.GetBias() - other_neuron.GetBias()) /
+                  std::max(fabs(neuron.GetBias()), fabs(other_neuron.GetBias()));
         }
+      }
     }
 
     // Count shared links and their weight differences
@@ -721,21 +721,21 @@ double Genome::CompatibilityBetweenGenomes(const Genome& other) const {
     // Genome& non_const_this = const_cast<Genome&>(*this);
     int Nshared_links = 0;
     for (const Link& link : links_) {
-        for (const Link& other_link : other.GetLinks()) {
-            if (link.GetId() == other_link.GetId()) {
-        Nshared_links++;
-        // add a relative difference in weights (a number between 0 and 2)
-        if (std::max(fabs(link.GetWeight()), fabs(other_link.GetWeight())) == 0){
+      for (const Link& other_link : other.GetLinks()) {
+        if (link.GetId() == other_link.GetId()) {
+          Nshared_links++;
+          // add a relative difference in weights (a number between 0 and 2)
+          if (std::max(fabs(link.GetWeight()), fabs(other_link.GetWeight())) == 0){
             average_weight_difference +=
-                fabs(link.GetWeight() - other_link.GetWeight());
-        } else {
+                    fabs(link.GetWeight() - other_link.GetWeight());
+          } else {
             average_weight_difference +=
-                fabs(link.GetWeight() - other_link.GetWeight()) /
-                std::max(fabs(link.GetWeight()), fabs(other_link.GetWeight()));
+                    fabs(link.GetWeight() - other_link.GetWeight()) /
+                    std::max(fabs(link.GetWeight()), fabs(other_link.GetWeight()));
+          }
+          break;
         }
-        break;
-            }
-        }
+      }
     }
     average_weight_difference =
         average_weight_difference / (double)(Nshared_neurons + Nshared_links);
