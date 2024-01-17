@@ -66,13 +66,9 @@ class Mutable {
                             relation to its size. */
   double diet_; /*!< Determines whether a creature is herbivore or carnivore */
   double genetic_strength_; /*! Determines bite stength */
-<<<<<<< HEAD
-  double eating_speed_;     /*! Determines eating and digestion cooldown */
-=======
   double eating_speed_; /*! Determines eating and digestion cooldown */
 
   double pheromone_emission_;/*! Determines the rate of pheromone emission */
->>>>>>> 79742cc (Add basic structure for pheromones)
 };
 
 Mutable MutableCrossover(const Mutable& dominant, const Mutable& recessive);

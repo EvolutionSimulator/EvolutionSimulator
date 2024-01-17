@@ -8,7 +8,7 @@ BrainModule::BrainModule(int input, int output, int module_id, bool multiple)
     // Create a random number generator
     std::random_device rd;  // Will be used to obtain a seed for the random number engine
     std::mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd()
-    std::uniform_int_distribution<> dis(1, 16); // Uniform distribution between 1 and 16
+    std::uniform_int_distribution<> dis(0, 15); // Uniform distribution between 1 and 16
 
     // Use the distribution to generate a random number
     type_ = dis(gen);

@@ -592,7 +592,7 @@ TEST(SimulationDataTest, UpdateGridWithAliveEntities) {
   food->SetState(Entity::Dead);
   simData.food_entities_.push_back(food);
 
-  entity_grid.UpdateGrid(simData, environment);
+  entity_grid.UpdateGrid(simData, environment, 0.05);
 
   for (const auto& row : entity_grid.GetGrid()) {
     for (const auto& cell : row) {
@@ -637,7 +637,7 @@ TEST(SimulationDataTest, CorrectEntityPlacementInGrid) {
   food_3->SetState(Entity::Dead);
   simData.food_entities_.push_back(food_3);
 
-  entity_grid.UpdateGrid(simData, environment);
+  entity_grid.UpdateGrid(simData, environment, 0.05);
 
   auto creatureCoordinates = creature_1->GetCoordinates();
   int creatureGridX = static_cast<int>(creatureCoordinates.first / SETTINGS.environment.grid_cell_size);

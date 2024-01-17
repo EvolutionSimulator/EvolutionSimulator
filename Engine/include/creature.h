@@ -13,6 +13,7 @@
 #include "digestive_system.h"
 #include "reproduction.h"
 #include "grabbing_entity.h"
+#include "pheromones_system.h"
 #include "mutable.h"
 /*!
  * @file creature.h
@@ -40,7 +41,8 @@
 class Creature : virtual public MovableEntity,
                  virtual public AliveEntity,
                  virtual public VisionSystem,
-                 virtual public DigestiveSystem,
+                 virtual public PheromoneSystem,
+                 virtual public DigestiveSystem,                 
                  virtual public MaleReproductiveSystem,
                  virtual public FemaleReproductiveSystem {
  public:

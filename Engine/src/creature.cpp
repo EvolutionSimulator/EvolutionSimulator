@@ -45,6 +45,7 @@ Creature::Creature(neat::Genome genome, Mutable mutables)
       ReproductiveSystem(genome, mutables),
       MaleReproductiveSystem(genome, mutables),
       FemaleReproductiveSystem(genome, mutables),
+      PheromoneSystem(genome, mutables),
       mating_desire_(false)
       {
     int neural_inputs = SETTINGS.environment.input_neurons;
@@ -239,6 +240,7 @@ void Creature::Think(std::vector<std::vector<std::vector<std::shared_ptr<Entity>
   // To allow creatures to use a module it should be included below
   ProcessVisionFood(grid, GridCellSize, width, height);
   ProcessVisionEnemies(grid, GridCellSize, width, height);
+  ProcessPheromoneDetection(grid, GridCellSize);
 
   if (neuron_data_.size() == 0) return;
   neuron_data_.at(0) = 1;
@@ -265,7 +267,11 @@ void Creature::Think(std::vector<std::vector<std::vector<std::shared_ptr<Entity>
       neuron_data_.at(i + 2) = orientation_;
     }
 
-    //To add the pheromone module
+    if (module.GetModuleId() == 2){ //Pheromone Module
+        int i = module.GetFirstInputIndex();
+        int type = module.GetType();
+        neuron_data_.at(i) = pheromone_densities_.at(type);
+    }
   }
 
   std::vector<double> output = brain_.Activate(neuron_data_);
@@ -279,7 +285,9 @@ void Creature::Think(std::vector<std::vector<std::vector<std::shared_ptr<Entity>
 
 
   for (BrainModule& module : GetGenome().GetModules()){
-    //To add the pheromone module
+      int i = module.GetFirstOutputIndex();
+      int type = module.GetType();
+      pheromone_emissions_.at(type) = output.at(i);
   }
 
   // grabbing_ = std::tanh(output.at(6)) > 0 ? 0 : 1;
@@ -307,59 +315,6 @@ void Creature::Grow(double energy) {
 }
 
 bool Creature::GetMatingDesire() const { return mating_desire_; }
-
-/*!
- * @brief Finds the closest food entity in the vicinity of the creature.
- *
- * @details Scans the nearby environment, represented by a grid, to locate the
- * nearest food entity. Returns a pointer to the closest food, or nullptr if no
- * food is within reach.
- *
- * @param grid The environmental grid.
- * @param GridCellSize Size of each cell in the grid.
- *
- * @return A pointer to the closest food entity or nullptr if none is found.
- */
-// Food *Creature::GetClosestFood(
-//     std::vector<std::vector<std::vector<Entity *>>> &grid,
-//     double GridCellSize) const {
-//   if (grid.empty()) return nullptr;
-//   std::pair<double, double> coordinates_creature = GetCoordinates();
-//   int i_creature = (int)coordinates_creature.first / (int)GridCellSize;
-//   int j_creature = (int)coordinates_creature.second /
-//                    (int)GridCellSize;  // position of the creature on the
-//                    grid
-//   std::vector<Food *> closest_food_entities = get_food_at_distance(
-//       grid, i_creature, j_creature,
-//       0);  // here we place the candidates for the closest food
-//   int grid_distance = 1;
-//   int boundary = std::max(grid.size(), grid[0].size());
-
-//   while (closest_food_entities.size() == 0 && grid_distance <= boundary) {
-//     // std::cout << "checking at distance " << grid_distance << std::endl;
-//     closest_food_entities =
-//         get_food_at_distance(grid, i_creature, j_creature, grid_distance);
-//     grid_distance++;
-//   }
-//   // assert(!closest_food_entities.empty());
-//   if (closest_food_entities.empty()) return nullptr;
-
-//   Food *closest_food = closest_food_entities.front();
-//   double smallest_distance =
-//       GetDistance(*closest_food, SETTINGS.environment.map_width,
-//                   SETTINGS.environment.map_height);
-//   for (Food *&food : closest_food_entities) {
-//     double distance = GetDistance(*food, SETTINGS.environment.map_width,
-//                                   SETTINGS.environment.map_height);
-//     if (distance < smallest_distance) {
-//       closest_food = food;
-//       smallest_distance = distance;
-//     }
-//     assert(!closest_food_entities.empty());
-//     return closest_food;
-//   }
-//   return nullptr;
-// }
 
 /*!
  * @brief Identifies food entities within a specified grid distance.
