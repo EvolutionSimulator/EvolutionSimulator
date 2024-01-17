@@ -586,8 +586,10 @@ void Creature::Bite(std::shared_ptr<Creature> creature)
  * @param entity The entity the creature bites into.
  */
 void Creature::Grab(std::shared_ptr<Entity> entity){
-    this->SetGrabbedEntity(std::dynamic_pointer_cast<MovableEntity>(entity));
-    std::dynamic_pointer_cast<GrabbingEntity>(entity)->AddToGrabbingEntities(std::make_shared<MovableEntity>(*this));
+    if(std::dynamic_pointer_cast<MovableEntity>(entity)){
+        this->SetGrabbedEntity(std::dynamic_pointer_cast<MovableEntity>(entity));
+        std::dynamic_pointer_cast<GrabbingEntity>(entity)->AddToGrabbedBy(std::make_shared<GrabbingEntity>(*this));
+    }
     SetEnergy(GetEnergy() - entity->GetSize());
     this->UpdateEntityVelocities();
 }
