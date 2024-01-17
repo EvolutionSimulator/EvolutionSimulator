@@ -161,12 +161,19 @@ void SimulationCanvas::RenderSimulation(SimulationData& data) {
   for (const auto& creature_ptr : data.creatures_) {
     if (creature_ptr == nullptr) continue;
     auto& creature_ref = *creature_ptr;
-    int id = creature_ref.GetID();
+    int id = creature_ref.GetID(); //Not sure but I think this line and the above aren't used
     std::shared_ptr<Creature> creature = creature_ptr;
     auto renderPositions = getEntityRenderPositions(creature);
     for (const auto& pos : renderPositions) {
       RenderCreatureAtPosition(creature, pos);
     }
+  }
+
+  for (const auto& pheromone : data.pheromones_) {
+      auto renderPositions = getEntityRenderPositions(pheromone);
+      for (const auto& pos : renderPositions) {
+          RenderPheromoneAtPosition(pheromone, pos);
+      }
   }
 }
 
@@ -266,6 +273,17 @@ void SimulationCanvas::RenderCreatureAtPosition(
   draw(tail_sprite, states);
 }
 
+void SimulationCanvas::RenderPheromoneAtPosition(const std::shared_ptr<Pheromone> pheromone, const std::pair<double, double>& position){
+  sf::Sprite foodSprite;
+  foodSprite.setTexture(texture_manager_.pheromone_texture_);
+  foodSprite.setOrigin(128.0f, 128.0f);
+
+  foodSprite.setScale(pheromone->GetSize()/128.0f, pheromone->GetSize()/128.0f);
+
+  sf::Transform pheromoneTransform;
+  pheromoneTransform.translate(position.first, position.second);
+  draw(foodSprite, pheromoneTransform);
+}
 
 std::vector<std::pair<double, double>> SimulationCanvas::getEntityRenderPositions(const std::shared_ptr<Entity> entity) {
     std::vector<std::pair<double, double>> positions;

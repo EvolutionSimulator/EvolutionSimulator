@@ -65,4 +65,5 @@ class Entity {
   int id_;
 };
 
+double GetRandomFloat(double max);
 #endif  // ENTITY_H

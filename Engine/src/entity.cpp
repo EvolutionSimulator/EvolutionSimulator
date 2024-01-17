@@ -33,7 +33,9 @@ Entity::Entity(const double x_coord, const double y_coord, const double size)
       orientation_(0),
       state_(Alive),
       id_(next_id_++),
-      color_hue_(0) {}
+      color_hue_(0) {
+    orientation_ = GetRandomFloat(2*M_PI);
+}
 
 /*!
  * @brief Constructor to initialize an Entity with a specified size at the

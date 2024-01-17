@@ -18,6 +18,7 @@ public:
   sf::Texture creature_texture_;
   sf::Texture eyes_texture_;
   sf::Texture tail_texture_;
+  sf::Texture pheromone_texture_;
 
   // Map textures
   sf::Texture texture_;
