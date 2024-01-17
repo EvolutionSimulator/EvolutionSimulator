@@ -121,6 +121,8 @@ class Settings {
     double d_bite_damage_ratio = 1.0;
     double d_bite_energy_consumption_ratio = 0.01;
     double d_bite_nutritional_value = 1.0;
+    double d_eating_speed = 0.6;
+    double d_pheromone_emission = 0.5;
   } physical_constraints;
 
   struct UISettings {

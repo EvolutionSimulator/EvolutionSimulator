@@ -70,6 +70,8 @@ add_library(Engine STATIC
   include/vision_system.h src/vision_system.cpp
   include/digestive_system.h src/digestive_system.cpp
 
+  include/pheromones_system.h src/pheromones_system.cpp
+
   include/creature.h src/creature.cpp
 
   include/geometry_primitives.h src/geometry_primitives.cpp

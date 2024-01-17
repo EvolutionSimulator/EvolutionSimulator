@@ -264,6 +264,8 @@ void Creature::Think(std::vector<std::vector<std::vector<std::shared_ptr<Entity>
       neuron_data_.at(i + 1) = y_coord_;
       neuron_data_.at(i + 2) = orientation_;
     }
+
+    //To add the pheromone module
   }
 
   std::vector<double> output = brain_.Activate(neuron_data_);
@@ -277,7 +279,7 @@ void Creature::Think(std::vector<std::vector<std::vector<std::shared_ptr<Entity>
 
 
   for (BrainModule& module : GetGenome().GetModules()){
-     //No module with outputs atm but they should be used as with the input
+    //To add the pheromone module
   }
 
   // grabbing_ = std::tanh(output.at(6)) > 0 ? 0 : 1;

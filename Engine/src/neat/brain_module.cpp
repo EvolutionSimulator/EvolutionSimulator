@@ -1,8 +1,8 @@
 #include "neat/brain_module.h"
 
-BrainModule::BrainModule(int input, int output, int module_id)
+BrainModule::BrainModule(int input, int output, int module_id, bool multiple)
     : input_neuron_ids_(input, 0), output_neuron_ids_(output, 0),
-      module_id_(module_id) { }
+      module_id_(module_id), multiple_(multiple) { }
 
 int BrainModule::GetFirstInputIndex() {
     return first_input_index_;
@@ -38,4 +38,8 @@ void BrainModule::SetOutputNeuronIds(const std::vector<int> output_neuron_ids) {
 
 int BrainModule::GetModuleId() {
     return module_id_;
+}
+
+bool BrainModule::GetMultiple() {
+    return multiple_;
 }

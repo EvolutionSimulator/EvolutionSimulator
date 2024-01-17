@@ -29,6 +29,7 @@ Mutable::Mutable()
     diet_(SETTINGS.physical_constraints.d_diet),
     eating_speed_(SETTINGS.physical_constraints.d_eating_cooldown),
     genetic_strength_(SETTINGS.physical_constraints.d_genetic_strength),
+    pheromone_emission_(SETTINGS.physical_constraints.d_pheromone_emission),
     gestation_ratio_to_incubation_(SETTINGS.physical_constraints.d_gestation_ratio_to_incubation){}
 
 /*!
@@ -38,12 +39,17 @@ Mutable::Mutable()
  * like energy density, integrity, size, etc.
  */
 double Mutable::Complexity() const {
-  // values to tweak in order to achieve ideal conditions
-  double complexity =
-      (energy_density_ * 10 + 5 / energy_loss_ + integrity_ * 20 +
-       5 / (1 + strafing_difficulty_) + max_force_ * 2 + 5 / growth_factor_ +
-       stomach_capacity_factor_ + eating_speed_ + genetic_strength_) *
-      baby_size_ / 12;
+  //values to tweak in order to achieve ideal conditions
+  double complexity = (energy_density_*10
+                       + 5/energy_loss_
+                       + integrity_ * 20
+                       + 5/(1+strafing_difficulty_)
+                       + max_force_ * 2
+                       + 5/growth_factor_
+                       + stomach_capacity_factor_
+                       + eating_speed_
+                       + genetic_strength_
+                       + pheromone_emission_) * baby_size_/12;
   return complexity;
 }
 
@@ -206,6 +212,33 @@ void Mutable::Mutate() {
     genetic_strength_ += delta;
     genetic_strength_ = mathlib::bound(genetic_strength_, 0.2, 1.2);
   }
+
+  //Eating Speed
+  if (uniform(gen) < SETTINGS.physical_constraints.mutation_rate){
+    std::normal_distribution<> dis(0.0,
+                                   SETTINGS.physical_constraints.d_eating_speed/10);
+    double delta = dis(gen);
+    eating_speed_ += delta;
+    if (eating_speed_  < 0.2) {
+        eating_speed_ = 0.2;
+    }
+    if (eating_speed_ > 1.2) {
+        eating_speed_ = 1.2;
+    }
+  }
+
+  if (uniform(gen) < SETTINGS.physical_constraints.mutation_rate){
+    std::normal_distribution<> dis(0.0,
+                                   SETTINGS.physical_constraints.d_pheromone_emission/10);
+    double delta = dis(gen);
+    pheromone_emission_ += delta;
+    if (pheromone_emission_  < 0) {
+        pheromone_emission_ = 0;
+    }
+    if (pheromone_emission_ > 1) {
+        pheromone_emission_ = 1;
+    }
+  }
 }
 
 // Getters
@@ -228,6 +261,7 @@ double Mutable::GetStomachCapacityFactor() const {
 double Mutable::GetDiet() const { return diet_; };
 double Mutable::GetGeneticStrength() const { return genetic_strength_; };
 double Mutable::GetEatingSpeed() const { return eating_speed_; };
+double Mutable::GetPheromoneEmission() const {return pheromone_emission_;}
 
 // Setters
 void Mutable::SetEnergyDensity(double value) { energy_density_ = value; }
@@ -252,6 +286,9 @@ void Mutable::SetDiet(double value) { diet_ = value; };
 void Mutable::SetGeneticStrength(double value) { genetic_strength_ = value; };
 void Mutable::SetEatingSpeed(double value) { eating_speed_ = value; };
 
+void Mutable::SetPheromoneEmission(double value) {pheromone_emission_ = value; }
+
+
 /*!
  * @brief Creates a new Mutable entity as a crossover of two existing entities.
  * @param dominant The Mutable entity considered as dominant in the crossover.
@@ -262,38 +299,38 @@ void Mutable::SetEatingSpeed(double value) { eating_speed_ = value; };
  */
 Mutable MutableCrossover(const Mutable &dominant, const Mutable &recessive) {
   Mutable crossover;
-  crossover.SetEnergyDensity(
-      (2 * dominant.GetEnergyDensity() + recessive.GetEnergyDensity()) / 3);
-  crossover.SetEnergyLoss(
-      (2 * dominant.GetEnergyLoss() + recessive.GetEnergyLoss()) / 3);
-  crossover.SetIntegrity(
-      (2 * dominant.GetIntegrity() + recessive.GetIntegrity()) / 3);
-  crossover.SetStrafingDifficulty((2 * dominant.GetStrafingDifficulty() +
-                                   recessive.GetStrafingDifficulty()) /
-                                  3);
-  crossover.SetMaxSize((2 * dominant.GetMaxSize() + recessive.GetMaxSize()) /
-                       3);
-  crossover.SetBabySize((2 * dominant.GetBabySize() + recessive.GetBabySize()) /
-                        3);
-  crossover.SetMaxForce((2 * dominant.GetMaxForce() + recessive.GetMaxForce()) /
-                        3);
-  crossover.SetGrowthFactor(
-      (2 * dominant.GetGrowthFactor() + recessive.GetGrowthFactor()) / 3);
-  crossover.SetVisionFactor(
-      (2 * dominant.GetVisionFactor() + recessive.GetVisionFactor()) / 3);
-  crossover.SetGestationRatioToIncubation(
-      (2 * dominant.GetGestationRatioToIncubation() +
-       recessive.GetGestationRatioToIncubation()) /
-      3);
-  crossover.SetColor((2 * dominant.GetColor() + recessive.GetColor()) / 3);
-  crossover.SetStomachCapacityFactor((2 * dominant.GetStomachCapacityFactor() +
-                                      recessive.GetStomachCapacityFactor()) /
-                                     3);
-  crossover.SetDiet((2 * dominant.GetDiet() + recessive.GetDiet()) / 3);
-  crossover.SetGeneticStrength(
-      (2 * dominant.GetGeneticStrength() + recessive.GetGeneticStrength()) / 3);
-  crossover.SetEatingSpeed(
-      (2 * dominant.GetEatingSpeed() + recessive.GetEatingSpeed()) / 3);
+  crossover.SetEnergyDensity((2*dominant.GetEnergyDensity()
+                              + recessive.GetEnergyDensity())/3);
+  crossover.SetEnergyLoss((2*dominant.GetEnergyLoss() +
+                           recessive.GetEnergyLoss() )/3);
+  crossover.SetIntegrity((2*dominant.GetIntegrity() +
+                          recessive.GetIntegrity() )/3);
+  crossover.SetStrafingDifficulty((2*dominant.GetStrafingDifficulty() +
+                                   recessive.GetStrafingDifficulty() )/3);
+  crossover.SetMaxSize((2*dominant.GetMaxSize() +
+                        recessive.GetMaxSize() )/3);
+  crossover.SetBabySize((2*dominant.GetBabySize() +
+                         recessive.GetBabySize() )/3);
+  crossover.SetMaxForce((2*dominant.GetMaxForce() +
+                         recessive.GetMaxForce() )/3);
+  crossover.SetGrowthFactor((2*dominant.GetGrowthFactor() +
+                             recessive.GetGrowthFactor() )/3);
+  crossover.SetVisionFactor((2*dominant.GetVisionFactor() +
+                             recessive.GetVisionFactor() )/3);
+  crossover.SetColor((2*dominant.GetColor() +
+                      recessive.GetColor())/3);
+  crossover.SetStomachCapacityFactor((2*dominant.GetStomachCapacityFactor() +
+                                      recessive.GetStomachCapacityFactor() )/3);
+  crossover.SetDiet((2*dominant.GetDiet() +
+                                      recessive.GetDiet() )/3);
+  crossover.SetGeneticStrength((2*dominant.GetGeneticStrength() +
+                     recessive.GetGeneticStrength() )/3);
+  crossover.SetEatingSpeed((2*dominant.GetEatingSpeed() +
+                                recessive.GetEatingSpeed() )/3);
+  crossover.SetGestationRatioToIncubation((2 * dominant.GetGestationRatioToIncubation() +
+                                           recessive.GetGestationRatioToIncubation()) /3);
+  crossover.SetPheromoneEmission((2*dominant.GetPheromoneEmission() +
+                                 recessive.GetPheromoneEmission())/3);
   return crossover;
 }
 
@@ -368,6 +405,29 @@ double Mutable::CompatibilityBetweenMutables(const Mutable &other_mutable) {
   distance += fabs(other_mutable.GetGestationRatioToIncubation() -
                    this->GetGestationRatioToIncubation()) /
               SETTINGS.physical_constraints.d_gestation_ratio_to_incubation;
+
+  // Color
+  distance += fabs(other_mutable.GetColor() - this->GetColor());
+
+  // Stomach Capacity Factor
+  distance += fabs(other_mutable.GetStomachCapacityFactor() - this->GetStomachCapacityFactor())
+              / SETTINGS.physical_constraints.d_stomach_capacity;
+
+  // Diet
+  distance += fabs(other_mutable.GetDiet() - this->GetDiet())
+              / SETTINGS.physical_constraints.d_diet;
+
+  // Genetic Strength
+  distance += fabs(other_mutable.GetGeneticStrength() - this->GetGeneticStrength())
+              / SETTINGS.physical_constraints.d_genetic_strength;
+
+  // Eating Speed
+  distance += fabs(other_mutable.GetEatingSpeed() - this->GetEatingSpeed())
+              / SETTINGS.physical_constraints.d_eating_speed;
+
+  // Pheromone Emission
+  distance += fabs(other_mutable.GetPheromoneEmission() - this->GetPheromoneEmission())
+              / SETTINGS.physical_constraints.d_pheromone_emission;
 
   return distance * SETTINGS.compatibility.mutables_compatibility;
 }

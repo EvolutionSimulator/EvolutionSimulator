@@ -631,6 +631,10 @@ void Genome::MutateActivateBrainModule(){
   }
   module.SetOutputNeuronIds(output_ids);
   modules_.push_back(module);
+
+  if (!module.GetMultiple()){ //Handles modules with multiplicity
+      AvailableModules.erase(AvailableModules.begin() + randomIndex);
+  }
 }
 
 /*!
