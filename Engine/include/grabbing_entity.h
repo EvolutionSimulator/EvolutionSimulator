@@ -11,18 +11,26 @@ class GrabbingEntity : virtual public MovableEntity {
   double GetEffectiveForwardAcceleration() const override;
   double GetEffectiveRotationalAcceleration() const override;*/
 
+  double GetForwardFriction() const override;
+  double GetRotationalFriction() const override;
+
   std::unordered_set<GrabbingEntity*> GetGrabbedBy() const;
   std::pair<double, double> GetCentreOfMass() const;
   double GetTotalMass() const;
-  void UpdateEntityVelocities();
+  void UpdateEntityVelocities() const;
 
   std::pair<double, double> GetTotalForwardAccelComps() const;
   double GetTotalForwardAccel() const;
   double GetTotalForwardAccelAngle() const;
   double GetTotalRotAccel() const;
 
-  void SetGrabbedEntity(MovableEntity *movable_entity); //Setting the entity i am grabbing as my grabbed entity
-  void AddToGrabbedBy(GrabbingEntity *movable_entity_); //Adding the entity that is grabbing me to the set of my grabbing entities
+  void SetGrabbedEntity(
+      MovableEntity* movable_entity);  // Setting the entity i am grabbing as my
+                                       // grabbed entity
+  void AddToGrabbedBy(
+      GrabbingEntity*
+          movable_entity_);  // Adding the entity that is grabbing me to the set
+                             // of my grabbing entities
 
   MovableEntity* GetGrabbedEntity() const;
 
