@@ -7,9 +7,9 @@
 class GrabbingEntity : virtual public MovableEntity {
  public:
   GrabbingEntity();
-  /*double GetEffectiveAccelerationAngle() const override;
+  double GetEffectiveAccelerationAngle() const override;
   double GetEffectiveForwardAcceleration() const override;
-  double GetEffectiveRotationalAcceleration() const override;*/
+  double GetEffectiveRotationalAcceleration() const override;
 
   double GetForwardFriction() const override;
   double GetRotationalFriction() const override;

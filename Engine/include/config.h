@@ -50,20 +50,11 @@ constexpr double kHealthToEnergy = 10.0;
 constexpr double kDefaultCreatureDensity = 5e-4;
 constexpr double kPlantNutritionalValue = 1.0;
 constexpr double kMeatNutritionalValue = 2.0;
-<<<<<<< HEAD
-<<<<<<< HEAD
 constexpr double kEggNutritionalValue = 3.0;
 constexpr double kEggIncubationTimeMultiplier = 1.0;
-constexpr double kPlantProportion =
-    0.5; /* PlantProportion + MeatProportion = 1 */
-constexpr double kRotFactor = 1.0;
-=======
-=======
 constexpr double kBiteNutritionalValue = 0.01;
->>>>>>> e1ad33d (New Tests)
 constexpr double kPlantProportion = 0.5; /* PlantProportion + MeatProportion = 1 */
 constexpr double kRotFactor = 5.0;
->>>>>>> c4092f3 (Add optimization, fix shader, apply rot and grow)
 constexpr double kGridCellSize = 50.0;
 constexpr int kMinCreatureSize = 4.0;
 constexpr double kReproductionThreshold = 0.80;
@@ -108,8 +99,6 @@ constexpr double kDDiet = 0.5;          // Default omnivores
 constexpr double KDEatingCooldown = 1;  // Decrease for easier survival
 constexpr double KDDigestionRate = 3;
 constexpr double KDGeneticStrength = 0.6;
-<<<<<<< HEAD
-constexpr double KDAcidToEnergy = 5;  // Increase for easier survival
 
 constexpr double kMaxRepdroducingAge = 700;
 constexpr double kMatingDesireMaxProb = 0.05;
@@ -117,13 +106,10 @@ constexpr double kMatingDesireFactor = 0.05;
 constexpr double kPregnancyEnergyFactor = 0.7;
 constexpr double kPregnancyVelocityFactor = 0.5;
 constexpr double kAfterBirthVelocityFactor = 1.5;
-}  // namespace physical_constraints
-=======
 constexpr double KDAcidToEnergy = 5; // Increase for easier survival
 constexpr double kBiteDamageRatio = 1;
 constexpr double kBiteEnergyConsumptionRatio = 0.01;
 } //namespace physical_constraints
->>>>>>> eac0cea (creation of the new bite function)
 
 namespace ui {
 constexpr double KDraggingSensitivity = 1.0f;
