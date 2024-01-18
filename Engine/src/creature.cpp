@@ -1,5 +1,4 @@
 #include "creature.h"
-#include "grabbing_entity.h"
 
 #include <algorithm>
 #include <cassert>
@@ -9,6 +8,7 @@
 #include "collision_functions.h"
 #include "mathlib.h"
 #include "settings.h"
+#include "grabbing_entity.h"
 
 /*!
  * @brief Construct a new Creature object.
@@ -23,7 +23,19 @@
  * @param mutables A Mutable object used to initialize the properties of the
  * AliveEntity.
  *
+ * * Default properties:
+ * - Health: 100
+ * - Energy: 100
+ * - Brain (Neural Network): Constructed from the provided genome.
+ * - Neuron Data: Initialized with zeros (size equal to
+ * `settings::environment::kInputNeurons`).
+ * - Reproduction Cooldown: Set to
+ * `settings::environment::kReproductionCooldown`.
+ * - Age: 0
+ * - Stomach capacity: area of creature *
+ * settings::environment::kDStomachCapacityFactor
  */
+
 Creature::Creature(neat::Genome genome, Mutable mutables)
     : Entity(),
       MovableEntity(),
@@ -100,6 +112,9 @@ void Creature::UpdateMatingDesire() {
   mating_desire_ = mathlib::RandomDouble(0, 1) < probability;
 }
 
+
+
+
 /*!
  * @brief Determines if the current creature is compatible with another
  * creature.
@@ -157,7 +172,7 @@ void Creature::Update(double deltaTime, double const kMapWidth,
   this->UpdateEnergy(deltaTime);
   this->UpdateVelocities(deltaTime);
   this->Move(deltaTime, kMapWidth, kMapHeight);
-  this->MovableEntity::Rotate(deltaTime);
+  this->Rotate(deltaTime, kMapWidth, kMapHeight);
   this->Think(grid, GridCellSize, deltaTime, kMapWidth, kMapHeight);
   this->Digest(deltaTime);
   this->Grow(energy_*deltaTime/1000);
@@ -177,8 +192,9 @@ void Creature::Update(double deltaTime, double const kMapWidth,
  * @brief Handles the collision of the creature with another entity.
  *
  * @details Processes the interaction when the creature collides with another
- * entity. If the creature is hungry, the creature consumes it, if the creature wants to grab it, it does so. Otherwise, standard
- * collision handling is performed.
+ * entity. If the creature is hungry, the creature consumes it, if the creature
+ * wants to grab it, it does so. Otherwise, standard collision handling is
+ * performed.
  *
  * @param other_entity The entity the creature collides with.
  * @param kMapWidth Width of the map.
@@ -265,7 +281,6 @@ void Creature::Think(std::vector<std::vector<std::vector<std::shared_ptr<Entity>
 
   // grabbing_ = std::tanh(output.at(6)) > 0 ? 0 : 1;
 }
-
 
 
 /*!
@@ -429,14 +444,16 @@ std::vector<Food *> get_food_at_distance(
 /*!
  * @brief Finds the closest enemy creature within the creature's line of sight.
  *
- * @details Performs a breadth-first search (BFS) on the grid cells within the creature's
- * field of view to locate the closest enemy creature. A creature is considered an enemy if it
- * is not compatible with it.
+ * @details Performs a breadth-first search (BFS) on the grid cells within the
+ * creature's field of view to locate the closest enemy creature. A creature is
+ * considered an enemy if it is not compatible with it.
  *
- * @param grid A 3-dimensional vector representing the environmental grid where each cell contains entities.
+ * @param grid A 3-dimensional vector representing the environmental grid where
+ * each cell contains entities.
  * @param grid_cell_size The size of each square cell in the grid.
  *
- * @return A pointer to the closest food entity within the line of sight; nullptr if no food is found.
+ * @return A pointer to the closest food entity within the line of sight;
+ * nullptr if no food is found.
  */
 std::shared_ptr<Creature> Creature::GetClosestEnemyInSight(
     std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
@@ -474,7 +491,6 @@ std::shared_ptr<Creature> Creature::GetClosestEnemyInSight(
 
     for (std::shared_ptr<Entity> entity : grid[x][y]) {
       std::shared_ptr<Creature> creature = std::dynamic_pointer_cast<Creature>(entity);
-
       if (creature && creature->GetState() == Entity::states::Alive && Compatible(creature) == 0) {
         auto point = Point(entity->GetCoordinates());
 
@@ -482,9 +498,8 @@ std::shared_ptr<Creature> Creature::GetClosestEnemyInSight(
 
         double distance = point.dist(cone_center);
 
-        bool is_in_field_of_view = (direction.IsInsideCone(
-            cone_left_boundary, cone_right_boundary));
-
+        bool is_in_field_of_view =
+            (direction.IsInsideCone(cone_left_boundary, cone_right_boundary));
         bool is_on_edge = (direction.AngleDistanceToCone(cone_left_boundary, cone_right_boundary) <= M_PI/2) && (distance * sin(direction.AngleDistanceToCone(cone_left_boundary, cone_right_boundary)) <= creature->GetSize() + SETTINGS.engine.eps);
 
         if (is_in_field_of_view) {
@@ -537,6 +552,7 @@ std::shared_ptr<Creature> Creature::GetClosestEnemyInSight(
   return closest_enemy;
 }
 
+
 void Creature::ProcessVisionEnemies(std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
                        double grid_cell_size, double width, double height)
 {
@@ -558,8 +574,8 @@ void Creature::ProcessVisionEnemies(std::vector<std::vector<std::vector<std::sha
 /*!
  * @brief Handles the biting of the creature.
  *
- * @details Adds the food it bites to the stomach (increasing fulness and potential
- * energy). Decreases food size/deletes food that gets bitten.
+ * @details Adds the food it bites to the stomach (increasing fulness and
+ * potential energy). Decreases food size/deletes food that gets bitten.
  *
  * @param food The food the creature bites into.
  */
@@ -589,9 +605,7 @@ void Creature::Grab(std::shared_ptr<Entity> entity){
     if(std::dynamic_pointer_cast<MovableEntity>(entity)){
         this->SetGrabbedEntity(std::dynamic_pointer_cast<MovableEntity>(entity));
         std::dynamic_pointer_cast<GrabbingEntity>(entity)->AddToGrabbedBy(std::make_shared<GrabbingEntity>(*this));
+        SetEnergy(GetEnergy() - entity->GetSize());
+        //this->UpdateEntityVelocities();
     }
-    SetEnergy(GetEnergy() - entity->GetSize());
-    //this->UpdateEntityVelocities();
 }
-
-
