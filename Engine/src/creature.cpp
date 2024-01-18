@@ -48,6 +48,7 @@ Creature::Creature(neat::Genome genome, Mutable mutables)
       PheromoneSystem(genome, mutables),
       mating_desire_(false)
       {
+<<<<<<< HEAD
     int neural_inputs = SETTINGS.environment.input_neurons;
     for (BrainModule module : genome.GetModules()){
         neural_inputs += module.GetInputNeuronIds().size();
@@ -55,6 +56,11 @@ Creature::Creature(neat::Genome genome, Mutable mutables)
     neuron_data_ = std::vector<double>(neural_inputs, 0.0);
     think_count_ = this->GetID();
     color_hue_ = mutables.GetColor();
+=======
+    size_ = mutables.GetBabySize();
+    health_ = mutables.GetIntegrity() * pow(size_, 2);
+    energy_ = mutables.GetEnergyDensity() * pow(size_, 2);
+>>>>>>> 272f94b (Bug fix with neural inputs)
 }
 
 /*!
@@ -242,6 +248,7 @@ void Creature::Think(std::vector<std::vector<std::vector<std::shared_ptr<Entity>
   ProcessVisionEnemies(grid, GridCellSize, width, height);
   ProcessPheromoneDetection(grid, GridCellSize);
 
+  std::vector<double> neuron_data_ = std::vector<double> (neural_inputs_, 0);
   if (neuron_data_.size() == 0) return;
   neuron_data_.at(0) = 1;
   neuron_data_.at(1) = energy_;
