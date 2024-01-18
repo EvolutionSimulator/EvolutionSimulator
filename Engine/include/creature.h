@@ -5,14 +5,13 @@
 
 #include "config.h"
 #include "food.h"
-#include "movable_entity.h"
 #include "alive_entity.h"
 #include "vision_system.h"
 #include "digestive_system.h"
 #include "reproductive_system.h"
 #include "grabbing_entity.h"
+#include "grabbing_entity.h"
 #include "mutable.h"
-
 /*!
  * @file creature.h
  * @brief Defines the Creature class and related functionalities in a NEAT-based
@@ -42,7 +41,7 @@ class Creature : virtual public AliveEntity,  virtual public GrabbingEntity, vir
 
   void UpdateEnergy(double deltaTime);
   void Update(double deltaTime, double const kMapWidth, double const kMapHeight,
-              std::vector<std::vector<std::vector<Entity *> > > &grid,
+              std::vector<std::vector<std::vector<Entity *>>> &grid,
               double GridCellSize, double frictional_coefficient);
 
   void OnCollision(Entity &other_entity, double const kMapWidth,

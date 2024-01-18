@@ -22,7 +22,8 @@ Food::Food(const double nutritional_value)
  * @param x_coord X-coordinate of the Food.
  * @param y_coord Y-coordinate of the Food.
  */
-Food::Food(const double x_coord, const double y_coord, const double nutritional_value)
+Food::Food(const double x_coord, const double y_coord,
+           const double nutritional_value)
     : Entity(x_coord, y_coord,
              std::rand() % SETTINGS.environment.max_food_size),
       nutritional_value_(nutritional_value) {}
@@ -34,9 +35,9 @@ Food::Food(const double x_coord, const double y_coord, const double nutritional_
  * @param y_coord Y-coordinate of the Food.
  * @param size Size of the Food.
  */
-Food::Food(const double x_coord, const double y_coord, const double size, const double nutritional_value)
-    : Entity(x_coord, y_coord, size),
-      nutritional_value_(nutritional_value) {}
+Food::Food(const double x_coord, const double y_coord, const double size,
+           const double nutritional_value)
+    : Entity(x_coord, y_coord, size), nutritional_value_(nutritional_value) {}
 
 /*!
  * @brief Constructor for Food with specified size.
@@ -44,9 +45,7 @@ Food::Food(const double x_coord, const double y_coord, const double size, const 
  * @param size Size of the Food.
  */
 Food::Food(const double size, const double nutritional_value)
-    : Entity(size),
-    nutritional_value_(nutritional_value) {}
-
+    : Entity(size), nutritional_value_(nutritional_value) {}
 
 /*!
  * @brief Simulates the consumption of the Food, setting its state to Dead.
@@ -70,7 +69,7 @@ void Food::SetNutritionalValue(double value) { nutritional_value_ = value; }
  */
 double Food::GetNutritionalValue() const { return nutritional_value_; }
 
-Food::type Food::GetType() const { return type_;}
+Food::type Food::GetType() const { return type_; }
 
 Plant::Plant()
     : Food(SETTINGS.environment.plant_nutritional_value) {

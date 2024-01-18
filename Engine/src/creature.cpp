@@ -1,5 +1,4 @@
 #include "creature.h"
-#include "grabbing_entity.h"
 
 #include <algorithm>
 #include <cassert>
@@ -8,6 +7,7 @@
 
 #include "collision_functions.h"
 #include "settings.h"
+#include "grabbing_entity.h"
 
 /*!
  * @brief Construct a new Creature object.
@@ -22,7 +22,19 @@
  * @param mutables A Mutable object used to initialize the properties of the
  * AliveEntity.
  *
+ * * Default properties:
+ * - Health: 100
+ * - Energy: 100
+ * - Brain (Neural Network): Constructed from the provided genome.
+ * - Neuron Data: Initialized with zeros (size equal to
+ * `settings::environment::kInputNeurons`).
+ * - Reproduction Cooldown: Set to
+ * `settings::environment::kReproductionCooldown`.
+ * - Age: 0
+ * - Stomach capacity: area of creature *
+ * settings::environment::kDStomachCapacityFactor
  */
+
 Creature::Creature(neat::Genome genome, Mutable mutables)
     : GrabbingEntity(),
       AliveEntity(genome, mutables),
@@ -50,8 +62,10 @@ Creature::Creature(neat::Genome genome, Mutable mutables)
  * calculated.
  */
 void Creature::UpdateEnergy(double deltaTime) {
-  double movement_energy = (fabs(GetAcceleration()) + fabs(GetRotationalAcceleration())) * GetSize() * deltaTime/200;
-  double heat_loss = mutable_.GetEnergyLoss() * pow(size_, 1) * deltaTime/100;
+  double movement_energy =
+      (fabs(GetAcceleration()) + fabs(GetRotationalAcceleration())) *
+      GetSize() * deltaTime / 200;
+  double heat_loss = mutable_.GetEnergyLoss() * pow(size_, 1) * deltaTime / 100;
 
   SetEnergy(GetEnergy() - movement_energy - heat_loss);
   BalanceHealthEnergy();
@@ -64,11 +78,20 @@ void Creature::UpdateEnergy(double deltaTime) {
 /*!
  * @brief Determines if the current creature is compatible with another creature.
  *
- * @details This function calculates the compatibility between the current creature and another creature based on their genomes and mutable characteristics. It sums the brain distance, derived from genome compatibility, with the mutable distance, derived from mutable characteristics compatibility. The creatures are considered compatible if the sum is less than a predefined compatibility threshold.
+ * @details This function calculates the compatibility between the current
+ * creature and another creature based on their genomes and mutable
+ * characteristics. It sums the brain distance, derived from genome
+ * compatibility, with the mutable distance, derived from mutable
+ * characteristics compatibility. The creatures are considered compatible if the
+ * sum is less than a predefined compatibility threshold.
  *
- * @param other_creature A reference to another `Creature` object for compatibility comparison.
- * @return bool Returns `true` if the sum of brain and mutable distances is less than the compatibility threshold, indicating compatibility; otherwise returns `false`.
+ * @param other_creature A reference to another `Creature` object for
+ * compatibility comparison.
+ * @return bool Returns `true` if the sum of brain and mutable distances is less
+ * than the compatibility threshold, indicating compatibility; otherwise returns
+ * `false`.
  */
+
 bool Creature::Compatible(const Creature& other_creature){
   double brain_distance = this->GetGenome().CompatibilityBetweenGenomes(other_creature.GetGenome());
   double mutable_distance = this->GetMutable().CompatibilityBetweenMutables(other_creature.GetMutable());
@@ -99,7 +122,7 @@ void Creature::Update(double deltaTime, double const kMapWidth,
   this->UpdateEnergy(deltaTime);
   this->UpdateVelocities(deltaTime);
   this->Move(deltaTime, kMapWidth, kMapHeight);
-  this->MovableEntity::Rotate(deltaTime);
+  this->Rotate(deltaTime, kMapWidth, kMapHeight);
   this->Think(grid, GridCellSize, deltaTime, kMapWidth, kMapHeight);
   this->Digest(deltaTime);
   age_ += deltaTime;
@@ -115,16 +138,15 @@ void Creature::Update(double deltaTime, double const kMapWidth,
   } else {
     eating_cooldown_ -= deltaTime;
   }
-
 }
-
 
 /*!
  * @brief Handles the collision of the creature with another entity.
  *
  * @details Processes the interaction when the creature collides with another
- * entity. If the creature is hungry, the creature consumes it, if the creature wants to grab it, it does so. Otherwise, standard
- * collision handling is performed.
+ * entity. If the creature is hungry, the creature consumes it, if the creature
+ * wants to grab it, it does so. Otherwise, standard collision handling is
+ * performed.
  *
  * @param other_entity The entity the creature collides with.
  * @param kMapWidth Width of the map.
@@ -142,9 +164,11 @@ void Creature::OnCollision(Entity &other_entity, double const kMapWidth, double 
       Bite(creature_entity);
     }
   }
-  if (other_entity.GetState() == Entity::Alive && grabbing_ && IsInSight(&other_entity) && !(this->GetGrabbedEntity())){
-    //checking if the creature wants to grab, has the entity in sight and if he is not already grabbing something
-      Grab(&other_entity);
+  if (other_entity.GetState() == Entity::Alive && grabbing_ &&
+      IsInSight(&other_entity) && !(this->GetGrabbedEntity())) {
+    // checking if the creature wants to grab, has the entity in sight and if he
+    // is not already grabbing something
+    Grab(&other_entity);
   }
   MovableEntity::OnCollision(other_entity, kMapWidth, kMapHeight);
 }
@@ -160,7 +184,8 @@ void Creature::OnCollision(Entity &other_entity, double const kMapWidth, double 
  * @param GridCellSize Size of each cell in the grid.
  */
 void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
-                     double GridCellSize, double deltaTime, double width, double height) {
+                     double GridCellSize, double deltaTime, double width,
+                     double height) {
   // Not pretty but we'll figure out a better way in the future
 
   think_count++;
@@ -199,15 +224,14 @@ void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
   }
 
   std::vector<double> output = brain_.Activate(neuron_data_);
-  SetAcceleration(std::tanh(output.at(0))*mutable_.GetMaxForce());
+  SetAcceleration(std::tanh(output.at(0)) * mutable_.GetMaxForce());
   SetAccelerationAngle(std::tanh(output.at(1)) * M_PI);
-  SetRotationalAcceleration(std::tanh(output.at(2))*mutable_.GetMaxForce());
+  SetRotationalAcceleration(std::tanh(output.at(2)) * mutable_.GetMaxForce());
   Grow(std::max(std::tanh(output.at(3)) * deltaTime, 0.0));
   AddAcid(std::max(std::tanh(output.at(4)) * 10.0, 0.0));
   biting_ = std::tanh(output.at(5)) > 0 ? 0 : 1;
   // grabbing_ = std::tanh(output.at(6)) > 0 ? 0 : 1;
 }
-
 
 
 /*!
@@ -221,6 +245,7 @@ void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
  */
 void Creature::Grow(double energy) {
   double size = GetSize() + energy * mutable_.GetGrowthFactor();
+
 //  std::cout << "Size difference: "<< size - GetSize() << "Energy: " << energy << "Growth Factor: " << mutable_.GetGrowthFactor() << std::endl;
   (size > mutable_.GetMaxSize()) ? SetSize(mutable_.GetMaxSize()) : SetSize(size);
   SetEnergy(GetEnergy() - energy);
@@ -247,7 +272,8 @@ void Creature::Grow(double energy) {
 //   std::pair<double, double> coordinates_creature = GetCoordinates();
 //   int i_creature = (int)coordinates_creature.first / (int)GridCellSize;
 //   int j_creature = (int)coordinates_creature.second /
-//                    (int)GridCellSize;  // position of the creature on the grid
+//                    (int)GridCellSize;  // position of the creature on the
+//                    grid
 //   std::vector<Food *> closest_food_entities = get_food_at_distance(
 //       grid, i_creature, j_creature,
 //       0);  // here we place the candidates for the closest food
@@ -366,26 +392,33 @@ std::vector<Food *> get_food_at_distance(
 /*!
  * @brief Finds the closest enemy creature within the creature's line of sight.
  *
- * @details Performs a breadth-first search (BFS) on the grid cells within the creature's
- * field of view to locate the closest enemy creature. A creature is considered an enemy if it
- * is not compatible with it.
+ * @details Performs a breadth-first search (BFS) on the grid cells within the
+ * creature's field of view to locate the closest enemy creature. A creature is
+ * considered an enemy if it is not compatible with it.
  *
- * @param grid A 3-dimensional vector representing the environmental grid where each cell contains entities.
+ * @param grid A 3-dimensional vector representing the environmental grid where
+ * each cell contains entities.
  * @param grid_cell_size The size of each square cell in the grid.
  *
- * @return A pointer to the closest food entity within the line of sight; nullptr if no food is found.
+ * @return A pointer to the closest food entity within the line of sight;
+ * nullptr if no food is found.
  */
 Creature *Creature::GetClosestEnemyInSight(
     std::vector<std::vector<std::vector<Entity *>>> &grid,
-    double grid_cell_size){
+    double grid_cell_size) {
   int grid_width = grid.size();
   int grid_height = grid[0].size();
 
   int x_grid = static_cast<int>(x_coord_ / grid_cell_size);
   int y_grid = static_cast<int>(y_coord_ / grid_cell_size);
 
-         //temporary fix multiply by 4
-  int max_cells_to_find_food = 4 * M_PI * pow(vision_radius_ + 2 * sqrt(2) * grid_cell_size + settings::environment::kMaxFoodSize, 2) / (grid_cell_size * grid_cell_size);
+  // temporary fix multiply by 4
+  int max_cells_to_find_food =
+      4 * M_PI *
+      pow(vision_radius_ + 2 * sqrt(2) * grid_cell_size +
+              settings::environment::kMaxFoodSize,
+          2) /
+      (grid_cell_size * grid_cell_size);
 
   auto cone_center = Point(x_coord_, y_coord_);
   auto cone_orientation = GetOrientation();
@@ -412,21 +445,28 @@ Creature *Creature::GetClosestEnemyInSight(
     for (Entity *entity : grid[x][y]) {
       Creature *creature = dynamic_cast<Creature *>(entity);
 
-      if (creature && creature->GetState() == Entity::states::Alive && Compatible(*creature) == 0) {
+      if (creature && creature->GetState() == Entity::states::Alive &&
+          Compatible(*creature) == 0) {
         auto point = Point(entity->GetCoordinates());
 
         auto direction = OrientedAngle(cone_center, point);
 
         double distance = point.dist(cone_center);
 
-        bool is_in_field_of_view = (direction.IsInsideCone(
-            cone_left_boundary, cone_right_boundary));
+        bool is_in_field_of_view =
+            (direction.IsInsideCone(cone_left_boundary, cone_right_boundary));
 
-        bool is_on_edge = (direction.AngleDistanceToCone(cone_left_boundary, cone_right_boundary) <= M_PI/2) && (distance * sin(direction.AngleDistanceToCone(cone_left_boundary, cone_right_boundary)) <= creature->GetSize() + settings::engine::EPS);
+        bool is_on_edge =
+            (direction.AngleDistanceToCone(cone_left_boundary,
+                                           cone_right_boundary) <= M_PI / 2) &&
+            (distance * sin(direction.AngleDistanceToCone(
+                            cone_left_boundary, cone_right_boundary)) <=
+             creature->GetSize() + settings::engine::EPS);
 
         if (is_in_field_of_view) {
-          bool is_within_vision_radius =
-              distance <= vision_radius_ + creature->GetSize() + settings::engine::EPS;
+          bool is_within_vision_radius = distance <= vision_radius_ +
+                                                         creature->GetSize() +
+                                                         settings::engine::EPS;
           if (is_within_vision_radius && distance < smallest_distance_enemy) {
             smallest_distance_enemy = distance;
             closest_enemy = creature;
@@ -436,7 +476,9 @@ Creature *Creature::GetClosestEnemyInSight(
 
         if (is_on_edge) {
           bool is_within_vision_radius =
-              (distance * cos(direction.AngleDistanceToCone(cone_left_boundary, cone_right_boundary)) <= vision_radius_ + settings::engine::EPS);
+              (distance * cos(direction.AngleDistanceToCone(
+                              cone_left_boundary, cone_right_boundary)) <=
+               vision_radius_ + settings::engine::EPS);
           if (is_within_vision_radius && distance < smallest_distance_enemy) {
             smallest_distance_enemy = distance;
             closest_enemy = creature;
@@ -474,6 +516,7 @@ Creature *Creature::GetClosestEnemyInSight(
   return closest_enemy;
 }
 
+
 void Creature::ProcessVisionEnemies(std::vector<std::vector<std::vector<Entity *>>> &grid,
                        double grid_cell_size, double width, double height)
 {
@@ -495,13 +538,12 @@ void Creature::ProcessVisionEnemies(std::vector<std::vector<std::vector<Entity *
 /*!
  * @brief Handles the biting of the creature.
  *
- * @details Adds the food it bites to the stomach (increasing fulness and potential
- * energy). Decreases food size/deletes food that gets bitten.
+ * @details Adds the food it bites to the stomach (increasing fulness and
+ * potential energy). Decreases food size/deletes food that gets bitten.
  *
  * @param food The food the creature bites into.
  */
-void Creature::Bite(Creature* creature)
-{
+void Creature::Bite(Creature *creature) {
   eating_cooldown_ = mutable_.GetEatingSpeed();
 
   //Bite logic - inflict damage, add energy
@@ -522,14 +564,11 @@ void Creature::Bite(Creature* creature)
  *
  * @param entity The entity the creature bites into.
  */
-void Creature::Grab(Entity* entity){
-  if (dynamic_cast<MovableEntity*>(entity))
-  {
-    this->SetGrabbedEntity(dynamic_cast<MovableEntity*>(entity));
-    dynamic_cast<GrabbingEntity*>(entity)->AddToGrabbedBy(this);
+void Creature::Grab(Entity *entity) {
+  if (dynamic_cast<MovableEntity *>(entity)) {
+    this->SetGrabbedEntity(dynamic_cast<MovableEntity *>(entity));
+    dynamic_cast<GrabbingEntity *>(entity)->AddToGrabbedBy(this);
     SetEnergy(GetEnergy() - entity->GetSize());
-    //this->UpdateEntityVelocities();
+    this->UpdateEntityVelocities();
   }
 }
-
-

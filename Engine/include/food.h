@@ -8,8 +8,10 @@
 class Food : public Entity {
  protected:
   Food(const double nutritional_value);
-  Food(const double x_coord, const double y_coord, const double nutritional_value);
-  Food(const double x_coord, const double y_coord, const double size, const double nutritional_value);
+  Food(const double x_coord, const double y_coord,
+       const double nutritional_value);
+  Food(const double x_coord, const double y_coord, const double size,
+       const double nutritional_value);
   Food(const double size, const double nutritional_value);
 
  public:
@@ -24,7 +26,8 @@ class Food : public Entity {
 
  protected:
   Food::type type_;
-  double nutritional_value_; /*!< Nutritional value per size unit of the Food. (depends on food type) */
+  double nutritional_value_; /*!< Nutritional value per size unit of the Food.
+                                (depends on food type) */
   int lifespan_; /*!< Lifespan of the Food in simulation time units. */
 };
 
