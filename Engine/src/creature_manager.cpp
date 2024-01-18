@@ -43,6 +43,7 @@ void CreatureManager::UpdateAllCreatures(SimulationData &data,
                     environment.GetFrictionalCoefficient());
     if (creature.Fit()) {
       data.new_reproduce_.push(creature);
+      creature.Reproduced();
     }
   }
 }
