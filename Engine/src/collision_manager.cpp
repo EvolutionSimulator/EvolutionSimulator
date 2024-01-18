@@ -25,6 +25,7 @@ void CollisionManager::CheckCollisions(EntityGrid& entity_grid) {
         const int layer_number =
             2 *
             ceil((entity1->GetSize() / SETTINGS.environment.grid_cell_size));
+
         std::vector<std::pair<int, int>> neighbours =
             entity_grid.GetNeighbours({col, row}, layer_number);
         for (const std::pair<int, int> neighbour : neighbours) {

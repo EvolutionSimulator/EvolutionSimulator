@@ -9,7 +9,13 @@
 #include "qwidgets/qsfmlcanvas.h"
 
 int main(int argc, char *argv[]) {
-  SETTINGS.LoadFromFile("./settings.json");
+  // SETTINGS.LoadFromFile("./settings.json");
+
+  int width = sf::VideoMode::getDesktopMode().width;
+  int height = sf::VideoMode::getDesktopMode().height;
+
+  SETTINGS.environment.map_width = width;
+  SETTINGS.environment.map_height = height;
 
   QApplication app(argc, argv);
   MainWindow window;

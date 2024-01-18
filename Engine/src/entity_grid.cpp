@@ -46,6 +46,7 @@ void UpdateGridFood(std::vector<Food> &foods,
                              }),
               foods.end());
 
+
   for (Food &entity : foods) {
     std::pair<double, double> coordinates = entity.GetCoordinates();
     int gridX = static_cast<int>(coordinates.first / cellSize);
@@ -80,6 +81,7 @@ void UpdateGridCreature(
                                    return entity.GetState() != Entity::Alive;
                                  }),
                   creatures.end());
+
   for (Creature &creature : creatures) {
     std::pair<double, double> coordinates = creature.GetCoordinates();
     int gridX = static_cast<int>(coordinates.first / cellSize);
@@ -119,8 +121,8 @@ void UpdateQueue(std::queue<Creature> &reproduce) {
  */
 void EntityGrid::UpdateGrid(SimulationData &data, Environment &environment) {
   ClearGrid();
-  UpdateGridCreature(data.creatures_, grid_, cell_size_, data.food_entities_);
-  UpdateGridFood(data.food_entities_, grid_, cell_size_);
+  UpdateGridCreature(data.creatures_, grid_, SETTINGS.environment.grid_cell_size, data.food_entities_);
+  UpdateGridFood(data.food_entities_, grid_, SETTINGS.environment.grid_cell_size);
   UpdateQueue(data.reproduce_);
 }
 
