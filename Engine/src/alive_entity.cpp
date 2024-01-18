@@ -15,7 +15,7 @@ AliveEntity::AliveEntity(neat::Genome genome, Mutable mutables)
     for (BrainModule module : genome.GetModules()){
         neural_inputs += module.GetInputNeuronIds().size();
     }
-    neural_inputs_ = neural_inputs;
+    neuron_data_ = std::vector<double> (neural_inputs, 0);
 }
 
 /*!

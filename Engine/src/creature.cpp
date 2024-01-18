@@ -173,6 +173,7 @@ void Creature::Update(double deltaTime, double const kMapWidth,
                       double const kMapHeight,
                       std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
                       double GridCellSize, double frictional_coefficient) {
+  if (state_ == Dead) return;
   this->frictional_coefficient_ = frictional_coefficient;
   this->UpdateMaxEnergy();
   // this->SetAffectedByGrabbedEnttityAll(false);
@@ -249,7 +250,6 @@ void Creature::Think(std::vector<std::vector<std::vector<std::shared_ptr<Entity>
   ProcessVisionEnemies(grid, GridCellSize, width, height);
   ProcessPheromoneDetection(grid, GridCellSize);
 
-  std::vector<double> neuron_data_ = std::vector<double> (neural_inputs_, 0);
   if (neuron_data_.size() == 0) return;
   neuron_data_.at(0) = 1;
   neuron_data_.at(1) = energy_;
