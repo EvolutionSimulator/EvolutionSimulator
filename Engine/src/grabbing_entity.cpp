@@ -74,29 +74,39 @@ double GrabbingEntity::GetRotationalFriction() const {
   return GetRotationalVelocity() * GetTotalMass() * frictional_coefficient;
 }
 
-std::pair<double, double> GrabbingEntity::GetCentreOfMass() const {
-  std::unordered_set<std::shared_ptr<GrabbingEntity>> entities = GetGrabbedBy();
-  std::pair<double, double> centre_of_mass = {0, 0};
-  for (auto& entity : entities) {
-    centre_of_mass.first +=
-        entity->GetCoordinates().first * pow(entity->GetSize(), 2);
-    centre_of_mass.second +=
-        entity->GetCoordinates().second * pow(entity->GetSize(), 2);
+std::unordered_set<std::shared_ptr<GrabbingEntity>> GrabbingEntity::FindGrabEntities() const {
+  std::unordered_set<std::shared_ptr<GrabbingEntity>> entities;
+  entities.insert(std::make_shared<GrabbingEntity>(*this));
+  for (std::shared_ptr<MovableEntity> entity : grabbed_by_) {
+    if (entity->GetID() == this->GetID()) continue;
+    if (std::dynamic_pointer_cast<GrabbingEntity>(entity) != nullptr) {
+      for (const auto entity2 :
+           std::dynamic_pointer_cast<GrabbingEntity>(entity)->GetGrabEntities()) {
+        entities.insert(entity2);
+      }
+    }
   }
-  double total_mass = GetTotalMass();
-  centre_of_mass.first /= total_mass;
-  centre_of_mass.second /= total_mass;
-  return centre_of_mass;
+  return entities;
 }
 
-double GrabbingEntity::GetTotalMass() const {
-  std::unordered_set<std::shared_ptr<GrabbingEntity>> entities = GetGrabbedBy();
+std::unordered_set<std::shared_ptr<GrabbingEntity>> GrabbingEntity::GetGrabEntities() const {
+  return grab_affected_entities_;
+}
+
+std::pair<double, double> GrabbingEntity::GetCentreOfMass() const {
+  return centre_of_mass_;
+}
+
+double GrabbingEntity::CalcTotalMass() const {
+  std::unordered_set<std::shared_ptr<GrabbingEntity>> entities = GetGrabEntities();
   double total_mass = 0;
   for (auto& entity : entities) {
     total_mass += pow(entity->GetSize(), 2);
   }
   return total_mass;
 }
+
+double GrabbingEntity::GetTotalMass() const { return total_mass_; }
 
 std::pair<double, double> GrabbingEntity::GetTotalForwardAccelComps() const {
   std::unordered_set<std::shared_ptr<GrabbingEntity>> entities = GetGrabbedBy();
@@ -124,6 +134,7 @@ double GrabbingEntity::GetTotalForwardAccelAngle() const {
   return atan2(comps.second, comps.first);
 }
 
+
 double GrabbingEntity::GetTotalRotAccel() const{
   std::unordered_set<std::shared_ptr<GrabbingEntity>> entities = GetGrabbedBy();
   std::pair<double, double> centre_of_mass = GetCentreOfMass();
@@ -149,9 +160,8 @@ double GrabbingEntity::GetTotalRotAccel() const{
   return total_rot_accel / GetTotalMass();
 }
 
-void GrabbingEntity::UpdateEntityVelocities() const {
-  // Implementation
-}
+
+
 
 std::shared_ptr<MovableEntity> GrabbingEntity::GetGrabbedEntity() const {
     return grabbed_entity_;
@@ -163,4 +173,88 @@ void GrabbingEntity::SetGrabbedEntity(std::shared_ptr<MovableEntity>movable_enti
 
 void GrabbingEntity::AddToGrabbedBy(std::shared_ptr<GrabbingEntity>movable_entity){
     grabbed_by_.insert(movable_entity);
+}
+
+void GrabbingEntity::SetAffectedByGrabbedEntity(bool affected) {
+  affected_by_grabbed_entity_ = affected;
+}
+
+void GrabbingEntity::SetGrabValues() {
+  if (!grabbed_entity_ && !grabbed_by_.size()) {
+    return;
+  }
+
+  total_mass_ = CalcTotalMass();
+  centre_of_mass_ = GetCentreOfMass();
+}
+
+void GrabbingEntity::UpdateVelocities(double deltaTime) {
+  if (!grabbed_entity_ && !grabbed_by_.size()) {
+    MovableEntity::UpdateVelocities(deltaTime);
+    return;
+  }
+  for (std::shared_ptr<GrabbingEntity> entity : grab_affected_entities_) {
+    double velocity_x =
+        GetVelocity() * cos(GetOrientation() + GetVelocityAngle());
+    double velocity_y =
+        GetVelocity() * sin(GetOrientation() + GetVelocityAngle());
+    velocity_x += GetEffectiveForwardAcceleration() * deltaTime *
+                  cos(GetOrientation() + GetEffectiveAccelerationAngle());
+    velocity_y += GetEffectiveForwardAcceleration() * deltaTime *
+                  sin(GetOrientation() + GetEffectiveAccelerationAngle());
+    entity->SetVelocity(sqrt(pow(velocity_x, 2) + pow(velocity_y, 2)));
+
+    entity->SetVelocityAngle(atan2(velocity_y, velocity_x) - GetOrientation());
+    entity->SetRotationalVelocity(GetRotationalVelocity() +
+                                  GetEffectiveRotationalAcceleration() *
+                                      deltaTime);
+  }
+}
+
+void GrabbingEntity::Move(double deltaTime, const double kMapWidth,
+                          const double kMapHeight) {
+  if (!grabbed_entity_ && !grabbed_by_.size()) {
+    MovableEntity::Move(deltaTime, kMapWidth, kMapHeight);
+    return;
+  }
+  for (std::shared_ptr<GrabbingEntity> entity : grab_affected_entities_) {
+    double x = entity->GetCoordinates().first;
+    double y = entity->GetCoordinates().second;
+    double velocity = entity->GetVelocity();
+    double velocity_angle = entity->GetVelocityAngle();
+    double new_x = x + velocity * deltaTime * cos(velocity_angle);
+    double new_y = y + velocity * deltaTime * sin(velocity_angle);
+    if (new_x < 0) {
+      new_x += kMapWidth;
+    } else if (new_x > kMapWidth) {
+      new_x -= kMapWidth;
+    }
+    if (new_y < 0) {
+      new_y += kMapHeight;
+    } else if (new_y > kMapHeight) {
+      new_y -= kMapHeight;
+    }
+    entity->SetCoordinates(new_x, new_y, kMapWidth, kMapHeight);
+  }
+}
+
+void GrabbingEntity::Rotate(double deltaTime, double kMapWidth,
+                            double kMapHeight) {
+  if (!grabbed_entity_ && !grabbed_by_.size()) {
+    MovableEntity::Rotate(deltaTime);
+    return;
+  }
+  for (std::shared_ptr<GrabbingEntity> entity : grab_affected_entities_) {
+    double cc_distance =
+        sqrt(pow(entity->GetCoordinates().first - centre_of_mass_.first, 2) +
+             pow(entity->GetCoordinates().second - centre_of_mass_.second, 2));
+    double cc_angle = atan2(
+        entity->GetCoordinates().second - centre_of_mass_.second,
+        entity->GetCoordinates().first -
+            centre_of_mass_.first);  // respective to horizontal, clockwise
+    double new_cc_angle = cc_angle + GetRotationalVelocity() * deltaTime;
+    double x = centre_of_mass_.first + cc_distance * cos(new_cc_angle);
+    double y = centre_of_mass_.second + cc_distance * sin(new_cc_angle);
+    entity->SetCoordinates(x, y, kMapWidth, kMapHeight);
+  }
 }
