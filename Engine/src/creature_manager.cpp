@@ -19,9 +19,23 @@ void CreatureManager::UpdateAllCreatures(SimulationData& data,
                                          double deltaTime) {
   auto grid = entity_grid.GetGrid();
 
+<<<<<<< HEAD
   #pragma omp parallel for
   for (auto& egg : data.eggs_) {
     egg->Update(deltaTime);
+=======
+  for (Creature &creature : data.creatures_) {
+    creature.Update(deltaTime, SETTINGS.environment.map_width,
+                    SETTINGS.environment.map_height, grid,
+                    SETTINGS.environment.grid_cell_size,
+                    environment.GetFrictionalCoefficient());
+    if (creature.Fit()) {
+      data.new_reproduce_.push(creature);
+      creature.Reproduced();
+    }
+    std::vector<Pheromone> emissions = creature.EmitPheromones(deltaTime);
+    data.pheromones_.insert(data.pheromones_.end(), emissions.begin(), emissions.end());
+>>>>>>> da22f30 (Fix to reproduction)
   }
   // Vector to store thread-local reproduce lists
   std::vector<std::vector<std::shared_ptr<Creature>>> local_reproduce_lists(omp_get_max_threads());
