@@ -29,7 +29,6 @@ void Simulation::FixedUpdate(double deltaTime) {
   auto data = GetSimulationData();
   auto environment = data->GetEnvironment();
 
-  // Test function (DO NOT USE)
   creature_manager_.UpdateAllCreatures(*data, environment, entity_grid_, deltaTime);
   creature_manager_.ReproduceCreatures(*data, environment);
   food_manager_.GenerateMoreFood(*data_, environment, deltaTime);

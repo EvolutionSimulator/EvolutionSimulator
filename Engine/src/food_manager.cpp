@@ -22,8 +22,8 @@ void FoodManager::InitializeFood(SimulationData &data,
 void FoodManager::GenerateMoreFood(SimulationData &data,
                                       Environment &environment, double deltaTime) {
   double spawn_cell_size = 50.0;
-  for (double x = 0; x < environment.GetMapWidth(); x += spawn_cell_size) {
-    for (double y = 0; y < environment.GetMapHeight(); y += spawn_cell_size) {
+  for (double x = 0; x < SETTINGS.environment.map_width; x += spawn_cell_size) {
+    for (double y = 0; y < SETTINGS.environment.map_height; y += spawn_cell_size) {
       double food_density = environment.GetFoodDensity(x, y);
       double food_spawn_probability =
           food_density * spawn_cell_size * spawn_cell_size *

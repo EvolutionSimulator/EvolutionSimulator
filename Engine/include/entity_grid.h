@@ -24,5 +24,4 @@ class EntityGrid {
  private:
   std::vector<std::vector<std::vector<Entity *>>> grid_;
   int num_columns_, num_rows_;
-  int cell_size_;
 };
