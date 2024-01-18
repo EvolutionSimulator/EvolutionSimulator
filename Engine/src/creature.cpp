@@ -175,7 +175,6 @@ void Creature::Update(double deltaTime, double const kMapWidth,
                       double GridCellSize, double frictional_coefficient) {
   this->frictional_coefficient_ = frictional_coefficient;
   this->UpdateMaxEnergy();
-  this->UpdateEnergy(deltaTime);
   // this->SetAffectedByGrabbedEnttityAll(false);
   // this->SetGrabValues();
   this->UpdateVelocities(deltaTime);
@@ -188,6 +187,8 @@ void Creature::Update(double deltaTime, double const kMapWidth,
   this->FemaleReproductiveSystem::Update(deltaTime);
   this->MaleReproductiveSystem::Update(deltaTime);
   this->UpdateAge(deltaTime);
+  this->UpdateEnergy(deltaTime);
+
 
   if (eating_cooldown_ <= 0) {
     eating_cooldown_ = 0.0;
