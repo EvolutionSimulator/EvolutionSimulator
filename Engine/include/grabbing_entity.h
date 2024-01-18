@@ -39,6 +39,12 @@ class GrabbingEntity : virtual public MovableEntity {
   void UpdateEntityVelocities() const;
 
   std::shared_ptr<MovableEntity> GetGrabbedEntity() const;
+
+  void AddToGrabAffected(
+      std::shared_ptr<GrabbingEntity>
+          movable_entity_);  // Adding the entity that is affected by me to the
+                             // set of my grab affected entities
+
   bool grabbing_;  /*! Indicates whether creature is grabbing or not*/
 
   void SetAffectedByGrabbedEntity(bool affected);
@@ -52,9 +58,9 @@ class GrabbingEntity : virtual public MovableEntity {
   bool affected_by_grabbed_entity_{false};
   std::unordered_set<std::shared_ptr<GrabbingEntity>>
       grab_affected_entities_;  // entities in the chain
-  double total_mass_;           // total mass of the entity chain
-  std::pair<double, double>
-      centre_of_mass_;  // centre of mass of the entity chain
+  double total_mass_{0};        // total mass of the entity chain
+  std::pair<double, double> centre_of_mass_{
+      0, 0};  // centre of mass of the entity chain
 };
 
 #endif  // GRABBING_ENTITY_H
