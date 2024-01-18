@@ -44,15 +44,20 @@ void MainWindow::InitializeEngine()
     int width = sf::VideoMode::getDesktopMode().width;
     int height = sf::VideoMode::getDesktopMode().height;
     engine_ = new Engine(width, height);
+    engine_->SetSpeed(10);
     ui_->canvas->SetSimulation(engine_->GetSimulation());
   }
+
   // If this function changes change the kMaxFoodDensityColor in config.h as for a correct shade of the backgroung we need this measure
   auto food_density_function = [this](double x, double y) {
-    return x * y * 2 / (ui_->canvas->GetSimulation()->GetSimulationData()->GetEnvironment().GetMapWidth() *
-                        ui_->canvas->GetSimulation()->GetSimulationData()->GetEnvironment().GetMapHeight()) * 5e-5;
+    auto data = engine_->GetSimulation()->GetSimulationData();
+    return x * y * 2 / (data->GetEnvironment().GetMapWidth() *
+                        data->GetEnvironment().GetMapHeight()) * 5e-5;
   };
-  engine_->GetEnvironment().SetFoodDensity(food_density_function); // Update the density
-  engine_->GetSimulation()->GetSimulationData()->InitializeFood();
+
+  auto data = engine_->GetSimulation()->GetSimulationData();
+
+  data->GetEnvironment().SetFoodDensity(food_density_function); // Update the density
   ui_->canvas->UpdateFoodDensityTexture(engine_->GetEnvironment().GetMapWidth(),
                                         engine_->GetEnvironment().GetMapHeight());
 }

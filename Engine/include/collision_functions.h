@@ -1,5 +1,5 @@
-#ifndef COLLISIONS_H
-#define COLLISIONS_H
+#ifndef COLLISION_FUNCTIONS_H
+#define COLLISION_FUNCTIONS_H
 
 #include <vector>
 
@@ -49,4 +49,4 @@ bool IsGridCellPotentiallyInsideCone(Point grid_point, double grid_cell_size,
                                      OrientedAngle cone_right_boundary);
 
 std::vector<std::pair<int, int>> SupercoverBresenhamLine(int x0, int y0, int x1, int y1);
-#endif  // COLLISIONS_H
+#endif  // COLLISION_FUNCTIONS_H

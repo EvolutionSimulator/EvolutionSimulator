@@ -8,10 +8,15 @@
 #include "data_accessor.h"
 #include "synchronization_primitives.h"
 
+#include "food_manager.h"
+#include "entity_grid.h"
+#include "collision_manager.h"
+#include "creature_manager.h"
+
 class Simulation {
  public:
   explicit Simulation(
-      myEnvironment::Environment&
+      Environment&
           environment);  // New constructor accepting Environment reference
   ~Simulation();
   DataAccessor<SimulationData> GetSimulationData();
@@ -21,7 +26,13 @@ class Simulation {
   void Stop();  // Gives us the possibility to stop the simulation
 
  private:
+  FoodManager food_manager_;
+  EntityGrid entity_grid_;
+  CollisionManager collision_manager_;
+  CreatureManager creature_manager_;
+
   SimulationData* data_;
   SynchronizationPrimitives data_sync_;
+
   bool is_running_;  // New boolean flag to control simulation state
 };

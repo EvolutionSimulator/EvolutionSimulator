@@ -171,8 +171,7 @@ double MovableEntity::GetEffectiveForwardAcceleration() const {
  * @return The calculated rotational friction.
  */
 double MovableEntity::GetRotationalFriction() const {
-  return GetRotationalVelocity() * GetSize() *
-         SETTINGS.environment.frictional_coefficient;
+  return GetRotationalVelocity() * GetSize() * frictional_coefficient_;
 }
 
 /*!

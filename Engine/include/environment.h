@@ -6,7 +6,6 @@
 
 #include "config.h"
 
-namespace myEnvironment {
 class Environment {
  public:
   // Constructor
@@ -40,6 +39,5 @@ class Environment {
   double map_width_;
   double map_height_;
 };
-}  // namespace myEnvironment
 
 #endif  // ENVIRONMENT_H

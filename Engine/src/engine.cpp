@@ -17,7 +17,7 @@ Engine::Engine(double width, double height, double food_density,
 
 Engine::~Engine() { delete simulation_; }
 
-myEnvironment::Environment& Engine::GetEnvironment() { return environment_; }
+Environment& Engine::GetEnvironment() { return environment_; }
 
 // Main engine loop
 void Engine::Run() {

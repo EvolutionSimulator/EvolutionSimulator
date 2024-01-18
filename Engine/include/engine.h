@@ -24,10 +24,10 @@ class Engine {
   bool IsPaused();
 
   Simulation* GetSimulation();
-  myEnvironment::Environment& GetEnvironment();
+  Environment& GetEnvironment();
 
  private:
-  myEnvironment::Environment environment_;
+  Environment environment_;
   const double kFixedUpdateInterval =
       SETTINGS.engine.fixed_update_interval;  // how often FixedUpdate is
                                                // called
