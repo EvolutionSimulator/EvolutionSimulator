@@ -175,6 +175,10 @@ void GrabbingEntity::AddToGrabbedBy(std::shared_ptr<GrabbingEntity>movable_entit
     grabbed_by_.insert(movable_entity);
 }
 
+void GrabbingEntity::AddToGrabAffected(std::shared_ptr<GrabbingEntity> movable_entity) {
+  grab_affected_entities_.insert(movable_entity);
+}
+
 void GrabbingEntity::SetAffectedByGrabbedEntity(bool affected) {
   affected_by_grabbed_entity_ = affected;
 }
@@ -183,7 +187,7 @@ void GrabbingEntity::SetGrabValues() {
   if (!grabbed_entity_ && !grabbed_by_.size()) {
     return;
   }
-
+  grab_affected_entities_ = FindGrabEntities();
   total_mass_ = CalcTotalMass();
   centre_of_mass_ = GetCentreOfMass();
 }
