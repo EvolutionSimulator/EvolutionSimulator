@@ -120,6 +120,7 @@ void Creature::Update(double deltaTime, double const kMapWidth,
   this->frictional_coefficient_ = frictional_coefficient;
   this->UpdateMaxEnergy();
   this->UpdateEnergy(deltaTime);
+  this->SetGrabValues();
   this->UpdateVelocities(deltaTime);
   this->Move(deltaTime, kMapWidth, kMapHeight);
   this->Rotate(deltaTime, kMapWidth, kMapHeight);
