@@ -3,6 +3,7 @@
 #include "settings.h"
 #include "math.h"
 #include "geometry_primitives.h"
+#include "math.h"
 
 /*!
  * @file movable_entity.h
@@ -124,8 +125,7 @@ void MovableEntity::SetRotationalVelocity(double rotational_velocity) {
  * @return The calculated forward friction.
  */
 double MovableEntity::GetForwardFriction() const {
-  return GetVelocity() * sqrt(GetSize()) *
-         frictional_coefficient_ *
+  return GetVelocity() * sqrt(GetSize()) * frictional_coefficient_ *
          (1 + strafing_difficulty_ * fabs(sin(GetVelocityAngle())));
 }
 
@@ -155,14 +155,14 @@ double MovableEntity::GetEffectiveForwardAcceleration() const {
   double friction = GetForwardFriction();
   // return the acceleration magnitude using the cosine formula
 
-  double acceleration_squared = pow(acceleration, 2) + pow(friction, 2) -
-                                2 * acceleration * friction *
-                                    cos(acceleration_angle_ - GetVelocityAngle());
-  if (acceleration_squared < 0){
-      return 0;
+  double acceleration_squared =
+      pow(acceleration, 2) + pow(friction, 2) -
+      2 * acceleration * friction *
+          cos(acceleration_angle_ - GetVelocityAngle());
+  if (acceleration_squared < 0) {
+    return 0;
   }
   return sqrt(acceleration_squared);
-
 }
 
 /*!
@@ -197,9 +197,11 @@ void MovableEntity::UpdateVelocities(double deltaTime) {
       GetVelocity() * sin(GetOrientation() + GetVelocityAngle());
   // update absolute x and y components of velocity
   velocity_x += GetEffectiveForwardAcceleration() *
-                cos(GetOrientation() + GetEffectiveAccelerationAngle()) * deltaTime;
+                cos(GetOrientation() + GetEffectiveAccelerationAngle()) *
+                deltaTime;
   velocity_y += GetEffectiveForwardAcceleration() *
-                sin(GetOrientation() + GetEffectiveAccelerationAngle()) * deltaTime;
+                sin(GetOrientation() + GetEffectiveAccelerationAngle()) *
+                deltaTime;
   // update velocity
   SetVelocity(sqrt(pow(velocity_x, 2) + pow(velocity_y, 2)));
   // update velocity angle

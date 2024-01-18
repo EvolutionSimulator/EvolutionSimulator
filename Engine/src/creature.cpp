@@ -99,7 +99,7 @@ void Creature::Update(double deltaTime, double const kMapWidth,
   this->UpdateEnergy(deltaTime);
   this->UpdateVelocities(deltaTime);
   this->Move(deltaTime, kMapWidth, kMapHeight);
-  this->Rotate(deltaTime);
+  this->MovableEntity::Rotate(deltaTime);
   this->Think(grid, GridCellSize, deltaTime, kMapWidth, kMapHeight);
   this->Digest(deltaTime);
   age_ += deltaTime;
@@ -528,7 +528,7 @@ void Creature::Grab(Entity* entity){
     this->SetGrabbedEntity(dynamic_cast<MovableEntity*>(entity));
     dynamic_cast<GrabbingEntity*>(entity)->AddToGrabbedBy(this);
     SetEnergy(GetEnergy() - entity->GetSize());
-    this->UpdateEntityVelocities();
+    //this->UpdateEntityVelocities();
   }
 }
 
