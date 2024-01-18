@@ -31,9 +31,10 @@ class MovableEntity : virtual public Entity {
   virtual double GetRotationalFriction() const;
   virtual double GetEffectiveRotationalAcceleration() const;
 
-  void UpdateVelocities(double deltaTime);
-  void Move(double deltaTime, const double kMapWidth, const double kMapHeight);
-  void Rotate(double deltaTime);
+  virtual void UpdateVelocities(double deltaTime);
+  virtual void Move(double deltaTime, const double kMapWidth,
+                    const double kMapHeight);
+  virtual void Rotate(double deltaTime);
 
   virtual void OnCollision(std::shared_ptr<Entity> other_entity, double const kMapWidth,
                            double const kMapHeight) override;

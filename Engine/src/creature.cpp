@@ -157,7 +157,7 @@ void Creature::Update(double deltaTime, double const kMapWidth,
   this->UpdateEnergy(deltaTime);
   this->UpdateVelocities(deltaTime);
   this->Move(deltaTime, kMapWidth, kMapHeight);
-  this->Rotate(deltaTime);
+  this->MovableEntity::Rotate(deltaTime);
   this->Think(grid, GridCellSize, deltaTime, kMapWidth, kMapHeight);
   this->Digest(deltaTime);
   this->Grow(energy_*deltaTime/1000);
@@ -591,6 +591,7 @@ void Creature::Grab(std::shared_ptr<Entity> entity){
         std::dynamic_pointer_cast<GrabbingEntity>(entity)->AddToGrabbedBy(std::make_shared<GrabbingEntity>(*this));
     }
     SetEnergy(GetEnergy() - entity->GetSize());
-    this->UpdateEntityVelocities();
+    //this->UpdateEntityVelocities();
 }
+
 
