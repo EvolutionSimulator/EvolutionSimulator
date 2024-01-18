@@ -188,6 +188,20 @@ void GrabbingEntity::SetGrabValues() {
   centre_of_mass_ = GetCentreOfMass();
 }
 
+void GrabbingEntity::UpdateEntityVelocities() {
+  double total_v_x = 0;
+  double total_v_y = 0;
+  for (std::shared_ptr<GrabbingEntity> entity : grab_affected_entities_) {
+    total_v_x += entity->GetVelocity() * cos(entity->GetVelocityAngle());
+    total_v_y += entity->GetVelocity() * sin(entity->GetVelocityAngle());
+  }
+  for (std::shared_ptr<GrabbingEntity> entity : grab_affected_entities_) {
+    entity->SetVelocity(sqrt(pow(total_v_x, 2) + pow(total_v_y, 2)));
+    entity->SetVelocityAngle(atan2(total_v_y, total_v_x));
+    entity->SetRotationalAcceleration(0);
+  }
+}
+
 void GrabbingEntity::UpdateVelocities(double deltaTime) {
   if (!grabbed_entity_ && !grabbed_by_.size()) {
     MovableEntity::UpdateVelocities(deltaTime);

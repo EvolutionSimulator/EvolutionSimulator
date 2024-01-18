@@ -4,18 +4,16 @@
 #include <unordered_map>
 #include <memory>
 
-#include "alive_entity.h"
-#include "digestive_system.h"
 #include "food.h"
-#include "movable_entity.h"
-
-#include "grabbing_entity.h"
-
-#include "mutable.h"
 #include "neat/neat-neural-network.h"
-#include "reproduction.h"
-#include "vision_system.h"
 
+#include "movable_entity.h"
+#include "alive_entity.h"
+#include "vision_system.h"
+#include "digestive_system.h"
+#include "reproduction.h"
+#include "grabbing_entity.h"
+#include "mutable.h"
 /*!
  * @file creature.h
  * @brief Defines the Creature class and related functionalities in a NEAT-based
