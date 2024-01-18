@@ -165,7 +165,7 @@ void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
   think_count = 0;
   // To allow creatures to use a module it should be included below
   ProcessVisionFood(grid, GridCellSize, width, height);
-
+  if (neuron_data_.size() == 0) return;
   neuron_data_.at(0) = 1;
   neuron_data_.at(1) = energy_;
   neuron_data_.at(2) = GetVelocity();
