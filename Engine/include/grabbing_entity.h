@@ -22,6 +22,7 @@ class GrabbingEntity : virtual public MovableEntity {
   double CalcTotalMass() const;
   double GetTotalMass() const;
 
+  void UpdateEntityVelocities();
   void UpdateVelocities(double deltaTime) override;
   void Move(double deltaTime, const double kMapWidth,
             const double kMapHeight) override;

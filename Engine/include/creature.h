@@ -5,10 +5,10 @@
 
 #include "config.h"
 #include "food.h"
-#include "movable_entity.h"
 #include "grabbing_entity.h"
-#include "neat/neat-neural-network.h"
+#include "movable_entity.h"
 #include "mutable.h"
+#include "neat/neat-neural-network.h"
 
 /*!
  * @file creature.h
@@ -46,9 +46,8 @@ class Creature : virtual public GrabbingEntity {
   Mutable GetMutable() const;
 
   void Update(double deltaTime, double const kMapWidth, double const kMapHeight,
-              std::vector<std::vector<std::vector<Entity *> > > &grid,
+              std::vector<std::vector<std::vector<Entity *>>> &grid,
               double GridCellSize, double frictional_coefficient);
-
 
   double GetHealth() const;
   void SetHealth(double health);
@@ -58,7 +57,6 @@ class Creature : virtual public GrabbingEntity {
 
   bool Fit();
   void Reproduced();
-
 
   double GetMaxEnergy() const;
   void UpdateMaxEnergy();
@@ -78,37 +76,38 @@ class Creature : virtual public GrabbingEntity {
       std::vector<std::vector<std::vector<Entity *>>> &grid,
       double grid_cell_size, Food::type food_type) const;
 
-  Food *GetClosestPlantInSight(std::vector<std::vector<std::vector<Entity *>>> &grid,
-          double grid_cell_size) const;
-  Food *GetClosestMeatInSight(std::vector<std::vector<std::vector<Entity *>>> &grid,
-          double grid_cell_size) const;
+  Food *GetClosestPlantInSight(
+      std::vector<std::vector<std::vector<Entity *>>> &grid,
+      double grid_cell_size) const;
+  Food *GetClosestMeatInSight(
+      std::vector<std::vector<std::vector<Entity *>>> &grid,
+      double grid_cell_size) const;
   Creature *GetClosestEnemyInSight(
       std::vector<std::vector<std::vector<Entity *>>> &grid,
       double grid_cell_size);
   bool IsInSight(Entity *entity);
 
-
   void Grow(double energy);
-  void Think(std::vector<std::vector<std::vector<Entity *> > > &grid,
-             double GridCellSize, double deltaTime, double width, double height);
-  void ProcessVisionFood(std::vector<std::vector<std::vector<Entity *> > > &grid,
+  void Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
+             double GridCellSize, double deltaTime, double width,
+             double height);
+  void ProcessVisionFood(std::vector<std::vector<std::vector<Entity *>>> &grid,
                          double grid_cell_size, double width, double height);
   int GetFoodID() const;
   void Digest(double deltaTime);
   void Bite(Food *food);
   void Bite(Creature *creature);
   void Grab(Entity *entity);
-  void Parasite(Creature* host);
+  void Parasite(Creature *host);
   void AddAcid(double quantity);
-
 
   int GetGeneration() const;
   void SetGeneration(int generation);
-  bool Compatible(const Creature& other_creature);
+  bool Compatible(const Creature &other_creature);
 
   double GetStomachCapacity() const;
   double GetStomachFullness() const;
-  void SetStomachFullness(const double& new_fullness);
+  void SetStomachFullness(const double &new_fullness);
   double GetEmptinessPercent() const;
   double GetAcid() const;
   double GetEnergyInStomach() const;
@@ -119,26 +118,27 @@ class Creature : virtual public GrabbingEntity {
 
   double health_; /*!< Represents the current health status of the creature. */
 
-  double age_;    /*!< Tracks the age of the creature. */
+  double age_; /*!< Tracks the age of the creature. */
 
   Mutable mutable_;
 
   neat::NeuralNetwork brain_; /*!< Neural network for processing environmental
                                  stimuli and decision making. */
   neat::Genome genome_;       /*!< Genetic makeup of the creature. */
-  double distance_plant_;       /*!< Distance to the nearest plant source. */
-  double distance_meat_;        /*!< Distance to the nearest meat source. */
-  double orientation_plant_;   /*!< Orientation relative to the nearest plant
-                                 source. */
-  double plant_size_;          /*! Size of the closest plant*/
+  double distance_plant_;     /*!< Distance to the nearest plant source. */
+  double distance_meat_;      /*!< Distance to the nearest meat source. */
+  double orientation_plant_;  /*!< Orientation relative to the nearest plant
+                                source. */
+  double plant_size_;         /*! Size of the closest plant*/
   double meat_size_;          /*! Size of the closest meat*/
-  int closest_plant_id_;       /*! Id of the closest plant to show in the UI */
-  int closest_meat_id_;      /*! Id of the closest meat to show in the UI */
+  int closest_plant_id_;      /*! Id of the closest plant to show in the UI */
+  int closest_meat_id_;       /*! Id of the closest meat to show in the UI */
   double orientation_meat_;   /*!< Orientation relative to the nearest meat
                                  source. */
-  double distance_enemy_;  /*!< Distance to the nearest enemy creature. */
-  double orientation_enemy_; /*!< Orientation relative to the nearest enemy creature. */
-  double enemy_size_; /*! Size of the closest enemy*/
+  double distance_enemy_;     /*!< Distance to the nearest enemy creature. */
+  double orientation_enemy_;  /*!< Orientation relative to the nearest enemy
+                                 creature. */
+  double enemy_size_;         /*! Size of the closest enemy*/
 
   std::vector<double>
       neuron_data_; /*!< Neuron data used in the neural network. */
@@ -152,15 +152,16 @@ class Creature : virtual public GrabbingEntity {
   double vision_angle_;  /*!< The angle of vision for the creature, representing
                             the field of view. */
 
-  double stomach_capacity_; /*!< The stomach capacity (area) - mutable proportional to size squared */
+  double stomach_capacity_; /*!< The stomach capacity (area) - mutable
+                               proportional to size squared */
   double stomach_fullness_; /*!< How much the stomach is filled (area) */
   double potential_energy_in_stomach_; /*! Energy to be gained in the stomach */
-  double bite_strength_; /*! How much radius of things it can bite - - mutable proportional to size */
+  double bite_strength_;   /*! How much radius of things it can bite - - mutable
+                              proportional to size */
   double eating_cooldown_; /*! How much time it has to wait to bite - mutable*/
-  double stomach_acid_; /*! Added when digestion occurs */
-  bool biting_;  /*! Indicates whether creature is biting or not*/
-  bool grabbing_;  /*! Indicates whether creature is grabbing or not*/
-
+  double stomach_acid_;    /*! Added when digestion occurs */
+  bool biting_;            /*! Indicates whether creature is biting or not*/
+  bool grabbing_;          /*! Indicates whether creature is grabbing or not*/
 };
 
 std::vector<Food *> get_food_at_distance(
