@@ -701,9 +701,14 @@ double Genome::CompatibilityBetweenGenomes(const Genome& other) const {
         if (other.FindNeuronById(neuron.GetId(), other_neuron)) {
             Nshared_neurons++;
             // add a relative difference in biases (a number between 0 and 2)
-            average_weight_difference +=
-                fabs(neuron.GetBias() - other_neuron.GetBias()) /
-                std::max(fabs(neuron.GetBias()), fabs(other_neuron.GetBias()));
+            if (std::max(fabs(neuron.GetBias()), fabs(other_neuron.GetBias())) == 0){
+                average_weight_difference +=
+                    fabs(neuron.GetBias() - other_neuron.GetBias());
+            } else {
+                average_weight_difference +=
+                        fabs(neuron.GetBias() - other_neuron.GetBias()) /
+                        std::max(fabs(neuron.GetBias()), fabs(other_neuron.GetBias()));
+            }
         }
     }
 
@@ -716,9 +721,14 @@ double Genome::CompatibilityBetweenGenomes(const Genome& other) const {
             if (link.GetId() == other_link.GetId()) {
         Nshared_links++;
         // add a relative difference in weights (a number between 0 and 2)
-        average_weight_difference +=
-            fabs(link.GetWeight() - other_link.GetWeight()) /
-            std::max(fabs(link.GetWeight()), fabs(other_link.GetWeight()));
+        if (std::max(fabs(link.GetWeight()), fabs(other_link.GetWeight())) == 0){
+            average_weight_difference +=
+                fabs(link.GetWeight() - other_link.GetWeight());
+        } else {
+            average_weight_difference +=
+                fabs(link.GetWeight() - other_link.GetWeight()) /
+                std::max(fabs(link.GetWeight()), fabs(other_link.GetWeight()));
+        }
         break;
             }
         }
