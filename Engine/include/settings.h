@@ -46,8 +46,8 @@ class Settings {
   } compatibility;
 
   struct EnvironmentSettings {
-    double d_map_width = 1900.0; // Not used currently
-    double d_map_height = 880.0; // Not used currently
+    double map_width = 1900.0;
+    double map_height = 880.0;
     double creature_density = 0.0005;
     int max_food_size = 15; // Influences vision
     int max_creature_size = 15;

@@ -10,37 +10,18 @@
 
 struct SimulationData {
  public:
-  explicit SimulationData(myEnvironment::Environment& env)
+  explicit SimulationData(Environment& env)
       : environment_(env), creatures_(), food_entities_(), lastRecordedTime_(0.0){
-    InitializeFood();
-    InitializeCreatures();
-    InitializeGrid();
+    // InitializeFood();
+    // InitializeCreatures();
+    // InitializeGrid();
   }
 
-  void InitializeCreatures();
-  void InitializeFood();
-  void InitializeGrid();
-
-  void AddCreature(const Creature& entity);
-  void RemoveCreature(const Creature& entity);
-
-  void GenerateMoreFood(double deltaTime);
-  void UpdateGrid();
-  void ClearGrid();
-
-  void CheckFoodCollisions();
-  void CheckCreatureCollisions();
-  void CheckCollisions();
-
-  void ModifyAllCreatures(double delta_x, double delta_y);
-  void UpdateAllCreatures(double deltaTime);
-
-  myEnvironment::Environment GetEnvironment();
-  void SetEnvironment(myEnvironment::Environment& environment);
+  Environment GetEnvironment();
+  void SetEnvironment(Environment& environment);
   std::vector<std::vector<std::vector<Entity*>>> GetGrid();
 
-  void ReproduceCreatures();
-  void ReproduceTwoCreatures(Creature& creature1, Creature& creature2);
+  void UpdateStatistics();
 
   std::vector<int> GetCreatureCountOverTime() const;
   std::vector<double> GetCreatureSizeOverTime() const;
@@ -56,8 +37,8 @@ struct SimulationData {
 
  private:
   double lastRecordedTime_;
-  myEnvironment::Environment& environment_;
-  std::vector<std::vector<std::vector<Entity*>>> grid_;
+  Environment& environment_;
+
   std::vector<int> creatureCountOverTime_;
   std::vector<double> creatureSizeOverTime_;
   std::vector<double> creatureEnergyOverTime_;

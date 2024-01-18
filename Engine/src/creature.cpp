@@ -5,7 +5,7 @@
 #include <queue>
 #include <set>
 
-#include "collisions.h"
+#include "collision_functions.h"
 #include "settings.h"
 
 /*!

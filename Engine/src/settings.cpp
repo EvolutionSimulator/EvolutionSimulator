@@ -32,8 +32,8 @@ void Settings::LoadFromFile(const std::string& filename) {
 
   // Load Environment settings
   auto& environment_json = config_json["environment"];
-  environment.d_map_width = environment_json["d_map_width"].get<double>();
-  environment.d_map_height = environment_json["d_map_height"].get<double>();
+  environment.map_width = environment_json["d_map_width"].get<double>();
+  environment.map_height = environment_json["d_map_height"].get<double>();
   environment.creature_density = environment_json["creature_density"].get<double>();
   environment.max_food_size = environment_json["max_food_size"].get<int>();
   environment.max_creature_size = environment_json["max_creature_size"].get<int>();

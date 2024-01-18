@@ -20,7 +20,6 @@ double positive_angle_mod(double angle){
     return positive_angle;
 }
 
-using namespace testing;
 
 TEST(EffectiveAngle, NoAcceleration) {
     MovableEntity creature1;
