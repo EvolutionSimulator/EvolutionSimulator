@@ -46,7 +46,7 @@ class AliveEntity : virtual public Entity {
   neat::NeuralNetwork brain_; /*!< Neural network for processing environmental
                                  stimuli and decision making. */
   neat::Genome genome_;       /*!< Genetic makeup of the creature. */
-  int neural_inputs_; /*!< Number of neural inputs */
+  std::vector<double> neuron_data_; /*!< Vector for the neural inputs */
 
   int generation_ = 0; /*!< Generation count of the creature. */
 };

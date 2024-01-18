@@ -145,6 +145,7 @@ void SimulationCanvas::RenderSimulation(SimulationData& data) {
     }
   }
 
+<<<<<<< HEAD
   for (const auto& egg_ptr : data.eggs_) {
     if (egg_ptr == nullptr) continue;
     std::shared_ptr<Egg> egg = egg_ptr;
@@ -163,6 +164,11 @@ void SimulationCanvas::RenderSimulation(SimulationData& data) {
     auto& creature_ref = *creature_ptr;
     int id = creature_ref.GetID(); //Not sure but I think this line and the above aren't used
     std::shared_ptr<Creature> creature = creature_ptr;
+=======
+  // Iterate through creatures and load the corresponding sprite
+  for (const auto& creature : data->creatures_) {
+    if (creature.GetState() == Entity::Dead) return;
+>>>>>>> 2a1eb4e (bug fixes)
     auto renderPositions = getEntityRenderPositions(creature);
     for (const auto& pos : renderPositions) {
       RenderCreatureAtPosition(creature, pos);
@@ -203,6 +209,7 @@ void SimulationCanvas::RenderFoodAtPosition(const std::shared_ptr<Food> food, co
   draw(foodSprite, states);
 }
 
+<<<<<<< HEAD
 void SimulationCanvas::RenderEggAtPosition(
     std::shared_ptr<Egg> egg, const std::pair<double, double>& position) {
   sf::Sprite eggSprite;
@@ -219,6 +226,10 @@ void SimulationCanvas::RenderEggAtPosition(
 void SimulationCanvas::RenderCreatureAtPosition(
     const std::shared_ptr<Creature> creature, const std::pair<double, double>& position) {
   if (creature == nullptr) return;
+=======
+void SimulationCanvas::RenderCreatureAtPosition(const Creature& creature, const std::pair<double, double>& position){
+  if (creature.GetState() == Entity::Dead) return;
+>>>>>>> 2a1eb4e (bug fixes)
   sf::Sprite base_sprite;
   sf::Sprite eyes_sprite;
   sf::Sprite tail_sprite;
