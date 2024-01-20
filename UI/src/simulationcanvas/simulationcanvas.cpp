@@ -119,7 +119,7 @@ void SimulationCanvas::RenderSimulation(DataAccessor<SimulationData> data) {
   // Iterate through food and load the corresponding sprite
   // Note that we are assuming to be working with a sprite sheet of 256x256 per sprite
 
-  for (const auto food : data->food_entities_) {
+  for (const auto& food : data->food_entities_) {
     auto renderPositions = getEntityRenderPositions(food);
     for (const auto& pos : renderPositions) {
       RenderFoodAtPosition(food, pos);
@@ -127,7 +127,7 @@ void SimulationCanvas::RenderSimulation(DataAccessor<SimulationData> data) {
   }
 
   // Iterate through creatures and create a gradient circle shape for each
-  for (const auto creature : data->creatures_) {
+  for (const auto& creature : data->creatures_) {
     auto renderPositions = getEntityRenderPositions(creature);
     for (const auto& pos : renderPositions) {
       RenderCreatureAtPosition(creature, pos);
@@ -136,6 +136,7 @@ void SimulationCanvas::RenderSimulation(DataAccessor<SimulationData> data) {
 }
 
 void SimulationCanvas::RenderFoodAtPosition(const std::shared_ptr<Food> food, const std::pair<double, double>& position){
+  if (food == nullptr) return;
   sf::Sprite foodSprite;
   foodSprite.setTexture(texture_manager_.food_texture_);
   int spriteIndex = food->GetID() % 3;
@@ -154,6 +155,7 @@ void SimulationCanvas::RenderFoodAtPosition(const std::shared_ptr<Food> food, co
 }
 
 void SimulationCanvas::RenderCreatureAtPosition(const std::shared_ptr<Creature> creature, const std::pair<double, double>& position){
+  if (creature == nullptr) return;
   sf::Sprite base_sprite;
   sf::Sprite eyes_sprite;
   sf::Sprite tail_sprite;
