@@ -96,12 +96,6 @@ void GraphManager::DrawSizeVelocityScatterplot() {
       }
   }
 
-  std::cout << "Velocities vector: ";
-  for (double velocity : velocities) {
-      std::cout << velocity << " ";
-  }
-  std::cout << std::endl;
-
   DrawScatterPlot(sizes, velocities, "Scatterplot of Creature Size and Velocity",
                   "Creature Size", "Creature Velocity");
 }
@@ -133,5 +127,10 @@ void GraphManager::handleDropdownSelection(int index) {
     qDebug() << "Calling DrawCreaturesOverTimeGraph";
     DrawSizeVelocityScatterplot();
   }
+  if (index == 7) {
+    qDebug() << "Calling DrawCreaturesOverTimeGraph";
+    DrawSizeVelocityScatterplot();
+  }
+
 
 }
