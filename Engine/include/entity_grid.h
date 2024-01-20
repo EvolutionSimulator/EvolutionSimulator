@@ -12,16 +12,16 @@ class EntityGrid {
   void UpdateGrid(SimulationData &data, Environment &environment);
   void ClearGrid();
 
-  std::vector<std::vector<std::vector<Entity *>>> GetGrid() const;
+  std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> GetGrid() const;
 
-  const std::vector<Entity*>& GetEntitiesAt(const int row, const int col) const;
-  const std::vector<Entity*>& GetEntitiesAt(const std::pair<int, int>& coords) const;
+  const std::vector<std::shared_ptr<Entity>>& GetEntitiesAt(const int row, const int col) const;
+  const std::vector<std::shared_ptr<Entity>>& GetEntitiesAt(const std::pair<int, int>& coords) const;
 
   const std::pair<int, int> GetGridSize() const;
 
   std::vector<std::pair<int, int>> GetNeighbours(const std::pair<int, int>& center, const int& layer_number);
 
  private:
-  std::vector<std::vector<std::vector<Entity *>>> grid_;
+  std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> grid_;
   int num_columns_, num_rows_;
 };

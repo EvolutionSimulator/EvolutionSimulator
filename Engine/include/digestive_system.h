@@ -7,7 +7,7 @@
 class DigestiveSystem : virtual public AliveEntity {
 public:
   DigestiveSystem(neat::Genome genome, Mutable mutables);
-
+  virtual ~DigestiveSystem() override {}
   double GetStomachCapacity() const;
   double GetStomachFullness() const;
   double GetEmptinessPercent() const;

@@ -119,7 +119,7 @@ void SimulationCanvas::RenderSimulation(DataAccessor<SimulationData> data) {
   // Iterate through food and load the corresponding sprite
   // Note that we are assuming to be working with a sprite sheet of 256x256 per sprite
 
-  for (const auto& food : data->food_entities_) {
+  for (const auto food : data->food_entities_) {
     auto renderPositions = getEntityRenderPositions(food);
     for (const auto& pos : renderPositions) {
       RenderFoodAtPosition(food, pos);
@@ -127,7 +127,7 @@ void SimulationCanvas::RenderSimulation(DataAccessor<SimulationData> data) {
   }
 
   // Iterate through creatures and create a gradient circle shape for each
-  for (const auto& creature : data->creatures_) {
+  for (const auto creature : data->creatures_) {
     auto renderPositions = getEntityRenderPositions(creature);
     for (const auto& pos : renderPositions) {
       RenderCreatureAtPosition(creature, pos);
@@ -135,25 +135,25 @@ void SimulationCanvas::RenderSimulation(DataAccessor<SimulationData> data) {
   }
 }
 
-void SimulationCanvas::RenderFoodAtPosition(const Food& food, const std::pair<double, double>& position){
+void SimulationCanvas::RenderFoodAtPosition(const std::shared_ptr<Food> food, const std::pair<double, double>& position){
   sf::Sprite foodSprite;
   foodSprite.setTexture(texture_manager_.food_texture_);
-  int spriteIndex = food.GetID() % 3;
-  if (food.GetType() == Food::type::plant) {
+  int spriteIndex = food->GetID() % 3;
+  if (food->GetType() == Food::type::plant) {
     foodSprite.setTextureRect(sf::IntRect(0, spriteIndex * 256, 256, 256));
-  } else if (food.GetType() == Food::type::meat) {
+  } else if (food->GetType() == Food::type::meat) {
     foodSprite.setTextureRect(sf::IntRect(256, spriteIndex * 256, 256, 256));
   }
   foodSprite.setOrigin(128.0f, 128.0f);
 
-  foodSprite.setScale(food.GetSize()/128.0f, food.GetSize()/128.0f);
+  foodSprite.setScale(food->GetSize()/128.0f, food->GetSize()/128.0f);
 
   sf::Transform foodTransform;
   foodTransform.translate(position.first, position.second);
   draw(foodSprite, foodTransform);
 }
 
-void SimulationCanvas::RenderCreatureAtPosition(const Creature& creature, const std::pair<double, double>& position){
+void SimulationCanvas::RenderCreatureAtPosition(const std::shared_ptr<Creature> creature, const std::pair<double, double>& position){
   sf::Sprite base_sprite;
   sf::Sprite eyes_sprite;
   sf::Sprite tail_sprite;
@@ -162,11 +162,11 @@ void SimulationCanvas::RenderCreatureAtPosition(const Creature& creature, const 
   tail_sprite.setTexture(texture_manager_.tail_texture_);
 
   //Get which sprites to use depending on the characteristics of the creature
-  int size_type  = std::floor((15 - creature.GetSize())/5); //size is the other way around
+  int size_type  = std::floor((15 - creature->GetSize())/5); //size is the other way around
   size_type = size_type > 2 ? 2 : size_type;
-  int eyes_type = std::floor(creature.GetMutable().GetVisionFactor()/100);
+  int eyes_type = std::floor(creature->GetMutable().GetVisionFactor()/100);
   eyes_type = eyes_type > 3 ? 3 : eyes_type;
-  int tail_type = std::floor(creature.GetMutable().GetMaxForce()/5);
+  int tail_type = std::floor(creature->GetMutable().GetMaxForce()/5);
   tail_type = tail_type > 3 ? 3 : tail_type;
 
   //Assuming the sprites are size 768x768
@@ -180,9 +180,9 @@ void SimulationCanvas::RenderCreatureAtPosition(const Creature& creature, const 
   tail_sprite.setOrigin(384.0f, 384.0f);
 
   //We use a certain proportion because the creature's body doesn't occupy the entirety of the image
-  base_sprite.setScale(creature.GetSize()/208.0f, creature.GetSize()/208.0f);
-  eyes_sprite.setScale(creature.GetSize()/208.0f, creature.GetSize()/208.0f);
-  tail_sprite.setScale(creature.GetSize()/208.0f, creature.GetSize()/208.0f);
+  base_sprite.setScale(creature->GetSize()/208.0f, creature->GetSize()/208.0f);
+  eyes_sprite.setScale(creature->GetSize()/208.0f, creature->GetSize()/208.0f);
+  tail_sprite.setScale(creature->GetSize()/208.0f, creature->GetSize()/208.0f);
 
   //Rotation offset
   base_sprite.setRotation(90.0f);
@@ -190,12 +190,12 @@ void SimulationCanvas::RenderCreatureAtPosition(const Creature& creature, const 
   tail_sprite.setRotation(90.0f);
 
   //Add color filter to creature
-  texture_manager_.color_shader_.setUniform("hueShift", creature.GetMutable().GetColor());
+  texture_manager_.color_shader_.setUniform("hueShift", creature->GetMutable().GetColor());
 
   sf::Transform creatureTransform;
   creatureTransform.translate(position.first,
                               position.second);
-  creatureTransform.rotate(creature.GetOrientation() * 180.0f /M_PI);
+  creatureTransform.rotate(creature->GetOrientation() * 180.0f /M_PI);
 
   sf::RenderStates states;
   states.shader = &texture_manager_.color_shader_;
@@ -207,10 +207,11 @@ void SimulationCanvas::RenderCreatureAtPosition(const Creature& creature, const 
 }
 
 
-std::vector<std::pair<double, double>> SimulationCanvas::getEntityRenderPositions(const Entity& entity) {
+std::vector<std::pair<double, double>> SimulationCanvas::getEntityRenderPositions(const std::shared_ptr<Entity> entity) {
     std::vector<std::pair<double, double>> positions;
-    auto [entityX, entityY] = entity.GetCoordinates();
-    double entitySize = entity.GetSize();
+    if (entity == nullptr) return positions;
+    auto [entityX, entityY] = entity->GetCoordinates();
+    double entitySize = entity->GetSize();
     sf::Vector2f viewCenter = getView().getCenter();
     sf::Vector2f viewSize = getView().getSize();
     double mapWidth = GetSimulation()->GetSimulationData()->GetEnvironment().GetMapWidth();
@@ -269,14 +270,14 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
 
   // Checking if we need to display info panel
   for (auto& creature : data->creatures_) {
-    auto [creatureX, creatureY] = creature.GetCoordinates();
-    float creatureSize = creature.GetSize();
+    auto [creatureX, creatureY] = creature->GetCoordinates();
+    float creatureSize = creature->GetSize();
     sf::Vector2f creaturePos(creatureX, creatureY);
 
     if (sqrt(pow(mousePos.x - creaturePos.x, 2) + pow(mousePos.y - creaturePos.y, 2)) <= creatureSize) {
-      qDebug() << "Creature Clicked: ID" << creature.GetID();
+      qDebug() << "Creature Clicked: ID" << creature->GetID();
       info_panel_.Show();
-      info_panel_.SetSelectedCreature(&creature);
+      info_panel_.SetSelectedCreature(creature);
       repaint();
       return;
     }

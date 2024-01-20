@@ -47,8 +47,8 @@ void GraphManager::DrawSizeEnergyScatterplot() {
   std::vector<double> energies;
 
   for (const auto& creature : data->creatures_) {
-      float creatureSize = creature.GetSize();
-      float creatureEnergy = creature.GetEnergy();
+      float creatureSize = creature->GetSize();
+      float creatureEnergy = creature->GetEnergy();
 
       // Append size and energy data to vectors
       sizes.push_back(creatureSize);

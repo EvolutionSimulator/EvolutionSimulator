@@ -20,7 +20,7 @@ void FoodManager::InitializeFood(SimulationData &data,
  * density.
  */
 void FoodManager::GenerateMoreFood(SimulationData &data,
-                                      Environment &environment, double deltaTime) {
+                                   Environment &environment, double deltaTime) {
   double spawn_cell_size = 50.0;
   for (double x = 0; x < SETTINGS.environment.map_width; x += spawn_cell_size) {
     for (double y = 0; y < SETTINGS.environment.map_height; y += spawn_cell_size) {
@@ -35,7 +35,8 @@ void FoodManager::GenerateMoreFood(SimulationData &data,
             x + static_cast<double>(rand()) / RAND_MAX * spawn_cell_size;
         double y_pos =
             y + static_cast<double>(rand()) / RAND_MAX * spawn_cell_size;
-        Plant plant(x_pos, y_pos);
+        // Use std::make_shared to create a shared pointer to a new Plant
+        auto plant = std::make_shared<Plant>(x_pos, y_pos);
         data.food_entities_.push_back(plant);
       }
     }

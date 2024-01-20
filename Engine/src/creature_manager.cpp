@@ -5,25 +5,6 @@
 CreatureManager::CreatureManager() {}
 
 /*!
- * @brief Modifies the positions of all creatures in the simulation.
- *
- * @param delta_x The change in x-coordinate for each creature.
- * @param delta_y The change in y-coordinate for each creature.
- */
-
-void CreatureManager::ModifyAllCreatures(SimulationData& data, double delta_x, double delta_y) {
-  std::pair<double, double> coordinates;
-  for (Creature& creature : data.creatures_) {
-    coordinates = creature.GetCoordinates();
-    coordinates.first = coordinates.first + delta_x;
-    coordinates.second = coordinates.second + delta_y;
-    creature.SetCoordinates(coordinates.first, coordinates.second,
-                            SETTINGS.environment.map_width,
-                            SETTINGS.environment.map_height);
-  }
-}
-
-/*!
  * @brief Updates the state of all creatures for a given time interval.
  *
  * @param deltaTime The time interval for which the creatures' states are
@@ -36,14 +17,14 @@ void CreatureManager::UpdateAllCreatures(SimulationData &data,
                                          double deltaTime) {
   auto grid = entity_grid.GetGrid();
 
-  for (Creature &creature : data.creatures_) {
-    creature.Update(deltaTime, SETTINGS.environment.map_width,
+  for (auto &creature : data.creatures_) {
+    creature->Update(deltaTime, SETTINGS.environment.map_width,
                     SETTINGS.environment.map_height, grid,
                     SETTINGS.environment.grid_cell_size,
                     environment.GetFrictionalCoefficient());
-    if (creature.Fit()) {
+    if (creature->Fit()) {
       data.new_reproduce_.push(creature);
-      creature.Reproduced();
+      creature->Reproduced();
     }
   }
 }
@@ -59,22 +40,22 @@ void CreatureManager::ReproduceCreatures(SimulationData& data, Environment& envi
   double max_creature_size = SETTINGS.environment.max_creature_size;
   double min_creature_size = SETTINGS.environment.min_creature_size;
 
-  std::queue<Creature> not_reproduced;
-  std::queue<Creature> temp_queue;
+  std::queue<std::shared_ptr<Creature>> not_reproduced;
+  std::queue<std::shared_ptr<Creature>> temp_queue;
 
   while (!data.reproduce_.empty()) {
-    Creature creature1 = data.reproduce_.front();
+    auto creature1 = data.reproduce_.front();
     data.reproduce_.pop();
     bool paired = false;
 
             // Attempt to pair creature1 with a compatible new creature
     while (!data.new_reproduce_.empty() && !paired) {
-      Creature creature2 = data.new_reproduce_.front();
+      auto creature2 = data.new_reproduce_.front();
       data.new_reproduce_.pop();
       //If these two creatures are compatible reproduce them otherwise
       //save the creature in a temporary queue for the next pairing round
-      if (creature1.Compatible(creature2)) {
-        ReproduceTwoCreatures(data, creature1, creature2);
+      if (creature1->Compatible(*creature2)) {
+        ReproduceTwoCreatures(data, *creature1, *creature2);
         paired = true;
       } else {
         temp_queue.push(creature2); // Save for next round
@@ -126,9 +107,9 @@ void CreatureManager::ReproduceTwoCreatures(SimulationData& data, Creature& crea
         MutableCrossover(creature1.GetMutable(), creature2.GetMutable());
     new_mutable.Mutate();
     new_mutable.Mutate();
-    Creature new_creature(new_genome, new_mutable);
-    new_creature.RandomInitialization(world_width, world_height);
-    new_creature.SetGeneration(creature1.GetGeneration() + 1);
+    std::shared_ptr<Creature> new_creature = std::make_shared<Creature>(new_genome, new_mutable);
+    new_creature->RandomInitialization(world_width, world_height);
+    new_creature->SetGeneration(creature1.GetGeneration() + 1);
     data.creatures_.push_back(new_creature);
   } else {
     neat::Genome new_genome =
@@ -139,9 +120,9 @@ void CreatureManager::ReproduceTwoCreatures(SimulationData& data, Creature& crea
         MutableCrossover(creature2.GetMutable(), creature1.GetMutable());
     new_mutable.Mutate();
     new_mutable.Mutate();
-    Creature new_creature(new_genome, new_mutable);
-    new_creature.RandomInitialization(world_width, world_height);
-    new_creature.SetGeneration(creature2.GetGeneration() + 1);
+    std::shared_ptr<Creature> new_creature = std::make_shared<Creature>(new_genome, new_mutable);
+    new_creature->RandomInitialization(world_width, world_height);
+    new_creature->SetGeneration(creature1.GetGeneration() + 1);
     data.creatures_.push_back(new_creature);
   }
 }
@@ -170,9 +151,9 @@ void CreatureManager::InitializeCreatures(SimulationData& data, Environment& env
         for (int i = 0; i < 40; i++) {
           mutables.Mutate();
         }
-        Creature new_creature(genome, mutables);
-        new_creature.RandomInitialization(world_width, world_height);
-        data.creatures_.emplace_back(new_creature);
+        std::shared_ptr<Creature> new_creature = std::make_shared<Creature>(genome, mutables);
+        new_creature->RandomInitialization(world_width, world_height);
+        data.creatures_.push_back(new_creature);
       }
     }
   }

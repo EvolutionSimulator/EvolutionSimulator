@@ -21,7 +21,7 @@ void CollisionManager::CheckCollisions(EntityGrid& entity_grid) {
 
   for (int row = 0; row < num_rows; row++) {
     for (int col = 0; col < num_cols; col++) {
-      for (Entity* entity1 : grid[col][row]) {
+      for (auto entity1 : grid[col][row]) {
         const int layer_number =
             2 *
             ceil((entity1->GetSize() / SETTINGS.environment.grid_cell_size));
@@ -29,7 +29,7 @@ void CollisionManager::CheckCollisions(EntityGrid& entity_grid) {
         std::vector<std::pair<int, int>> neighbours =
             entity_grid.GetNeighbours({col, row}, layer_number);
         for (const std::pair<int, int> neighbour : neighbours) {
-          for (Entity* entity2 : grid[neighbour.first][neighbour.second]) {
+          for (auto entity2 : grid[neighbour.first][neighbour.second]) {
             if (entity1->CheckCollisionWithEntity(tolerance, *entity2)) {
               if (entity1 != entity2) {
                 entity1->OnCollision(*entity2, SETTINGS.environment.map_width,

@@ -49,7 +49,7 @@ Entity::Entity(const double size)
 /*!
  * @brief Destructor sets the state of the entity to Dead.
  */
-Entity::~Entity() { state_ = Dead; }
+Entity::~Entity() { }
 
 /*!
  * @brief Retrieves the size of the entity.

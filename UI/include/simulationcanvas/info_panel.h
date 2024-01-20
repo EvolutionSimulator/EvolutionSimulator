@@ -13,9 +13,9 @@ public:
 
   InfoPanel(QSFMLCanvas* canvas, TextureManager* texture_manager, Simulation *simulation);
 
-  void SetSelectedCreature(Creature* creature);
+  void SetSelectedCreature(std::shared_ptr<Creature> creature);
   void UpdateSelectedFood();
-  Creature* GetSelectedCreature() const;
+  std::shared_ptr<Creature> GetSelectedCreature() const;
 
   void Show();
   void Hide();
@@ -27,8 +27,8 @@ public:
 private:
   QSFMLCanvas* canvas_;
   Simulation* simulation_;
-  Creature* selected_creature_;
-  Food* selected_food_;
+  std::shared_ptr<Creature> selected_creature_;
+  std::shared_ptr<Food> selected_food_;
   bool is_visible_;
   sf::Font font_;
   TextureManager* texture_manager_;
