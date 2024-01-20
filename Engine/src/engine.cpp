@@ -51,6 +51,7 @@ void Engine::Run() {
     time_since_fixed_update += update_delta;
 
     simulation_->Update(update_delta.count());
+    //simulation_ -> UpdateStatistics();
 
     while (time_since_fixed_update.count() >= kFixedUpdateInterval) {
       simulation_->FixedUpdate(kFixedUpdateInterval);
