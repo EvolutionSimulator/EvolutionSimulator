@@ -1,6 +1,11 @@
 #ifndef GRAPH_MANAGER_H
 #define GRAPH_MANAGER_H
 
+#include <QFileDialog>
+#include <QStandardPaths>
+#include <QMessageBox>
+#include <QVBoxLayout>
+#include <QPainter>
 #include <QObject>
 #include <QWidget>
 #include <QDialog>
@@ -12,6 +17,7 @@
 #include <QtCharts/QScatterSeries>
 #include <QDialog>
 #include <QVBoxLayout>
+#include "QtWidgets/qpushbutton.h"
 #include "engine.h"
 
 class GraphManager : public QObject {
@@ -20,6 +26,15 @@ class GraphManager : public QObject {
 public:
   explicit GraphManager(QWidget* parent, Engine* engine);
   void SetEngine(Engine* engine);
+
+  // Helper function to create a directory if it doesn't exist
+  bool createDirectory(const QString& path) {
+      QDir dir(path);
+      if (!dir.exists()) {
+          return dir.mkpath(path);
+      }
+      return true;
+  }
 
   template <typename T> void DrawGraph(std::vector<T> data, const QString& graphTitle) {
 
@@ -49,6 +64,41 @@ public:
     layout->addWidget(chartView);
     dialog->setLayout(layout);
     dialog->resize(800, 600);
+
+    // Add a Save button to the dialog
+    QPushButton* saveButton = new QPushButton("Save Graph");
+    layout->addWidget(saveButton);
+
+    // Connect the Save button to a slot that saves the graph
+    connect(saveButton, &QPushButton::clicked, [chartView, data, graphTitle, this]() {
+        QString desktopPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+        QString folderPath = desktopPath + "/EvolutionSimulationData/";
+
+        // Create the folder if it doesn't exist
+        if (createDirectory(folderPath)) {
+            QString filePath = QFileDialog::getSaveFileName(nullptr, "Save Graph", folderPath, "PNG Image (*.png);;CSV File (*.csv)");
+            if (!filePath.isEmpty()) {
+                // Save image
+                QString imageFilePath = filePath + ".png";
+                chartView->grab().save(imageFilePath);
+
+                // Save data to CSV file
+                QString csvFilePath = filePath + ".csv";
+                QFile file(csvFilePath);
+                if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+                    QTextStream stream(&file);
+                    for (size_t i = 0; i < data.size(); ++i) {
+                        stream << i << "," << data[i] << "\n";
+                    }
+                    file.close();
+                } else {
+                    QMessageBox::critical(nullptr, "Error", "Failed to save CSV file.");
+                }
+            }
+        } else {
+            QMessageBox::critical(nullptr, "Error", "Failed to create the directory.");
+        }
+    });
 
     connect(dialog, &QDialog::finished, dialog, &QObject::deleteLater);
 
@@ -98,6 +148,40 @@ public:
     dialog.resize(800, 600);
     dialog.setWindowTitle(title);
 
+    // Add a Save button to the dialog
+    QPushButton* saveButton = new QPushButton("Save Scatter Plot");
+    layout->addWidget(saveButton);
+
+    // Connect the Save button to a slot that saves the scatter plot
+    connect(saveButton, &QPushButton::clicked, [chartView, data1, data2, title, this]() {
+        QString desktopPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+        QString folderPath = desktopPath + "/EvolutionSimulationData/";
+
+        // Create the folder if it doesn't exist
+        if (createDirectory(folderPath)) {
+            QString filePath = QFileDialog::getSaveFileName(nullptr, "Save Scatter Plot", folderPath, "PNG Image (*.png);;CSV File (*.csv)");
+            if (!filePath.isEmpty()) {
+                // Save image
+                QString imageFilePath = filePath + ".png";
+                chartView->grab().save(imageFilePath);
+
+                // Save data to CSV file
+                QString csvFilePath = filePath + ".csv";
+                QFile file(csvFilePath);
+                if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+                    QTextStream stream(&file);
+                    for (size_t i = 0; i < data1.size(); ++i) {
+                        stream << data1[i] << "," << data2[i] << "\n";
+                    }
+                    file.close();
+                } else {
+                    QMessageBox::critical(nullptr, "Error", "Failed to save CSV file.");
+                }
+            }
+        } else {
+            QMessageBox::critical(nullptr, "Error", "Failed to create the directory.");
+        }
+    });
     emit resetGraphMenuIndex();
 
     dialog.exec();
