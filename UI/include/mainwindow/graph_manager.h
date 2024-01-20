@@ -108,6 +108,17 @@ public:
     dialog->exec();
   }
 
+  //helper function to take the absolute values of each entry in a vector
+  std::vector<double> absoluteValues2(const std::vector<double>& input) {
+    std::vector<double> result(input.size());
+
+    std::transform(input.begin(), input.end(), result.begin(), [](double value) {
+        return std::abs(value);
+    });
+
+    return result;
+  }
+
   // Function to draw scatter plot
   void DrawScatterPlot(const std::vector<double>& data1, const std::vector<double>& data2,
                        const QString& title, const QString& xAxisLabel, const QString& yAxisLabel) {
@@ -144,9 +155,9 @@ public:
     chart->addSeries(series_red);
 
     // Set custom axis ranges with margins
-    double minX = 1.9;
+    double minX = *std::min_element(data1.begin(), data1.end()) * 0.95;
     double maxX = std::max(*std::max_element(data1.begin(), data1.end()), -(*std::min_element(data1.begin(), data1.end()))) * 1.1;
-    double minY = 0;
+    double minY = *std::min_element(data2.begin(), data2.end()) * 0.95;
     double maxY = std::max(*std::max_element(data2.begin(), data2.end()), -(*std::min_element(data2.begin(), data2.end()))) * 1.1;
 
     chart->createDefaultAxes();
@@ -213,6 +224,7 @@ public slots:
   void DrawCreaturesEnergyOverTimeGraph();
   void DrawCreaturesVelocityOverTimeGraph();
   void DrawSizeEnergyScatterplot();
+  void DrawSizeVelocityScatterplot();
   void handleDropdownSelection(int index);
 
 private:
