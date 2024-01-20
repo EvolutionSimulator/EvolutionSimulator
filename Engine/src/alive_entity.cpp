@@ -138,7 +138,7 @@ void AliveEntity::SetMaxEnergy(double max_energy) { max_energy_ = max_energy; };
  * @param max_energy The desired maximum energy level.
  */
 void AliveEntity::UpdateMaxEnergy() {
-  max_energy_ = mutable_.GetEnergyDensity() * pow(size_, 2) * (1 - age_/1000);
+  max_energy_ = mutable_.GetEnergyDensity() * pow(size_, 2) * std::exp(-age_/100);
 }
 
 /*!
