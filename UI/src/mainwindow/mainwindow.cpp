@@ -7,7 +7,6 @@
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QChart>
 #include <QVBoxLayout>
-#include "QtWidgets/qslider.h"
 
 #include <QDockWidget>
 #include "ui_mainwindow.h"
@@ -166,15 +165,9 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
     }
 }
 
-
-void MainWindow::handleUIUpdateForConfigScreen(double food_density, double friction_coefficient){
-    ui_->frictionLabel->setText(QString::number(friction_coefficient, 'f', 2));
-}
-
 void MainWindow::SetUpConnections()
 {
     // Connect configuration menu signals
-    connect(config_manager_, &ConfigManager::UpdateUIForConfigScreen, this, &MainWindow::handleUIUpdateForConfigScreen);
     connect(config_manager_, &ConfigManager::RestartSimulationRequested, this, &MainWindow::handleRestartSimulationRequested);
     connect(config_manager_, &ConfigManager::PauseSimulation, this, &MainWindow::PauseSimulation);
     connect(config_manager_, &ConfigManager::ResumeSimulation, this, &MainWindow::ResumeSimulation);
@@ -192,12 +185,6 @@ void MainWindow::SetUpConnections()
     updateTimer = new QTimer(this);
     connect(updateTimer, SIGNAL(timeout()), this, SLOT(recordCreatureCount()));
     updateTimer->start(1000);  // Set the interval to 1000 milliseconds (1 second)
-
-    // Connect friction slider on main UI
-    connect(ui_->frictionCoefficientSpinBox, SIGNAL(valueChanged(double)), this,
-            SLOT(ChangeFrictionCoefficient(double)));
-    connect(ui_->frictionCoefficientSpinBox, &QSlider::valueChanged, config_manager_, &ConfigManager::ChangeFriction);
-    ui_ -> frictionCoefficientSpinBox->setTracking(true);
 
 }
 
