@@ -21,6 +21,8 @@ class SimulationCanvas : public QSFMLCanvas {
 
   void UpdateFoodDensityTexture(double width, double height);
 
+  InfoPanel& GetInfoPanel();
+
   protected:
   void mousePressEvent(QMouseEvent *event) override;
   void wheelEvent(QWheelEvent *event) override;

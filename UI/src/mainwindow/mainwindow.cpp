@@ -7,7 +7,6 @@
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QChart>
 #include <QVBoxLayout>
-#include "QtWidgets/qslider.h"
 
 #include <QDockWidget>
 #include "ui_mainwindow.h"
@@ -19,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent)
   InitializeEngine();
   PauseSimulation();
   RunSimulation();
-  graph_manager_ = new GraphManager(this, engine_);
+  graph_manager_ = new GraphManager(this, engine_, ui_->canvas);
   config_manager_ = new ConfigManager(this, engine_);
 
   DrawUI();
@@ -166,15 +165,9 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
     }
 }
 
-
-void MainWindow::handleUIUpdateForConfigScreen(double food_density, double friction_coefficient){
-    ui_->frictionLabel->setText(QString::number(friction_coefficient, 'f', 2));
-}
-
 void MainWindow::SetUpConnections()
 {
     // Connect configuration menu signals
-    connect(config_manager_, &ConfigManager::UpdateUIForConfigScreen, this, &MainWindow::handleUIUpdateForConfigScreen);
     connect(config_manager_, &ConfigManager::RestartSimulationRequested, this, &MainWindow::handleRestartSimulationRequested);
     connect(config_manager_, &ConfigManager::PauseSimulation, this, &MainWindow::PauseSimulation);
     connect(config_manager_, &ConfigManager::ResumeSimulation, this, &MainWindow::ResumeSimulation);
@@ -193,12 +186,6 @@ void MainWindow::SetUpConnections()
     connect(updateTimer, SIGNAL(timeout()), this, SLOT(recordCreatureCount()));
     updateTimer->start(1000);  // Set the interval to 1000 milliseconds (1 second)
 
-    // Connect friction slider on main UI
-    connect(ui_->frictionCoefficientSpinBox, SIGNAL(valueChanged(double)), this,
-            SLOT(ChangeFrictionCoefficient(double)));
-    connect(ui_->frictionCoefficientSpinBox, &QSlider::valueChanged, config_manager_, &ConfigManager::ChangeFriction);
-    ui_ -> frictionCoefficientSpinBox->setTracking(true);
-
 }
 
 void MainWindow::DrawUI()
@@ -214,13 +201,15 @@ void MainWindow::DrawUI()
     comboBox->addItem("Creatures Energy Over Time");
     comboBox->addItem("Creatures Velocity Over Time");
     comboBox->addItem("Size and Energy Scatterplot");
+    comboBox->addItem("Size and Velocity Scatterplot");
+    comboBox->addItem("Energy and Velocity Scatterplot");
     connect(graph_manager_, &GraphManager::resetGraphMenuIndex, this, [this]() {
         ui_->graphMenu->setCurrentIndex(0);
     });
 
     // Set up run, restart
     QRect rect(2,2,45,45);
-    QRect rect3(2,2,46,45);
+    QRect rect3(2,2,45,45);
     QRegion region(rect, QRegion::Ellipse);
     QRegion region3(rect3, QRegion::Ellipse);
     ui_->runButton->setMask(region);

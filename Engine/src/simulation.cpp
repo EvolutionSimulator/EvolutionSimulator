@@ -35,6 +35,7 @@ void Simulation::FixedUpdate(double deltaTime) {
   entity_grid_.UpdateGrid(*data_, environment);
   collision_manager_.CheckCollisions(entity_grid_);
   data_->world_time_ += deltaTime;
+  data_ -> UpdateStatistics();
 
   std::cout << "World time: " << data_->world_time_ << std::endl;
 }

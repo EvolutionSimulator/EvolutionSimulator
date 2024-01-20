@@ -19,6 +19,7 @@ class Engine {
   void Pause();
   void Resume();
   void SetSpeed(double speed);
+  double GetSpeed();
   void UpdateEnvironment();
 
   bool IsPaused();

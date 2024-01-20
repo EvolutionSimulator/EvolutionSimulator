@@ -433,3 +433,6 @@ void SimulationCanvas::resizeEvent(QResizeEvent* event) {
     setView(view);
 }
 
+InfoPanel& SimulationCanvas::GetInfoPanel() {
+    return info_panel_;
+}

@@ -59,7 +59,7 @@ constexpr double kMaxNutritionalValue = 5;
 constexpr double kDefaultLifespan = 30;
 constexpr double kPhotosynthesisFactor = 0.1;
 constexpr double kFrictionalCoefficient =
-    0.15;  // Needs to be less than 1
+    0.05;  // Needs to be less than 1
 }  // namespace environment
 
 namespace engine {
