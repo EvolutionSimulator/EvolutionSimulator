@@ -119,7 +119,9 @@ void SimulationCanvas::RenderSimulation(DataAccessor<SimulationData> data) {
   // Iterate through food and load the corresponding sprite
   // Note that we are assuming to be working with a sprite sheet of 256x256 per sprite
 
-  for (const auto& food : data->food_entities_) {
+  for (const auto& food_ptr : data->food_entities_) {
+    if (food_ptr == nullptr) continue;
+    std::shared_ptr<Food> food = food_ptr;
     auto renderPositions = getEntityRenderPositions(food);
     for (const auto& pos : renderPositions) {
       RenderFoodAtPosition(food, pos);
@@ -127,7 +129,9 @@ void SimulationCanvas::RenderSimulation(DataAccessor<SimulationData> data) {
   }
 
   // Iterate through creatures and create a gradient circle shape for each
-  for (const auto& creature : data->creatures_) {
+  for (const auto& creature_ptr : data->creatures_) {
+    if (creature_ptr == nullptr) continue;
+    std::shared_ptr<Creature> creature = creature_ptr;
     auto renderPositions = getEntityRenderPositions(creature);
     for (const auto& pos : renderPositions) {
       RenderCreatureAtPosition(creature, pos);
