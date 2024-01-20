@@ -53,12 +53,12 @@ class Settings {
     int max_creature_size = 15;
     double tolerance = 1e-3;
     double default_food_density = 0.005;
-    double food_spawn_rate = 5e-5;
+    double food_spawn_rate = 1e-5;
     double energy_to_health = 70.0;
     double health_to_energy = 10.0;
     double default_creature_density = 0.0001;
-    double plant_nutritional_value = 2.0;
-    double meat_nutritional_value = 3.0;
+    double plant_nutritional_value = 0.5;
+    double meat_nutritional_value = 1;
     double plant_proportion = 0.5; // PlantProportion + MeatProportion = 1
     double rot_factor = 1.0;
     double grid_cell_size = 50.0;
