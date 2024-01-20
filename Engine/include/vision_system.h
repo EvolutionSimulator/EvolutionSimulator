@@ -1,29 +1,32 @@
 #ifndef VISIONSYSTEM_H
 #define VISIONSYSTEM_H
 
+#include <memory>
+
 #include "alive_entity.h"
 #include "food.h"
 
 class VisionSystem : virtual public AliveEntity {
 public:
   VisionSystem(neat::Genome genome, Mutable mutables);
+  virtual ~VisionSystem() override {}
 
   void SetVision(double radius, double angle);
   double GetVisionRadius() const;
   double GetVisionAngle() const;
 
-  Food *GetClosestFood(std::vector<std::vector<std::vector<Entity *>>> &grid,
+  std::shared_ptr<Food> GetClosestFood(std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
                        double GridCellSize) const;
-  Food *GetClosestFoodInSight(
-      std::vector<std::vector<std::vector<Entity *>>> &grid,
+  std::shared_ptr<Food> GetClosestFoodInSight(
+      std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
       double grid_cell_size, Food::type type) const;
 
-  void ProcessVisionFood(std::vector<std::vector<std::vector<Entity *>>> &grid,
+  void ProcessVisionFood(std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
                          double grid_cell_size, double width, double height);
-  Food* GetFoodID() const;
-  Food *GetClosestPlantInSight(std::vector<std::vector<std::vector<Entity *>>> &grid,
+  std::shared_ptr<Food> GetFoodID() const;
+  std::shared_ptr<Food> GetClosestPlantInSight(std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
           double grid_cell_size) const;
-  Food *GetClosestMeatInSight(std::vector<std::vector<std::vector<Entity *>>> &grid,
+  std::shared_ptr<Food> GetClosestMeatInSight(std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
           double grid_cell_size) const;
   bool IsFoodInSight(Food *food);
 
@@ -34,8 +37,8 @@ protected:
                                  source. */
   double plant_size_;          /*! Size of the closest plant*/
   double meat_size_;          /*! Size of the closest meat*/
-  Food* closest_plant_;       /*! Closest plant to show in the UI */
-  Food* closest_meat_;      /*! Closest meat to show in the UI */
+  std::shared_ptr<Food> closest_plant_;       /*! Closest plant to show in the UI */
+  std::shared_ptr<Food> closest_meat_;      /*! Closest meat to show in the UI */
   double orientation_meat_;   /*!< Orientation relative to the nearest meat
                                 source. */
   double vision_radius_; /*!< The radius within which the creature can detect

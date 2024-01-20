@@ -38,9 +38,9 @@ class SimulationCanvas : public QSFMLCanvas {
 
   // Rendering logic
   void RenderSimulation(DataAccessor<SimulationData> data);
-  void RenderFoodAtPosition(const Food& food, const std::pair<double, double>& position);
-  void RenderCreatureAtPosition(const Creature& creature, const std::pair<double, double>& position);
-  std::vector<std::pair<double, double>> getEntityRenderPositions(const Entity& entity);
+  void RenderFoodAtPosition(const std::shared_ptr<Food> food, const std::pair<double, double>& position);
+  void RenderCreatureAtPosition(const std::shared_ptr<Creature> creature, const std::pair<double, double>& position);
+  std::vector<std::pair<double, double>> getEntityRenderPositions(const std::shared_ptr<Entity> entity);
 
   // Zoom logic
   float zoomFactor = 1.0f;

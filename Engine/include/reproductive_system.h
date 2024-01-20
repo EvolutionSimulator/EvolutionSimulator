@@ -6,6 +6,7 @@
 class ReproductiveSystem : virtual public AliveEntity {
 public:
   ReproductiveSystem(neat::Genome genome, Mutable mutables);
+  virtual ~ReproductiveSystem() override {}
 
   bool Fit();
   void Reproduced();
