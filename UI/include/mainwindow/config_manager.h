@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QWidget>
+#include "QtWidgets/qlabel.h"
 #include "engine.h"
 
 class ConfigManager : public QObject {
@@ -15,7 +16,7 @@ public:
 public slots:
   void ChangeFoodDensity(int value);
   void ChangeFriction(int value);
-  void ChangeEngineSpeed(int value);
+  void ChangeEngineSpeed(double value);
   void ChangeCreatureDensity(int value);
   void ShowConfigScreen();
 
@@ -31,6 +32,7 @@ private:
   double food_density_ = 0.001;
   QWidget* parent_;
   Engine* engine_;
+  QLabel* speedValueLabel;
 };
 
 

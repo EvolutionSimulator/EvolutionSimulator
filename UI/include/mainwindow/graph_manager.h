@@ -84,7 +84,7 @@ public:
                 chartView->grab().save(imageFilePath);
 
                 // Save data to CSV file
-                QString csvFilePath = filePath + ".csv";
+                QString csvFilePath = filePath;
                 QFile file(csvFilePath);
                 if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
                     QTextStream stream(&file);
@@ -190,7 +190,7 @@ public:
 
         // Create the folder if it doesn't exist
         if (createDirectory(folderPath)) {
-            QString filePath = QFileDialog::getSaveFileName(nullptr, "Save Scatter Plot", folderPath, "PNG Image (*.png);;CSV File (*.csv)");
+            QString filePath = QFileDialog::getSaveFileName(nullptr, "Save Scatter Plot", folderPath, "PNG Image (.png);;CSV File (.csv)");
             if (!filePath.isEmpty()) {
                 // Save image
                 QString imageFilePath = filePath + ".png";
@@ -225,6 +225,7 @@ public slots:
   void DrawCreaturesVelocityOverTimeGraph();
   void DrawSizeEnergyScatterplot();
   void DrawSizeVelocityScatterplot();
+  void DrawEnergyVelocityScatterplot();
   void handleDropdownSelection(int index);
 
 private:

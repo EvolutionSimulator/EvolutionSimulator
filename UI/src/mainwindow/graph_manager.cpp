@@ -100,6 +100,36 @@ void GraphManager::DrawSizeVelocityScatterplot() {
                   "Creature Size", "Creature Velocity");
 }
 
+void GraphManager::DrawEnergyVelocityScatterplot() {
+  auto& infoPanel = simulationCanvas_->GetInfoPanel();
+  Creature* selectedCreature = infoPanel.GetSelectedCreature();
+
+  auto data = engine_->GetSimulation()->GetSimulationData();
+
+  // Vectors to store size and velocity data
+  std::vector<double> energies;
+  std::vector<double> velocities;
+
+  for (const auto& creature : data->creatures_) {
+      float creatureEnergy = creature.GetEnergy();
+      float creatureVelocity = creature.GetVelocity();
+
+      // Check if the creature is selected
+      if (selectedCreature && creature.GetID() == selectedCreature->GetID()) {
+          // If selected, make size and velocity negative
+          energies.push_back(-creatureEnergy);
+          velocities.push_back(-creatureVelocity);
+      } else {
+          // If not selected, use regular values
+          energies.push_back(creatureEnergy);
+          velocities.push_back(creatureVelocity);
+      }
+  }
+
+  DrawScatterPlot(energies, velocities, "Scatterplot of Creature Energy and Velocity",
+                  "Creature Energy", "Creature Velocity");
+}
+
 void GraphManager::handleDropdownSelection(int index) {
   qDebug() << "Dropdown selection changed to index:" << index;
 
@@ -129,7 +159,7 @@ void GraphManager::handleDropdownSelection(int index) {
   }
   if (index == 7) {
     qDebug() << "Calling DrawCreaturesOverTimeGraph";
-    DrawSizeVelocityScatterplot();
+    DrawEnergyVelocityScatterplot();
   }
 
 

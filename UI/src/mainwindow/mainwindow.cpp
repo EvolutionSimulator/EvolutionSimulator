@@ -215,7 +215,7 @@ void MainWindow::DrawUI()
     comboBox->addItem("Creatures Velocity Over Time");
     comboBox->addItem("Size and Energy Scatterplot");
     comboBox->addItem("Size and Velocity Scatterplot");
-    comboBox->addItem("Size and _ Scatterplot");
+    comboBox->addItem("Energy and Velocity Scatterplot");
     connect(graph_manager_, &GraphManager::resetGraphMenuIndex, this, [this]() {
         ui_->graphMenu->setCurrentIndex(0);
     });

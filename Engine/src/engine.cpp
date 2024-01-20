@@ -67,6 +67,11 @@ bool Engine::IsPaused() { return paused_; }
 
 void Engine::SetSpeed(double speed) { engine_speed_ = std::max(0.0, speed); }
 
+double Engine::GetSpeed()
+{
+  return engine_speed_;
+}
+
 void Engine::Stop() { running_ = false; }
 
 void Engine::Pause() { paused_ = true; }

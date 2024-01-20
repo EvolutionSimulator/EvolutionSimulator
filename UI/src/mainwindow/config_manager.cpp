@@ -9,7 +9,7 @@ ConfigManager::ConfigManager(QWidget* parent, Engine *engine) :
                                                               QObject(nullptr),
                                                               parent_(parent),
                                                               engine_(engine){
-  friction_coefficient_ = 0.0;
+  friction_coefficient_ = 0.05;
 }
 
 void ConfigManager::ChangeFoodDensity(int value) {
@@ -24,8 +24,8 @@ void ConfigManager::SetEngine(Engine* engine)
   engine_ = engine;
 }
 
-void ConfigManager::ChangeEngineSpeed(int value) {
-  engine_->SetSpeed(value);
+void ConfigManager::ChangeEngineSpeed(double value) {
+  engine_->SetSpeed(value/100.0);
 }
 
 void ConfigManager::ChangeFriction(int value) {
@@ -38,8 +38,8 @@ void ConfigManager::ChangeFriction(int value) {
 void ConfigManager::ShowConfigScreen(){
 
   emit PauseSimulation();
+  double initial_speed = engine_->GetSpeed();
 
-  double initial_creature_density = engine_->GetEnvironment().GetCreatureDensity();
 
          // Create a new QDialog (config dialog)
   QDialog* configDialog = new QDialog(parent_);
@@ -63,21 +63,21 @@ void ConfigManager::ShowConfigScreen(){
   mainLayout->addLayout(contentLayout);
 
   QLabel* titleLabel = new QLabel("<html><h1><b>Configuration Options</b></h1></html>", configDialog);
-  QLabel* speedLabel = new QLabel("Simulation Speed:", configDialog);
   QLabel* foodDLabel = new QLabel("Food density:", configDialog);
   QLabel* frictionLabel = new QLabel("Friction:", configDialog);
 
   QSlider* speedSlider = new QSlider(Qt::Horizontal, configDialog);
-  speedSlider-> setMinimum(0);
-  speedSlider-> setMaximum(5);
+  speedSlider-> setMinimum(1);
+  speedSlider-> setMaximum(1000);
   speedSlider-> setSingleStep(1);
-  speedSlider->setTickPosition(QSlider::TicksBelow);
+  speedSlider->setValue(initial_speed * 100);
 
   QSlider* foodDSlider = new QSlider(Qt::Horizontal, configDialog);
   QSlider* frictionSlider = new QSlider(Qt::Horizontal, configDialog);
 
   titleLayout->addWidget(titleLabel, Qt::AlignTop | Qt::AlignHCenter);
-  contentLayout->addWidget(speedLabel);
+  QLabel* speedValueLabel = new QLabel(QString("Simulation Speed: %1").arg(initial_speed));
+  contentLayout->addWidget(speedValueLabel);
   contentLayout->addWidget(speedSlider);
 
   contentLayout->addWidget(foodDLabel);
@@ -94,6 +94,17 @@ void ConfigManager::ShowConfigScreen(){
   connect(speedSlider, &QSlider::valueChanged, this, &ConfigManager::ChangeEngineSpeed);
   connect(foodDSlider, &QSlider::valueChanged, this, &ConfigManager::ChangeFoodDensity);
   connect(frictionSlider, &QSlider::valueChanged, this, &ConfigManager::ChangeFriction);
+
+  // Create a local pointer to configDialog
+  QDialog* localConfigDialog = configDialog;
+
+  // Connect the valueChanged signal of the speedSlider to update the speedValueLabel
+  connect(speedSlider, &QSlider::valueChanged, [speedValueLabel, localConfigDialog](int value) {
+      double speedValue = static_cast<double>(value) / 100.0;  // Convert to actual speed value
+      speedValueLabel->setText(QString("Simulation Speed: %1").arg(speedValue));
+
+      // Now, you can use localConfigDialog here if needed
+  });
 
          // Show the configuration dialog modally
   configDialog->setLayout(mainLayout);
