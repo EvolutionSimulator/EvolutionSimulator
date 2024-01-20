@@ -6,6 +6,7 @@
 class MovableEntity : virtual public Entity {
  public:
   MovableEntity();
+  virtual ~MovableEntity() override {}
 
   double GetAcceleration() const;
   double GetAccelerationAngle()

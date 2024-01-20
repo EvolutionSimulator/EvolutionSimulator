@@ -37,6 +37,7 @@ Creature::Creature(neat::Genome genome, Mutable mutables)
         neural_inputs += module.GetInputNeuronIds().size();
     }
     neuron_data_ = std::vector<double>(neural_inputs, 0.0);
+    think_count_ = this->GetID();
 }
 
 /*!
@@ -91,7 +92,7 @@ bool Creature::Compatible(const Creature& other_creature){
  */
 void Creature::Update(double deltaTime, double const kMapWidth,
                       double const kMapHeight,
-                      std::vector<std::vector<std::vector<Entity *>>> &grid,
+                      std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
                       double GridCellSize, double frictional_coefficient) {
   this->frictional_coefficient_ = frictional_coefficient;
   this->UpdateMaxEnergy();
@@ -154,15 +155,15 @@ void Creature::OnCollision(Entity &other_entity, double const kMapWidth,
  * @param grid The environmental grid.
  * @param GridCellSize Size of each cell in the grid.
  */
-void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
+void Creature::Think(std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
                      double GridCellSize, double deltaTime, double width, double height) {
   // Not pretty but we'll figure out a better way in the future
 
-  think_count++;
-  if (think_count % 5 != 0){
+  think_count_++;
+  if (think_count_ % 5 != 0){
       return;
   }
-  think_count = 0;
+  think_count_ = 0;
   // To allow creatures to use a module it should be included below
   ProcessVisionFood(grid, GridCellSize, width, height);
   if (neuron_data_.size() == 0) return;

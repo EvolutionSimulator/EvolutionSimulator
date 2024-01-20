@@ -8,6 +8,7 @@
 class AliveEntity : virtual public Entity {
 public:
   AliveEntity(neat::Genome genome, Mutable mutable_);
+  virtual ~AliveEntity() override {}
 
   void Dies();
   double GetHealth() const;

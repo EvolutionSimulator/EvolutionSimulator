@@ -51,8 +51,8 @@ void GraphManager::DrawSizeEnergyScatterplot() {
   std::vector<double> energies;
 
   for (const auto& creature : data->creatures_) {
-      float creatureSize = creature.GetSize();
-      float creatureEnergy = creature.GetEnergy();
+      float creatureSize = creature->GetSize();
+      float creatureEnergy = creature->GetEnergy();
 
       // Check if the creature is selected
       if (selectedCreature && creature.GetID() == selectedCreature->GetID()) {

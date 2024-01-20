@@ -35,15 +35,15 @@ double VisionSystem::GetVisionAngle() const { return vision_angle_; }
 
 
 
-Food* VisionSystem::GetClosestMeatInSight(
-    std::vector<std::vector<std::vector<Entity *>>> &grid,
+std::shared_ptr<Food> VisionSystem::GetClosestMeatInSight(
+    std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
     double grid_cell_size) const {
     return (GetClosestFoodInSight(grid, grid_cell_size, Food::type::meat));
 }
 
 // Function to get the closest plant in sight
-Food* VisionSystem::GetClosestPlantInSight(
-    std::vector<std::vector<std::vector<Entity *>>> &grid,
+std::shared_ptr<Food> VisionSystem::GetClosestPlantInSight(
+    std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
     double grid_cell_size) const {
     return (GetClosestFoodInSight(grid, grid_cell_size, Food::type::plant));
 }
@@ -63,8 +63,8 @@ Food* VisionSystem::GetClosestPlantInSight(
  *
  * @return A pointer to the closest food entity within the line of sight; nullptr if no food is found.
  */
-Food *VisionSystem::GetClosestFoodInSight(
-    std::vector<std::vector<std::vector<Entity *>>> &grid,
+std::shared_ptr<Food> VisionSystem::GetClosestFoodInSight(
+    std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
     double grid_cell_size, Food::type food_type) const {
   int grid_width = grid.size();
   int grid_height = grid[0].size();
@@ -81,7 +81,7 @@ Food *VisionSystem::GetClosestFoodInSight(
   auto cone_right_boundary =
       OrientedAngle(cone_orientation + vision_angle_ / 2);
 
-  Food *closest_food = nullptr;
+  std::shared_ptr<Food> closest_food = nullptr;
   double smallest_distance_food = std::numeric_limits<double>::max();
 
   std::queue<std::pair<int, int>> cells_queue;
@@ -97,8 +97,8 @@ Food *VisionSystem::GetClosestFoodInSight(
     cells_queue.pop();
     ++processed_cells;
 
-    for (Entity *entity : grid[x][y]) {
-      Food *food = dynamic_cast<Food *>(entity);
+    for (auto entity : grid[x][y]) {
+      std::shared_ptr<Food> food = std::dynamic_pointer_cast<Food>(entity);
 
       if (food && food->GetType()==food_type) {
         auto food_point = Point(entity->GetCoordinates());
@@ -189,10 +189,10 @@ bool VisionSystem::IsFoodInSight(Food *food)
  * @param GridCellSize Size of each cell in the grid.
  */
 void VisionSystem::ProcessVisionFood(
-    std::vector<std::vector<std::vector<Entity *>>> &grid,
+    std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
     double GridCellSize, double width, double height) {
-  Food *closePlant = GetClosestPlantInSight(grid, GridCellSize);
-  Food *closeMeat = GetClosestMeatInSight(grid, GridCellSize);
+  std::shared_ptr<Food> closePlant = GetClosestPlantInSight(grid, GridCellSize);
+  std::shared_ptr<Food> closeMeat = GetClosestMeatInSight(grid, GridCellSize);
 
   if (closePlant){
         distance_plant_ = this->GetDistance(*closePlant, width, height) - (*closePlant).GetSize();
@@ -226,7 +226,7 @@ void VisionSystem::ProcessVisionFood(
  *
  * @return The id of the closest food or -1 if there is no food in vision.
  */
-Food *VisionSystem::GetFoodID() const {
+std::shared_ptr<Food> VisionSystem::GetFoodID() const {
   if (distance_plant_ <= distance_meat_) {return closest_plant_;};
   return closest_meat_;
 }

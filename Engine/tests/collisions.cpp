@@ -573,21 +573,23 @@ TEST(SimulationDataTest, UpdateGridWithAliveEntities) {
   entity_grid.ClearGrid();
 
   Mutable mutables;
-  Creature creature_1(neat::Genome(2, 3), mutables);
-  creature_1.SetCoordinates(2.1, 3.4, 100.0, 100.0);
-  creature_1.SetSize(10.0);
+  auto creature_1 = std::make_shared<Creature>(neat::Genome(2, 3), mutables);
+  creature_1->SetCoordinates(2.1, 3.4, 100.0, 100.0);
+  creature_1->SetSize(10.0);
   simData.creatures_.push_back(creature_1);
 
-  Creature creature_2(neat::Genome(2, 3), mutables);
-  creature_2.SetCoordinates(1.1, 2.4, 100.0, 100.0);
-  creature_2.SetSize(10.0);
-  creature_2.SetState(Entity::Dead);
+  auto creature_2 = std::make_shared<Creature>(neat::Genome(2, 3), mutables);
+  creature_2->SetCoordinates(1.1, 2.4, 100.0, 100.0);
+  creature_2->SetSize(10.0);
+  creature_2->SetState(Entity::Dead);
   simData.creatures_.push_back(creature_2);
 
-  simData.food_entities_.push_back(Plant(2.5, 3.4, 5.0));
-  simData.food_entities_.push_back(Plant(2.7, 9, 5.0));
-  Plant food(5.3, 6.7, 4.0);
-  food.SetState(Entity::Dead);
+  auto plant1 = std::make_shared<Plant>(2.5, 3.4, 5.0);
+  auto plant2 = std::make_shared<Plant>(2.7, 9, 5.0);
+  simData.food_entities_.push_back(plant1);
+  simData.food_entities_.push_back(plant2);
+  auto food = std::make_shared<Plant>(5.3, 6.7, 4.0);
+  food->SetState(Entity::Dead);
   simData.food_entities_.push_back(food);
 
   entity_grid.UpdateGrid(simData, environment);
@@ -616,40 +618,34 @@ TEST(SimulationDataTest, CorrectEntityPlacementInGrid) {
   entity_grid.ClearGrid();
 
   Mutable mutables;
-  Creature creature_1(neat::Genome(2, 3), mutables);
-  creature_1.SetCoordinates(200.1, 300.4, environment.GetMapWidth(),
-                            environment.GetMapHeight());
-  creature_1.SetSize(10.0);
+  auto creature_1 = std::make_shared<Creature>(neat::Genome(2, 3), mutables);
+  creature_1->SetCoordinates(200.1, 300.4, environment.GetMapWidth(), environment.GetMapHeight());
+  creature_1->SetSize(10.0);
   simData.creatures_.push_back(creature_1);
 
-  Creature creature_2(neat::Genome(2, 3), mutables);
-  creature_2.SetCoordinates(100.1, 350.4, environment.GetMapWidth(),
-                            environment.GetMapHeight());
-  creature_2.SetSize(10.0);
-  creature_2.SetState(Entity::Dead);
+  auto creature_2 = std::make_shared<Creature>(neat::Genome(2, 3), mutables);
+  creature_2->SetCoordinates(100.1, 350.4, environment.GetMapWidth(), environment.GetMapHeight());
+  creature_2->SetSize(10.0);
+  creature_2->SetState(Entity::Dead);
   simData.creatures_.push_back(creature_2);
 
-  Plant food_1(200.5, 300.4, 5.0);
-  Plant food_2(200.7, 200, 5.0);
+  auto food_1 = std::make_shared<Plant>(200.5, 300.4, 5.0);
+  auto food_2 = std::make_shared<Plant>(200.7, 200, 5.0);
   simData.food_entities_.push_back(food_1);
   simData.food_entities_.push_back(food_2);
-  Plant food_3(50.3, 60.7, 4.0);
-  food_3.SetState(Entity::Dead);
+  auto food_3 = std::make_shared<Plant>(50.3, 60.7, 4.0);
+  food_3->SetState(Entity::Dead);
   simData.food_entities_.push_back(food_3);
 
   entity_grid.UpdateGrid(simData, environment);
 
-  auto creatureCoordinates = creature_1.GetCoordinates();
-  int creatureGridX = static_cast<int>(creatureCoordinates.first /
-                                       SETTINGS.environment.grid_cell_size);
-  int creatureGridY = static_cast<int>(creatureCoordinates.second /
-                                       SETTINGS.environment.grid_cell_size);
+  auto creatureCoordinates = creature_1->GetCoordinates();
+  int creatureGridX = static_cast<int>(creatureCoordinates.first / SETTINGS.environment.grid_cell_size);
+  int creatureGridY = static_cast<int>(creatureCoordinates.second / SETTINGS.environment.grid_cell_size);
 
-  auto foodCoordinates = food_1.GetCoordinates();
-  int foodGridX = static_cast<int>(foodCoordinates.first /
-                                   SETTINGS.environment.grid_cell_size);
-  int foodGridY = static_cast<int>(foodCoordinates.second /
-                                   SETTINGS.environment.grid_cell_size);
+  auto foodCoordinates = food_1->GetCoordinates();
+  int foodGridX = static_cast<int>(foodCoordinates.first / SETTINGS.environment.grid_cell_size);
+  int foodGridY = static_cast<int>(foodCoordinates.second / SETTINGS.environment.grid_cell_size);
 
   EXPECT_NE(entity_grid.GetGrid()[creatureGridX][creatureGridY].empty(), true);
   EXPECT_NE(entity_grid.GetGrid()[foodGridX][foodGridY].empty(), true);
