@@ -9,10 +9,11 @@
 #include <QVBoxLayout>
 #include <QValueAxis>
 
-GraphManager::GraphManager(QWidget* parent, Engine *engine) :
-                                                              QObject(nullptr),
-                                                              parent_(parent),
-                                                              engine_(engine){}
+GraphManager::GraphManager(QWidget* parent, Engine *engine, SimulationCanvas* simulationCanvas) :
+    QObject(nullptr),
+    parent_(parent),
+    engine_(engine),
+    simulationCanvas_(simulationCanvas){}
 
 void GraphManager::SetEngine(Engine* engine)
 {
@@ -40,6 +41,9 @@ void GraphManager::DrawCreaturesVelocityOverTimeGraph() {
 }
 
 void GraphManager::DrawSizeEnergyScatterplot() {
+  auto& infoPanel = simulationCanvas_->GetInfoPanel();
+  Creature* selectedCreature = infoPanel.GetSelectedCreature();
+
   auto data = engine_->GetSimulation()->GetSimulationData();
 
   // Vectors to store size and energy data
@@ -50,9 +54,16 @@ void GraphManager::DrawSizeEnergyScatterplot() {
       float creatureSize = creature.GetSize();
       float creatureEnergy = creature.GetEnergy();
 
-      // Append size and energy data to vectors
-      sizes.push_back(creatureSize);
-      energies.push_back(creatureEnergy);
+      // Check if the creature is selected
+      if (selectedCreature && creature.GetID() == selectedCreature->GetID()) {
+          // If selected, make size and energy negative
+          sizes.push_back(-creatureSize);
+          energies.push_back(-creatureEnergy);
+      } else {
+          // If not selected, use regular values
+          sizes.push_back(creatureSize);
+          energies.push_back(creatureEnergy);
+      }
   }
 
   DrawScatterPlot(sizes, energies, "Scatterplot of Creature Size and Energy",

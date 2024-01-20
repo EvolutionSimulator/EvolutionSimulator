@@ -19,7 +19,7 @@ MainWindow::MainWindow(QWidget *parent)
   InitializeEngine();
   PauseSimulation();
   RunSimulation();
-  graph_manager_ = new GraphManager(this, engine_);
+  graph_manager_ = new GraphManager(this, engine_, ui_->canvas);
   config_manager_ = new ConfigManager(this, engine_);
 
   DrawUI();
