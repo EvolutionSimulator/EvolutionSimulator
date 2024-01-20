@@ -156,10 +156,14 @@ public:
     chart->addSeries(series_blue);
     chart->addSeries(series_red);
 
+    // Calculate absolute values of data1 and data2
+    std::vector<double> absData1 = absoluteValues2(data1);
+    std::vector<double> absData2 = absoluteValues2(data2);
+
     // Set custom axis ranges with margins
-    double minX = *std::min_element(data1.begin(), data1.end()) * 0.95;
+    double minX = *std::min_element(absData1.begin(), absData1.end()) * 0.95;
     double maxX = std::max(*std::max_element(data1.begin(), data1.end()), -(*std::min_element(data1.begin(), data1.end()))) * 1.1;
-    double minY = *std::min_element(data2.begin(), data2.end()) * 0.95;
+    double minY = *std::min_element(absData2.begin(), absData2.end()) * 0.95;
     double maxY = std::max(*std::max_element(data2.begin(), data2.end()), -(*std::min_element(data2.begin(), data2.end()))) * 1.1;
 
     chart->createDefaultAxes();
