@@ -15,7 +15,7 @@ public:
 
 public slots:
   void ChangeFoodDensity(int value);
-  void ChangeFriction(int value);
+  void ChangeFriction(double value);
   void ChangeEngineSpeed(double value);
   void ChangeCreatureDensity(int value);
   void ShowConfigScreen();
@@ -28,7 +28,7 @@ signals:
 
 private:
   double creature_density_ = 0.001;
-  double friction_coefficient_;
+  double friction_coefficient_ = 0.05;
   double food_density_ = 0.001;
   QWidget* parent_;
   Engine* engine_;

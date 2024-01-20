@@ -9,7 +9,6 @@ ConfigManager::ConfigManager(QWidget* parent, Engine *engine) :
                                                               QObject(nullptr),
                                                               parent_(parent),
                                                               engine_(engine){
-  friction_coefficient_ = 0.05;
 }
 
 void ConfigManager::ChangeFoodDensity(int value) {
@@ -28,7 +27,7 @@ void ConfigManager::ChangeEngineSpeed(double value) {
   engine_->SetSpeed(value/100.0);
 }
 
-void ConfigManager::ChangeFriction(int value) {
+void ConfigManager::ChangeFriction(double value) {
   friction_coefficient_ = static_cast<double>(value) / 100.0;  // Scale slider value to be in the range 0.05 to 0.20
   engine_->GetEnvironment().SetFrictionalCoefficient(friction_coefficient_);
   engine_->UpdateEnvironment();
@@ -39,7 +38,7 @@ void ConfigManager::ShowConfigScreen(){
 
   emit PauseSimulation();
   double initial_speed = engine_->GetSpeed();
-
+  double frictional_coefficient = engine_->GetEnvironment().GetFrictionalCoefficient();
 
          // Create a new QDialog (config dialog)
   QDialog* configDialog = new QDialog(parent_);
@@ -64,7 +63,6 @@ void ConfigManager::ShowConfigScreen(){
 
   QLabel* titleLabel = new QLabel("<html><h1><b>Configuration Options</b></h1></html>", configDialog);
   QLabel* foodDLabel = new QLabel("Food density:", configDialog);
-  QLabel* frictionLabel = new QLabel("Friction:", configDialog);
 
   QSlider* speedSlider = new QSlider(Qt::Horizontal, configDialog);
   speedSlider-> setMinimum(1);
@@ -74,6 +72,11 @@ void ConfigManager::ShowConfigScreen(){
 
   QSlider* foodDSlider = new QSlider(Qt::Horizontal, configDialog);
   QSlider* frictionSlider = new QSlider(Qt::Horizontal, configDialog);
+  frictionSlider-> setMinimum(5);
+  frictionSlider-> setMaximum(100);
+  frictionSlider-> setSingleStep(1);
+  frictionSlider->setValue(static_cast<int>(frictional_coefficient * 100));
+
 
   titleLayout->addWidget(titleLabel, Qt::AlignTop | Qt::AlignHCenter);
   QLabel* speedValueLabel = new QLabel(QString("Simulation Speed: %1").arg(initial_speed));
@@ -83,7 +86,8 @@ void ConfigManager::ShowConfigScreen(){
   contentLayout->addWidget(foodDLabel);
   contentLayout->addWidget(foodDSlider);
 
-  contentLayout->addWidget(frictionLabel);
+  QLabel* frictionValueLabel = new QLabel(QString("Frictional Coefficient: %1").arg(frictional_coefficient));
+  contentLayout->addWidget(frictionValueLabel);
   contentLayout->addWidget(frictionSlider);
 
 
@@ -102,6 +106,14 @@ void ConfigManager::ShowConfigScreen(){
   connect(speedSlider, &QSlider::valueChanged, [speedValueLabel, localConfigDialog](int value) {
       double speedValue = static_cast<double>(value) / 100.0;  // Convert to actual speed value
       speedValueLabel->setText(QString("Simulation Speed: %1").arg(speedValue));
+
+      // Now, you can use localConfigDialog here if needed
+  });
+
+  // Connect the valueChanged signal of the frictionSlider to update the frictionValueLabel
+  connect(frictionSlider, &QSlider::valueChanged, [frictionValueLabel, localConfigDialog](int value) {
+      double frictionValue = static_cast<double>(value) / 100.0;  // Convert to actual friction value
+      frictionValueLabel->setText(QString("Frictional Coefficient: %1").arg(frictionValue));
 
       // Now, you can use localConfigDialog here if needed
   });

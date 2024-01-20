@@ -56,6 +56,8 @@ public:
     chart->axes(Qt::Vertical).first()->setTitleText(graphTitle);
     chart->axes(Qt::Vertical).first()->setRange(0, *std::max_element(data.begin(), data.end()) * 1.2);
 
+    chart->legend()->markers(series)[0]->setVisible(false);
+
     QChartView* chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
 

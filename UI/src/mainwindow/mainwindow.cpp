@@ -222,7 +222,7 @@ void MainWindow::DrawUI()
 
     // Set up run, restart
     QRect rect(2,2,45,45);
-    QRect rect3(2,2,46,45);
+    QRect rect3(2,2,45,45);
     QRegion region(rect, QRegion::Ellipse);
     QRegion region3(rect3, QRegion::Ellipse);
     ui_->runButton->setMask(region);

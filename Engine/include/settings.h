@@ -70,7 +70,7 @@ class Settings {
     double max_nutritional_value = 5;
     double default_lifespan = 30;
     double photosynthesis_factor = 0.1;
-    double frictional_coefficient = 0.15; // Needs to be less than 1
+    double frictional_coefficient = 0.05; // Needs to be less than 1
   } environment;
 
   struct EngineSettings {
