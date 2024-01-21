@@ -196,6 +196,7 @@ void MovableEntity::UpdateVelocities(double deltaTime) {
       GetVelocity() * cos(GetOrientation() + GetVelocityAngle());
   double velocity_y =
       GetVelocity() * sin(GetOrientation() + GetVelocityAngle());
+
   // update absolute x and y components of velocity
   velocity_x += GetEffectiveForwardAcceleration() *
                 cos(GetOrientation() + GetEffectiveAccelerationAngle()) * deltaTime;
@@ -222,8 +223,10 @@ void MovableEntity::Move(double deltaTime, const double kMapWidth,
                          const double kMapHeight) {
   double orientation = GetOrientation();
 
-  double delta_x = velocity_ * cos(orientation + velocity_angle_) * deltaTime;
-  double delta_y = velocity_ * sin(orientation + velocity_angle_) * deltaTime;
+  double delta_x =
+      GetVelocity() * cos(orientation + velocity_angle_) * deltaTime;
+  double delta_y =
+      GetVelocity() * sin(orientation + velocity_angle_) * deltaTime;
 
   // Update position
   auto [current_x, current_y] = GetCoordinates();

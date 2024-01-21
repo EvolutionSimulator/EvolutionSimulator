@@ -8,6 +8,7 @@
 #include "movable_entity.h"
 #include "mutable.h"
 #include "neat/neat-neural-network.h"
+#include "reproduction.h"
 
 /*!
  * @file creature.h
@@ -56,13 +57,13 @@ class Creature : public MovableEntity {
   void OnCollision(Entity &other_entity, double const kMapWidth,
                    double const kMapHeight) override;
 
-  bool Fit();
-  void Reproduced();
+  void AfterMate();
 
   double GetMaxEnergy() const;
   void UpdateMaxEnergy();
 
   void UpdateMatingDesire();
+  void UpdateReproductiveSystem(double deltaTime);
 
   double GetAge() const;
   void SetAge(double age);
@@ -107,8 +108,10 @@ class Creature : public MovableEntity {
   double GetEmptinessPercent() const;
   double GetAcid() const;
   double GetEnergyInStomach() const;
+  
   bool GetMatingDesire() const;
-  int GetGender() const;
+  MaleReproductiveSystem* GetMaleReproductiveSystem();
+  FemaleReproductiveSystem* GetFemaleReproductiveSystem();
 
  protected:
   double max_energy_;
@@ -156,8 +159,11 @@ class Creature : public MovableEntity {
   double stomach_acid_;    /*! Added when digestion occurs */
   bool biting_;            /*! Indicates whether creature is biting or not*/
 
+  // Creatures are hermaphrodites, possessing both male and female reproductive
+  // systems
+  MaleReproductiveSystem male_reproductive_system_;
+  FemaleReproductiveSystem female_reproductive_system_;
   bool mating_desire_; /*! Indicates whether creature currently wants to mate*/
-  int gender_;         /*! Indicates the gender of the creature*/
 };
 
 std::vector<Food *> get_food_at_distance(

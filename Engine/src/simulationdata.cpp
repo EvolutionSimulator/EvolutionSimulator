@@ -10,6 +10,7 @@
 #include "config.h"
 #include "egg.h"
 #include "food.h"
+#include "mathlib.h"
 
 /*!
  * @brief Adds a creature to the simulation.
@@ -95,16 +96,29 @@ void SimulationData::ModifyAllCreatures(double delta_x, double delta_y) {
  */
 
 void SimulationData::UpdateAllCreatures(double deltaTime) {
-  for (Creature& creature : creatures_) {
+  for (Egg& egg : eggs_) {
+    egg.Update(deltaTime);
+  }
+
+  for (int creature_index = 0; creature_index < creatures_.size();
+       creature_index++) {
+    Creature& creature = creatures_[creature_index];
     creature.Update(deltaTime, environment_.GetMapWidth(),
                     environment_.GetMapHeight(), grid_,
                     settings::environment::kGridCellSize,
                     environment_.GetFrictionalCoefficient());
-    if (creature.Fit()) {
-      new_reproduce_.push(creature);
-      creature.Reproduced();
+    if (creature.GetMatingDesire()) {
+      new_reproduce_.push(creature_index);
+    }
+
+    if (creature.GetFemaleReproductiveSystem()->CanBirth()) {
+      AddEgg(creature.GetFemaleReproductiveSystem()->GiveBirth());
+      creature.SetVelocity(
+          creature.GetVelocity() *
+          settings::physical_constraints::kAfterBirthVelocityFactor);
     }
   }
+
   world_time_ += deltaTime;
 
   // Store the creature count when the time increases by a second
@@ -139,11 +153,16 @@ void SimulationData::GenerateMoreFood() {
   }
 }
 
+void SimulationData::AddEgg(const Egg& egg) {
+  eggs_.push_back(egg);
+}
+
 void SimulationData::HatchEggs() {
   std::remove_if(eggs_.begin(), eggs_.end(), [this](Egg& egg) {
-    egg.SimulationUpdate();
     if (egg.GetAge() >= egg.GetIncubationTime()) {
       Creature new_creature = egg.Hatch();
+      new_creature.RandomInitialization(environment_.GetMapWidth(),
+                                        environment_.GetMapHeight());
       AddCreature(new_creature);
       return true;
     }
@@ -163,31 +182,35 @@ void SimulationData::ReproduceCreatures() {
   double max_creature_size = settings::environment::kMaxCreatureSize;
   double min_creature_size = settings::environment::kMinCreatureSize;
 
-  std::queue<Creature> not_reproduced;
-  std::queue<Creature> temp_queue;
+  std::queue<int> not_reproduced;
+  std::queue<int> temp_queue;
 
   while (!reproduce_.empty()) {
-    Creature creature1 = reproduce_.front();
+    int creature1_index = reproduce_.front();
+    Creature& creature1 = creatures_[creature1_index];
     reproduce_.pop();
     bool paired = false;
 
     // Attempt to pair creature1 with a compatible new creature
     while (!new_reproduce_.empty() && !paired) {
-      Creature creature2 = new_reproduce_.front();
+      int creature2_index = new_reproduce_.front();
+      Creature& creature2 = creatures_[creature2_index];
       new_reproduce_.pop();
       // If these two creatures are compatible reproduce them otherwise
       // save the creature in a temporary queue for the next pairing round
-      if (creature1.Compatible(creature2)) {
+      if (creature1.Compatible(creature2) and
+          creature1.GetMaleReproductiveSystem()->ReadyToProcreate() and
+          creature2.GetFemaleReproductiveSystem()->ReadyToProcreate()) {
         ReproduceTwoCreatures(creature1, creature2);
         paired = true;
       } else {
-        temp_queue.push(creature2);  // Save for next round
+        temp_queue.push(creature2_index);  // Save for next round
       }
     }
 
     // If the creature wasn't paired add it to not_reproduced
     if (!paired) {
-      not_reproduced.push(creature1);
+      not_reproduced.push(creature1_index);
     }
 
     // Refill newCreatures with unpaired creatures for next attempt
@@ -218,37 +241,11 @@ void SimulationData::ReproduceCreatures() {
  * the dominant creature for the algorithms that that has the highest energy at
  * the moment of reproduction
  */
-void SimulationData::ReproduceTwoCreatures(Creature& creature1,
-                                           Creature& creature2) {
-  double world_width = environment_.GetMapWidth();
-  double world_height = environment_.GetMapHeight();
-  double energy1 = creature1.GetEnergy();
-  double energy2 = creature2.GetEnergy();
-  if (energy2 > energy1) {
-    std::swap(energy1, energy2);
-    std::swap(creature1, creature2);
-  }
-  if (energy1 > energy2) {
-    neat::Genome new_genome =
-        neat::Crossover(creature1.GetGenome(), creature2.GetGenome());
-    new_genome.Mutate();
-    new_genome.Mutate();
-    Mutable new_mutable =
-        MutableCrossover(creature1.GetMutable(), creature2.GetMutable());
-    new_mutable.Mutate();
-    new_mutable.Mutate();
-    if (creature1.GetGender() == 1) {
-      Egg new_egg(new_genome, new_mutable, creature1.GetCoordinates().first,
-                  creature1.GetCoordinates().second);
-      new_egg.SetGeneration(creature1.GetGeneration() + 1);
-      eggs_.push_back(new_egg);
-    } else {
-      Egg new_egg(new_genome, new_mutable, creature2.GetCoordinates().first,
-                  creature2.GetCoordinates().second);
-      new_egg.SetGeneration(creature2.GetGeneration() + 1);
-      eggs_.push_back(new_egg);
-    }
-  }
+void SimulationData::ReproduceTwoCreatures(Creature& father, Creature& mother) {
+  father.GetMaleReproductiveSystem()->MateWithFemale();
+  mother.GetFemaleReproductiveSystem()->MateWithMale(&father, &mother);
+  father.AfterMate();
+  mother.AfterMate();
 }
 
 /*!
@@ -396,16 +393,16 @@ void UpdateGridCreature(
  * @param reproduce A queue of Creature objects, potentially containing dead
  * creatures.
  */
-void UpdateQueue(std::queue<Creature>& reproduce) {
-  std::queue<Creature> tempQueue;
+void UpdateQueue(std::queue<int>& reproduce, const std::vector<Creature>& creatures) {
+  std::queue<int> tempQueue;
 
   while (!reproduce.empty()) {
-    Creature currentCreature = reproduce.front();
+    int current_creature_index = reproduce.front();
     reproduce.pop();
 
     // Check if the current creature is not dead
-    if (currentCreature.GetState() != Entity::Dead) {
-      tempQueue.push(currentCreature);
+    if (creatures[current_creature_index].GetState() != Entity::Dead) {
+      tempQueue.push(current_creature_index);
     }
   }
 
@@ -423,7 +420,7 @@ void SimulationData::UpdateGrid() {
   UpdateGridCreature(creatures_, grid_, settings::environment::kGridCellSize,
                      food_entities_);
   UpdateGridFood(food_entities_, grid_, settings::environment::kGridCellSize);
-  UpdateQueue(reproduce_);
+  UpdateQueue(reproduce_, creatures_);
 }
 
 /*!

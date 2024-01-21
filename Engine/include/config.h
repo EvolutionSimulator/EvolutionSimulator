@@ -46,6 +46,7 @@ constexpr double kDefaultCreatureDensity = 0.0001;
 constexpr double kPlantNutritionalValue = 2.0;
 constexpr double kMeatNutritionalValue = 3.0;
 constexpr double kEggNutritionalValue = 4.0;
+constexpr double kEggIncubationTimeMultiplier = 1.0;
 constexpr double kPlantProportion = 0.5; /* PlantProportion + MeatProportion = 1 */
 constexpr double kRotFactor = 1.0;
 constexpr double kGridCellSize = 50.0;
@@ -80,6 +81,7 @@ constexpr double kDBabySize = 2;
 constexpr double kDMaxForce = 10;
 constexpr double kDGrowthFactor = 10;
 constexpr double kDVisionFactor = 200;
+constexpr double kDGestationRatioToIncubation = 10;
 constexpr double kVisionRadius = 200; //Default values or not used not sure
 constexpr double kVisionAngle = M_PI / 3; //Default values or not used not sure
 constexpr double kVisionARratio = 200 * M_PI / 3;
@@ -90,6 +92,11 @@ constexpr double KDEatingCooldown = 1; // Decrease for easier survival
 constexpr double KDDigestionRate = 3;
 constexpr double KDGeneticStrength = 0.6;
 constexpr double KDAcidToEnergy = 5; // Increase for easier survival
+constexpr double kMaxRepdroducingAge = 700;
+constexpr double kMatingDesireFactor = 0.6;
+constexpr double kPregnancyEnergyFactor = 0.7;
+constexpr double kPregnancyVelocityFactor = 0.5;
+constexpr double kAfterBirthVelocityFactor = 1.5;
 } //namespace physical_constraints
 
 namespace ui {

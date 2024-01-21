@@ -29,6 +29,7 @@ struct SimulationData {
   void RemoveCreature(const Creature& entity);
 
   void AddEgg(const Egg& egg);
+  void HatchEggs();
 
   void GenerateMoreFood();
   void UpdateGrid();
@@ -45,16 +46,16 @@ struct SimulationData {
   void SetEnvironment(myEnvironment::Environment& environment);
   std::vector<std::vector<std::vector<Entity*>>> GetGrid();
 
-  void HatchEggs();
-
   void ReproduceCreatures();
   void ReproduceTwoCreatures(Creature& creature1, Creature& creature2);
 
   std::vector<Creature> creatures_;
   std::vector<Food> food_entities_;
   std::vector<Egg> eggs_;
-  std::queue<Creature> reproduce_;
-  std::queue<Creature> new_reproduce_;
+  std::queue<int>
+      reproduce_;  // Stores indices of creatures that are ready to reproduce
+  std::queue<int> new_reproduce_;  // Stores indices of creatures that are ready
+                                   // to reproduce
 
   double world_time_ = 0;
 

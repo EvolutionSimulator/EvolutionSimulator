@@ -1,40 +1,41 @@
 #include "egg.h"
 
-/*!
- * @class Egg
- * @brief Represents the eggs produced from reproduction between creatures,
- * that stores the traits of the offspring to hatch.
- *
- * @details This class stores the attributes of the offspring that are necessary
- * for Creature initialization. Furthermore stores attributes that dictate
- * behaviour of the egg prior to hatching, such as size_ as they can be
- * consumed.
- */
-Egg::Egg(neat::Genome genome, Mutable mutables, const double x_coord,
-         const double y_coord)
-    : Food(x_coord, y_coord, mutables.GetBabySize(),
-           settings::environment::kEggNutritionalValue),
-      Creature(genome, mutables) {
+Egg::Egg(const GestatingEgg& gestating_egg)
+    : Food(NAN, NAN, 0, 0),
+      Creature(gestating_egg.genome, gestating_egg.mutables),
+      generation_(gestating_egg.generation),
+      incubation_time_(gestating_egg.incubation_time)
+
+{
   type_ = egg;
-  age_ = 0;
-  incubation_time_ = 1;  // TODO fix this
-  fertilized_ = true;  // FOR NOW WE SAY THAT THE EGG IS FERTILIZED BY DEFAULT,
-                       // CHANGES IF NOT FERTILIZED UPON BEING LAYED
-
-  // TODO calculate incubation time based on mutable complexity + (genome complexity later)
+  age_ = gestating_egg.age;
 }
 
-void Egg::SimulationUpdate() {
-  age_ += 0.05;  // TODO make this a constant
-}
-
-double Egg::GetAge() const { return age_; }
 double Egg::GetIncubationTime() const { return incubation_time_; }
+
+void Egg::Update(double delta_time) {
+  if (Creature::GetState() == Dead) {
+    return;
+  }
+
+  age_ += delta_time;
+
+  Food::SetSize(age_ / incubation_time_ * Creature::GetMutable().GetBabySize());
+  Food::SetNutritionalValue(settings::environment::kEggNutritionalValue *
+                            Food::GetSize());
+}
 
 void Egg::Break() { Creature::SetState(Dead); }
 
-Creature Egg::Hatch() const {
-  auto creature =
-      Creature(genome_, mutable_, Food::x_coord_, Food::y_coord_, generation_);
+Creature Egg::Hatch() {
+  if (Creature::GetState() == Dead) {
+    throw std::runtime_error("Cannot hatch a dead egg");
+  }
+  if (age_ < incubation_time_) {
+    throw std::runtime_error("Cannot hatch an egg that has not incubated");
+  }
+
+  Creature creature = Creature(genome_, mutable_);
+  creature.SetGeneration(generation_);
   return creature;
 }

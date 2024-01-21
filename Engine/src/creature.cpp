@@ -7,6 +7,7 @@
 
 #include "collisions.h"
 #include "config.h"
+#include "mathlib.h"
 
 /*!
  * @brief Construct a new Creature object.
@@ -42,16 +43,17 @@ Creature::Creature(neat::Genome genome, Mutable mutables)
       vision_angle_(settings::physical_constraints::kVisionARratio /
                     mutables.GetVisionFactor()),
       age_(0),
-      reproduction_cooldown_(mutables.GetMaturityAge()),
       eating_cooldown_(mutables.GetEatingSpeed()),
       stomach_acid_(0.0),
-      potential_energy_in_stomach_(0.0) {
+      potential_energy_in_stomach_(0.0),
+      male_reproductive_system_(&mutables),
+      female_reproductive_system_(&mutables) {
   size_ = mutables.GetBabySize();
   health_ = mutables.GetIntegrity() * pow(size_, 2);
   energy_ = mutables.GetEnergyDensity() * pow(size_, 2);
   stomach_capacity_ = mutables.GetStomachCapacityFactor() * pow(size_, 2);
   bite_strength_ = mutables.GetGeneticStrength() * size_;
-  gender_ = rand() % 2;
+
   mating_desire_ = false;
 }
 
@@ -122,15 +124,6 @@ void Creature::BalanceHealthEnergy() {
  * @return double The current health level of the creature.
  */
 double Creature::GetHealth() const { return health_; }
-
-/*!
- * @brief Retrieves the gender of the creature.
- *
- * @details This method returns the creature's gender
- *
- * @return Takes a value of 0 (male) or 1 (female)
- */
-int Creature::GetGender() const { return gender_; }
 
 /*!
  * @brief Retrieves the whether or not a creature wants to mate
@@ -208,44 +201,40 @@ void Creature::UpdateEnergy(double deltaTime) {
  * while for males can mate past kMinProducingAge with falling probability.
  */
 void Creature::UpdateMatingDesire() {
-  double min_reproducing_age = mutable_.GetMaturityAge();
-  double max_repdroducing_age_ = 700;
-  if (age_ < min_reproducing_age) {
+  if (not male_reproductive_system_.ReadyToProcreate() and
+      not female_reproductive_system_.ReadyToProcreate()) {
     mating_desire_ = false;
     return;
   }
-  if (gender_ == 1) {
-    // For females, desire to mate is high at young age and decays over time
-    // until age 700
-    if (age_ >= max_repdroducing_age_) {
-      mating_desire_ = false;
-      return;
-    }
-    double probability = 1 - static_cast<double>(age_ - min_reproducing_age) /
-                                 (1.5 * max_repdroducing_age_);
-    mating_desire_ = (rand() % 100) < (probability * 100);
-  } else {
-    // For males, desire to mate is high at young age, and there is no age limit
-    double probability = 1 - static_cast<double>(age_ - min_reproducing_age) /
-                                 1000;  // 5 SHOULD BE REPLACED BY MAX AGE
-    mating_desire_ = (rand() % 100) < (probability * 100);
+
+  if (age_ >= settings::physical_constraints::kMaxRepdroducingAge) {
+    mating_desire_ = false;
+    return;
   }
+
+  double min_reproducing_age =
+      std::min(male_reproductive_system_.GetMaturityAge(),
+               female_reproductive_system_.GetMaturityAge());
+
+  double probability =
+      1 -
+      (age_ - min_reproducing_age) /
+          settings::physical_constraints::kMaxRepdroducingAge -
+      min_reproducing_age * settings::physical_constraints::kMatingDesireFactor;
+  mating_desire_ = mathlib::RandomDouble(0, 1) < probability;
 }
 
-/*!
- * @brief Checks if the creature is fit for reproduction.
- *
- * @details This method determines if the creature meets the energy requirements
- * and cooldown period for reproduction.
- *
- * @return true if the creature is fit for reproduction, false otherwise.
- */
-bool Creature::Fit() {
-  if (energy_ > settings::environment::kReproductionThreshold * max_energy_ &&
-      reproduction_cooldown_ == 0.0 && age_ < 700) {
-    return true;
-  }
-  return false;
+MaleReproductiveSystem *Creature::GetMaleReproductiveSystem() {
+  return &male_reproductive_system_;
+}
+
+FemaleReproductiveSystem *Creature::GetFemaleReproductiveSystem() {
+  return &female_reproductive_system_;
+}
+
+void Creature::UpdateReproductiveSystem(double deltaTime) {
+  male_reproductive_system_.Update(deltaTime);
+  female_reproductive_system_.Update(deltaTime);
 }
 
 /*!
@@ -254,9 +243,12 @@ bool Creature::Fit() {
  * @details This method deducts the energy cost of reproduction and initiates
  * the cooldown period.
  */
-void Creature::Reproduced() {
-  SetEnergy(GetEnergy() - 0.7 * max_energy_);
-  reproduction_cooldown_ = mutable_.GetReproductionCooldown();
+void Creature::AfterMate() {
+  if (GetFemaleReproductiveSystem()->IsPregnant()) {
+    SetEnergy(GetEnergy() - 0.7 * max_energy_);
+    SetVelocity(GetVelocity() *
+                settings::physical_constraints::kPregnancyVelocityFactor);
+  }
 }
 
 /*!
@@ -285,11 +277,8 @@ bool Creature::Compatible(const Creature &other_creature) {
   std::pair<double, double> C2 = other_creature.GetCoordinates();
   double physical_distance =
       sqrt(pow(C1.first - C2.first, 2) + pow(C1.second - C2.second, 2));
-  bool gender_difference =
-      (this->GetGender() + other_creature.GetGender() == 1) ? true : false;
-  return (gender_difference &&
-          (brain_distance + mutable_distance <
-           settings::compatibility::kCompatibilityThreshold)) &&
+  return (brain_distance + mutable_distance <
+          settings::compatibility::kCompatibilityThreshold) &&
          physical_distance < settings::compatibility::kCompatibilityDistance;
 }
 
@@ -367,6 +356,7 @@ void Creature::Update(double deltaTime, double const kMapWidth,
   this->Think(grid, GridCellSize, deltaTime, kMapWidth, kMapHeight);
   this->Digest(deltaTime);
   this->UpdateMatingDesire();
+  this->UpdateReproductiveSystem(deltaTime);
   age_ += 0.05;
 
   if (reproduction_cooldown_ <= 0) {

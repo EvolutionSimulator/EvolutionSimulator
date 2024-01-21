@@ -1,6 +1,7 @@
 #include "mutable.h"
 #include "config.h"
 #include "math.h"
+#include "mathlib.h"
 #include <random>
 #include <algorithm>
 
@@ -23,20 +24,7 @@ Mutable::Mutable()
     stomach_capacity_factor_(settings::physical_constraints::kDStomachCapacity),
     diet_(settings::physical_constraints::kDDiet),
     eating_speed_(settings::physical_constraints::KDEatingCooldown),
-    genetic_strength_(settings::physical_constraints::KDGeneticStrength){
-  UpdateReproduction();
-}
-
-/*!
- * @brief Updates the reproduction characteristics of the entity.
- * @details Calculates and sets the maturity age and reproduction cooldown
- * based on the entity's complexity and size.
- */
-void Mutable::UpdateReproduction() {
-  double complexity  = Complexity();
-  maturity_age_ = complexity * (1 + max_size_ - baby_size_) * 0.2;
-  reproduction_cooldown_ = complexity * 0.5;
-}
+    genetic_strength_(settings::physical_constraints::KDGeneticStrength){}
 
 /*!
  * @brief Calculates the complexity of the entity.
@@ -44,7 +32,7 @@ void Mutable::UpdateReproduction() {
  * @details The complexity is calculated based on various properties
  * like energy density, integrity, size, etc.
  */
-double Mutable::Complexity() {
+double Mutable::Complexity() const {
   //values to tweak in order to achieve ideal conditions
   double complexity = (energy_density_*10
                        + 5/energy_loss_
@@ -172,6 +160,16 @@ void Mutable::Mutate() {
     }
   }
 
+  // Gestation Ratio To Incubation
+  if (uniform(gen) < settings::physical_constraints::kMutationRate) {
+    std::normal_distribution<> dis(
+        0.0, settings::physical_constraints::kDGestationRatioToIncubation / 20);
+    double delta = dis(gen);
+    gestation_ratio_to_incubation_ += delta;
+    gestation_ratio_to_incubation_ =
+        mathlib::bound(gestation_ratio_to_incubation_, 0, 1);
+  }
+
   //Color
   if (uniform(gen) < settings::physical_constraints::kMutationRate){
       std::normal_distribution<> dis(0.0,
@@ -235,8 +233,9 @@ double Mutable::GetBabySize() const { return baby_size_; }
 double Mutable::GetMaxForce() const { return max_force_; }
 double Mutable::GetGrowthFactor() const { return growth_factor_; }
 double Mutable::GetVisionFactor() const { return vision_factor_; }
-double Mutable::GetReproductionCooldown() const { return reproduction_cooldown_; }
-double Mutable::GetMaturityAge() const { return maturity_age_; }
+double Mutable::GetGestationRatioToIncubation() const {
+  return gestation_ratio_to_incubation_;
+}
 float Mutable::GetColor() const { return color_; }
 double Mutable::GetStomachCapacityFactor() const { return stomach_capacity_factor_; }
 double Mutable::GetDiet() const {return diet_; };
@@ -253,8 +252,9 @@ void Mutable::SetBabySize(double value) { baby_size_ = value; }
 void Mutable::SetMaxForce(double value) { max_force_ = value; }
 void Mutable::SetGrowthFactor(double value) { growth_factor_ = value; }
 void Mutable::SetVisionFactor(double value) { vision_factor_ = value; }
-void Mutable::SetReproductionCooldown(double value) { reproduction_cooldown_ = value; }
-void Mutable::SetMaturityAge(double value) { maturity_age_ = value; }
+void Mutable::SetGestationRatioToIncubation(double value) {
+  gestation_ratio_to_incubation_ = value;
+}
 void Mutable::SetColor(double hue) { color_ = hue; }
 void Mutable::SetStomachCapacityFactor(double value) { stomach_capacity_factor_ = value; }
 void Mutable::SetDiet(double value) {diet_ = value; };
@@ -289,6 +289,10 @@ Mutable MutableCrossover(const Mutable &dominant, const Mutable &recessive) {
                              recessive.GetGrowthFactor() )/3);
   crossover.SetVisionFactor((2*dominant.GetVisionFactor() +
                              recessive.GetVisionFactor() )/3);
+  crossover.SetGestationRatioToIncubation(
+      (2 * dominant.GetGestationRatioToIncubation() +
+       recessive.GetGestationRatioToIncubation()) /
+      3);
   crossover.SetColor((2*dominant.GetColor() +
                       recessive.GetColor())/3);
   crossover.SetStomachCapacityFactor((2*dominant.GetStomachCapacityFactor() +
@@ -299,7 +303,6 @@ Mutable MutableCrossover(const Mutable &dominant, const Mutable &recessive) {
                      recessive.GetGeneticStrength() )/3);
   crossover.SetEatingSpeed((2*dominant.GetEatingSpeed() +
                                 recessive.GetEatingSpeed() )/3);
-  crossover.UpdateReproduction();
   return crossover;
 }
 
@@ -359,6 +362,11 @@ double Mutable::CompatibilityBetweenMutables(const Mutable& other_mutable) {
   // Vision Factor
   distance += fabs(other_mutable.GetVisionFactor() - this->GetVisionFactor())
               / settings::physical_constraints::kDVisionFactor;
+
+  // Gestation Ratio To Incubation
+  distance += fabs(other_mutable.GetGestationRatioToIncubation() -
+                   this->GetGestationRatioToIncubation()) /
+              settings::physical_constraints::kDGestationRatioToIncubation;
 
   return distance * settings::compatibility::kMutablesCompatibility;
 }
