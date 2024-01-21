@@ -1,6 +1,8 @@
-#include "../include/collision_manager.h"
+#include "collision_manager.h"
 
 #include "settings.h"
+
+#include <omp.h>
 
 CollisionManager::CollisionManager() {}
 
@@ -19,6 +21,7 @@ void CollisionManager::CheckCollisions(EntityGrid& entity_grid) {
   int num_rows = entity_grid_size.first;
   int num_cols = entity_grid_size.second;
 
+  #pragma omp parallel for collapse(2)
   for (int row = 0; row < num_rows; row++) {
     for (int col = 0; col < num_cols; col++) {
       for (auto entity1 : grid[col][row]) {
@@ -32,8 +35,11 @@ void CollisionManager::CheckCollisions(EntityGrid& entity_grid) {
           for (auto entity2 : grid[neighbour.first][neighbour.second]) {
             if (entity1->CheckCollisionWithEntity(tolerance, *entity2)) {
               if (entity1 != entity2) {
-                entity1->OnCollision(*entity2, SETTINGS.environment.map_width,
-                                     SETTINGS.environment.map_height);
+                #pragma omp critical
+                {
+                  entity1->OnCollision(*entity2, SETTINGS.environment.map_width,
+                                       SETTINGS.environment.map_height);
+                }
               }
             }
           }
