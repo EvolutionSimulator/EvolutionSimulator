@@ -103,9 +103,9 @@ void Plant::Update(double deltaTime) {
   double updated_nutritional_value =
       GetNutritionalValue() + SETTINGS.environment.photosynthesis_factor * deltaTime;
   double aging_factor = 0.002;
-  if (updated_nutritional_value <=
+  if (updated_nutritional_value >
       SETTINGS.environment.max_nutritional_value * std::exp(-aging_factor * age_)) {
-    SetNutritionalValue(updated_nutritional_value);
+    updated_nutritional_value = SETTINGS.environment.max_nutritional_value * std::exp(-aging_factor * age_);
   }
   age_ += deltaTime;
     // Adjust this factor
