@@ -41,7 +41,6 @@ class Creature : virtual public MovableEntity,
                  virtual public AliveEntity,
                  virtual public VisionSystem,
                  virtual public DigestiveSystem,
-                 virtual public GrabbingEntity,
                  virtual public MaleReproductiveSystem,
                  virtual public FemaleReproductiveSystem {
  public:

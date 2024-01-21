@@ -26,7 +26,7 @@ TextureManager::TextureManager()
   InitializeFile(energy_texture_, ":/Resources/Energy.png");
   InitializeFile(health_texture_, ":/Resources/Health.png");
   InitializeFile(stomach_texture_, ":/Resources/EmptyStomach.png");
-  InitializeFile(stomach_shader_, ":/Resources/stomachShader.png");
+  InitializeFile(stomach_shader_, ":/Shaders/stomachShader.frag");
 }
 
 void TextureManager::InitializeFile(sf::Shader &ValueSaved, std::string path)

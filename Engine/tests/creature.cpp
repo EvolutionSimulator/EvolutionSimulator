@@ -1,5 +1,6 @@
 #include <creature.h>
 #include <gtest/gtest.h>
+
 #include "geometry_primitives.h"
 #include "settings.h"
 
@@ -27,7 +28,6 @@ TEST(CreatureTests, CreatureConstructor) {
   double size = SETTINGS.physical_constraints.d_baby_size;
   double initial_health = SETTINGS.physical_constraints.d_integrity * pow(size, 2);
   double initial_energy = SETTINGS.physical_constraints.d_energy_density * pow(size, 2);
-
   EXPECT_EQ(creature.GetEnergy(), initial_energy);
   EXPECT_EQ(creature.GetHealth(), initial_health);
 }
@@ -64,7 +64,8 @@ TEST(CreatureTests, CreatureConstructor) {
 // /*!
 //  * @brief Tests the Creature's ability to retrieve its health value.
 //  *
-//  * @details Ensures that the GetHealth method correctly returns the Creature's
+//  * @details Ensures that the GetHealth method correctly returns the
+//  Creature's
 //  * current health.
 //  */
 // TEST(CreatureTests, GetHealth) {
@@ -78,7 +79,8 @@ TEST(CreatureTests, CreatureConstructor) {
 // /*!
 //  * @brief Tests the Creature's ability to set its health value.
 //  *
-//  * @details Validates that the SetHealth method correctly updates the Creature's
+//  * @details Validates that the SetHealth method correctly updates the
+//  Creature's
 //  * health.
 //  */
 // TEST(CreatureTests, SetHealth) {
@@ -185,31 +187,26 @@ TEST(CreatureTests, CreatureConstructor) {
 TEST(CreatureTests, IsGridCellPotentiallyInsideCone) {
   double grid_cell_size = 1.0;
 
-  auto grid_in_sight_1 = IsGridCellPotentiallyInsideCone(Point(5,5), grid_cell_size,
-                                                                 Point(5,5), 3.0,
-                                                                 OrientedAngle(-M_PI/4),
-                                                                 OrientedAngle(M_PI/4));
+  auto grid_in_sight_1 = IsGridCellPotentiallyInsideCone(
+      Point(5, 5), grid_cell_size, Point(5, 5), 3.0, OrientedAngle(-M_PI / 4),
+      OrientedAngle(M_PI / 4));
 
-  auto grid_in_sight_2 = IsGridCellPotentiallyInsideCone(Point(6,4), grid_cell_size,
-                                                       Point(5,5), 3.0,
-                                                       OrientedAngle(-M_PI/4),
-                                                       OrientedAngle(M_PI/4));
+  auto grid_in_sight_2 = IsGridCellPotentiallyInsideCone(
+      Point(6, 4), grid_cell_size, Point(5, 5), 3.0, OrientedAngle(-M_PI / 4),
+      OrientedAngle(M_PI / 4));
 
-  auto grid_in_sight_3 = IsGridCellPotentiallyInsideCone(Point(7,6), grid_cell_size,
-                                                         Point(5,5), 3.0,
-                                                         OrientedAngle(-M_PI/4),
-                                                         OrientedAngle(M_PI/4));
+  auto grid_in_sight_3 = IsGridCellPotentiallyInsideCone(
+      Point(7, 6), grid_cell_size, Point(5, 5), 3.0, OrientedAngle(-M_PI / 4),
+      OrientedAngle(M_PI / 4));
 
-  auto grid_out_of_sight = IsGridCellPotentiallyInsideCone(Point(15,19), grid_cell_size,
-                                                         Point(1,1), 3.0,
-                                                         OrientedAngle(-M_PI/4),
-                                                         OrientedAngle(M_PI/4));
+  auto grid_out_of_sight = IsGridCellPotentiallyInsideCone(
+      Point(15, 19), grid_cell_size, Point(1, 1), 3.0, OrientedAngle(-M_PI / 4),
+      OrientedAngle(M_PI / 4));
 
   EXPECT_TRUE(grid_in_sight_1);
   EXPECT_TRUE(grid_in_sight_2);
   EXPECT_TRUE(grid_in_sight_3);
   EXPECT_FALSE(grid_out_of_sight);
-
 }
 
 TEST(CreatureTests, GetClosestFoodInSight_MultipleFoods) {
@@ -229,14 +226,16 @@ TEST(CreatureTests, GetClosestFoodInSight_MultipleFoods) {
   meat_3->SetCoordinates(3.87724,2.52718, 10, 10); // distance = 1.14
   grid[3][2].push_back(meat_3);
 
-
   double creature_x = 4.26364, creature_y = 3.60048;
   creature.SetCoordinates(creature_x, creature_y, 10, 10);
   double target_x = 2.84687, target_y = 2.26958;
-  creature.SetOrientation(OrientedAngle(Point(creature_x,creature_y),Point(target_x,target_y)).GetAngle());
-  creature.SetVision(2.0, M_PI/3);
+  creature.SetOrientation(
+      OrientedAngle(Point(creature_x, creature_y), Point(target_x, target_y))
+          .GetAngle());
+  creature.SetVision(2.0, M_PI / 3);
 
-  auto closest_food = creature.GetClosestFoodInSight(grid, gridCellSize, Food::type::meat);
+  auto closest_food =
+      creature.GetClosestFoodInSight(grid, gridCellSize, Food::type::meat);
 
   ASSERT_EQ(closest_food, meat_1);
 }
@@ -262,18 +261,19 @@ TEST(CreatureTests, GetClosestFoodInSight_NoFoodInSight) {
   meat_3->SetCoordinates(3.87724,2.52718, 10, 10); // distance = 1.14
   grid[3][2].push_back(meat_3);
 
-
   double creature_x = 4.26364, creature_y = 3.60048;
   creature.SetCoordinates(creature_x, creature_y, 10, 10);
   double target_x = 2.84687, target_y = 2.26958;
-  creature.SetOrientation(OrientedAngle(Point(creature_x,creature_y),Point(target_x,target_y)).GetAngle());
-  creature.SetVision(1, M_PI/3);
+  creature.SetOrientation(
+      OrientedAngle(Point(creature_x, creature_y), Point(target_x, target_y))
+          .GetAngle());
+  creature.SetVision(1, M_PI / 3);
 
-  auto closest_food = creature.GetClosestFoodInSight(grid, gridCellSize, Food::type::meat);
+  auto closest_food =
+      creature.GetClosestFoodInSight(grid, gridCellSize, Food::type::meat);
 
   ASSERT_EQ(closest_food, nullptr);
 }
-
 
 TEST(CreatureTests, Digest) {
   // Initialize creature with specific energy and stomach fullness
@@ -324,7 +324,7 @@ TEST(CreatureTests, BiteCreature) {
 
   ASSERT_LT(creature2.GetHealth(), initialHealth);
 }
-
+/*
 TEST(CreatureTests, Grab) {
   neat::Genome genome(3, 4);
   Mutable mutables;
@@ -339,7 +339,7 @@ TEST(CreatureTests, Grab) {
   //ASSERT_TRUE(dynamic_cast<GrabbingEntity*>(&entity)->IsBeingGrabbedBy(&creature));
   ASSERT_LT(creature.GetEnergy(), initialEnergy);
 }
-
+*/
 
 TEST(CreatureTests, EmptinessPercent) {
   neat::Genome genome(3, 4);
