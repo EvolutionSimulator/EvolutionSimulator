@@ -217,10 +217,11 @@ void Creature::UpdateMatingDesire() {
                female_reproductive_system_.GetMaturityAge());
 
   double probability =
-      1 -
+      settings::physical_constraints::kMatingDesireMaxProb -
       (age_ - min_reproducing_age) /
-          settings::physical_constraints::kMaxRepdroducingAge -
-      min_reproducing_age * settings::physical_constraints::kMatingDesireFactor;
+          (settings::physical_constraints::kMaxRepdroducingAge -
+           min_reproducing_age) *
+          settings::physical_constraints::kMatingDesireFactor;
   mating_desire_ = mathlib::RandomDouble(0, 1) < probability;
 }
 

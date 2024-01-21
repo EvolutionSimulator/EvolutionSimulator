@@ -158,16 +158,19 @@ void SimulationData::AddEgg(const Egg& egg) {
 }
 
 void SimulationData::HatchEggs() {
-  std::remove_if(eggs_.begin(), eggs_.end(), [this](Egg& egg) {
-    if (egg.GetAge() >= egg.GetIncubationTime()) {
-      Creature new_creature = egg.Hatch();
-      new_creature.RandomInitialization(environment_.GetMapWidth(),
-                                        environment_.GetMapHeight());
-      AddCreature(new_creature);
-      return true;
-    }
-    return false;
-  });
+  eggs_.erase(std::remove_if(eggs_.begin(), eggs_.end(),
+                             [this](Egg& egg) {
+                               if (egg.GetAge() >= egg.GetIncubationTime()) {
+                                 Creature new_creature = egg.Hatch();
+                                 new_creature.RandomInitialization(
+                                     environment_.GetMapWidth(),
+                                     environment_.GetMapHeight());
+                                 AddCreature(new_creature);
+                                 return true;
+                               }
+                               return false;
+                             }),
+              eggs_.end());
 }
 
 /*!

@@ -60,6 +60,7 @@ constexpr double kDefaultLifespan = 30;
 constexpr double kPhotosynthesisFactor = 0.1;
 constexpr double kFrictionalCoefficient =
     0.15;  // Needs to be less than 1
+constexpr double kMaturityAgeMultiplier = 0.2;
 }  // namespace environment
 
 namespace engine {
@@ -92,8 +93,10 @@ constexpr double KDEatingCooldown = 1; // Decrease for easier survival
 constexpr double KDDigestionRate = 3;
 constexpr double KDGeneticStrength = 0.6;
 constexpr double KDAcidToEnergy = 5; // Increase for easier survival
+
 constexpr double kMaxRepdroducingAge = 700;
-constexpr double kMatingDesireFactor = 0.6;
+constexpr double kMatingDesireMaxProb = 0.05;
+constexpr double kMatingDesireFactor = 0.05;
 constexpr double kPregnancyEnergyFactor = 0.7;
 constexpr double kPregnancyVelocityFactor = 0.5;
 constexpr double kAfterBirthVelocityFactor = 1.5;

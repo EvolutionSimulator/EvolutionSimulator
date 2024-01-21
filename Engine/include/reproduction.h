@@ -25,7 +25,7 @@ class ReproductiveSystem {
   double ReadyToReproduceAt() const { return ready_to_reproduce_at_; }
 
  protected:
-  ReproductiveSystem() {};
+  ReproductiveSystem(){};
 
   double maturity_age_;
   double reproduction_cooldown_;
@@ -41,8 +41,10 @@ class ReproductiveSystem {
 
 class MaleReproductiveSystem : public ReproductiveSystem {
  public:
-  MaleReproductiveSystem() {}
   MaleReproductiveSystem(const Mutable* const mutables);
+  MaleReproductiveSystem(Mutable mutables)
+      : MaleReproductiveSystem(&mutables){};
+  MaleReproductiveSystem() : MaleReproductiveSystem(Mutable()) {}
 
   bool IsMale() const override { return true; }
   void MateWithFemale();
@@ -64,11 +66,14 @@ struct GestatingEgg {
 
 class FemaleReproductiveSystem : public ReproductiveSystem {
  public:
-  FemaleReproductiveSystem() {}
   FemaleReproductiveSystem(const Mutable* const mutables);
+  FemaleReproductiveSystem(Mutable mutables)
+      : FemaleReproductiveSystem(&mutables){};
+  FemaleReproductiveSystem() : FemaleReproductiveSystem(Mutable()) {}
 
   bool IsFemale() const override { return true; }
   bool IsPregnant() const override { return egg_.has_value(); };
+  GestatingEgg GetEgg() const { return egg_.value(); }
 
   virtual void Update(double delta_time) override;
   void MateWithMale(const Creature* const father, const Creature* const mother);

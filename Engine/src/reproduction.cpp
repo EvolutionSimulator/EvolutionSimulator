@@ -17,7 +17,8 @@ void ReproductiveSystem::ResetReproductionClock() {
 
 double ReproductiveSystem::MaturityAge(const Mutable* const mutables) const {
   return mutables->Complexity() *
-         (1 + mutables->GetMaxSize() - mutables->GetBabySize()) * 0.2;
+         (1 + mutables->GetMaxSize() - mutables->GetBabySize()) *
+         settings::environment::kMaturityAgeMultiplier;
 }
 
 MaleReproductiveSystem::MaleReproductiveSystem(const Mutable* const mutables) {
@@ -58,7 +59,7 @@ FemaleReproductiveSystem::FemaleReproductiveSystem(
 }
 
 void FemaleReproductiveSystem::Update(double delta_time) {
-  Update(delta_time);
+  ReproductiveSystem::Update(delta_time);
   if (egg_.has_value()) {
     egg_->age += delta_time;
   }
