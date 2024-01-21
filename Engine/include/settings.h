@@ -88,7 +88,7 @@ class Settings {
     double d_integrity = 3.0;
     double d_strafing_difficulty = 0.5;
     double d_max_size = 10;
-    double d_baby_size = 2;
+    double d_baby_size = 4;
     double d_max_force = 10;
     double d_growth_factor = 10;
     double d_vision_factor = 200;

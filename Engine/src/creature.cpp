@@ -101,7 +101,7 @@ void Creature::Update(double deltaTime, double const kMapWidth,
   this->Rotate(deltaTime);
   this->Think(grid, GridCellSize, deltaTime, kMapWidth, kMapHeight);
   this->Digest(deltaTime);
-  age_ += 0.05;
+  age_ += deltaTime;
 
   if (reproduction_cooldown_ <= 0) {
     reproduction_cooldown_ = 0.0;
