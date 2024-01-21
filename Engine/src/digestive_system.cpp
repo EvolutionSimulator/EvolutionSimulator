@@ -95,7 +95,7 @@ void DigestiveSystem::Bite(Food* food)
   else
   {
     double initial_food_size = food->GetSize();
-    double new_radius = std::sqrt(pow(initial_food_size,2) - pow(food_to_eat,2));
+    double new_radius = std::sqrt(std::abs(pow(initial_food_size,2) - pow(food_to_eat,2)));
     food->SetSize(new_radius);
     stomach_fullness_ += pow(food_to_eat, 2);
     max_nutrition =  food->GetNutritionalValue() * food_to_eat;

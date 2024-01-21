@@ -124,7 +124,7 @@ void MovableEntity::SetRotationalVelocity(double rotational_velocity) {
  * @return The calculated forward friction.
  */
 double MovableEntity::GetForwardFriction() const {
-  return GetVelocity() * sqrt(GetSize()) *
+  return GetVelocity() * sqrt(std::abs(GetSize())) *
          frictional_coefficient_ *
          (1 + strafing_difficulty_ * fabs(sin(GetVelocityAngle())));
 }

@@ -60,16 +60,16 @@ class Settings {
     double plant_nutritional_value = 0.5;
     double meat_nutritional_value = 1;
     double plant_proportion = 0.5; // PlantProportion + MeatProportion = 1
-    double rot_factor = 1.0;
+    double rot_factor = 0.01;
     double grid_cell_size = 50.0;
     int min_creature_size = 2;
     double reproduction_threshold = 0.80;
     double reproduction_cooldown = 10;
     int input_neurons = 12;
     int output_neurons = 6;
-    double max_nutritional_value = 5;
+    double max_nutritional_value = 2;
     double default_lifespan = 30;
-    double photosynthesis_factor = 0.1;
+    double photosynthesis_factor = 0.01;
     double frictional_coefficient = 0.15; // Needs to be less than 1
   } environment;
 

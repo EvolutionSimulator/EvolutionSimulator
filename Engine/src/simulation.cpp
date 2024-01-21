@@ -32,6 +32,7 @@ void Simulation::FixedUpdate(double deltaTime) {
   creature_manager_.UpdateAllCreatures(*data, environment, entity_grid_, deltaTime);
   creature_manager_.ReproduceCreatures(*data, environment);
   food_manager_.GenerateMoreFood(*data_, environment, deltaTime);
+  food_manager_.UpdateAllFood(*data, deltaTime);
   entity_grid_.UpdateGrid(*data_, environment);
   collision_manager_.CheckCollisions(entity_grid_);
   data_->world_time_ += deltaTime;
