@@ -245,8 +245,14 @@ void Entity::OnCollision(Entity &other_entity, double const kMapWidth,
   double x_overlap = overlap * (x_coord_ - other_coordinates.first) / distance;
   double y_overlap = overlap * (y_coord_ - other_coordinates.second) / distance;
 
-  // If this entity is larger than the other entity, move the other entity
-  // Otherwise, move this entity
+  // Calculate how much should each entity move
+  double total_size = size_ + other_size;
+  this->SetCoordinates(x_coord_ + x_overlap*size_/total_size,
+                       y_coord_ + y_overlap*size_/total_size,
+                       kMapWidth, kMapHeight);
+  other_entity.SetCoordinates(other_coordinates.first - x_overlap*other_size/total_size,
+                              other_coordinates.second - y_overlap*other_size/total_size,
+                              kMapWidth, kMapHeight);
   if (GetSize() > other_entity.GetSize()) {
     other_entity.SetCoordinates(other_coordinates.first - x_overlap,
                                 other_coordinates.second - y_overlap, kMapWidth,
