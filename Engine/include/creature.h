@@ -35,7 +35,7 @@
  * for and consuming food, and managing its energy and health. The class also
  * supports evolutionary features like reproduction and genetic inheritance.
  */
-class Creature : virtual public AliveEntity,  virtual public GrabbingEntity, virtual public VisionSystem, virtual public DigestiveSystem, virtual public ReproductiveSystem {
+class Creature : virtual public AliveEntity,  virtual public MovableEntity, virtual public VisionSystem, virtual public DigestiveSystem, virtual public ReproductiveSystem {
  public:
   Creature(neat::Genome genome, Mutable mutable_);
 

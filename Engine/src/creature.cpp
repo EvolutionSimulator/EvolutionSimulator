@@ -36,7 +36,7 @@
  */
 
 Creature::Creature(neat::Genome genome, Mutable mutables)
-    : GrabbingEntity(),
+    : MovableEntity(),
       AliveEntity(genome, mutables),
       VisionSystem(genome, mutables),
       DigestiveSystem(genome, mutables),
@@ -120,11 +120,11 @@ void Creature::Update(double deltaTime, double const kMapWidth,
   this->frictional_coefficient_ = frictional_coefficient;
   this->UpdateMaxEnergy();
   this->UpdateEnergy(deltaTime);
-  this->SetAffectedByGrabbedEnttityAll(false);
-  this->SetGrabValues();
+  // this->SetAffectedByGrabbedEnttityAll(false);
+  // this->SetGrabValues();
   this->UpdateVelocities(deltaTime);
   this->Move(deltaTime, kMapWidth, kMapHeight);
-  this->Rotate(deltaTime, kMapWidth, kMapHeight);
+  this->Rotate(deltaTime);  //, kMapWidth, kMapHeight);
   this->Think(grid, GridCellSize, deltaTime, kMapWidth, kMapHeight);
   this->Digest(deltaTime);
   age_ += deltaTime;
@@ -166,12 +166,14 @@ void Creature::OnCollision(Entity &other_entity, double const kMapWidth, double 
       Bite(creature_entity);
     }
   }
+  /*
   if (other_entity.GetState() == Entity::Alive && grabbing_ &&
       IsInSight(&other_entity) && !(this->GetGrabbedEntity())) {
     // checking if the creature wants to grab, has the entity in sight and if he
     // is not already grabbing something
     Grab(&other_entity);
   }
+  */
   MovableEntity::OnCollision(other_entity, kMapWidth, kMapHeight);
 }
 
@@ -566,6 +568,7 @@ void Creature::Bite(Creature *creature) {
  *
  * @param entity The entity the creature bites into.
  */
+/*
 void Creature::Grab(Entity *entity) {
   if (dynamic_cast<MovableEntity *>(entity)) {
     this->SetGrabbedEntity(dynamic_cast<MovableEntity *>(entity));
@@ -575,3 +578,4 @@ void Creature::Grab(Entity *entity) {
     this->UpdateEntityVelocities();
   }
 }
+*/
