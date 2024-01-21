@@ -44,8 +44,8 @@ void Engine::Run() {
         std::chrono::duration<double>(current_time - last_update_time_) *
         speed;
 
-    if (update_delta.count() > 0.25)
-      update_delta = std::chrono::duration<double>(0.25);
+    if (update_delta.count() > 0.05)
+      update_delta = std::chrono::duration<double>(0.05);
 
     last_update_time_ = current_time;
     time_since_fixed_update += update_delta;
@@ -58,7 +58,7 @@ void Engine::Run() {
       time_since_fixed_update -= fixed_update_interval_duration;
     }
 
-    std::this_thread::yield();
+    std::this_thread::sleep_for(std::chrono::microseconds(1000));
   }
 }
 
