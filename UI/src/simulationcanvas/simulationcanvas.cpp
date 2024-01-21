@@ -285,7 +285,9 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
     auto data = simulation_->GetSimulationData();
 
     float scaledX = initialClickPosition.x;
+    scaledX = fmod(scaledX, static_cast<float>(settings::environment::kDMapWidth));
     float scaledY = initialClickPosition.y;
+    scaledY = fmod(scaledY, static_cast<float>(settings::environment::kDMapHeight));
     #if defined(Q_OS_MACOS)
         // On macOS, halve the mouse coordinates
       scaledX *= 1439.0 / 2880.0f;
@@ -299,7 +301,8 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
             auto [creatureX, creatureY] = creature.GetCoordinates();
             float creatureSize = creature.GetSize();
             sf::Vector2f creaturePos(creatureX, creatureY);
-
+            //double scaledCreaturePosX = fmod(creaturePos.x, static_cast<float>(settings::environment::kDMapWidth));
+            //double scaledCreaturePosY = fmod(creaturePos.x, static_cast<float>(settings::environment::kDMapHeight));
             if (sqrt(pow(scaledX - creaturePos.x, 2) + pow(scaledY - creaturePos.y, 2)) <= 1.5*creatureSize) {
                 // Mouse position coincides with the creature, toggle the followCreature flag
                 followCreature = !followCreature;
