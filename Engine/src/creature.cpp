@@ -170,6 +170,7 @@ void Creature::Update(double deltaTime, double const kMapWidth,
   this->frictional_coefficient_ = frictional_coefficient;
   this->UpdateMaxEnergy();
   this->UpdateEnergy(deltaTime);
+  this->SetAffectedByGrabbedEnttityAll(false);
   this->SetGrabValues();
   this->UpdateVelocities(deltaTime);
   this->Move(deltaTime, kMapWidth, kMapHeight);
@@ -607,6 +608,7 @@ void Creature::Grab(std::shared_ptr<Entity> entity){
         this->SetGrabbedEntity(std::dynamic_pointer_cast<MovableEntity>(entity));
         std::dynamic_pointer_cast<GrabbingEntity>(entity)->AddToGrabbedBy(std::make_shared<GrabbingEntity>(*this));
         SetEnergy(GetEnergy() - entity->GetSize());
-        //this->UpdateEntityVelocities();
+        // this->SetGrabValues();
+        // this->UpdateEntityVelocities();
     }
 }
