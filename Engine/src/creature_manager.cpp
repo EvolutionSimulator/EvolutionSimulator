@@ -1,6 +1,8 @@
-#include "../include/creature_manager.h"
+#include "creature_manager.h"
 
 #include "settings.h"
+
+#include <omp.h>
 
 CreatureManager::CreatureManager() {}
 
@@ -17,14 +19,28 @@ void CreatureManager::UpdateAllCreatures(SimulationData &data,
                                          double deltaTime) {
   auto grid = entity_grid.GetGrid();
 
-  for (auto &creature : data.creatures_) {
+  // Vector to store thread-local reproduce lists
+  std::vector<std::vector<std::shared_ptr<Creature>>> local_reproduce_lists(omp_get_max_threads());
+
+  #pragma omp parallel for
+  for (int i = 0; i < data.creatures_.size(); ++i) {
+    auto& creature = data.creatures_[i];
     creature->Update(deltaTime, SETTINGS.environment.map_width,
-                    SETTINGS.environment.map_height, grid,
-                    SETTINGS.environment.grid_cell_size,
-                    environment.GetFrictionalCoefficient());
+                     SETTINGS.environment.map_height, grid,
+                     SETTINGS.environment.grid_cell_size,
+                     environment.GetFrictionalCoefficient());
+
     if (creature->Fit()) {
-      data.new_reproduce_.push(creature);
+      int thread_id = omp_get_thread_num();
+      local_reproduce_lists[thread_id].push_back(creature);
       creature->Reproduced();
+    }
+  }
+
+  // Merge thread-local lists into the global reproduce list
+  for (auto &list : local_reproduce_lists) {
+    for (auto &creature : list) {
+      data.new_reproduce_.push(creature);
     }
   }
 }
