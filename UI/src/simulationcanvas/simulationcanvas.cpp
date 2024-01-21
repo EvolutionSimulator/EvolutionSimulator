@@ -36,7 +36,10 @@ SimulationCanvas::SimulationCanvas(QWidget* Parent)
 
 
 
-void SimulationCanvas::UpdateFoodDensityTexture(double width, double height){
+void SimulationCanvas::UpdateFoodDensityTexture(SimulationData& data){
+    int width = data.GetEnvironment().GetMapWidth();
+    int height = data.GetEnvironment().GetMapHeight();
+
     texture_manager_.food_density_texture_.create(width, height);
     sf::Image densityImage;
     densityImage.create(width, height, sf::Color::Black);
@@ -44,7 +47,7 @@ void SimulationCanvas::UpdateFoodDensityTexture(double width, double height){
     for (unsigned int x = 0; x < width; ++x) {
         for (unsigned int y = 0; y < height; ++y) {
             // Get the density value from the function
-            float densityValue = simulation_->GetSimulationData()->GetEnvironment().GetFoodDensity(x, y);
+            float densityValue = data.GetEnvironment().GetFoodDensity(x, y);
 
             // Normalize the density value to the range 0 - 255 for the red channel
             sf::Uint8 greenValue = static_cast<sf::Uint8>(255 * std::min(
@@ -72,11 +75,14 @@ void SimulationCanvas::OnInit()
   clear(sf::Color(0, 255, 0));
   initialViewCenter = getView().getCenter();
   initialViewSize = getView().getSize();
+
+  OnUpdate();
 }
 
 void SimulationCanvas::OnUpdate()
 {
-  RenderSimulation(simulation_->GetSimulationData());
+  auto data = simulation_->GetSimulationData();
+  RenderSimulation(*data);
 
   // Check if a creature is selected
   if (info_panel_.IsVisible() && info_panel_.GetSelectedCreature()) {
@@ -113,13 +119,13 @@ void SimulationCanvas::DrawMouseCoordinates()
 }
 
 // use this to process the simulation data and render it on the screen
-void SimulationCanvas::RenderSimulation(DataAccessor<SimulationData> data) {
+void SimulationCanvas::RenderSimulation(SimulationData& data) {
   clear(sf::Color(20, 22, 69));
 
   // Iterate through food and load the corresponding sprite
   // Note that we are assuming to be working with a sprite sheet of 256x256 per sprite
 
-  for (const auto& food_ptr : data->food_entities_) {
+  for (const auto& food_ptr : data.food_entities_) {
     if (food_ptr == nullptr) continue;
     std::shared_ptr<Food> food = food_ptr;
     auto renderPositions = getEntityRenderPositions(food);
@@ -128,9 +134,12 @@ void SimulationCanvas::RenderSimulation(DataAccessor<SimulationData> data) {
     }
   }
 
+  int size = data.creatures_.size();
   // Iterate through creatures and create a gradient circle shape for each
-  for (const auto& creature_ptr : data->creatures_) {
+  for (const auto& creature_ptr : data.creatures_) {
     if (creature_ptr == nullptr) continue;
+    auto& creature_ref = *creature_ptr;
+    int id = creature_ref.GetID();
     std::shared_ptr<Creature> creature = creature_ptr;
     auto renderPositions = getEntityRenderPositions(creature);
     for (const auto& pos : renderPositions) {
@@ -220,8 +229,8 @@ std::vector<std::pair<double, double>> SimulationCanvas::getEntityRenderPosition
     double entitySize = entity->GetSize();
     sf::Vector2f viewCenter = getView().getCenter();
     sf::Vector2f viewSize = getView().getSize();
-    double mapWidth = GetSimulation()->GetSimulationData()->GetEnvironment().GetMapWidth();
-    double mapHeight = GetSimulation()->GetSimulationData()->GetEnvironment().GetMapHeight();
+    double mapWidth = SETTINGS.environment.map_width;
+    double mapHeight = SETTINGS.environment.map_height;
 
     // Function to check if position is within view bounds
     auto isInView = [&](double x, double y) {
@@ -292,7 +301,7 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
   qDebug() << "Click Outside, closing panel";
   info_panel_.Hide();
   info_panel_.SetSelectedCreature(nullptr);
-  repaint();
+  // repaint();
 }
 
 
@@ -391,8 +400,8 @@ void SimulationCanvas::mouseMoveEvent(QMouseEvent* event) {
         sf::View view = getView();
         view.move(averagedDelta);
         // Get map dimensions
-        double mapWidth = simulation_->GetSimulationData()->GetEnvironment().GetMapWidth();
-        double mapHeight = simulation_->GetSimulationData()->GetEnvironment().GetMapHeight();
+        double mapWidth = SETTINGS.environment.map_width;
+        double mapHeight = SETTINGS.environment.map_height;
 
         // Get the new center of the view
         sf::Vector2f newCenter = view.getCenter();

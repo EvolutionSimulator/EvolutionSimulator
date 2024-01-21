@@ -20,23 +20,23 @@ void GraphManager::SetEngine(Engine* engine)
 }
 
 void GraphManager::DrawCreaturesOverTimeGraph() {
-  auto data = engine_->GetSimulation()->GetSimulationData()->GetCreatureCountOverTime();
-  DrawGraph(data, "Number of Creatures in the Simulation");
+  auto data = engine_->GetSimulation()->GetSimulationData();
+  DrawGraph(data->GetCreatureCountOverTime(), "Number of Creatures in the Simulation");
 }
 
 void GraphManager::DrawCreaturesSizeOverTimeGraph() {
-  auto data = engine_->GetSimulation()->GetSimulationData()->GetCreatureSizeOverTime();
-  DrawGraph(data, "Average Size of Creatures in the Simulation");
+  auto data = engine_->GetSimulation()->GetSimulationData();
+  DrawGraph(data->GetCreatureSizeOverTime(), "Average Size of Creatures in the Simulation");
 }
 
 void GraphManager::DrawCreaturesEnergyOverTimeGraph() {
-  auto data = engine_->GetSimulation()->GetSimulationData()->GetCreatureEnergyOverTime();
-  DrawGraph(data, "Average Energy of Creatures in the Simulation");
+  auto data = engine_->GetSimulation()->GetSimulationData();
+  DrawGraph(data->GetCreatureEnergyOverTime(), "Average Energy of Creatures in the Simulation");
 }
 
 void GraphManager::DrawCreaturesVelocityOverTimeGraph() {
-  auto data = engine_->GetSimulation()->GetSimulationData()->GetCreatureVelocityOverTime();
-  DrawGraph(data, "Average Velocity of Creatures in the Simulation");
+  auto data = engine_->GetSimulation()->GetSimulationData();
+  DrawGraph(data->GetCreatureVelocityOverTime(), "Average Velocity of Creatures in the Simulation");
 }
 
 void GraphManager::DrawSizeEnergyScatterplot() {
