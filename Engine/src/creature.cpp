@@ -38,6 +38,7 @@ Creature::Creature(neat::Genome genome, Mutable mutables)
     }
     neuron_data_ = std::vector<double>(neural_inputs, 0.0);
     think_count_ = this->GetID();
+    color_hue_ = mutables.GetColor();
 }
 
 /*!
