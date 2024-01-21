@@ -246,21 +246,13 @@ void Entity::OnCollision(Entity &other_entity, double const kMapWidth,
   double y_overlap = overlap * (y_coord_ - other_coordinates.second) / distance;
 
   // Calculate how much should each entity move
-  double total_size = size_ + other_size;
-  this->SetCoordinates(x_coord_ + x_overlap*size_/total_size,
-                       y_coord_ + y_overlap*size_/total_size,
+  double total_size = std::pow(size_, 2) + std::pow(other_size, 2);
+  this->SetCoordinates(x_coord_ + x_overlap*std::pow(size_, 2)/total_size,
+                       y_coord_ + y_overlap*std::pow(size_, 2)/total_size,
                        kMapWidth, kMapHeight);
-  other_entity.SetCoordinates(other_coordinates.first - x_overlap*other_size/total_size,
-                              other_coordinates.second - y_overlap*other_size/total_size,
+  other_entity.SetCoordinates(other_coordinates.first - x_overlap*std::pow(other_size, 2)/total_size,
+                              other_coordinates.second - y_overlap*std::pow(other_size, 2)/total_size,
                               kMapWidth, kMapHeight);
-  if (GetSize() > other_entity.GetSize()) {
-    other_entity.SetCoordinates(other_coordinates.first - x_overlap,
-                                other_coordinates.second - y_overlap, kMapWidth,
-                                kMapHeight);
-  } else {
-    SetCoordinates(x_coord_ + x_overlap, y_coord_ + y_overlap, kMapWidth,
-                   kMapHeight);
-  }
 
   // Assert that the entities are no longer overlapping
   // assert(size_ + other_size - GetDistance(other_entity, kMapWidth,
