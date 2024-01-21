@@ -189,10 +189,10 @@ void MainWindow::SetUpConnections()
     updateTimer->start(1000);  // Set the interval to 1000 milliseconds (1 second)
 
     // Connect friction slider on main UI
-    connect(ui_->frictionCoefficientSpinBox, SIGNAL(valueChanged(double)), this,
-            SLOT(ChangeFrictionCoefficient(double)));
-    connect(ui_->frictionCoefficientSpinBox, &QSlider::valueChanged, config_manager_, &ConfigManager::ChangeFriction);
-    ui_ -> frictionCoefficientSpinBox->setTracking(true);
+    //connect(ui_->frictionCoefficientSpinBox, SIGNAL(valueChanged(double)), this,
+          //  SLOT(ChangeFrictionCoefficient(double)));
+    //connect(ui_->frictionCoefficientSpinBox, &QSlider::valueChanged, config_manager_, &ConfigManager::ChangeFriction);
+   // ui_ -> frictionCoefficientSpinBox->setTracking(true);
 
 }
 
@@ -206,6 +206,14 @@ void MainWindow::DrawUI()
     comboBox->addItem(QIcon(scaledPixmap), "Graphs");
     comboBox->addItem("Number of Creatures Over Time");
     comboBox->addItem("Creatures Size Over Time");
+
+    QComboBox *comboBox2 = ui_->saveLoadMenu;
+    QPixmap originalPixmap2(":/Resources/save.png");
+    QPixmap scaledPixmap2 = originalPixmap2.scaled(20, 20, Qt::KeepAspectRatio);
+    comboBox2->setIconSize(scaledPixmap2.size());
+    comboBox2->addItem(QIcon(scaledPixmap2), "Save/Load");
+    comboBox2->addItem("Save");
+    comboBox2->addItem("Load");
 
     // Set up run, restart
     QRect rect(2,2,45,45);
