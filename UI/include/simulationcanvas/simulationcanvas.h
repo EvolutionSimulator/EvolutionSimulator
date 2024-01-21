@@ -36,6 +36,8 @@ class SimulationCanvas : public QSFMLCanvas {
   Simulation *simulation_ = nullptr;
   virtual void OnInit() override;
   virtual void OnUpdate() override;
+  Creature* followedCreature = nullptr;
+  bool followCreature = false;
 
   // Rendering logic
   void RenderSimulation(DataAccessor<SimulationData> data);

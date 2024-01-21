@@ -1,4 +1,5 @@
 #include "simulationcanvas/simulationcanvas.h"
+#include "QtWidgets/qapplication.h"
 #include <QDebug>
 #include <QDir>
 #include <QFile>
@@ -76,6 +77,11 @@ void SimulationCanvas::OnInit()
 
 void SimulationCanvas::OnUpdate()
 {
+    if (followCreature && followedCreature) {
+        // Update the view to follow the creature
+        centerViewAroundCreature({static_cast<float>(followedCreature->GetCoordinates().first), static_cast<float>(followedCreature->GetCoordinates().second)});
+    }
+
   RenderSimulation(simulation_->GetSimulationData());
 
   // Check if a creature is selected
@@ -266,70 +272,86 @@ void SimulationCanvas::centerViewAroundCreature(const sf::Vector2f& creaturePosi
 }
 
 void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
-  float scaleFactor = this->devicePixelRatioF();
-  sf::Vector2i scaledPos(static_cast<int>(event->position().x() * scaleFactor),
-                         static_cast<int>(event->position().y() * scaleFactor));
-  sf::Vector2f mousePos = mapPixelToCoords(scaledPos);
+    float scaleFactor = this->devicePixelRatioF();
+    sf::Vector2i scaledPos(static_cast<int>(event->position().x() * scaleFactor),
+                           static_cast<int>(event->position().y() * scaleFactor));
+    sf::Vector2f mousePos = mapPixelToCoords(scaledPos);
 
-  // Needed for differentiating clicking and dragging
-  initialClickPosition = mousePos;
-  isClicking = true;
-  qDebug() << "Mouse Pressed at: " << mousePos.x << ", " << mousePos.y;
+    // Needed for differentiating clicking and dragging
+    initialClickPosition = mousePos;
+    isClicking = true;
+    qDebug() << "Mouse Pressed at: " << mousePos.x << ", " << mousePos.y;
 
-  auto data = simulation_->GetSimulationData();
+    auto data = simulation_->GetSimulationData();
 
-  float scaledX = initialClickPosition.x;
-  float scaledY = initialClickPosition.y;
+    float scaledX = initialClickPosition.x;
+    float scaledY = initialClickPosition.y;
     #if defined(Q_OS_MACOS)
         // On macOS, halve the mouse coordinates
       scaledX *= 1439.0 / 2880.0f;
       scaledY *= 899.0f / 1800.0f;
     #endif
-  qDebug() << "(RESCALED) Mouse Pressed at: " << scaledX << ", " << scaledY;
+    qDebug() << "(RESCALED) Mouse Pressed at: " << scaledX << ", " << scaledY;
 
-  if (event->button() == Qt::RightButton) {
-          // Right-clicked, check if the mouse position coincides with any creature
-          for (auto& creature : simulation_->GetSimulationData()->creatures_) {
-              auto [creatureX, creatureY] = creature.GetCoordinates();
-              float creatureSize = creature.GetSize();
-              sf::Vector2f creaturePos(creatureX, creatureY);
+    if (event->button() == Qt::RightButton) {
+        // Right-clicked, check if the mouse position coincides with any creature
+        for (auto& creature : simulation_->GetSimulationData()->creatures_) {
+            auto [creatureX, creatureY] = creature.GetCoordinates();
+            float creatureSize = creature.GetSize();
+            sf::Vector2f creaturePos(creatureX, creatureY);
 
-              if (sqrt(pow(scaledX - creaturePos.x, 2) + pow(scaledY - creaturePos.y, 2)) <= 1.5*creatureSize) {
-                  // Mouse position coincides with the creature, center the view around it
-                  centerViewAroundCreature(creaturePos);
+            if (sqrt(pow(scaledX - creaturePos.x, 2) + pow(scaledY - creaturePos.y, 2)) <= 1.5*creatureSize) {
+                // Mouse position coincides with the creature, toggle the followCreature flag
+                followCreature = !followCreature;
 
-                  // Update the view
-                  info_panel_.Hide();
-                  info_panel_.SetSelectedCreature(nullptr);
-                  update();
-                  return;
-              }
-          }
-      }
+                if (followCreature) {
+                    // If following, set the creature to be followed
+                    followedCreature = &creature;
+                    centerViewAroundCreature(creaturePos);
+                } else {
+                    // If not following, stop following the creature
+                    followedCreature = nullptr;
+                }
 
-  // Checking if we need to display info panel
-  for (auto& creature : data->creatures_) {
-    auto [creatureX, creatureY] = creature.GetCoordinates();
-    float creatureSize = creature.GetSize();
-    sf::Vector2f creaturePos(creatureX, creatureY);
-
-    if (abs(creatureY-scaledY)<20 && (abs(creatureX - scaledX) < 20)){
-        qDebug() << "Creature Position: " << creatureX << "    " << creatureY;
+                // Update the view
+                info_panel_.Hide();
+                info_panel_.SetSelectedCreature(nullptr);
+                update();
+                return;
+            }
+        }
+    } else {
+        // Any other mouse click while following a creature stops following
+        if (followCreature) {
+            followCreature = false;
+            followedCreature = nullptr;
+            update();
+        }
     }
 
-    if (sqrt(pow(scaledX - creaturePos.x, 2) + pow(scaledY - creaturePos.y, 2)) <= 1.5*creatureSize) {
-      qDebug() << "Creature Clicked: ID" << creature.GetID();
-      info_panel_.Show();
-      info_panel_.SetSelectedCreature(&creature);
-      repaint();
-      return;
-    }
-  }
+    // Checking if we need to display info panel
+    for (auto& creature : data->creatures_) {
+        auto [creatureX, creatureY] = creature.GetCoordinates();
+        float creatureSize = creature.GetSize();
+        sf::Vector2f creaturePos(creatureX, creatureY);
 
-  qDebug() << "Click Outside, closing panel";
-  info_panel_.Hide();
-  info_panel_.SetSelectedCreature(nullptr);
-  repaint();
+        if (abs(creatureY-scaledY)<20 && (abs(creatureX - scaledX) < 20)){
+            qDebug() << "Creature Position: " << creatureX << "    " << creatureY;
+        }
+
+        if (sqrt(pow(scaledX - creaturePos.x, 2) + pow(scaledY - creaturePos.y, 2)) <= 1.5*creatureSize) {
+            qDebug() << "Creature Clicked: ID" << creature.GetID();
+            info_panel_.Show();
+            info_panel_.SetSelectedCreature(&creature);
+            repaint();
+            return;
+        }
+    }
+
+    qDebug() << "Click Outside, closing panel";
+    info_panel_.Hide();
+    info_panel_.SetSelectedCreature(nullptr);
+    repaint();
 }
 
 
