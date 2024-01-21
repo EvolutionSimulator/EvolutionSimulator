@@ -50,6 +50,7 @@ class GrabbingEntity : virtual public MovableEntity {
   bool grabbing_;  /*! Indicates whether creature is grabbing or not*/
 
   void SetAffectedByGrabbedEntity(bool affected);
+  void SetAffectedByGrabbedEnttityAll(bool affected);
 
   void SetGrabValues();
 
