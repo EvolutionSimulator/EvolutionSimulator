@@ -112,7 +112,8 @@ void SimulationData::UpdateAllCreatures(double deltaTime) {
     }
 
     if (creature.GetFemaleReproductiveSystem()->CanBirth()) {
-      AddEgg(creature.GetFemaleReproductiveSystem()->GiveBirth());
+      AddEgg(creature.GetFemaleReproductiveSystem()->GiveBirth(
+          creature.GetCoordinates()));
       creature.SetVelocity(
           creature.GetVelocity() *
           settings::physical_constraints::kAfterBirthVelocityFactor);

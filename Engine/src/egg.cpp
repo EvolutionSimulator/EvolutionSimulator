@@ -1,14 +1,14 @@
 #include "egg.h"
 
-Egg::Egg(const GestatingEgg& gestating_egg)
-    : Food(NAN, NAN, 0, 0),
+Egg::Egg(const GestatingEgg& gestating_egg,
+         const std::pair<double, double>& coordinates)
+    : Food(coordinates.first, coordinates.second, 0, 0),
       Creature(gestating_egg.genome, gestating_egg.mutables),
       generation_(gestating_egg.generation),
-      incubation_time_(gestating_egg.incubation_time)
-
-{
+      incubation_time_(gestating_egg.incubation_time) {
   type_ = egg;
   age_ = gestating_egg.age;
+  Update(0);
 }
 
 double Egg::GetIncubationTime() const { return incubation_time_; }

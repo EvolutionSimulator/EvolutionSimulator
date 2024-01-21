@@ -103,7 +103,8 @@ bool FemaleReproductiveSystem::CanBirth() const {
          egg_->age / egg_->incubation_time >= gestation_ratio_to_incubation_;
 }
 
-Egg FemaleReproductiveSystem::GiveBirth() {
+Egg FemaleReproductiveSystem::GiveBirth(
+    const std::pair<double, double>& coordinates) {
   if (not CanBirth()) {
     throw std::runtime_error("Egg not ready to hatch");
   }
@@ -112,7 +113,7 @@ Egg FemaleReproductiveSystem::GiveBirth() {
   egg_.reset();
 
   ResetReproductionClock();
-  return egg;
+  return Egg(egg, coordinates);
 }
 
 double FemaleReproductiveSystem::ReproductionCooldown(

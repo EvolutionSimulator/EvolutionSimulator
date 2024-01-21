@@ -29,7 +29,8 @@ TEST(ReproductionTest, SimulatePregnancy) {
   ASSERT_TRUE(female.GetFemaleReproductiveSystem()->IsPregnant());
   ASSERT_TRUE(female.GetFemaleReproductiveSystem()->CanBirth());
 
-  Egg egg = female.GetFemaleReproductiveSystem()->GiveBirth();
+  Egg egg =
+      female.GetFemaleReproductiveSystem()->GiveBirth(female.GetCoordinates());
   ASSERT_FALSE(female.GetFemaleReproductiveSystem()->IsPregnant());
   ASSERT_FALSE(female.GetFemaleReproductiveSystem()->CanBirth());
 }

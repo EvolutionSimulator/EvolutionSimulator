@@ -7,7 +7,8 @@
 
 class Egg : public Food, public Creature {
  public:
-  Egg(const GestatingEgg& gestating_egg);
+  Egg(const GestatingEgg& gestating_egg,
+      const std::pair<double, double>& coordinates);
 
   double GetIncubationTime() const;
 
