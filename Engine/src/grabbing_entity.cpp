@@ -2,6 +2,8 @@
 
 #include <math.h>
 
+#include <iostream>
+
 #include "config.h"
 #include "movable_entity.h"
 
@@ -181,6 +183,12 @@ void GrabbingEntity::SetAffectedByGrabbedEntity(bool affected) {
   affected_by_grabbed_entity_ = affected;
 }
 
+void GrabbingEntity::SetAffectedByGrabbedEnttityAll(bool affected) {
+  for (GrabbingEntity* entity : grab_affected_entities_) {
+    entity->SetAffectedByGrabbedEntity(affected);
+  }
+}
+
 void GrabbingEntity::SetGrabValues() {
   if (!grabbed_entity_ && !grabbed_by_.size()) {
     return;
@@ -193,6 +201,7 @@ void GrabbingEntity::SetGrabValues() {
 void GrabbingEntity::UpdateEntityVelocities() {
   double total_v_x = 0;
   double total_v_y = 0;
+
   for (GrabbingEntity* entity : grab_affected_entities_) {
     total_v_x += entity->GetVelocity() * cos(entity->GetVelocityAngle());
     total_v_y += entity->GetVelocity() * sin(entity->GetVelocityAngle());
@@ -210,6 +219,7 @@ void GrabbingEntity::UpdateVelocities(double deltaTime) {
     return;
   }
   for (GrabbingEntity* entity : grab_affected_entities_) {
+    entity->SetAffectedByGrabbedEntity(true);
     double velocity_x =
         GetVelocity() * cos(GetOrientation() + GetVelocityAngle());
     double velocity_y =
@@ -229,6 +239,9 @@ void GrabbingEntity::UpdateVelocities(double deltaTime) {
 
 void GrabbingEntity::Move(double deltaTime, const double kMapWidth,
                           const double kMapHeight) {
+  std::cout << GetID() << std::endl;
+  int id = GetID();
+  if (affected_by_grabbed_entity_) return;
   if (!grabbed_entity_ && !grabbed_by_.size()) {
     MovableEntity::Move(deltaTime, kMapWidth, kMapHeight);
     return;
@@ -256,6 +269,7 @@ void GrabbingEntity::Move(double deltaTime, const double kMapWidth,
 
 void GrabbingEntity::Rotate(double deltaTime, double kMapWidth,
                             double kMapHeight) {
+  if (affected_by_grabbed_entity_) return;
   if (!grabbed_entity_ && !grabbed_by_.size()) {
     MovableEntity::Rotate(deltaTime);
     return;

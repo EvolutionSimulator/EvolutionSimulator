@@ -49,6 +49,7 @@ class GrabbingEntity : virtual public MovableEntity {
   MovableEntity* GetGrabbedEntity() const;
 
   void SetAffectedByGrabbedEntity(bool affected);
+  void SetAffectedByGrabbedEnttityAll(bool affected);
 
   void SetGrabValues();
 
