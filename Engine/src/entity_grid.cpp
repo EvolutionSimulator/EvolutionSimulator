@@ -41,12 +41,12 @@ void UpdateGridFood(std::vector<std::shared_ptr<Food>> &foods,
                     std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &entityGrid,
                     double cellSize) {
     foods.erase(std::remove_if(foods.begin(), foods.end(),
-                               [](const std::shared_ptr<Food> &food) {
+                               [](const std::shared_ptr<Food> food) {
                                    return food->GetState() != Entity::Alive;
                                }),
                 foods.end());
 
-    for (const auto &food : foods) {
+    for (const auto food : foods) {
         std::pair<double, double> coordinates = food->GetCoordinates();
         int gridX = static_cast<int>(coordinates.first / cellSize);
         int gridY = static_cast<int>(coordinates.second / cellSize);
@@ -80,12 +80,12 @@ void UpdateGridCreature(
     }
 
     creatures.erase(std::remove_if(creatures.begin(), creatures.end(),
-                                    [](const std::shared_ptr<Creature> &creature) {
+                                    [](const std::shared_ptr<Creature> creature) {
                                         return creature->GetState() == Entity::Dead;
                                     }),
                     creatures.end());
 
-    for (const auto &creature : creatures) {
+    for (const auto creature : creatures) {
         std::pair<double, double> coordinates = creature->GetCoordinates();
         int gridX = static_cast<int>(coordinates.first / cellSize);
         int gridY = static_cast<int>(coordinates.second / cellSize);
