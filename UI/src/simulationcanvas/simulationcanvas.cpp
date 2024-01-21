@@ -252,8 +252,20 @@ std::vector<std::pair<double, double>> SimulationCanvas::getEntityRenderPosition
 }
 
 
-void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
+void SimulationCanvas::centerViewAroundCreature(const sf::Vector2f& creaturePosition) {
+    sf::View view = getView();
 
+    // Calculate the new center directly based on the creature position
+    sf::Vector2f newCenter = creaturePosition;
+    // Set the new center of the view
+    view.setCenter(newCenter);
+    // Set the new size of the view (you may adjust this based on your requirements)
+    view.setSize(initialViewSize.x/2, initialViewSize.y/2);
+    // Apply the new view
+    setView(view);
+}
+
+void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
   float scaleFactor = this->devicePixelRatioF();
   sf::Vector2i scaledPos(static_cast<int>(event->position().x() * scaleFactor),
                          static_cast<int>(event->position().y() * scaleFactor));
@@ -262,10 +274,38 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
   // Needed for differentiating clicking and dragging
   initialClickPosition = mousePos;
   isClicking = true;
-
   qDebug() << "Mouse Pressed at: " << mousePos.x << ", " << mousePos.y;
 
   auto data = simulation_->GetSimulationData();
+
+  float scaledX = initialClickPosition.x;
+  float scaledY = initialClickPosition.y;
+    #if defined(Q_OS_MACOS)
+        // On macOS, halve the mouse coordinates
+      scaledX *= 1439.0 / 2880.0f;
+      scaledY *= 899.0f / 1800.0f;
+    #endif
+  qDebug() << "(RESCALED) Mouse Pressed at: " << scaledX << ", " << scaledY;
+
+  if (event->button() == Qt::RightButton) {
+          // Right-clicked, check if the mouse position coincides with any creature
+          for (auto& creature : simulation_->GetSimulationData()->creatures_) {
+              auto [creatureX, creatureY] = creature.GetCoordinates();
+              float creatureSize = creature.GetSize();
+              sf::Vector2f creaturePos(creatureX, creatureY);
+
+              if (sqrt(pow(scaledX - creaturePos.x, 2) + pow(scaledY - creaturePos.y, 2)) <= 1.5*creatureSize) {
+                  // Mouse position coincides with the creature, center the view around it
+                  centerViewAroundCreature(creaturePos);
+
+                  // Update the view
+                  info_panel_.Hide();
+                  info_panel_.SetSelectedCreature(nullptr);
+                  update();
+                  return;
+              }
+          }
+      }
 
   // Checking if we need to display info panel
   for (auto& creature : data->creatures_) {
@@ -273,7 +313,11 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
     float creatureSize = creature.GetSize();
     sf::Vector2f creaturePos(creatureX, creatureY);
 
-    if (sqrt(pow(mousePos.x - creaturePos.x, 2) + pow(mousePos.y - creaturePos.y, 2)) <= creatureSize) {
+    if (abs(creatureY-scaledY)<20 && (abs(creatureX - scaledX) < 20)){
+        qDebug() << "Creature Position: " << creatureX << "    " << creatureY;
+    }
+
+    if (sqrt(pow(scaledX - creaturePos.x, 2) + pow(scaledY - creaturePos.y, 2)) <= 1.5*creatureSize) {
       qDebug() << "Creature Clicked: ID" << creature.GetID();
       info_panel_.Show();
       info_panel_.SetSelectedCreature(&creature);
@@ -287,6 +331,7 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
   info_panel_.SetSelectedCreature(nullptr);
   repaint();
 }
+
 
 
 void SimulationCanvas::wheelEvent(QWheelEvent *event) {

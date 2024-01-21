@@ -30,6 +30,7 @@ class SimulationCanvas : public QSFMLCanvas {
   void mouseReleaseEvent(QMouseEvent* event) override;
   void resizeEvent(QResizeEvent* event) override;
   void zoom(float factor, sf::Vector2f& zoomPoint);
+  void centerViewAroundCreature(const sf::Vector2f& creaturePosition);
 
   private:
   Simulation *simulation_ = nullptr;
