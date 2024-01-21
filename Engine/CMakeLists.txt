@@ -27,6 +27,7 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
   add_compile_options(-O3) # Full optimization (GCC/Clang)
 endif()
 
+find_package(OpenMP)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 
@@ -83,3 +84,8 @@ target_link_libraries(Engine PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_compile_definitions(Engine PRIVATE Engine_LIBRARY)
 
 target_link_libraries(Engine PRIVATE nlohmann_json::nlohmann_json)
+
+# Link OpenMP if found
+if(OpenMP_CXX_FOUND)
+  target_link_libraries(Engine PRIVATE OpenMP::OpenMP_CXX)
+endif()

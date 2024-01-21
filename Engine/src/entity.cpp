@@ -14,7 +14,9 @@ int Entity::next_id_ = 0;
  * @brief Default constructor initializing an Entity at the origin with zero
  * size.
  */
-Entity::Entity() : x_coord_(0.0), y_coord_(0.0), size_(0.0), state_(Alive), orientation_(0), id_(next_id_++) {}
+Entity::Entity() : x_coord_(0.0), y_coord_(0.0),
+    size_(0.0), state_(Alive), orientation_(0),
+    id_(next_id_++), color_hue_(0) {}
 
 
 /*!
@@ -31,7 +33,8 @@ Entity::Entity(const double x_coord, const double y_coord, const double size)
       size_(size),
       orientation_(0),
       state_(Alive),
-      id_(next_id_++) {}
+      id_(next_id_++),
+      color_hue_(0) {}
 
 /*!
  * @brief Constructor to initialize an Entity with a specified size at the
@@ -44,7 +47,8 @@ Entity::Entity(const double size)
       size_(size),
       orientation_(0),
       state_(Alive),
-      id_(next_id_++) {}
+      id_(next_id_++),
+      color_hue_(0) {}
 
 /*!
  * @brief Destructor sets the state of the entity to Dead.
@@ -259,4 +263,12 @@ void Entity::OnCollision(Entity &other_entity, double const kMapWidth,
 
 int Entity::GetID() const {
   return id_;
+}
+
+float Entity::GetColor() const {
+  return color_hue_;
+}
+
+void Entity::SetColor(float value){
+  color_hue_ = fmod(value, 360);
 }
