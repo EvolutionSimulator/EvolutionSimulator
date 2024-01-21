@@ -162,9 +162,16 @@ void SimulationCanvas::RenderFoodAtPosition(const std::shared_ptr<Food> food, co
 
   foodSprite.setScale(food->GetSize()/128.0f, food->GetSize()/128.0f);
 
+  texture_manager_.color_shader_.setUniform("hueShift", food->GetColor());
+
   sf::Transform foodTransform;
   foodTransform.translate(position.first, position.second);
-  draw(foodSprite, foodTransform);
+
+  sf::RenderStates states;
+  states.shader = &texture_manager_.color_shader_;
+  states.transform = foodTransform;
+
+  draw(foodSprite, states);
 }
 
 void SimulationCanvas::RenderCreatureAtPosition(const std::shared_ptr<Creature> creature, const std::pair<double, double>& position){
@@ -205,7 +212,7 @@ void SimulationCanvas::RenderCreatureAtPosition(const std::shared_ptr<Creature> 
   tail_sprite.setRotation(90.0f);
 
   //Add color filter to creature
-  texture_manager_.color_shader_.setUniform("hueShift", creature->GetMutable().GetColor());
+  texture_manager_.color_shader_.setUniform("hueShift", creature->GetColor());
 
   sf::Transform creatureTransform;
   creatureTransform.translate(position.first,

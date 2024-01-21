@@ -42,3 +42,9 @@ void FoodManager::GenerateMoreFood(SimulationData &data,
     }
   }
 }
+
+void FoodManager::UpdateAllFood(SimulationData &data, double deltaTime){
+  for (auto food : data.food_entities_){
+      food->Update(deltaTime);
+  }
+}
