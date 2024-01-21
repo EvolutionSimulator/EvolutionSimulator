@@ -33,7 +33,7 @@
  * for and consuming food, and managing its energy and health. The class also
  * supports evolutionary features like reproduction and genetic inheritance.
  */
-class Creature : virtual public GrabbingEntity {
+class Creature : virtual public MovableEntity {
  public:
   Creature(neat::Genome genome, Mutable mutable_);
 
