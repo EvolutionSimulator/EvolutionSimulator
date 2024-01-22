@@ -73,7 +73,7 @@ void Creature::UpdateEnergy(double deltaTime) {
  * while for males can mate past kMinProducingAge with falling probability.
  */
 void Creature::UpdateMatingDesire() {
-  if (this->MaleReproductiveSystem::ReadyToProcreate() &&
+  if (!this->MaleReproductiveSystem::ReadyToProcreate() &&
       !(this->FemaleReproductiveSystem::ReadyToProcreate())) {
     mating_desire_ = false;
     return;
@@ -89,10 +89,10 @@ void Creature::UpdateMatingDesire() {
                this->FemaleReproductiveSystem::GetMaturityAge());
 
   double probability =
-      1 -
-      (this->GetAge() - min_reproducing_age) /
-          SETTINGS.physical_constraints.max_reproducing_age -
-      min_reproducing_age * SETTINGS.physical_constraints.mating_desire_factor;
+      1 - (this->GetAge() - min_reproducing_age) /
+              (SETTINGS.physical_constraints.max_reproducing_age -
+               min_reproducing_age) *
+              SETTINGS.physical_constraints.mating_desire_factor;
   mating_desire_ = mathlib::RandomDouble(0, 1) < probability;
 }
 
@@ -122,6 +122,7 @@ void Creature::AfterMate() {
  * `false`.
  */
 bool Creature::Compatible(const Creature &other_creature) {
+  if (this == &other_creature) return false;
   double brain_distance =
       this->GetGenome().CompatibilityBetweenGenomes(other_creature.GetGenome());
   double mutable_distance = this->GetMutable().CompatibilityBetweenMutables(
@@ -129,6 +130,9 @@ bool Creature::Compatible(const Creature &other_creature) {
   double physical_distance =
       this->GetDistance(other_creature, SETTINGS.environment.map_width,
                         SETTINGS.environment.map_height);
+  bool flag = brain_distance + mutable_distance <
+                  SETTINGS.compatibility.compatibility_threshold &&
+              physical_distance < SETTINGS.compatibility.compatibility_distance;
   return brain_distance + mutable_distance <
              SETTINGS.compatibility.compatibility_threshold &&
          physical_distance < SETTINGS.compatibility.compatibility_distance;

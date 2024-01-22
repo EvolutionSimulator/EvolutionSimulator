@@ -124,7 +124,7 @@ void SimulationCanvas::RenderSimulation(DataAccessor<SimulationData> data) {
   }
 
   for (const auto& egg : data->eggs_) {
-    auto renderPositions = getEntityRenderPositions(egg);
+    auto renderPositions = getEntityRenderPositions((AliveEntity) egg);
     for (const auto& pos : renderPositions) {
       RenderEggAtPosition(egg, pos);
     }

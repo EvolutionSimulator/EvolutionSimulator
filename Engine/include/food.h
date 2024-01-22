@@ -5,7 +5,7 @@
 
 #include "environment.h"
 
-class Food : virtual public Entity {  
+class Food : public Entity {  
  protected:
   Food(const double nutritional_value);
   Food(const double x_coord, const double y_coord, const double nutritional_value);
