@@ -74,16 +74,8 @@ void GraphManager::DrawAreaGraph(const std::vector<std::tuple<double, double, do
       return;
   }
 
-  // Print the original data for debugging
-  qDebug() << "Original Data:";
-  PrintData(data);
-
   std::vector<std::tuple<double, double, double>> sortedData = data;
   SortById(sortedData);
-
-  // Print the sorted data for debugging
-  qDebug() << "Sorted Data:";
-  PrintData(sortedData);
 
   QChart* chart = new QChart();
 
@@ -111,27 +103,28 @@ void GraphManager::DrawAreaGraph(const std::vector<std::tuple<double, double, do
       seriesColors.push_back(color);
   }
 
-  QLineSeries* lowerSeries = new QLineSeries();
+  std::vector<double> lower_bound(data.size(), 0.0);
 
   for (double id : uniqueIds) {
       QLineSeries* upperSeries = new QLineSeries();
-
+      QLineSeries* lowerSeries = new QLineSeries();
       for (const auto& seriesData : data) {
           if (std::get<0>(seriesData) == id) {
               qreal x = std::get<1>(seriesData); // Second element as x
               qreal y = std::get<2>(seriesData); // Third element as y
 
               // Append to upper series
-              upperSeries->append(QPointF(x, y));
+              upperSeries->append(QPointF(x,y+lower_bound[x]));
 
               // Update min and max values
               minX = std::min(minX, x);
               maxX = std::max(maxX, x);
               minY = std::min(minY, y);
-              maxY = std::max(maxY, y);
+              maxY = std::max(maxY, y+lower_bound[x]);
 
               // Append to lower series
-              lowerSeries->append(QPointF(x, 0));
+              lowerSeries->append(QPointF(x, lower_bound[x]));
+              lower_bound[x] = y+lower_bound[x];
           }
       }
 
@@ -153,8 +146,11 @@ void GraphManager::DrawAreaGraph(const std::vector<std::tuple<double, double, do
 
   chart->setTitle(graphTitle);
   chart->createDefaultAxes();
+  chart->axes(Qt::Horizontal).first()->setTitleText("Time");
+  chart->axes(Qt::Vertical).first()->setTitleText("Number of Creatures");
   chart->axes(Qt::Horizontal).first()->setRange(minX, maxX);
   chart->axes(Qt::Vertical).first()->setRange(minY, maxY);
+
 
   chart->setTheme(QChart::ChartThemeLight);
   chart->setAnimationOptions(QChart::AllAnimations);
@@ -175,12 +171,13 @@ void GraphManager::DrawAreaGraph(const std::vector<std::tuple<double, double, do
       QString folderPath = desktopPath + "/EvolutionSimulationData/";
 
       if (createDirectory(folderPath)) {
-          QString filePath = QFileDialog::getSaveFileName(nullptr, "Save Graph", folderPath, "PNG Image (*.png);;CSV File (*.csv)");
+          QString filePath = QFileDialog::getSaveFileName(nullptr, "Save Graph", folderPath, "PNG Image (.png);;CSV File (.csv)");
           if (!filePath.isEmpty()) {
+              // Save image
               QString imageFilePath = filePath + ".png";
               chartView->grab().save(imageFilePath);
 
-              QString csvFilePath = filePath;
+              QString csvFilePath = filePath + ".csv";
               QFile file(csvFilePath);
               if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
                   QTextStream stream(&file);
@@ -208,7 +205,7 @@ void GraphManager::DrawAreaGraph(const std::vector<std::tuple<double, double, do
 }
 
 void GraphManager::DrawSpeciesArea() {
-  DrawAreaGraph(testData, "Test Area Graph");
+  DrawAreaGraph(testData, "Species Population over Time");
 }
 
 void GraphManager::DrawSizeEnergyScatterplot() {

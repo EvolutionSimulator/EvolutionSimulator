@@ -18,7 +18,6 @@
 #include <QtCharts/QAreaSeries>
 #include <QDialog>
 #include <QVBoxLayout>
-#include "QtCharts/qvalueaxis.h"
 #include "QtWidgets/qpushbutton.h"
 #include "engine.h"
 #include "simulationcanvas/simulationcanvas.h"
@@ -86,14 +85,15 @@ public:
 
         // Create the folder if it doesn't exist
         if (createDirectory(folderPath)) {
-            QString filePath = QFileDialog::getSaveFileName(nullptr, "Save Graph", folderPath, "PNG Image (*.png);;CSV File (*.csv)");
+            QString filePath = QFileDialog::getSaveFileName(nullptr, "Save Graph", folderPath, "PNG Image (.png);;CSV File (.csv)");
             if (!filePath.isEmpty()) {
+
                 // Save image
                 QString imageFilePath = filePath + ".png";
                 chartView->grab().save(imageFilePath);
 
                 // Save data to CSV file
-                QString csvFilePath = filePath;
+                QString csvFilePath = filePath + ".csv";
                 QFile file(csvFilePath);
                 if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
                     QTextStream stream(&file);
