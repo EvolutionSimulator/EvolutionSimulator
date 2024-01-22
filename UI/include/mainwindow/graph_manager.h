@@ -236,102 +236,16 @@ public:
     dialog.exec();
   }
 
-  void DrawAreaGraph(const std::vector<std::vector<std::pair<double, double>>>& data, const QString& graphTitle) {
-    if (data.empty()) {
-      qDebug() << "No data to display.";
-      return;
+  template <size_t Index = 0, typename... Types>
+  void writeTupleElements(QTextStream& stream, size_t id, const std::tuple<Types...>& tuple) {
+    if constexpr (Index < sizeof...(Types)) {
+      stream << id << "," << Index << "," << std::get<Index>(tuple) << "\n";
+      writeTupleElements<Index + 1>(stream, id, tuple);
     }
-
-    QChart* chart = new QChart();
-
-    for (size_t id = 0; id < data.size(); ++id) {
-      const auto& seriesData = data[id];
-
-      if (seriesData.empty()) {
-          continue;  // Skip empty data for this ID
-      }
-
-      QLineSeries* upperSeries = new QLineSeries();
-      QLineSeries* lowerSeries = new QLineSeries();
-
-      for (const auto& point : seriesData) {
-          qreal x = static_cast<qreal>(point.first);
-          qreal y = static_cast<qreal>(point.second);
-          upperSeries->append(QPointF(x, y));
-          lowerSeries->append(QPointF(x, 0));  // Assumes lower bound is 0
-      }
-
-      QAreaSeries* series = new QAreaSeries(upperSeries, lowerSeries);
-
-      qDebug() << "Series ID:" << id;
-      qDebug() << "Upper Series Points:" << upperSeries->points();
-      qDebug() << "Lower Series Points:" << lowerSeries->points();
-
-      chart->addSeries(series);
-    }
-
-    chart->createDefaultAxes();
-    QValueAxis* horizontalAxis = new QValueAxis;
-    QValueAxis* verticalAxis = new QValueAxis;
-    chart->setAxisX(horizontalAxis, chart->series().isEmpty() ? nullptr : chart->series().first());
-    chart->setAxisY(verticalAxis, chart->series().isEmpty() ? nullptr : chart->series().first());
-
-    horizontalAxis->setRange(0, 10);  // Adjust the range as needed
-    verticalAxis->setRange(0, 10);    // Adjust the range as needed
-
-    chart->setTheme(QChart::ChartThemeLight);
-    chart->setAnimationOptions(QChart::AllAnimations);
-    chart->legend()->setVisible(true);
-    chart->legend()->setAlignment(Qt::AlignBottom);
-
-    QPushButton* saveButton = new QPushButton("Save Graph");
-
-    QVBoxLayout* layout = new QVBoxLayout();
-    layout->addWidget(saveButton);
-
-    QChartView* chartView = new QChartView(chart);
-    chartView->setRenderHint(QPainter::Antialiasing);
-    layout->addWidget(chartView);
-
-    connect(saveButton, &QPushButton::clicked, [chartView, data, graphTitle, this]() {
-        QString desktopPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
-        QString folderPath = desktopPath + "/EvolutionSimulationData/";
-
-        if (createDirectory(folderPath)) {
-            QString filePath = QFileDialog::getSaveFileName(nullptr, "Save Graph", folderPath, "PNG Image (*.png);;CSV File (*.csv)");
-            if (!filePath.isEmpty()) {
-                QString imageFilePath = filePath + ".png";
-                chartView->grab().save(imageFilePath);
-
-                QString csvFilePath = filePath;
-                QFile file(csvFilePath);
-                if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-                    QTextStream stream(&file);
-                    for (size_t id = 0; id < data.size(); ++id) {
-                        for (size_t i = 0; i < data[id].size(); ++i) {
-                            stream << id << "," << i << "," << data[id][i].second << "\n";
-                        }
-                    }
-                    file.close();
-                } else {
-                    QMessageBox::critical(nullptr, "Error", "Failed to save CSV file.");
-                }
-            }
-        } else {
-            QMessageBox::critical(nullptr, "Error", "Failed to create the directory.");
-        }
-    });
-
-    QDialog* dialog = new QDialog(parent_);
-    dialog->setWindowTitle(graphTitle);
-    dialog->setLayout(layout);
-    dialog->resize(800, 600);
-    connect(dialog, &QDialog::finished, dialog, &QObject::deleteLater);
-    emit resetGraphMenuIndex();
-    dialog->exec();
   }
 
 public slots:
+  void DrawAreaGraph(const std::vector<std::tuple<double,double, double>>& data, const QString& graphTitle);
   void DrawCreaturesOverTimeGraph();
   void DrawCreaturesSizeOverTimeGraph();
   void DrawCreaturesEnergyOverTimeGraph();
@@ -347,7 +261,7 @@ private:
   Engine* engine_;
   SimulationCanvas* simulationCanvas_;
   InfoPanel* GetInfoPanel();
-  std::vector<std::vector<std::pair<double, double>>> testData;
+  std::vector<std::tuple<double,double, double>> testData;
 
 signals:
   void resetGraphMenuIndex();
