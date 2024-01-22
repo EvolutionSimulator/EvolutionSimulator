@@ -281,9 +281,7 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
     float mouseWindowHeight = sf::Mouse::getPosition(*this).y;
     float mouseWindowWidth = sf::Mouse::getPosition(*this).x;
 
-    float scaledX=currTopLeft.x+getView().getSize().x*(mouseWindowWidth/scaledScreenWidth);
-    float scaledY=currTopLeft.y+getView().getSize().y*(mouseWindowHeight/scaledScreenHeight);
-    qDebug() << "Mouse x and y: " << scaledX << "  " << scaledY;
+    //qDebug() << "Mouse x and y: " << scaledX << "  " << scaledY;
 
     qDebug() << "Height of box: " << scaledScreenHeight;
     sf::Vector2i scaledPos(static_cast<int>(event->position().x() * scaleFactor),
@@ -297,13 +295,19 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
 
     auto data = simulation_->GetSimulationData();
 
-//    float scaledX = initialClickPosition.x;
+    float scaledX = initialClickPosition.x;
 //    //scaledX = fmod(scaledX, static_cast<float>(settings::environment::kDMapWidth));
-//    float scaledY = initialClickPosition.y;
+    float scaledY = initialClickPosition.y;
 //    //scaledY = fmod(scaledY, static_cast<float>(settings::environment::kDMapHeight));
 //    scaledX/=scaleFactor; //1439/2880
 //    scaledY/=scaleFactor; //899/1800
 //    qDebug() << "(RESCALED) Mouse Pressed at: " << scaledX << ", " << scaledY;
+    if (QSysInfo::kernelType() == "darwin") {
+            qDebug() << "True";
+            scaledX=currTopLeft.x+getView().getSize().x*(mouseWindowWidth/scaledScreenWidth);
+            scaledY=currTopLeft.y+getView().getSize().y*(mouseWindowHeight/scaledScreenHeight);
+    }
+
 
     if (event->button() == Qt::RightButton) {
         // Right-clicked, check if the mouse position coincides with any creature
