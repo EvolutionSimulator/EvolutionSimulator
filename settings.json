@@ -81,7 +81,13 @@
     "d_eating_cooldown": 1,
     "d_digestion_rate": 3,
     "d_genetic_strength": 0.6,
-    "d_acid_to_energy": 5
+    "d_acid_to_energy": 5,
+    "max_reproducing_age": 700,
+    "mating_desire_max_prob": 0.05,
+    "mating_desire_factor": 0.05,
+    "pregnancy_energy_factor": 0.7,
+    "pregnancy_velocity_factor": 0.5,
+    "after_birth_velocity_factor": 1.5
   },
   "ui": {
     "dragging_sensitivity": 1.0

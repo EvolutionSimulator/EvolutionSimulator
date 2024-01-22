@@ -2,8 +2,8 @@
 
 #include <cmath>
 
-#include "settings.h"
 #include "geometry_primitives.h"
+#include "settings.h"
 
 /*!
  * @file collision_utils.cpp
@@ -146,20 +146,23 @@ bool CollisionCircleLine(const double& tolerance,
 }
 
 /*!
- * @brief Determines if a grid cell might intersect with or lie inside a specified cone.
+ * @brief Determines if a grid cell might intersect with or lie inside a
+ * specified cone.
  *
- * @details This function evaluates whether a grid cell, represented by a point and its size,
- * could potentially be inside a cone defined by a center point, radius,
- * and angular boundaries. It accounts for edge cases and uses a small epsilon value for
- * precision considerations.
+ * @details This function evaluates whether a grid cell, represented by a point
+ * and its size, could potentially be inside a cone defined by a center point,
+ * radius, and angular boundaries. It accounts for edge cases and uses a small
+ * epsilon value for precision considerations.
  *
- * @param grid_point The representative point of the grid cell, typically its center.
+ * @param grid_point The representative point of the grid cell, typically its
+ * center.
  * @param grid_cell_size The length of the side of the square grid cell.
  * @param cone_center The center point of the cone.
  * @param cone_radius The radius of the cone from the center point.
  * @param cone_left_boundary The left boundary angle of the cone.
  * @param cone_right_boundary The right boundary angle of the cone.
- * @return True if the grid cell is potentially inside the cone, otherwise false.
+ * @return True if the grid cell is potentially inside the cone, otherwise
+ * false.
  */
 bool IsGridCellPotentiallyInsideCone(Point grid_point, double grid_cell_size,
                                      Point cone_center, double cone_radius,
@@ -171,20 +174,20 @@ bool IsGridCellPotentiallyInsideCone(Point grid_point, double grid_cell_size,
     return true;
   }
   double max_distance_in_cell = sqrt(2) * grid_cell_size;
-  if (distance > cone_radius + max_distance_in_cell + SETTINGS.environment.max_food_size + EPS) {
+  if (distance > cone_radius + max_distance_in_cell +
+                     SETTINGS.environment.max_food_size + EPS) {
     return false;
   }
   OrientedAngle cell_relative_angle(cone_center, grid_point);
   double angle_distance = cell_relative_angle.AngleDistanceToCone(
       cone_left_boundary, cone_right_boundary);
-  if (sin(angle_distance) > (max_distance_in_cell+ SETTINGS.environment.max_food_size) / distance + EPS) {
+  if (sin(angle_distance) >
+      (max_distance_in_cell + SETTINGS.environment.max_food_size) / distance +
+          EPS) {
     return false;
   }
   return true;
 }
-
-
-
 
 /*!
  * @brief Generates a supercover of grid cells that a line passes through.
@@ -198,9 +201,11 @@ bool IsGridCellPotentiallyInsideCone(Point grid_point, double grid_cell_size,
  * @param x1 The x-coordinate of the ending point of the line.
  * @param y1 The y-coordinate of the ending point of the line.
  *
- * @return A vector of pairs of integers, each representing a grid cell (x, y) that the line intersects.
+ * @return A vector of pairs of integers, each representing a grid cell (x, y)
+ * that the line intersects.
  */
-std::vector<std::pair<int, int>> SupercoverBresenhamLine(int x0, int y0, int x1, int y1) {
+std::vector<std::pair<int, int>> SupercoverBresenhamLine(int x0, int y0, int x1,
+                                                         int y1) {
   std::vector<std::pair<int, int>> line;
 
   int dx = x1 - x0;

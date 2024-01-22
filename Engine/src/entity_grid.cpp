@@ -1,8 +1,9 @@
 #include "../include/entity_grid.h"
 
-#include "settings.h"
 #include <cmath>
 #include <vector>
+
+#include "settings.h"
 
 EntityGrid::EntityGrid() {
   num_columns_ = static_cast<int>(std::ceil(
@@ -46,7 +47,6 @@ void UpdateGridFood(std::vector<Food> &foods,
                              }),
               foods.end());
 
-
   for (Food &entity : foods) {
     std::pair<double, double> coordinates = entity.GetCoordinates();
     int gridX = static_cast<int>(coordinates.first / cellSize);
@@ -70,17 +70,17 @@ void UpdateGridCreature(
     std::vector<Creature> &creatures,
     std::vector<std::vector<std::vector<Entity *>>> &entityGrid,
     double cellSize, std::vector<Food> &food) {
-  creatures.erase(std::remove_if(creatures.begin(), creatures.end(),
-                                 [&food](const Creature &entity) {
-                                   if (entity.GetState() == Entity::Dead) {
-                                     food.emplace_back(
-                                         Meat(entity.GetCoordinates().first,
-                                              entity.GetCoordinates().second,
-                                              entity.GetSize()));
-                                   }
-                                   return entity.GetState() != Entity::Alive;
-                                 }),
-                  creatures.end());
+  creatures.erase(
+      std::remove_if(creatures.begin(), creatures.end(),
+                     [&food](const Creature &entity) {
+                       if (entity.GetState() == Entity::Dead) {
+                         food.emplace_back(Meat(entity.GetCoordinates().first,
+                                                entity.GetCoordinates().second,
+                                                entity.GetSize()));
+                       }
+                       return entity.GetState() != Entity::Alive;
+                     }),
+      creatures.end());
 
   for (Creature &creature : creatures) {
     std::pair<double, double> coordinates = creature.GetCoordinates();
@@ -97,16 +97,42 @@ void UpdateGridCreature(
  * @param reproduce A queue of Creature objects, potentially containing dead
  * creatures.
  */
-void UpdateQueue(std::queue<Creature> &reproduce) {
-  std::queue<Creature> tempQueue;
+void UpdateQueue(std::queue<int> &reproduce,
+                 const std::vector<Creature> &creatures) {
+  std::queue<int> tempQueue;
 
   while (!reproduce.empty()) {
-    Creature currentCreature = reproduce.front();
+    int current_creature_index = reproduce.front();
     reproduce.pop();
 
     // Check if the current creature is not dead
-    if (currentCreature.GetState() != Entity::Dead) {
-      tempQueue.push(currentCreature);
+    if (creatures[current_creature_index].GetState() != Entity::Dead) {
+      tempQueue.push(current_creature_index);
+    }
+  }
+
+  // Replace the original queue with the temporary queue
+  // containing all living creatures
+  reproduce = std::move(tempQueue);
+}
+
+/*!
+ * @brief Removes creatures with a state of 'Dead' from a given queue.
+ *
+ * @param reproduce A queue of Creature objects, potentially containing dead
+ * creatures.
+ */
+void UpdateQueue(std::queue<int> &reproduce,
+                 const std::vector<Creature> &creatures) {
+  std::queue<int> tempQueue;
+
+  while (!reproduce.empty()) {
+    int current_creature_index = reproduce.front();
+    reproduce.pop();
+
+    // Check if the current creature is not dead
+    if (creatures[current_creature_index].GetState() != Entity::Dead) {
+      tempQueue.push(current_creature_index);
     }
   }
 
@@ -121,9 +147,11 @@ void UpdateQueue(std::queue<Creature> &reproduce) {
  */
 void EntityGrid::UpdateGrid(SimulationData &data, Environment &environment) {
   ClearGrid();
-  UpdateGridCreature(data.creatures_, grid_, SETTINGS.environment.grid_cell_size, data.food_entities_);
-  UpdateGridFood(data.food_entities_, grid_, SETTINGS.environment.grid_cell_size);
-  UpdateQueue(data.reproduce_);
+  UpdateGridCreature(data.creatures_, grid_,
+                     SETTINGS.environment.grid_cell_size, data.food_entities_);
+  UpdateGridFood(data.food_entities_, grid_,
+                 SETTINGS.environment.grid_cell_size);
+  UpdateQueue(data.reproduce_, data.creatures_);
 }
 
 const std::vector<Entity *> &EntityGrid::GetEntitiesAt(const int row,
@@ -131,8 +159,8 @@ const std::vector<Entity *> &EntityGrid::GetEntitiesAt(const int row,
   return grid_[row][col];
 }
 
-const std::vector<Entity *> &
-EntityGrid::GetEntitiesAt(const std::pair<int, int> &coords) const {
+const std::vector<Entity *> &EntityGrid::GetEntitiesAt(
+    const std::pair<int, int> &coords) const {
   return grid_[coords.first][coords.second];
 }
 
@@ -157,17 +185,14 @@ const std::pair<int, int> EntityGrid::GetGridSize() const {
  *
  * @return A vector of pairs representing the coordinates of neighboring cells.
  */
-std::vector<std::pair<int, int>>
-EntityGrid::GetNeighbours(const std::pair<int, int> &center,
-                          const int &layer_number) {
+std::vector<std::pair<int, int>> EntityGrid::GetNeighbours(
+    const std::pair<int, int> &center, const int &layer_number) {
   std::vector<std::pair<int, int>> neighbours;
   int x_center = center.first;
   int y_center = center.second;
 
-  for (int y = y_center - layer_number; y <= y_center + layer_number;
-       y++) {
-    for (int x = x_center - layer_number;
-         x <= x_center + layer_number; x++) {
+  for (int y = y_center - layer_number; y <= y_center + layer_number; y++) {
+    for (int x = x_center - layer_number; x <= x_center + layer_number; x++) {
       neighbours.push_back(std::make_pair((x + num_columns_) % num_columns_,
                                           (y + num_rows_) % num_rows_));
     }

@@ -1,65 +1,34 @@
 #include "mutable.h"
 
-#include "math.h"
-#include "settings.h"
-<<<<<<< HEAD
-#include <iostream>
-    == == ==
-    =
-#include "mathlib.h"
-        >>>>>>> eggs /
-                    main
 #include <algorithm>
+#include <iostream>
 #include <random>
 
-                    /*!
-                     * @brief Constructs a new Mutable object.
-                     *
-                     * @details Initializes the Mutable object with predefined
-                     * values from the settings::physical_constraints namespace.
-                     */
-                    Mutable::Mutable()
-<<<<<<< HEAD
-    : energy_density_(SETTINGS.physical_constraints.d_energy_density),
-energy_loss_(SETTINGS.physical_constraints.d_energy_loss),
-integrity_(SETTINGS.physical_constraints.d_integrity),
-strafing_difficulty_(SETTINGS.physical_constraints.d_strafing_difficulty),
-max_size_(SETTINGS.physical_constraints.d_max_size),
-baby_size_(SETTINGS.physical_constraints.d_baby_size),
-max_force_(SETTINGS.physical_constraints.d_max_force),
-growth_factor_(SETTINGS.physical_constraints.d_growth_factor), color_(0.0f),
-stomach_capacity_factor_(SETTINGS.physical_constraints.d_stomach_capacity),
-diet_(SETTINGS.physical_constraints.d_diet),
-eating_speed_(SETTINGS.physical_constraints.d_eating_cooldown),
-genetic_strength_(SETTINGS.physical_constraints.d_genetic_strength) {
-  UpdateReproduction();
-}
+#include "math.h"
+#include "mathlib.h"
+#include "settings.h"
 
 /*!
- * @brief Updates the reproduction characteristics of the entity.
- * @details Calculates and sets the maturity age and reproduction cooldown
- * based on the entity's complexity and size.
+ * @brief Constructs a new Mutable object.
+ *
+ * @details Initializes the Mutable object with predefined values from the
+ *          settings::physical_constraints namespace.
  */
-void Mutable::UpdateReproduction() {
-  double complexity = Complexity();
-  maturity_age_ = complexity * (1 + max_size_ - baby_size_) * 0.2;
-  reproduction_cooldown_ = complexity * 0.5;
-}
-=======
-    : energy_density_(settings::physical_constraints::kDEnergyDensity),
-energy_loss_(settings::physical_constraints::kDEnergyLoss),
-integrity_(settings::physical_constraints::kDIntegrity),
-strafing_difficulty_(settings::physical_constraints::kDStrafingDifficulty),
-max_size_(settings::physical_constraints::kDMaxSize),
-baby_size_(settings::physical_constraints::kDBabySize),
-max_force_(settings::physical_constraints::kDMaxForce),
-growth_factor_(settings::physical_constraints::kDGrowthFactor), color_(0.5f),
-stomach_capacity_factor_(settings::physical_constraints::kDStomachCapacity),
-diet_(settings::physical_constraints::kDDiet),
-eating_speed_(settings::physical_constraints::KDEatingCooldown),
-genetic_strength_(settings::physical_constraints::KDGeneticStrength) {
-}
->>>>>>> eggs/main
+Mutable::Mutable()
+    : energy_density_(SETTINGS.physical_constraints.d_energy_density),
+      energy_loss_(SETTINGS.physical_constraints.d_energy_loss),
+      integrity_(SETTINGS.physical_constraints.d_integrity),
+      strafing_difficulty_(SETTINGS.physical_constraints.d_strafing_difficulty),
+      max_size_(SETTINGS.physical_constraints.d_max_size),
+      baby_size_(SETTINGS.physical_constraints.d_baby_size),
+      max_force_(SETTINGS.physical_constraints.d_max_force),
+      growth_factor_(SETTINGS.physical_constraints.d_growth_factor),
+      color_(0.0f),
+      stomach_capacity_factor_(
+          SETTINGS.physical_constraints.d_stomach_capacity),
+      diet_(SETTINGS.physical_constraints.d_diet),
+      eating_speed_(SETTINGS.physical_constraints.d_eating_cooldown),
+      genetic_strength_(SETTINGS.physical_constraints.d_genetic_strength) {}
 
 /*!
  * @brief Calculates the complexity of the entity.
@@ -193,9 +162,10 @@ void Mutable::Mutate() {
   }
 
   // Gestation Ratio To Incubation
-  if (uniform(gen) < settings::physical_constraints::kMutationRate) {
+  if (uniform(gen) < SETTINGS.physical_constraints.mutation_rate) {
     std::normal_distribution<> dis(
-        0.0, settings::physical_constraints::kDGestationRatioToIncubation / 20);
+        0.0,
+        SETTINGS.physical_constraints.d_gestation_ratio_to_incubation / 20);
     double delta = dis(gen);
     gestation_ratio_to_incubation_ += delta;
     gestation_ratio_to_incubation_ =

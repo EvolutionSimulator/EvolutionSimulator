@@ -142,6 +142,18 @@ void Settings::LoadFromFile(const std::string& filename) {
       physical_constraints_json["d_genetic_strength"].get<double>();
   physical_constraints.d_acid_to_energy =
       physical_constraints_json["d_acid_to_energy"].get<double>();
+  physical_constraints.max_reproducing_age =
+      physical_constraints_json["max_reproducing_age"].get<double>();
+  physical_constraints.mating_desire_max_prob =
+      physical_constraints_json["mating_desire_max_prob"].get<double>();
+  physical_constraints.mating_desire_factor =
+      physical_constraints_json["mating_desire_factor"].get<double>();
+  physical_constraints.pregnancy_energy_factor =
+      physical_constraints_json["pregnancy_energy_factor"].get<double>();
+  physical_constraints.pregnancy_velocity_factor =
+      physical_constraints_json["pregnancy_velocity_factor"].get<double>();
+  physical_constraints.after_birth_velocity_factor =
+      physical_constraints_json["after_birth_velocity_factor"].get<double>();
 
   // Load Compatibility settings
   auto& compatibility_json = config_json["compatibility"];

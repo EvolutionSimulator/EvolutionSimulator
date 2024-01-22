@@ -79,7 +79,7 @@ void Creature::UpdateMatingDesire() {
     return;
   }
 
-  if (this->GetAge() >= settings::physical_constraints::kMaxRepdroducingAge) {
+  if (this->GetAge() >= SETTINGS.physical_constraints.max_reproducing_age) {
     mating_desire_ = false;
     return;
   }
@@ -91,9 +91,17 @@ void Creature::UpdateMatingDesire() {
   double probability =
       1 -
       (this->GetAge() - min_reproducing_age) /
-          settings::physical_constraints::kMaxRepdroducingAge -
-      min_reproducing_age * settings::physical_constraints::kMatingDesireFactor;
+          SETTINGS.physical_constraints.max_reproducing_age -
+      min_reproducing_age * SETTINGS.physical_constraints.mating_desire_factor;
   mating_desire_ = mathlib::RandomDouble(0, 1) < probability;
+}
+
+void Creature::AfterMate() {
+  if (this->FemaleReproductiveSystem::IsPregnant()) {
+    SetEnergy(GetEnergy() - 0.7 * max_energy_);
+    SetVelocity(GetVelocity() *
+                SETTINGS.physical_constraints.pregnancy_velocity_factor);
+  }
 }
 
 /*!
@@ -267,6 +275,8 @@ void Creature::Grow(double energy) {
   stomach_capacity_ = mutable_.GetStomachCapacityFactor() * pow(size_, 2);
   bite_strength_ = mutable_.GetGeneticStrength() * size_;
 }
+
+bool Creature::GetMatingDesire() const { return mating_desire_; }
 
 /*!
  * @brief Finds the closest food entity in the vicinity of the creature.

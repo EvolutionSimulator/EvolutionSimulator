@@ -106,6 +106,12 @@ class Settings {
     double d_digestion_rate = 3;
     double d_genetic_strength = 0.6;
     double d_acid_to_energy = 5;  // Increase for easier survival
+    double max_reproducing_age = 700;
+    double mating_desire_max_prob = 0.05;
+    double mating_desire_factor = 0.05;
+    double pregnancy_energy_factor = 0.7;
+    double pregnancy_velocity_factor = 0.5;
+    double after_birth_velocity_factor = 1.5;
   } physical_constraints;
 
   struct UISettings {

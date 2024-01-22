@@ -64,6 +64,9 @@ class Creature : virtual public MovableEntity,
              double height);
   bool Compatible(const Creature &other_creature);
 
+  bool GetMatingDesire() const;
+  void AfterMate();
+
  protected:
   int think_count;     /*! Keeps track so that creatures think every 5 loops */
   bool mating_desire_; /*! Indicates whether creature currently wants to mate*/
