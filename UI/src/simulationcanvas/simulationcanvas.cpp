@@ -274,6 +274,18 @@ void SimulationCanvas::centerViewAroundCreature(const sf::Vector2f& creaturePosi
 void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
     float scaleFactor = this->devicePixelRatioF();
     qDebug() << "Top Left: " << currTopLeft.x << "  " << currTopLeft.y;
+    float screenHeight = sf::VideoMode::getDesktopMode().height;
+    float scaledScreenHeight = static_cast<float>(screenHeight / scaleFactor);
+    float screenWidth = sf::VideoMode::getDesktopMode().width;
+    float scaledScreenWidth = static_cast<float>(screenWidth / scaleFactor);
+    float mouseWindowHeight = sf::Mouse::getPosition(*this).y;
+    float mouseWindowWidth = sf::Mouse::getPosition(*this).x;
+
+    float scaledX=currTopLeft.x+getView().getSize().x*(mouseWindowWidth/scaledScreenWidth);
+    float scaledY=currTopLeft.y+getView().getSize().y*(mouseWindowHeight/scaledScreenHeight);
+    qDebug() << "Mouse x and y: " << scaledX << "  " << scaledY;
+
+    qDebug() << "Height of box: " << scaledScreenHeight;
     sf::Vector2i scaledPos(static_cast<int>(event->position().x() * scaleFactor),
                            static_cast<int>(event->position().y() * scaleFactor));
     sf::Vector2f mousePos = mapPixelToCoords(scaledPos);
@@ -281,18 +293,17 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
     // Needed for differentiating clicking and dragging
     initialClickPosition = mousePos;
     isClicking = true;
-    qDebug() << "Mouse Pressed at: " << mousePos.x << ", " << mousePos.y;
+    //qDebug() << "Mouse Pressed at: " << mousePos.x << ", " << mousePos.y;
 
     auto data = simulation_->GetSimulationData();
 
-    float scaledX = initialClickPosition.x;
-
-    //scaledX = fmod(scaledX, static_cast<float>(settings::environment::kDMapWidth));
-    float scaledY = initialClickPosition.y;
-    //scaledY = fmod(scaledY, static_cast<float>(settings::environment::kDMapHeight));
-    scaledX/=scaleFactor; //1439/2880
-    scaledY/=scaleFactor; //899/1800
-    qDebug() << "(RESCALED) Mouse Pressed at: " << scaledX << ", " << scaledY;
+//    float scaledX = initialClickPosition.x;
+//    //scaledX = fmod(scaledX, static_cast<float>(settings::environment::kDMapWidth));
+//    float scaledY = initialClickPosition.y;
+//    //scaledY = fmod(scaledY, static_cast<float>(settings::environment::kDMapHeight));
+//    scaledX/=scaleFactor; //1439/2880
+//    scaledY/=scaleFactor; //899/1800
+//    qDebug() << "(RESCALED) Mouse Pressed at: " << scaledX << ", " << scaledY;
 
     if (event->button() == Qt::RightButton) {
         // Right-clicked, check if the mouse position coincides with any creature
@@ -388,6 +399,7 @@ void SimulationCanvas::zoom(float factor, sf::Vector2f& zoomPoint) {
     if (zoomFactor * factor > 1) {
         zoomFactor = 1;
         view.setCenter(initialViewCenter);
+        currTopLeft=sf::Vector2f(0,0);
     } else {
         zoomFactor *= factor;
 
