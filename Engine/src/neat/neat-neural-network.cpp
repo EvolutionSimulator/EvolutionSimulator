@@ -18,7 +18,8 @@ namespace neat {
  *
  * @param genome The Genome to construct the NeuralNetwork from.
  */
-NeuralNetwork::NeuralNetwork(const Genome &genom) {
+NeuralNetwork::NeuralNetwork(const Genome &genom)
+    : values_(genom.GetNeurons().front().next_id_, 0) {
   std::vector<std::vector<Neuron> > layers = get_layers(genom);
   // std::vector<Neuron> neurons = genom.GetNeurons();
   std::vector<FeedForwardNeuron> ffneurons;
@@ -47,8 +48,9 @@ NeuralNetwork::NeuralNetwork(const Genome &genom) {
         }
       }
       FeedForwardNeuron ffneuron = {
-          neuron.GetId(), neuron.GetBias(),   0.0,
-          inputs,         inputs_from_cycles, neuron.GetActivation()};
+          neuron.GetId(),        neuron.GetBias(), 0.0,
+          neuron.GetType(),      inputs,           inputs_from_cycles,
+          neuron.GetActivation()};
       ffneurons.push_back(ffneuron);
     }
   }
@@ -65,45 +67,49 @@ NeuralNetwork::NeuralNetwork(const Genome &genom) {
 std::vector<double> NeuralNetwork::Activate(
     const std::vector<double> &input_values) {
   assert(input_values.size() == input_ids_.size());
-  std::unordered_map<int, double> values;
+  // std::unordered_map<int, double> values;
+
   for (int i = 0; i < input_values.size(); i++) {
-    values[input_ids_[i]] = input_values[i];
+    values_[input_ids_[i]] = input_values[i];
   }
 
   for (const FeedForwardNeuron &ffneuron : ffneurons_) {
-    if (values.find(ffneuron.id) ==
-        values.end()) {  // if ffneuron is not already activated
+    if (ffneuron.type !=
+        NeuronType::kInput) {  // if ffneuron is not already activated
       double value = ffneuron.value;
       for (const NeuronInput &input : ffneuron.inputs) {
         // assert(values.find(input.input_id) != values.end()); //previous
         // neurons have to be activated
-        if (values.find(input.input_id) != values.end()) {
+        /*if (values.find(input.input_id) != values.end()) {
           value += values[input.input_id] * input.weight;
-        }
+        }*/
+
+        value += values_[input.input_id] * input.weight;
       }
       value += ffneuron.bias;
 
-      if (std::find(output_ids_.begin(), output_ids_.end(), ffneuron.id) ==
-          output_ids_.end()) {
+      if (ffneuron.type != NeuronType::kOutput) {
         value = activation_function(ffneuron.activation , value);
       }
 
-      values[ffneuron.id] = value;
+      values_[ffneuron.id] = value;
     }
   }
   // update values stored by ffneurons. this affects those neurons which start a
   // cycle
   for (FeedForwardNeuron &ffneuron : ffneurons_) {
-    // ffneuron.value = 0;
+    ffneuron.value = 0;
     for (const NeuronInput &neuron_input : ffneuron.inputs_from_cycles) {
-        if (abs(values[neuron_input.input_id]) > 1e10) continue;
-        ffneuron.value += neuron_input.weight * values[neuron_input.input_id];
-
+      if (abs(values[neuron_input.input_id]) > 1e10) continue;
+      ffneuron.value += neuron_input.weight * values[neuron_input.input_id];
     }
+    ffneuron.value += ffneuron.bias;
+    ffneuron.value =
+        activation_function(ActivationType::sigmoid, ffneuron.value);
   }
   std::vector<double> result;
   for (int i = 0; i < output_ids_.size(); i++) {
-    result.push_back(values[output_ids_[i]]);
+    result.push_back(values_[output_ids_[i]]);
   }
   return result;
 }

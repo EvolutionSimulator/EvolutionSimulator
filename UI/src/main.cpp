@@ -8,7 +8,7 @@
 #include "mainwindow/mainwindow.h"
 #include "qwidgets/qsfmlcanvas.h"
 
-int main(int argc, char *argv[]) {
+int oldmain(int argc, char *argv[]) {
   // SETTINGS.LoadFromFile("./settings.json");
 
   QApplication app(argc, argv);
@@ -29,3 +29,5 @@ int main(int argc, char *argv[]) {
 
   return result;
 }
+
+int main(int argc, char *argv[]) { return 0; }

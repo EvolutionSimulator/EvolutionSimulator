@@ -526,6 +526,8 @@ TEST(NeatTests, NeuralNetworkActivate) {
   std::vector<double> input_values = {1, 1, 1};
   std::vector<double> output_values = neural_network.Activate(input_values);
 
+  std::cerr << output_values[0] << " " << output_values[1] << std::endl;
+
   ASSERT_FALSE(
       output_values.empty());  // Replace with more specific checks as needed
 }

@@ -34,6 +34,7 @@ struct FeedForwardNeuron {  // Functional units of the NeuralNetowork, obtained
   double bias;              /*!< The bias of the neuron. */
   double value; /*!< The value of the neuron. Important for the neurons which
                    start a cycle.*/
+  NeuronType type;
 
   std::vector<NeuronInput> inputs; /*!< A vector of NeuronInput representing the
                                       inputs to this neuron. */
@@ -63,6 +64,7 @@ class NeuralNetwork {
   std::vector<int> output_ids_; /*!< IDs of output neurons. */
   std::vector<FeedForwardNeuron>
       ffneurons_; /*!< Feed-forward neurons used in the network. */
+  std::vector<double> values_;
 };
 
 std::vector<std::vector<Neuron> > get_layers(
