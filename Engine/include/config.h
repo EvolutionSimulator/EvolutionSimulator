@@ -31,13 +31,14 @@ constexpr double kAverageWeightSharedLinks = 0.5;
 constexpr double kColorCompatibility = 0.1;
 constexpr double kMutablesCompatibility = 0.5;
 constexpr double kCompatibilityThreshold = 2;
-}
+constexpr double kCompatibilityDistance = 100;
+}  // namespace compatibility
 
 namespace environment {
-constexpr double kDMapWidth = 1900.0; //not used currently
-constexpr double kDMapHeight = 880.0; //not used currently
+constexpr double kDMapWidth = 1900.0;  // not used currently
+constexpr double kDMapHeight = 880.0;  // not used currently
 constexpr double kCreatureDensity = 0.0005;
-constexpr int kMaxFoodSize = 15; // Influences vision
+constexpr int kMaxFoodSize = 15;  // Influences vision
 constexpr int kMaxCreatureSize = 15;
 constexpr double kTolerance = 1e-3;
 constexpr double kDefaultFoodDensity = 5e-4;
@@ -47,7 +48,10 @@ constexpr double kHealthToEnergy = 10.0;
 constexpr double kDefaultCreatureDensity = 5e-4;
 constexpr double kPlantNutritionalValue = 1.0;
 constexpr double kMeatNutritionalValue = 2.0;
-constexpr double kPlantProportion = 0.5; /* PlantProportion + MeatProportion = 1 */
+constexpr double kEggNutritionalValue = 3.0;
+constexpr double kEggIncubationTimeMultiplier = 1.0;
+constexpr double kPlantProportion =
+    0.5; /* PlantProportion + MeatProportion = 1 */
 constexpr double kRotFactor = 1.0;
 constexpr double kGridCellSize = 50.0;
 constexpr int kMinCreatureSize = 2;
@@ -58,15 +62,14 @@ constexpr int kOutputNeurons = 6;
 constexpr double kMaxNutritionalValue = 5;
 constexpr double kDefaultLifespan = 30;
 constexpr double kPhotosynthesisFactor = 0.1;
-constexpr double kFrictionalCoefficient =
-    0.05;  // Needs to be less than 1
+constexpr double kFrictionalCoefficient = 0.05;  // Needs to be less than 1
 }  // namespace environment
 
 namespace engine {
 constexpr double kFixedUpdateInterval = 0.05;
 constexpr double EPS = 1e-7;
 constexpr size_t kMaxCellsToFindFood = 30;
-//with the current function the max value is 1e-4 so we select a higher value
+// with the current function the max value is 1e-4 so we select a higher value
 constexpr double kMaxFoodDensityColored = 5e-4;
 }  // namespace engine
 
@@ -83,21 +86,30 @@ constexpr double kDBabySize = 2;
 constexpr double kDMaxForce = 10;
 constexpr double kDGrowthFactor = 10;
 constexpr double kDVisionFactor = 200;
-constexpr double kVisionRadius = 200; //Default values or not used not sure
-constexpr double kVisionAngle = M_PI / 3; //Default values or not used not sure
+constexpr double kDGestationRatioToIncubation = 10;
+constexpr double kVisionRadius = 200;  // Default values or not used not sure
+constexpr double kVisionAngle = M_PI / 3;  // Default values or not used not
+                                           // sure
 constexpr double kVisionARratio = 200 * M_PI / 3;
 constexpr double kColorMutationFactor = 0.05;
 constexpr double kDStomachCapacity = 2;
-constexpr double kDDiet = 0.5; // Default omnivores
-constexpr double KDEatingCooldown = 1; // Decrease for easier survival
+constexpr double kDDiet = 0.5;          // Default omnivores
+constexpr double KDEatingCooldown = 1;  // Decrease for easier survival
 constexpr double KDDigestionRate = 3;
 constexpr double KDGeneticStrength = 0.6;
-constexpr double KDAcidToEnergy = 5; // Increase for easier survival
-} //namespace physical_constraints
+constexpr double KDAcidToEnergy = 5;  // Increase for easier survival
+
+constexpr double kMaxRepdroducingAge = 700;
+constexpr double kMatingDesireMaxProb = 0.05;
+constexpr double kMatingDesireFactor = 0.05;
+constexpr double kPregnancyEnergyFactor = 0.7;
+constexpr double kPregnancyVelocityFactor = 0.5;
+constexpr double kAfterBirthVelocityFactor = 1.5;
+}  // namespace physical_constraints
 
 namespace ui {
 constexpr double KDraggingSensitivity = 1.0f;
-} //namespace ui
+}  // namespace ui
 
 }  // namespace settings
 

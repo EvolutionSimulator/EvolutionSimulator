@@ -4,14 +4,17 @@
 #include <vector>
 
 #include "creature.h"
+#include "egg.h"
 #include "environment.h"
 #include "food.h"
-
 
 struct SimulationData {
  public:
   explicit SimulationData(Environment& env)
-      : environment_(env), creatures_(), food_entities_(), lastRecordedTime_(0.0){
+      : environment_(env),
+        creatures_(),
+        food_entities_(),
+        lastRecordedTime_(0.0) {
     // InitializeFood();
     // InitializeCreatures();
     // InitializeGrid();
@@ -30,8 +33,11 @@ struct SimulationData {
 
   std::vector<Creature> creatures_;
   std::vector<Food> food_entities_;
-  std::queue<Creature> reproduce_;
-  std::queue<Creature> new_reproduce_;
+  std::vector<Egg> eggs_;
+  std::queue<int>
+      reproduce_;  // Stores indices of creatures that are ready to reproduce
+  std::queue<int> new_reproduce_;  // Stores indices of creatures that are ready
+                                   // to reproduce
 
   double world_time_ = 0;
 

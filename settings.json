@@ -22,7 +22,8 @@
     "average_weight_shared_links": 0.5,
     "color_compatibility": 0.1,
     "mutables_compatibility": 0.5,
-    "compatibility_threshold": 2.0
+    "compatibility_threshold": 2.0,
+    "compatibility_distance": 100
   },
   "environment": {
     "d_map_width": 1900.0,
@@ -37,6 +38,8 @@
     "default_creature_density": 0.0001,
     "plant_nutritional_value": 2.0,
     "meat_nutritional_value": 3.0,
+    "egg_nutritional_value": 4.0,
+    "incubation_time_multiplier": 1.0,
     "plant_proportion": 0.5,
     "rot_factor": 1.0,
     "grid_cell_size": 50.0,
@@ -68,6 +71,7 @@
     "d_max_force": 10,
     "d_growth_factor": 10,
     "d_vision_factor": 200,
+    "d_gestation_ratio_to_incubation": 20,
     "vision_radius": 200,
     "vision_angle": 3.141592653589793,
     "vision_ar_ratio": 209.43,

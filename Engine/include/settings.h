@@ -1,8 +1,8 @@
 #pragma once
 
+#include <cmath>  // Added for M_PI
 #include <fstream>
 #include <iostream>
-#include <cmath>  // Added for M_PI
 
 class Settings {
  public:
@@ -43,13 +43,14 @@ class Settings {
     double color_compatibility = 0.1;
     double mutables_compatibility = 0.5;
     double compatibility_threshold = 2.0;
+    double compatibility_distance = 100.0;
   } compatibility;
 
   struct EnvironmentSettings {
     double map_width = 1900.0;
     double map_height = 880.0;
     double creature_density = 0.0005;
-    int max_food_size = 15; // Influences vision
+    int max_food_size = 15;  // Influences vision
     int max_creature_size = 15;
     double tolerance = 1e-3;
     double default_food_density = 0.005;
@@ -59,7 +60,9 @@ class Settings {
     double default_creature_density = 0.0001;
     double plant_nutritional_value = 2.0;
     double meat_nutritional_value = 3.0;
-    double plant_proportion = 0.5; // PlantProportion + MeatProportion = 1
+    double egg_nutritional_value = 4.0;
+    double egg_incubation_time_multiplier = 1.0;
+    double plant_proportion = 0.5;  // PlantProportion + MeatProportion = 1
     double rot_factor = 1.0;
     double grid_cell_size = 50.0;
     int min_creature_size = 2;
@@ -70,7 +73,7 @@ class Settings {
     double max_nutritional_value = 5;
     double default_lifespan = 30;
     double photosynthesis_factor = 0.1;
-    double frictional_coefficient = 0.05; // Needs to be less than 1
+    double frictional_coefficient = 0.05;  // Needs to be less than 1
   } environment;
 
   struct EngineSettings {
@@ -92,16 +95,17 @@ class Settings {
     double d_max_force = 10;
     double d_growth_factor = 10;
     double d_vision_factor = 200;
-    double vision_radius = 200; // Default values or not used, not sure
-    double vision_angle = M_PI / 3; // Default values or not used, not sure
+    double d_gestation_ratio_to_incubation = 20;
+    double vision_radius = 200;      // Default values or not used, not sure
+    double vision_angle = M_PI / 3;  // Default values or not used, not sure
     double vision_ar_ratio = 200 * M_PI / 3;
     double color_mutation_factor = 0.05;
     double d_stomach_capacity = 2;
-    double d_diet = 0.5; // Default omnivores
-    double d_eating_cooldown = 1; // Decrease for easier survival
+    double d_diet = 0.5;           // Default omnivores
+    double d_eating_cooldown = 1;  // Decrease for easier survival
     double d_digestion_rate = 3;
     double d_genetic_strength = 0.6;
-    double d_acid_to_energy = 5; // Increase for easier survival
+    double d_acid_to_energy = 5;  // Increase for easier survival
   } physical_constraints;
 
   struct UISettings {

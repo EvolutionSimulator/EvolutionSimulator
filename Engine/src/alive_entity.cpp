@@ -1,4 +1,5 @@
 #include "alive_entity.h"
+
 #include "settings.h"
 
 AliveEntity::AliveEntity(neat::Genome genome, Mutable mutables)
@@ -8,9 +9,9 @@ AliveEntity::AliveEntity(neat::Genome genome, Mutable mutables)
       genome_(genome),
       neuron_data_(SETTINGS.environment.input_neurons, 0),
       age_(0) {
-    size_ = mutables.GetBabySize();
-    health_ = mutables.GetIntegrity() * pow(size_, 2);
-    energy_ = mutables.GetEnergyDensity() * pow(size_, 2);
+  size_ = mutables.GetBabySize();
+  health_ = mutables.GetIntegrity() * pow(size_, 2);
+  energy_ = mutables.GetEnergyDensity() * pow(size_, 2);
 }
 
 /*!
@@ -57,8 +58,7 @@ void AliveEntity::BalanceHealthEnergy() {
   if (GetEnergy() < 0) {
     SetHealth(GetHealth() + GetEnergy() - 0.1);
     SetEnergy(0.1);
-  } else if (GetHealth() < GetEnergy() &&
-             GetEnergy() >= 0.1*max_energy_) {
+  } else if (GetHealth() < GetEnergy() && GetEnergy() >= 0.1 * max_energy_) {
     SetEnergy(GetEnergy() - 0.1);
     SetHealth(GetHealth() + 0.1);
   }
@@ -90,8 +90,8 @@ void AliveEntity::SetHealth(double health) {
 /*!
  * @brief Triggers the death of the AliveEntity.
  *
- * @details This method changes the state of the AliveEntity to 'Dead', indicating
- * its demise.
+ * @details This method changes the state of the AliveEntity to 'Dead',
+ * indicating its demise.
  */
 void AliveEntity::Dies() { SetState(Dead); }
 
@@ -119,7 +119,6 @@ void AliveEntity::SetEnergy(double energy) {
  */
 double AliveEntity::GetMaxEnergy() const { return max_energy_; }
 
-
 /*!
  * @brief Sets  the maximum energy level of the AliveEntity.
  *
@@ -127,7 +126,6 @@ double AliveEntity::GetMaxEnergy() const { return max_energy_; }
  * capacity.
  */
 void AliveEntity::SetMaxEnergy(double max_energy) { max_energy_ = max_energy; };
-
 
 /*!
  * @brief Updates the maximum energy level of the AliveEntity.
@@ -138,14 +136,14 @@ void AliveEntity::SetMaxEnergy(double max_energy) { max_energy_ = max_energy; };
  * @param max_energy The desired maximum energy level.
  */
 void AliveEntity::UpdateMaxEnergy() {
-  max_energy_ = mutable_.GetEnergyDensity() * pow(size_, 2) * (1 - age_/1000);
+  max_energy_ = mutable_.GetEnergyDensity() * pow(size_, 2) * (1 - age_ / 1000);
 }
 
 /*!
  * @brief Retrieves the age of the AliveEntity.
  *
- * @details This method returns the current age of the AliveEntity, which is stored
- * in the age_ member variable.
+ * @details This method returns the current age of the AliveEntity, which is
+ * stored in the age_ member variable.
  *
  * @return The current age of the AliveEntity.
  */
@@ -156,27 +154,31 @@ double AliveEntity::GetAge() const { return age_; }
  *
  * @param age The new age to be set.
  */
-void AliveEntity::SetAge(double age) {
-  age_ = age;
-}
+void AliveEntity::SetAge(double age) { age_ = age; }
 
 /*!
- * @brief Retrieves the AliveEntity's genetic genome.
- *
- * @details Returns the genome of the AliveEntity, which is a representation of its
- * genetic makeup.
- *
- * @return The genome of the AliveEntity.
+ * @brief Updates the age of the AliveEntity.
  */
-neat::Genome AliveEntity::GetGenome() const { return genome_; }
 
-/*!
- * @brief Retrieves the AliveEntity's mutables
- *
- * @details Return the mutables of the AliveEntity which is a representation of its
- * characteristics
- *
- * @return The mutables of the AliveEntity.
- */
-Mutable AliveEntity::GetMutable() const {return mutable_;}
+void AliveEntity::UpdateAge() {
+  age_ += 0.05;
 
+  /*!
+   * @brief Retrieves the AliveEntity's genetic genome.
+   *
+   * @details Returns the genome of the AliveEntity, which is a representation
+   * of its genetic makeup.
+   *
+   * @return The genome of the AliveEntity.
+   */
+  neat::Genome AliveEntity::GetGenome() const { return genome_; }
+
+  /*!
+   * @brief Retrieves the AliveEntity's mutables
+   *
+   * @details Return the mutables of the AliveEntity which is a representation
+   * of its characteristics
+   *
+   * @return The mutables of the AliveEntity.
+   */
+  Mutable AliveEntity::GetMutable() const { return mutable_; }

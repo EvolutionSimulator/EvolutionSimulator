@@ -1,8 +1,8 @@
 #include "simulation.h"
+
 #include <chrono>
 
-Simulation::Simulation(Environment& environment):
-    food_manager_() {
+Simulation::Simulation(Environment& environment) : food_manager_() {
   data_ = new SimulationData(environment);
   is_running_ = true;  // Initialize the flag to true
 }
@@ -29,13 +29,15 @@ void Simulation::FixedUpdate(double deltaTime) {
   auto data = GetSimulationData();
   auto environment = data->GetEnvironment();
 
-  creature_manager_.UpdateAllCreatures(*data, environment, entity_grid_, deltaTime);
+  creature_manager_.UpdateAllCreatures(*data, environment, entity_grid_,
+                                       deltaTime);
+  creature_manager_.HatchEggs();
   creature_manager_.ReproduceCreatures(*data, environment);
   food_manager_.GenerateMoreFood(*data_, environment, deltaTime);
   entity_grid_.UpdateGrid(*data_, environment);
   collision_manager_.CheckCollisions(entity_grid_);
   data_->world_time_ += deltaTime;
-  data_ -> UpdateStatistics();
+  data_->UpdateStatistics();
 
   std::cout << "World time: " << data_->world_time_ << std::endl;
 }

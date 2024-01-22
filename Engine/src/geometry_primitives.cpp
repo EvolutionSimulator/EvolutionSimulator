@@ -56,7 +56,8 @@ Point Point::operator-(const Point &other) const {
 OrientedAngle::OrientedAngle(double angle) : angle_(angle) { Normalize(); }
 
 /*!
- * @brief Constructs an OrientedAngle based on the direction from one Point to another.
+ * @brief Constructs an OrientedAngle based on the direction from one Point to
+ * another.
  * @param from The starting Point.
  * @param to The ending Point.
  */
@@ -83,7 +84,8 @@ OrientedAngle OrientedAngle::operator+(const OrientedAngle &other) const {
 /*!
  * @brief Overloads subtraction operator to handle Oriented Angles.
  * @param other The other OrientedAngle to subtract from this angle.
- * @return A new OrientedAngle representing the difference between this angle and the other.
+ * @return A new OrientedAngle representing the difference between this angle
+ * and the other.
  */
 OrientedAngle OrientedAngle::operator-(const OrientedAngle &other) const {
   return OrientedAngle(angle_ - other.GetAngle());
@@ -95,7 +97,8 @@ OrientedAngle OrientedAngle::operator-(const OrientedAngle &other) const {
 void OrientedAngle::Normalize() { angle_ = remainder(angle_, 2 * M_PI); }
 
 /*!
- * @brief Calculates the minimum angle between this angle and a cone defined by two boundaries.
+ * @brief Calculates the minimum angle between this angle and a cone defined by
+ * two boundaries.
  * @param left_boundary The left boundary of the cone.
  * @param right_boundary The right boundary of the cone.
  * @return The minimum angle distance to the cone.

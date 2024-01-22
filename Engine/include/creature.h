@@ -3,14 +3,15 @@
 
 #include <unordered_map>
 
+#include "alive_entity.h"
 #include "config.h"
+#include "digestive_system.h"
 #include "food.h"
 #include "movable_entity.h"
-#include "alive_entity.h"
-#include "vision_system.h"
-#include "digestive_system.h"
-#include "reproductive_system.h"
 #include "mutable.h"
+#include "neat/neat-neural-network.h"
+#include "reproduction.h"
+#include "vision_system.h"
 
 /*!
  * @file creature.h
@@ -35,25 +36,37 @@
  * for and consuming food, and managing its energy and health. The class also
  * supports evolutionary features like reproduction and genetic inheritance.
  */
-class Creature : virtual public MovableEntity, virtual public AliveEntity, virtual public VisionSystem, virtual public DigestiveSystem, virtual public ReproductiveSystem {
+class Creature : virtual public MovableEntity,
+                 virtual public AliveEntity,
+                 virtual public VisionSystem,
+                 virtual public DigestiveSystem,
+                 virtual public MaleReproductiveSystem,
+                 virtual public FemaleReproductiveSystem {
  public:
   Creature(neat::Genome genome, Mutable mutable_);
+  Creature(neat::Genome genome, Mutable mutable_, const double x_coord,
+           const double y_coord, int generation);
 
   void UpdateEnergy(double deltaTime);
+
+  void UpdateMatingDesire();
+
   void Update(double deltaTime, double const kMapWidth, double const kMapHeight,
-              std::vector<std::vector<std::vector<Entity *> > > &grid,
+              std::vector<std::vector<std::vector<Entity *>>> &grid,
               double GridCellSize, double frictional_coefficient);
 
   void OnCollision(Entity &other_entity, double const kMapWidth,
                    double const kMapHeight) override;
 
   void Grow(double energy);
-  void Think(std::vector<std::vector<std::vector<Entity *> > > &grid,
-             double GridCellSize, double deltaTime, double width, double height);
-  bool Compatible(const Creature& other_creature);
+  void Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
+             double GridCellSize, double deltaTime, double width,
+             double height);
+  bool Compatible(const Creature &other_creature);
 
  protected:
-  int think_count; /*! Keeps track so that creatures think every 5 loops */
+  int think_count;     /*! Keeps track so that creatures think every 5 loops */
+  bool mating_desire_; /*! Indicates whether creature currently wants to mate*/
 };
 
 std::vector<Food *> get_food_at_distance(
