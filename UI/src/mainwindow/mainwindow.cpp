@@ -16,6 +16,8 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui_(new Ui::MainWindow), lastRecordedTime_(0.0) {
   ui_->setupUi(this);
 
+  ui_->canvas->SetRefreshInterval(1000.0 / 60);
+
   InitializeEngine();
   PauseSimulation();
   RunSimulation();
@@ -44,7 +46,7 @@ void MainWindow::InitializeEngine()
     int width = sf::VideoMode::getDesktopMode().width;
     int height = sf::VideoMode::getDesktopMode().height;
     engine_ = new Engine(width, height);
-    engine_->SetSpeed(20);
+    engine_->SetSpeed(100);
     ui_->canvas->SetSimulation(engine_->GetSimulation());
   }
 
