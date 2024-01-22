@@ -20,11 +20,11 @@ DigestiveSystem::DigestiveSystem(neat::Genome genome, Mutable mutables)
  *
  * @param nutritional_value The nutritional value of the consumed food.
  */
-void DigestiveSystem::Eats(double nutritional_value) {
+void DigestiveSystem::Eats(double nutritional_value, double deltaTime) {
   //velocity_ = 0;
   SetEnergy(GetEnergy() + nutritional_value);
   if (GetEnergy() > max_energy_) {
-    BalanceHealthEnergy();
+    BalanceHealthEnergy(deltaTime);
   }
 }
 
@@ -56,7 +56,7 @@ void DigestiveSystem::Digest(double deltaTime)
          // Digests the food, increasing energy
   SetEnergy(GetEnergy() + quantity * avg_nutritional_value);
   if (GetEnergy() > max_energy_) {
-    BalanceHealthEnergy();
+    BalanceHealthEnergy(deltaTime);
   }
 
          // Empties out the stomach space

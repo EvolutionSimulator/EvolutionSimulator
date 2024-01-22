@@ -17,7 +17,7 @@ public:
   void Digest(double deltaTime);
   void Bite(Food *food);
   void AddAcid(double quantity);
-  void Eats(double nutritional_value);
+  void Eats(double nutritional_value, double deltaTime);
 
 
 protected:
