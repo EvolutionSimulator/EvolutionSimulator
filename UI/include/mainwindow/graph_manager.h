@@ -73,7 +73,6 @@ public:
     // Set the stack mode for the chart
     chart->setTheme(QChart::ChartThemeLight);
     chart->setAnimationOptions(QChart::AllAnimations);
-    chart->legend()->setVisible(true);
     chart->legend()->setAlignment(Qt::AlignBottom);
 
     // Add a Save button to the dialog
@@ -196,7 +195,6 @@ public:
     // Set the stack mode for the chart
     chart->setTheme(QChart::ChartThemeLight);
     chart->setAnimationOptions(QChart::AllAnimations);
-    chart->legend()->setVisible(true);
     chart->legend()->setAlignment(Qt::AlignBottom);
 
     // Add a Save button to the dialog
@@ -238,14 +236,13 @@ public:
     dialog.exec();
   }
 
-  void DrawAreaGraph(const std::vector<std::vector<std::pair<double, double>>> data, const QString& graphTitle) {
+  void DrawAreaGraph(const std::vector<std::vector<std::pair<double, double>>>& data, const QString& graphTitle) {
     if (data.empty()) {
       qDebug() << "No data to display.";
       return;
     }
 
-    // Create a vector to store series
-    std::vector<QAreaSeries*> seriesVector;
+    QChart* chart = new QChart();
 
     for (size_t id = 0; id < data.size(); ++id) {
       const auto& seriesData = data[id];
@@ -266,18 +263,10 @@ public:
 
       QAreaSeries* series = new QAreaSeries(upperSeries, lowerSeries);
 
-      // Print information about the series to the console
       qDebug() << "Series ID:" << id;
       qDebug() << "Upper Series Points:" << upperSeries->points();
       qDebug() << "Lower Series Points:" << lowerSeries->points();
 
-      // Store the series in the vector
-      seriesVector.push_back(series);
-    }
-
-    QChart* chart = new QChart();
-    for (auto series : seriesVector) {
-      qDebug() << "Series:" << series;
       chart->addSeries(series);
     }
 
@@ -290,32 +279,49 @@ public:
     horizontalAxis->setRange(0, 10);  // Adjust the range as needed
     verticalAxis->setRange(0, 10);    // Adjust the range as needed
 
-    // Set the stack mode for the chart
     chart->setTheme(QChart::ChartThemeLight);
     chart->setAnimationOptions(QChart::AllAnimations);
     chart->legend()->setVisible(true);
     chart->legend()->setAlignment(Qt::AlignBottom);
 
-    // Create a Save button
     QPushButton* saveButton = new QPushButton("Save Graph");
 
-    // Create a layout for the chart
     QVBoxLayout* layout = new QVBoxLayout();
-
-    // Add the Save button to the layout
     layout->addWidget(saveButton);
 
-    // Add the chartView to the layout
     QChartView* chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
     layout->addWidget(chartView);
 
-    // Connect the Save button to a slot that saves the graph
     connect(saveButton, &QPushButton::clicked, [chartView, data, graphTitle, this]() {
-        // Save logic remains unchanged
+        QString desktopPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+        QString folderPath = desktopPath + "/EvolutionSimulationData/";
+
+        if (createDirectory(folderPath)) {
+            QString filePath = QFileDialog::getSaveFileName(nullptr, "Save Graph", folderPath, "PNG Image (*.png);;CSV File (*.csv)");
+            if (!filePath.isEmpty()) {
+                QString imageFilePath = filePath + ".png";
+                chartView->grab().save(imageFilePath);
+
+                QString csvFilePath = filePath;
+                QFile file(csvFilePath);
+                if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+                    QTextStream stream(&file);
+                    for (size_t id = 0; id < data.size(); ++id) {
+                        for (size_t i = 0; i < data[id].size(); ++i) {
+                            stream << id << "," << i << "," << data[id][i].second << "\n";
+                        }
+                    }
+                    file.close();
+                } else {
+                    QMessageBox::critical(nullptr, "Error", "Failed to save CSV file.");
+                }
+            }
+        } else {
+            QMessageBox::critical(nullptr, "Error", "Failed to create the directory.");
+        }
     });
 
-    // Create a dialog to display the chart
     QDialog* dialog = new QDialog(parent_);
     dialog->setWindowTitle(graphTitle);
     dialog->setLayout(layout);
@@ -341,6 +347,7 @@ private:
   Engine* engine_;
   SimulationCanvas* simulationCanvas_;
   InfoPanel* GetInfoPanel();
+  std::vector<std::vector<std::pair<double, double>>> testData;
 
 signals:
   void resetGraphMenuIndex();

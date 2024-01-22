@@ -13,7 +13,14 @@ GraphManager::GraphManager(QWidget* parent, Engine *engine, SimulationCanvas* si
     QObject(nullptr),
     parent_(parent),
     engine_(engine),
-    simulationCanvas_(simulationCanvas){}
+    simulationCanvas_(simulationCanvas){
+    testData = {
+        {{0.0, 0.0}, {0.0, 1.0}, {0.0, 2.0}, {0.0, 3.0}, {0.0, 4.0}},   // Series with ID 0
+        {{1.0, 1.0}, {1.0, 2.0}, {1.0, 3.0}, {1.0, 4.0}, {1.0, 5.0}},   // Series with ID 1
+        {{2.0, 2.0}, {2.0, 3.0}, {2.0, 4.0}, {2.0, 3.0}, {2.0, 2.0}}    // Series with ID 2
+        // Add more series as needed
+    };
+}
 
 void GraphManager::SetEngine(Engine* engine)
 {
@@ -41,13 +48,6 @@ void GraphManager::DrawCreaturesVelocityOverTimeGraph() {
 }
 
 void GraphManager::DrawSpeciesArea() {
-  // Sample data vector for testing
-  std::vector<std::vector<std::pair<double, double>>> testData = {
-      {{0.0, 0.0}, {0.0, 1.0}, {0.0, 2.0}, {0.0, 3.0}, {0.0, 4.0}},   // Series with ID 0
-      {{1.0, 1.0}, {1.0, 2.0}, {1.0, 3.0}, {1.0, 4.0}, {1.0, 5.0}},   // Series with ID 1
-      {{2.0, 2.0}, {2.0, 3.0}, {2.0, 4.0}, {2.0, 3.0}, {2.0, 2.0}}    // Series with ID 2
-      // Add more series as needed
-  };
   // Check if testData is not empty
   if (!testData.empty()) {
       // Ensure each series is not empty
@@ -64,7 +64,6 @@ void GraphManager::DrawSpeciesArea() {
       qDebug() << "Error: testData is empty.";
   }
 }
-
 void GraphManager::DrawSizeEnergyScatterplot() {
   auto& infoPanel = simulationCanvas_->GetInfoPanel();
   Creature* selectedCreature = infoPanel.GetSelectedCreature();
