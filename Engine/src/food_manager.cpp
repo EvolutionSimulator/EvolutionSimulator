@@ -10,8 +10,8 @@ FoodManager::FoodManager() {}
 void FoodManager::InitializeFood(SimulationData &data,
                                  Environment &environment) {
   data.food_entities_.clear();
-  for (int i = 0; i < 100; i++) {
-    GenerateMoreFood(data, environment, 3);
+  for (int i = 0; i < 1000; i++) {
+    GenerateMoreFood(data, environment, 5);
   }
 }
 

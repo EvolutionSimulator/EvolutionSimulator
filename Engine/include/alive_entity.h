@@ -21,7 +21,7 @@ public:
   void SetMaxEnergy(double max_energy);
   void UpdateMaxEnergy();
 
-  void BalanceHealthEnergy();
+  void BalanceHealthEnergy(double deltaTime);
 
   double GetAge() const;
   void SetAge(double age);

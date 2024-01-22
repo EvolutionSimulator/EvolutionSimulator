@@ -53,14 +53,14 @@ double AliveEntity::GetEnergy() const { return energy_; }
  * @details This method adjusts the AliveEntity's health and energy depending on
  * their current values and predefined thresholds.
  */
-void AliveEntity::BalanceHealthEnergy() {
+void AliveEntity::BalanceHealthEnergy(double deltaTime) {
   if (GetEnergy() < 0) {
-    SetHealth(GetHealth() + GetEnergy() - 0.1);
-    SetEnergy(0.1);
+    SetHealth(GetHealth() + GetEnergy() - deltaTime);
+    SetEnergy(deltaTime);
   } else if (GetHealth() < GetEnergy() &&
              GetEnergy() >= 0.1*max_energy_) {
-    SetEnergy(GetEnergy() - 0.1);
-    SetHealth(GetHealth() + 0.1);
+    SetEnergy(GetEnergy() - deltaTime);
+    SetHealth(GetHealth() + deltaTime);
   }
 }
 
@@ -138,7 +138,7 @@ void AliveEntity::SetMaxEnergy(double max_energy) { max_energy_ = max_energy; };
  * @param max_energy The desired maximum energy level.
  */
 void AliveEntity::UpdateMaxEnergy() {
-  max_energy_ = mutable_.GetEnergyDensity() * pow(size_, 2) * std::exp(-age_/10);
+  max_energy_ = mutable_.GetEnergyDensity() * pow(size_, 2) * std::exp(-age_/30);
 }
 
 /*!

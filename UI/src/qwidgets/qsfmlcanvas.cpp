@@ -13,7 +13,7 @@ QSFMLCanvas::QSFMLCanvas(QWidget* Parent) : QWidget(Parent) {
 
   // Setup the timer with a specified refresh interval (0 means it updates as
   // fast as possible)
-  timer_.setInterval(0);
+  timer_.setInterval(30);
 }
 
 void QSFMLCanvas::SetRefreshInterval(int milliseconds) {

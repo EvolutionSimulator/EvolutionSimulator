@@ -55,7 +55,7 @@ void Creature::UpdateEnergy(double deltaTime) {
   double heat_loss = mutable_.GetEnergyLoss() * pow(size_, 1) * deltaTime/100;
 
   SetEnergy(GetEnergy() - movement_energy - heat_loss);
-  BalanceHealthEnergy();
+  BalanceHealthEnergy(deltaTime);
 
   if (GetHealth() <= 0) {
     Dies();

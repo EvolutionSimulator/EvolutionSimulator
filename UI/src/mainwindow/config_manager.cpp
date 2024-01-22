@@ -13,8 +13,19 @@ ConfigManager::ConfigManager(QWidget* parent, Engine *engine) :
 }
 
 void ConfigManager::ChangeFoodDensity(int value) {
-  food_density_ = static_cast<double>(value) / 1000.0;     // Convert to density
-  engine_->GetEnvironment().SetFoodDensity(food_density_); // Update the density
+  food_density_ = static_cast<double>(value) / 1000.0;
+  double map_height = engine_->GetEnvironment().GetMapHeight();
+  double map_width = engine_->GetEnvironment().GetMapWidth();
+  double food_density = food_density_;
+  engine_->GetEnvironment().SetFoodDensity(
+              [food_density, map_height, map_width](double x, double y) {
+      double mu_x = map_width/2;
+      double mu_y = map_height/2;
+      double sigma_x = map_width/10;
+      double sigma_y = map_height/10;
+      double exponent = exp(-0.5 * (pow((x - mu_y) / sigma_x, 2) + pow((y - mu_y) / sigma_y, 2)));
+      return (1 / (2 * M_PI * sigma_x * sigma_y)) * food_density * exponent;
+  }); // Update the density
   engine_->UpdateEnvironment(); // Apply the updated density
   emit UpdateUIForConfigScreen(food_density_, friction_coefficient_);
 }
