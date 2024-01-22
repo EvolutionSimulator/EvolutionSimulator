@@ -428,7 +428,7 @@ void SimulationCanvas::zoom(float factor, sf::Vector2f& zoomPoint) {
         view.setCenter(view.getCenter() + zoomDiff * factor);
 
         // Update currTopLeft based on the new view center
-        currTopLeft = view.getCenter() - sf::Vector2f(view.getSize().x / 2, view.getSize().y / 2);
+
     }
 
     // Set the new size of the view
@@ -436,6 +436,7 @@ void SimulationCanvas::zoom(float factor, sf::Vector2f& zoomPoint) {
 
     // Apply the new view and update
     setView(view);
+    currTopLeft = view.getCenter() - sf::Vector2f(view.getSize().x / 2, view.getSize().y / 2);
     update();
 }
 
