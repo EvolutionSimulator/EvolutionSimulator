@@ -38,6 +38,7 @@ class SimulationCanvas : public QSFMLCanvas {
   virtual void OnUpdate() override;
   Creature* followedCreature = nullptr;
   bool followCreature = false;
+  sf::Vector2f currTopLeft = sf::Vector2f(0,0);
 
   // Rendering logic
   void RenderSimulation(DataAccessor<SimulationData> data);

@@ -266,13 +266,14 @@ void SimulationCanvas::centerViewAroundCreature(const sf::Vector2f& creaturePosi
     // Set the new center of the view
     view.setCenter(newCenter);
     // Set the new size of the view (you may adjust this based on your requirements)
-    view.setSize(initialViewSize.x/2, initialViewSize.y/2);
+    view.setSize(initialViewSize.x, initialViewSize.y);
     // Apply the new view
     setView(view);
 }
 
 void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
     float scaleFactor = this->devicePixelRatioF();
+    qDebug() << "Top Left: " << currTopLeft.x << "  " << currTopLeft.y;
     sf::Vector2i scaledPos(static_cast<int>(event->position().x() * scaleFactor),
                            static_cast<int>(event->position().y() * scaleFactor));
     sf::Vector2f mousePos = mapPixelToCoords(scaledPos);
@@ -285,14 +286,12 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
     auto data = simulation_->GetSimulationData();
 
     float scaledX = initialClickPosition.x;
-    scaledX = fmod(scaledX, static_cast<float>(settings::environment::kDMapWidth));
+
+    //scaledX = fmod(scaledX, static_cast<float>(settings::environment::kDMapWidth));
     float scaledY = initialClickPosition.y;
-    scaledY = fmod(scaledY, static_cast<float>(settings::environment::kDMapHeight));
-    #if defined(Q_OS_MACOS)
-        // On macOS, halve the mouse coordinates
-      scaledX *= 1439.0 / 2880.0f;
-      scaledY *= 899.0f / 1800.0f;
-    #endif
+    //scaledY = fmod(scaledY, static_cast<float>(settings::environment::kDMapHeight));
+    scaledX/=scaleFactor; //1439/2880
+    scaledY/=scaleFactor; //899/1800
     qDebug() << "(RESCALED) Mouse Pressed at: " << scaledX << ", " << scaledY;
 
     if (event->button() == Qt::RightButton) {
@@ -415,6 +414,9 @@ void SimulationCanvas::zoom(float factor, sf::Vector2f& zoomPoint) {
         // Adjust the center again to ensure it's relative to the mouse position
         sf::Vector2f zoomDiff = mouseWorldPosBeforeZoom - mouseWorldPosAfterZoom;
         view.setCenter(view.getCenter() + zoomDiff * factor);
+
+        // Update currTopLeft based on the new view center
+        currTopLeft = view.getCenter() - sf::Vector2f(view.getSize().x / 2, view.getSize().y / 2);
     }
 
     // Set the new size of the view
@@ -424,6 +426,7 @@ void SimulationCanvas::zoom(float factor, sf::Vector2f& zoomPoint) {
     setView(view);
     update();
 }
+
 
 void SimulationCanvas::mouseMoveEvent(QMouseEvent* event) {
     float scaleFactor = this->devicePixelRatioF();
@@ -436,9 +439,9 @@ void SimulationCanvas::mouseMoveEvent(QMouseEvent* event) {
                               pow(currentMousePosition.y - initialClickPosition.y, 2));
 
         if (distance > SETTINGS.ui.dragging_sensitivity) {
-      qDebug() << "Switched to dragging";
-      isDragging = true;
-      isClicking = false;
+            qDebug() << "Switched to dragging";
+            isDragging = true;
+            isClicking = false;
         }
     }
     if (isDragging) {
@@ -452,40 +455,26 @@ void SimulationCanvas::mouseMoveEvent(QMouseEvent* event) {
         averagedDelta /= static_cast<float>(deltaHistory.size());
 
         sf::View view = getView();
-        view.move(averagedDelta);
-        // Get map dimensions
-        double mapWidth = simulation_->GetSimulationData()->GetEnvironment().GetMapWidth();
-        double mapHeight = simulation_->GetSimulationData()->GetEnvironment().GetMapHeight();
+        sf::Vector2f currentCenter = view.getCenter();
+        float viewWidth = view.getSize().x;
+        float viewHeight = view.getSize().y;
 
-        // Get the new center of the view
-        sf::Vector2f newCenter = view.getCenter();
+        // Adjust the averaged delta based on the view size
+        averagedDelta.x *= viewWidth / getSize().x;
+        averagedDelta.y *= viewHeight / getSize().y;
 
-        // Wrap around horizontally
-        if (newCenter.x < 0) {
-            currentMousePosition.x += mapWidth;
-            newCenter.x += mapWidth;
-        }
-        else if (newCenter.x > mapWidth) {
-            currentMousePosition.x -= mapWidth;
-            newCenter.x -= mapWidth;
-        }
-
-        // Wrap around vertically
-        if (newCenter.y < 0) {
-            currentMousePosition.y += mapHeight;
-            newCenter.y += mapHeight;
-        }
-        else if (newCenter.y > mapHeight) {
-            currentMousePosition.y -= mapHeight;
-            newCenter.y -= mapHeight;
-        }
-        // Set the wrapped center back to the view
-        view.setCenter(newCenter);
+        // Update the view position
+        view.setCenter(currentCenter + averagedDelta);
         setView(view);
 
         initialClickPosition = currentMousePosition;
+
+        // Update currTopLeft based on the new view center
+        currTopLeft = view.getCenter() - sf::Vector2f(viewWidth / 2, viewHeight / 2);
     }
 }
+
+
 
 void SimulationCanvas::mouseReleaseEvent(QMouseEvent* event) {
     qDebug() << "Mouse released";
