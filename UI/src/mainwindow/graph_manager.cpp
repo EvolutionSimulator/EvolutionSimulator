@@ -43,9 +43,9 @@ void GraphManager::DrawCreaturesVelocityOverTimeGraph() {
 void GraphManager::DrawSpeciesArea() {
   // Sample data vector for testing
   std::vector<std::vector<std::pair<double, double>>> testData = {
-      {{0, 0.0}, {0, 1.0}, {0, 2.0}, {0, 3.0}, {0, 4.0}},   // Series with ID 0
-      {{1, 1.0}, {1, 2.0}, {1, 3.0}, {1, 4.0}, {1, 5.0}},   // Series with ID 1
-      {{2, 2.0}, {2, 3.0}, {2, 4.0}, {2, 3.0}, {2, 2.0}}    // Series with ID 2
+      {{0.0, 0.0}, {0.0, 1.0}, {0.0, 2.0}, {0.0, 3.0}, {0.0, 4.0}},   // Series with ID 0
+      {{1.0, 1.0}, {1.0, 2.0}, {1.0, 3.0}, {1.0, 4.0}, {1.0, 5.0}},   // Series with ID 1
+      {{2.0, 2.0}, {2.0, 3.0}, {2.0, 4.0}, {2.0, 3.0}, {2.0, 2.0}}    // Series with ID 2
       // Add more series as needed
   };
   // Check if testData is not empty
@@ -57,7 +57,7 @@ void GraphManager::DrawSpeciesArea() {
               return;
           }
       }
-
+      qDebug() << "testData is not empty.";
       // Call DrawAreaGraph with the valid testData
       DrawAreaGraph(testData, "Test Area Graph");
   } else {
