@@ -266,7 +266,7 @@ void SimulationCanvas::centerViewAroundCreature(const sf::Vector2f& creaturePosi
     // Set the new center of the view
     view.setCenter(newCenter);
     // Set the new size of the view (you may adjust this based on your requirements)
-    view.setSize(initialViewSize.x, initialViewSize.y);
+    view.setSize(getView().getSize().x, getView().getSize().y);
     // Apply the new view
     setView(view);
 }
