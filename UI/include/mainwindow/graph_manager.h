@@ -15,6 +15,7 @@
 #include <QtCharts/QChart>
 #include <QtCharts/QChartView>
 #include <QtCharts/QScatterSeries>
+#include <QtCharts/QAreaSeries>
 #include <QDialog>
 #include <QVBoxLayout>
 #include "QtWidgets/qpushbutton.h"
@@ -224,11 +225,112 @@ public:
     dialog.exec();
   }
 
+  template <typename T>
+  void DrawAreaGraph(const std::vector<T>& data, const QString& graphTitle) {
+    if (data.empty()) {
+      qDebug() << "Data vector is empty.";
+      return;
+    }
+
+    QChart* chart = new QChart();
+    chart->createDefaultAxes();
+    chart->axes(Qt::Horizontal).first()->setTitleText("Time Elapsed");
+    chart->axes(Qt::Vertical).first()->setTitleText(graphTitle);
+
+    std::vector<QAreaSeries*> areaSeriesList;
+
+    for (size_t id = 0; id < data.size(); ++id) {
+      if (data[id].empty()) {
+          qDebug() << "Data for ID" << id << "is empty. Skipping.";
+          continue;  // Skip empty data for this ID
+      }
+
+      QLineSeries* upperSeries = new QLineSeries();
+      QLineSeries* lowerSeries = new QLineSeries();
+
+      for (size_t i = 0; i < data[id].size(); ++i) {
+          qreal x = static_cast<qreal>(data[id][i].first);
+          qreal y = static_cast<qreal>(data[id][i].second);
+          upperSeries->append(QPointF(x, y));
+          lowerSeries->append(QPointF(x, 0));  // Assumes lower bound is 0
+      }
+
+      QAreaSeries* series = new QAreaSeries(upperSeries, lowerSeries);
+      chart->addSeries(series);
+      areaSeriesList.push_back(series);
+    }
+
+    // Set the stack mode for the chart
+    chart->setTheme(QChart::ChartThemeLight);
+    chart->setAnimationOptions(QChart::AllAnimations);
+    chart->legend()->setVisible(true);
+    chart->legend()->setAlignment(Qt::AlignBottom);
+
+    // Create a Save button
+    QPushButton* saveButton = new QPushButton("Save Graph");
+
+    // Create a layout for the chart
+    QVBoxLayout* layout = new QVBoxLayout();
+
+    // Add the Save button to the layout
+    layout->addWidget(saveButton);
+
+    // Add the chartView to the layout
+    QChartView* chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+    layout->addWidget(chartView);
+
+    // Connect the Save button to a slot that saves the graph
+    connect(saveButton, &QPushButton::clicked, [chartView, data, graphTitle, this]() {
+        QString desktopPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+        QString folderPath = desktopPath + "/EvolutionSimulationData/";
+
+        // Create the folder if it doesn't exist
+        if (createDirectory(folderPath)) {
+            QString filePath = QFileDialog::getSaveFileName(nullptr, "Save Graph", folderPath, "PNG Image (*.png);;CSV File (*.csv)");
+            if (!filePath.isEmpty()) {
+                // Save image
+                QString imageFilePath = filePath + ".png";
+                chartView->grab().save(imageFilePath);
+
+                // Save data to CSV file
+                QString csvFilePath = filePath;
+                QFile file(csvFilePath);
+                if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+                    QTextStream stream(&file);
+                    for (size_t id = 0; id < data.size(); ++id) {
+                        for (size_t i = 0; i < data[id].size(); ++i) {
+                            stream << id << "," << data[id][i].first << "," << data[id][i].second << "\n";
+                        }
+                    }
+                    file.close();
+                } else {
+                    QMessageBox::critical(nullptr, "Error", "Failed to save CSV file.");
+                }
+            }
+        } else {
+            QMessageBox::critical(nullptr, "Error", "Failed to create the directory.");
+        }
+    });
+
+    // Create a dialog to display the chart
+    QDialog* dialog = new QDialog(parent_);
+    dialog->setWindowTitle(graphTitle);
+    dialog->setLayout(layout);
+    dialog->resize(800, 600);
+    connect(dialog, &QDialog::finished, dialog, &QObject::deleteLater);
+    emit resetGraphMenuIndex();
+    dialog->exec();
+  }
+
+
+
 public slots:
   void DrawCreaturesOverTimeGraph();
   void DrawCreaturesSizeOverTimeGraph();
   void DrawCreaturesEnergyOverTimeGraph();
   void DrawCreaturesVelocityOverTimeGraph();
+  void DrawSpeciesArea();
   void DrawSizeEnergyScatterplot();
   void DrawSizeVelocityScatterplot();
   void DrawEnergyVelocityScatterplot();

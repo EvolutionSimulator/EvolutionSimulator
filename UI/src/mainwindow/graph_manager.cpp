@@ -40,6 +40,31 @@ void GraphManager::DrawCreaturesVelocityOverTimeGraph() {
   DrawGraph(data, "Average Velocity of Creatures in the Simulation");
 }
 
+void GraphManager::DrawSpeciesArea() {
+  // Sample data vector for testing
+  std::vector<std::vector<std::pair<double, double>>> testData = {
+      {{0, 0.0}, {0, 1.0}, {0, 2.0}, {0, 3.0}, {0, 4.0}},   // Series with ID 0
+      {{1, 1.0}, {1, 2.0}, {1, 3.0}, {1, 4.0}, {1, 5.0}},   // Series with ID 1
+      {{2, 2.0}, {2, 3.0}, {2, 4.0}, {2, 3.0}, {2, 2.0}}    // Series with ID 2
+      // Add more series as needed
+  };
+  // Check if testData is not empty
+  if (!testData.empty()) {
+      // Ensure each series is not empty
+      for (const auto& series : testData) {
+          if (series.empty()) {
+              qDebug() << "Error: Series is empty.";
+              return;
+          }
+      }
+
+      // Call DrawAreaGraph with the valid testData
+      DrawAreaGraph(testData, "Test Area Graph");
+  } else {
+      qDebug() << "Error: testData is empty.";
+  }
+}
+
 void GraphManager::DrawSizeEnergyScatterplot() {
   auto& infoPanel = simulationCanvas_->GetInfoPanel();
   Creature* selectedCreature = infoPanel.GetSelectedCreature();
@@ -161,6 +186,8 @@ void GraphManager::handleDropdownSelection(int index) {
     qDebug() << "Calling DrawCreaturesOverTimeGraph";
     DrawEnergyVelocityScatterplot();
   }
-
-
+  if (index == 8) {
+    qDebug() << "Calling DrawSpeciesArea";
+    DrawSpeciesArea();
+  }
 }

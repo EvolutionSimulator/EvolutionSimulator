@@ -203,6 +203,7 @@ void MainWindow::DrawUI()
     comboBox->addItem("Size and Energy Scatterplot");
     comboBox->addItem("Size and Velocity Scatterplot");
     comboBox->addItem("Energy and Velocity Scatterplot");
+    comboBox->addItem("Species Area");
     connect(graph_manager_, &GraphManager::resetGraphMenuIndex, this, [this]() {
         ui_->graphMenu->setCurrentIndex(0);
     });
