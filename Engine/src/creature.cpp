@@ -29,9 +29,6 @@ Creature::Creature(neat::Genome genome, Mutable mutables)
       DigestiveSystem(genome, mutables),
       ReproductiveSystem(genome,mutables)
       {
-    size_ = mutables.GetBabySize();
-    health_ = mutables.GetIntegrity() * pow(size_, 2);
-    energy_ = mutables.GetEnergyDensity() * pow(size_, 2);
     int neural_inputs = settings::environment::kInputNeurons;
     for (BrainModule module : genome.GetModules()){
         neural_inputs += module.GetInputNeuronIds().size();
@@ -104,6 +101,7 @@ void Creature::Update(double deltaTime, double const kMapWidth,
   this->Think(grid, GridCellSize, deltaTime, kMapWidth, kMapHeight);
   this->Digest(deltaTime);
   age_ += deltaTime;
+  this->Grow(energy_*deltaTime/1000);
 
   if (reproduction_cooldown_ <= 0) {
     reproduction_cooldown_ = 0.0;
@@ -195,9 +193,9 @@ void Creature::Think(std::vector<std::vector<std::vector<std::shared_ptr<Entity>
   SetAcceleration(std::tanh(output.at(0))*mutable_.GetMaxForce());
   SetAccelerationAngle(std::tanh(output.at(1)) * M_PI);
   SetRotationalAcceleration(std::tanh(output.at(2))*mutable_.GetMaxForce());
-  Grow(std::max(std::tanh(output.at(3)) * deltaTime, 0.0));
+  // Grow(std::max(std::tanh(output.at(3)) * deltaTime, 0.0));
   AddAcid(std::max(std::tanh(output.at(4)) * 10.0, 0.0));
-  biting_ = std::tanh(output.at(5)) > 0 ? 0 : 1;
+  biting_ = std::tanh(output.at(5)) > 0 ? 1 : 0;
 
 
 

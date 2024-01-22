@@ -57,8 +57,8 @@ class Settings {
     double energy_to_health = 70.0;
     double health_to_energy = 10.0;
     double default_creature_density = 0.0001;
-    double plant_nutritional_value = 0.25;
-    double meat_nutritional_value = 0.5;
+    double plant_nutritional_value = 0.5;
+    double meat_nutritional_value = 1;
     double plant_proportion = 0.5; // PlantProportion + MeatProportion = 1
     double rot_factor = 0.03;
     double grid_cell_size = 50.0;
