@@ -20,6 +20,7 @@ Mutable::Mutable()
     baby_size_(SETTINGS.physical_constraints.d_baby_size),
     max_force_(SETTINGS.physical_constraints.d_max_force),
     growth_factor_(SETTINGS.physical_constraints.d_growth_factor),
+    vision_factor_(SETTINGS.physical_constraints.d_vision_factor),
     color_(0.0f),
     stomach_capacity_factor_(SETTINGS.physical_constraints.d_stomach_capacity),
     diet_(SETTINGS.physical_constraints.d_diet),
