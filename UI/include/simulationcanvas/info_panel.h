@@ -1,6 +1,8 @@
 #ifndef INFO_PANEL_H
 #define INFO_PANEL_H
 
+
+#include <SFML/Graphics.hpp>
 #include "SFML/Graphics/Font.hpp"
 #include "SFML/Graphics/RenderTarget.hpp"
 #include "creature.h"
@@ -16,6 +18,8 @@ public:
   void SetSelectedCreature(Creature* creature);
   void UpdateSelectedFood();
   Creature* GetSelectedCreature() const;
+  void SetUIView(sf::View view);
+  void SetPanelView(sf::View view);
 
   void Show();
   void Hide();
@@ -35,5 +39,8 @@ private:
 
   void DrawPanel(sf::RenderTarget& target);
   void DrawCreatureInfo(sf::RenderTarget& target);
+
+  sf::View ui_view_;
+  sf::View info_panel_view_;
 };
 #endif // INFO_PANEL_H

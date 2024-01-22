@@ -60,5 +60,8 @@ class SimulationCanvas : public QSFMLCanvas {
   InfoPanel info_panel_;
   void SetSelectedFood();
   void DrawMouseCoordinates();
+
+  sf::View ui_view_;
+  sf::View info_panel_view_;
 };
 
