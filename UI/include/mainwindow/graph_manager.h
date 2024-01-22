@@ -70,6 +70,12 @@ public:
     dialog->setLayout(layout);
     dialog->resize(800, 600);
 
+    // Set the stack mode for the chart
+    chart->setTheme(QChart::ChartThemeLight);
+    chart->setAnimationOptions(QChart::AllAnimations);
+    chart->legend()->setVisible(true);
+    chart->legend()->setAlignment(Qt::AlignBottom);
+
     // Add a Save button to the dialog
     QPushButton* saveButton = new QPushButton("Save Graph");
     layout->addWidget(saveButton);
@@ -187,6 +193,12 @@ public:
     dialog.resize(800, 600);
     dialog.setWindowTitle(title);
 
+    // Set the stack mode for the chart
+    chart->setTheme(QChart::ChartThemeLight);
+    chart->setAnimationOptions(QChart::AllAnimations);
+    chart->legend()->setVisible(true);
+    chart->legend()->setAlignment(Qt::AlignBottom);
+
     // Add a Save button to the dialog
     QPushButton* saveButton = new QPushButton("Save Scatter Plot");
     layout->addWidget(saveButton);
@@ -232,16 +244,8 @@ public:
       return;
     }
 
-    QChart* chart = new QChart();
-    chart->createDefaultAxes();
-
-    QValueAxis* horizontalAxis = new QValueAxis;
-    QValueAxis* verticalAxis = new QValueAxis;
-    chart->setAxisX(horizontalAxis, chart->series().isEmpty() ? nullptr : chart->series().first());
-    chart->setAxisY(verticalAxis, chart->series().isEmpty() ? nullptr : chart->series().first());
-
-    horizontalAxis->setRange(0, 10);  // Adjust the range as needed
-    verticalAxis->setRange(0, 10);    // Adjust the range as needed
+    // Create a vector to store series
+    std::vector<QAreaSeries*> seriesVector;
 
     for (size_t id = 0; id < data.size(); ++id) {
       const auto& seriesData = data[id];
@@ -261,12 +265,30 @@ public:
       }
 
       QAreaSeries* series = new QAreaSeries(upperSeries, lowerSeries);
-      chart->addSeries(series);
 
-      // Attach series to both axes
-      series->attachAxis(horizontalAxis);
-      series->attachAxis(verticalAxis);
+      // Print information about the series to the console
+      qDebug() << "Series ID:" << id;
+      qDebug() << "Upper Series Points:" << upperSeries->points();
+      qDebug() << "Lower Series Points:" << lowerSeries->points();
+
+      // Store the series in the vector
+      seriesVector.push_back(series);
     }
+
+    QChart* chart = new QChart();
+    for (auto series : seriesVector) {
+      qDebug() << "Series:" << series;
+      chart->addSeries(series);
+    }
+
+    chart->createDefaultAxes();
+    QValueAxis* horizontalAxis = new QValueAxis;
+    QValueAxis* verticalAxis = new QValueAxis;
+    chart->setAxisX(horizontalAxis, chart->series().isEmpty() ? nullptr : chart->series().first());
+    chart->setAxisY(verticalAxis, chart->series().isEmpty() ? nullptr : chart->series().first());
+
+    horizontalAxis->setRange(0, 10);  // Adjust the range as needed
+    verticalAxis->setRange(0, 10);    // Adjust the range as needed
 
     // Set the stack mode for the chart
     chart->setTheme(QChart::ChartThemeLight);
