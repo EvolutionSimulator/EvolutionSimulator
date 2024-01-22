@@ -3,7 +3,7 @@
 Egg::Egg(const GestatingEgg& gestating_egg,
          const std::pair<double, double>& coordinates)
     : Food(coordinates.first, coordinates.second, 0, 0),
-      Creature(gestating_egg.genome, gestating_egg.mutables),
+      AliveEntity(gestating_egg.genome, gestating_egg.mutables),
       generation_(gestating_egg.generation),
       incubation_time_(gestating_egg.incubation_time) {
   type_ = egg;
@@ -14,21 +14,21 @@ Egg::Egg(const GestatingEgg& gestating_egg,
 double Egg::GetIncubationTime() const { return incubation_time_; }
 
 void Egg::Update(double delta_time) {
-  if (Creature::GetState() == Dead) {
+  if (AliveEntity::GetState() == Dead) {
     return;
   }
 
   age_ += delta_time;
 
-  Food::SetSize(age_ / incubation_time_ * Creature::GetMutable().GetBabySize());
+  Food::SetSize(age_ / incubation_time_ * AliveEntity::GetMutable().GetBabySize());
   Food::SetNutritionalValue(settings::environment::kEggNutritionalValue *
                             Food::GetSize());
 }
 
-void Egg::Break() { Creature::SetState(Dead); }
+void Egg::Break() { AliveEntity::SetState(Dead); }
 
 Creature Egg::Hatch() {
-  if (Creature::GetState() == Dead) {
+  if (AliveEntity::GetState() == Dead) {
     throw std::runtime_error("Cannot hatch a dead egg");
   }
   if (age_ < incubation_time_) {
@@ -36,6 +36,8 @@ Creature Egg::Hatch() {
   }
 
   Creature creature = Creature(genome_, mutable_);
+  auto coordinates = Food::GetCoordinates();
+  creature.SetCoordinatesNoWrap(coordinates.first, coordinates.second);
   creature.SetGeneration(generation_);
   return creature;
 }

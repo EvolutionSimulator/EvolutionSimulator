@@ -117,31 +117,6 @@ void UpdateQueue(std::queue<int> &reproduce,
 }
 
 /*!
- * @brief Removes creatures with a state of 'Dead' from a given queue.
- *
- * @param reproduce A queue of Creature objects, potentially containing dead
- * creatures.
- */
-void UpdateQueue(std::queue<int> &reproduce,
-                 const std::vector<Creature> &creatures) {
-  std::queue<int> tempQueue;
-
-  while (!reproduce.empty()) {
-    int current_creature_index = reproduce.front();
-    reproduce.pop();
-
-    // Check if the current creature is not dead
-    if (creatures[current_creature_index].GetState() != Entity::Dead) {
-      tempQueue.push(current_creature_index);
-    }
-  }
-
-  // Replace the original queue with the temporary queue
-  // containing all living creatures
-  reproduce = std::move(tempQueue);
-}
-
-/*!
  * @brief Updates the simulation grid, removing dead entities and placing the
  * living ones.
  */

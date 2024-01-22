@@ -5,7 +5,7 @@
 #include "mutable.h"
 #include "neat/neat-genome.h"
 
-class Egg : virtual public Food, virtual public Creature {
+class Egg : virtual public Food, virtual public AliveEntity {
  public:
   Egg(const GestatingEgg& gestating_egg,
       const std::pair<double, double>& coordinates);

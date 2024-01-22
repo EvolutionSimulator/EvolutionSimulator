@@ -85,6 +85,8 @@ void Settings::LoadFromFile(const std::string& filename) {
       environment_json["photosynthesis_factor"].get<double>();
   environment.frictional_coefficient =
       environment_json["frictional_coefficient"].get<double>();
+  environment.maturity_age_multiplier =
+      environment_json["maturity_age_multiplier"].get<double>();
 
   // Load Engine settings
   auto& engine_json = config_json["engine"];

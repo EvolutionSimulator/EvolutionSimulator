@@ -60,18 +60,15 @@ void CreatureManager::UpdateAllCreatures(SimulationData& data,
   }
 }
 
-void CreatureManager::HatchEggs(SimulationData& data) {
-  std::remove_if(data.eggs_.begin(), data.eggs_.end(), [this](Egg& egg) {
+void CreatureManager::HatchEggs(SimulationData& data, Environment& environment) {
+  data.eggs_.erase(std::remove_if(data.eggs_.begin(), data.eggs_.end(), [this, &data](Egg& egg) {
     if (egg.GetAge() >= egg.GetIncubationTime()) {
       Creature new_creature = egg.Hatch();
-      new_creature.SetCoordinates(
-          egg.GetCoordinates().first, egg.GetCoordinates().second,
-          environment_.GetMapWidth(), environment_.GetMapHeight());
       data.creatures_.push_back(new_creature);
       return true;
     }
     return false;
-  });
+  }), data.eggs_.end());
 }
 
 /*!
@@ -128,7 +125,7 @@ void CreatureManager::ReproduceCreatures(SimulationData& data,
   // Refill reproduce_ with creatures for the next iteration
   while (!data.new_reproduce_.empty()) {
     data.reproduce_.push(data.new_reproduce_.front());
-    new_reproduce_.pop();
+    data.new_reproduce_.pop();
   }
 
   // Refill reproduce_ with the remaining creatures

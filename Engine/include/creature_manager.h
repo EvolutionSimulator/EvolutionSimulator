@@ -14,7 +14,7 @@ class CreatureManager {
   void UpdateAllCreatures(SimulationData& data, Environment& environment,
                           EntityGrid& entity_grid, double deltaTime);
 
-  void HatchEggs(SimulationData& data);
+  void HatchEggs(SimulationData& data, Environment& environment);
   void ReproduceCreatures(SimulationData& data, Environment& environment);
 
  private:

@@ -51,7 +51,8 @@
     "max_nutritional_value": 5,
     "default_lifespan": 30,
     "photosynthesis_factor": 0.1,
-    "frictional_coefficient": 0.15
+    "frictional_coefficient": 0.15,
+    "maturity_age_multiplier": 0.2
   },
   "engine": {
     "fixed_update_interval": 0.05,

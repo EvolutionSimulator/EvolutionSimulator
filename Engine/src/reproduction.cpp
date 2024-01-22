@@ -4,6 +4,7 @@
 
 #include "creature.h"
 #include "egg.h"
+#include "settings.h"
 
 bool ReproductiveSystem::ReadyToProcreate() const {
   return age_ >= ready_to_reproduce_at_;
@@ -18,7 +19,7 @@ void ReproductiveSystem::ResetReproductionClock() {
 double ReproductiveSystem::MaturityAge(const Mutable* const mutables) const {
   return mutables->Complexity() *
          (1 + mutables->GetMaxSize() - mutables->GetBabySize()) *
-         settings::environment::kMaturityAgeMultiplier;
+         SETTINGS.environment.maturity_age_multiplier;
 }
 
 MaleReproductiveSystem::MaleReproductiveSystem(const Mutable* const mutables) {

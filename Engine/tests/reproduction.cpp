@@ -10,27 +10,27 @@ TEST(ReproductionTest, SimulatePregnancy) {
   Creature male(genome, mutables);
   Creature female(genome, mutables);
 
-  double maturity_age = male.GetMaleReproductiveSystem()->GetMaturityAge() + 10;
-  male.GetMaleReproductiveSystem()->Update(maturity_age);
-  female.GetFemaleReproductiveSystem()->Update(maturity_age);
+  double maturity_age = male.MaleReproductiveSystem::GetMaturityAge() + 10;
+  male.MaleReproductiveSystem::Update(maturity_age);
+  female.FemaleReproductiveSystem::Update(maturity_age);
 
-  ASSERT_TRUE(male.GetMaleReproductiveSystem()->ReadyToProcreate());
-  ASSERT_TRUE(female.GetFemaleReproductiveSystem()->ReadyToProcreate());
+  ASSERT_TRUE(male.MaleReproductiveSystem::ReadyToProcreate());
+  ASSERT_TRUE(female.FemaleReproductiveSystem::ReadyToProcreate());
 
-  male.GetMaleReproductiveSystem()->MateWithFemale();
-  female.GetFemaleReproductiveSystem()->MateWithMale(&male, &female);
+  male.MaleReproductiveSystem::MateWithFemale();
+  female.FemaleReproductiveSystem::MateWithMale(&male, &female);
   male.AfterMate();
   female.AfterMate();
 
   double incubation_time =
-      female.GetFemaleReproductiveSystem()->GetEgg().incubation_time;
-  female.GetFemaleReproductiveSystem()->Update(incubation_time);
+      female.FemaleReproductiveSystem::GetEgg().incubation_time;
+  female.FemaleReproductiveSystem::Update(incubation_time);
 
-  ASSERT_TRUE(female.GetFemaleReproductiveSystem()->IsPregnant());
-  ASSERT_TRUE(female.GetFemaleReproductiveSystem()->CanBirth());
+  ASSERT_TRUE(female.FemaleReproductiveSystem::IsPregnant());
+  ASSERT_TRUE(female.FemaleReproductiveSystem::CanBirth());
 
   Egg egg =
-      female.GetFemaleReproductiveSystem()->GiveBirth(female.GetCoordinates());
-  ASSERT_FALSE(female.GetFemaleReproductiveSystem()->IsPregnant());
-  ASSERT_FALSE(female.GetFemaleReproductiveSystem()->CanBirth());
+      female.FemaleReproductiveSystem::GiveBirth(female.GetCoordinates());
+  ASSERT_FALSE(female.FemaleReproductiveSystem::IsPregnant());
+  ASSERT_FALSE(female.FemaleReproductiveSystem::CanBirth());
 }

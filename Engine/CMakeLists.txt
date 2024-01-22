@@ -64,7 +64,6 @@ add_library(Engine STATIC
 
   include/vision_system.h src/vision_system.cpp
   include/digestive_system.h src/digestive_system.cpp
-  include/reproductive_system.h src/reproductive_system.cpp
 
   include/creature.h src/creature.cpp
 
@@ -72,10 +71,6 @@ add_library(Engine STATIC
   include/collision_functions.h src/collision_functions.cpp
   include/config.h
 
-  include/digestive_system.h
-  src/digestive_system.cpp
-  include/reproductive_system.h
-  src/reproductive_system.cpp
   include/food_manager.h src/food_manager.cpp
   include/entity_grid.h src/entity_grid.cpp
   include/collision_manager.h src/collision_manager.cpp

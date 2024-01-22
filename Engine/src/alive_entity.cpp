@@ -160,25 +160,24 @@ void AliveEntity::SetAge(double age) { age_ = age; }
  * @brief Updates the age of the AliveEntity.
  */
 
-void AliveEntity::UpdateAge() {
-  age_ += 0.05;
+void AliveEntity::UpdateAge() { age_ += 0.05; }
 
-  /*!
-   * @brief Retrieves the AliveEntity's genetic genome.
-   *
-   * @details Returns the genome of the AliveEntity, which is a representation
-   * of its genetic makeup.
-   *
-   * @return The genome of the AliveEntity.
-   */
-  neat::Genome AliveEntity::GetGenome() const { return genome_; }
+/*!
+ * @brief Retrieves the AliveEntity's genetic genome.
+ *
+ * @details Returns the genome of the AliveEntity, which is a representation
+ * of its genetic makeup.
+ *
+ * @return The genome of the AliveEntity.
+ */
+neat::Genome AliveEntity::GetGenome() const { return genome_; }
 
-  /*!
-   * @brief Retrieves the AliveEntity's mutables
-   *
-   * @details Return the mutables of the AliveEntity which is a representation
-   * of its characteristics
-   *
-   * @return The mutables of the AliveEntity.
-   */
-  Mutable AliveEntity::GetMutable() const { return mutable_; }
+/*!
+ * @brief Retrieves the AliveEntity's mutables
+ *
+ * @details Return the mutables of the AliveEntity which is a representation
+ * of its characteristics
+ *
+ * @return The mutables of the AliveEntity.
+ */
+Mutable AliveEntity::GetMutable() const { return mutable_; }

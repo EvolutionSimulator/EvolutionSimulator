@@ -74,6 +74,7 @@ class Settings {
     double default_lifespan = 30;
     double photosynthesis_factor = 0.1;
     double frictional_coefficient = 0.05;  // Needs to be less than 1
+    double maturity_age_multiplier = 0.2;
   } environment;
 
   struct EngineSettings {

@@ -44,8 +44,6 @@ class Creature : virtual public MovableEntity,
                  virtual public FemaleReproductiveSystem {
  public:
   Creature(neat::Genome genome, Mutable mutable_);
-  Creature(neat::Genome genome, Mutable mutable_, const double x_coord,
-           const double y_coord, int generation);
 
   void UpdateEnergy(double deltaTime);
 

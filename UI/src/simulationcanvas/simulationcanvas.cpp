@@ -123,7 +123,7 @@ void SimulationCanvas::RenderSimulation(DataAccessor<SimulationData> data) {
     }
   }
 
-  for (const auto& egg : data->egg_entities_) {
+  for (const auto& egg : data->eggs_) {
     auto renderPositions = getEntityRenderPositions(egg);
     for (const auto& pos : renderPositions) {
       RenderEggAtPosition(egg, pos);
@@ -161,7 +161,7 @@ void SimulationCanvas::RenderFoodAtPosition(
 void SimulationCanvas::RenderEggAtPosition(
     const Egg& egg, const std::pair<double, double>& position) {
   sf::Sprite eggSprite;
-  eggSprite.setTexture(egg_texture_);
+  eggSprite.setTexture(texture_manager_.egg_texture_);
   eggSprite.setScale(egg.Food::GetSize() / 50.0f, egg.Food::GetSize() / 50.0f);
   eggSprite.setOrigin(128.0f, 128.0f);
 
