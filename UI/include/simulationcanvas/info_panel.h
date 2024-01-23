@@ -7,6 +7,7 @@
 #include "qwidgets/qsfmlcanvas.h"
 #include "simulation.h"
 #include "texture_manager.h"
+#include <SFML/Graphics.hpp>
 
 class InfoPanel {
 public:
@@ -25,6 +26,9 @@ public:
   void DrawStomach(sf::RenderTarget& target, const Creature& creature);
   std::string FormatCreatureInfo(const Creature& creature);
 
+  void SetUIView(sf::View view);
+  void SetPanelView(sf::View view);
+
 private:
   QSFMLCanvas* canvas_;
   Simulation* simulation_;
@@ -35,5 +39,8 @@ private:
 
   void DrawPanel(sf::RenderTarget& target);
   void DrawCreatureInfo(sf::RenderTarget& target);
+
+  sf::View ui_view_;
+  sf::View info_panel_view_;
 };
 #endif // INFO_PANEL_H

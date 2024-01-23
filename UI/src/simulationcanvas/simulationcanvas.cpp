@@ -75,19 +75,29 @@ void SimulationCanvas::OnInit() {
   initialViewCenter = getView().getCenter();
   initialViewSize = getView().getSize();
 
+  ui_view_ = getView();
+  info_panel_view_ = getView();
+
   OnUpdate();
 }
 
 void SimulationCanvas::OnUpdate()
 {
+  setView(ui_view_);
+
   DataAccessor<SimulationData> data = simulation_->GetSimulationData();
   SimulationData& data_ref = *data;
   RenderSimulation(data_ref);
 
   // Check if a creature is selected
   if (info_panel_.IsVisible() && info_panel_.GetSelectedCreature()) {
-    info_panel_.UpdateSelectedFood();
-    info_panel_.Draw();
+    if (info_panel_.GetSelectedCreature()->GetState() == AliveEntity::Alive)
+    {
+      info_panel_.UpdateSelectedFood();
+      info_panel_.SetUIView(ui_view_);
+      info_panel_.SetPanelView(info_panel_view_);
+      info_panel_.Draw();
+    }
   } else if (info_panel_.IsVisible()) {
     std::cout << "Info panel flag is set, but no creature position is recorded."
               << std::endl;
@@ -262,8 +272,8 @@ std::vector<std::pair<double, double>> SimulationCanvas::getEntityRenderPosition
     if (entity == nullptr) return positions;
     auto [entityX, entityY] = entity->GetCoordinates();
     double entitySize = entity->GetSize();
-    sf::Vector2f viewCenter = getView().getCenter();
-    sf::Vector2f viewSize = getView().getSize();
+    sf::Vector2f viewCenter = ui_view_.getCenter();
+    sf::Vector2f viewSize = ui_view_.getSize();
     double mapWidth = SETTINGS.environment.map_width;
     double mapHeight = SETTINGS.environment.map_height;
 
@@ -362,13 +372,11 @@ void SimulationCanvas::wheelEvent(QWheelEvent* event) {
 }
 
 void SimulationCanvas::zoom(float factor, sf::Vector2f& zoomPoint) {
-  // Get the current view
-  sf::View view = getView();
 
   // Check for maximum zoom
   if (zoomFactor * factor > 1) {
     zoomFactor = 1;
-    view.setCenter(initialViewCenter);
+    ui_view_.setCenter(initialViewCenter);
   } else {
     zoomFactor *= factor;
 
@@ -383,25 +391,25 @@ void SimulationCanvas::zoom(float factor, sf::Vector2f& zoomPoint) {
 
     // Adjust the new center based on the zoom factor and direction
     float zoomSpeed = 0.1f;
-    sf::Vector2f centerDiff = newCenter - view.getCenter();
+    sf::Vector2f centerDiff = newCenter - ui_view_.getCenter();
     if (factor > 1.0f) {
       // Invert the direction for zooming out
       centerDiff *= -(1.0f + 1.0f / (8 * factor));
     }
-    view.setCenter(view.getCenter() + centerDiff * zoomSpeed);
+    ui_view_.setCenter(ui_view_.getCenter() + centerDiff * zoomSpeed);
 
     // After adjusting center, get the new mouse position in world coordinates
     sf::Vector2f mouseWorldPosAfterZoom = mapPixelToCoords(mouseScreenPos);
     // Adjust the center again to ensure it's relative to the mouse position
     sf::Vector2f zoomDiff = mouseWorldPosBeforeZoom - mouseWorldPosAfterZoom;
-    view.setCenter(view.getCenter() + zoomDiff * factor);
+    ui_view_.setCenter(ui_view_.getCenter() + zoomDiff * factor);
   }
 
   // Set the new size of the view
-  view.setSize(initialViewSize.x * zoomFactor, initialViewSize.y * zoomFactor);
+  ui_view_.setSize(initialViewSize.x * zoomFactor, initialViewSize.y * zoomFactor);
 
   // Apply the new view and update
-  setView(view);
+  setView(ui_view_);
   update();
 }
 
@@ -433,14 +441,13 @@ void SimulationCanvas::mouseMoveEvent(QMouseEvent* event) {
         deltaHistory.begin(), deltaHistory.end(), sf::Vector2f(0, 0));
     averagedDelta /= static_cast<float>(deltaHistory.size());
 
-        sf::View view = getView();
-        view.move(averagedDelta);
+        ui_view_.move(averagedDelta);
         // Get map dimensions
         double mapWidth = SETTINGS.environment.map_width;
         double mapHeight = SETTINGS.environment.map_height;
 
     // Get the new center of the view
-    sf::Vector2f newCenter = view.getCenter();
+    sf::Vector2f newCenter = ui_view_.getCenter();
 
     // Wrap around horizontally
     if (newCenter.x < 0) {
@@ -460,8 +467,8 @@ void SimulationCanvas::mouseMoveEvent(QMouseEvent* event) {
       newCenter.y -= mapHeight;
     }
     // Set the wrapped center back to the view
-    view.setCenter(newCenter);
-    setView(view);
+    ui_view_.setCenter(newCenter);
+    setView(ui_view_);
 
     initialClickPosition = currentMousePosition;
   }
@@ -480,7 +487,7 @@ void SimulationCanvas::resizeEvent(QResizeEvent* event) {
   sf::View view = getView();
   view.setSize(newSize.x, newSize.y);
   view.setCenter(newSize.x / 2, newSize.y / 2);
-  setView(view);
+  info_panel_view_ = view;
 }
 
 InfoPanel& SimulationCanvas::GetInfoPanel() { return info_panel_; }
