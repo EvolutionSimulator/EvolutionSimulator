@@ -82,8 +82,6 @@ std::string InfoPanel::FormatCreatureInfo(const Creature& creature) {
   ss << "Max force: " << mutables.GetMaxForce() << "\n";
   ss << "Max size: " << mutables.GetMaxSize() << "\n";
   ss << "Baby size: " << mutables.GetBabySize() << "\n";
-  ss << "Rep. cooldown: " << mutables.GetReproductionCooldown() << "\n";
-  ss << "Maturity age: " << mutables.GetMaturityAge() << "\n";
   return ss.str();
 }
 

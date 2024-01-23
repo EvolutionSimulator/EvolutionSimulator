@@ -39,6 +39,7 @@ class SimulationCanvas : public QSFMLCanvas {
   // Rendering logic
   void RenderSimulation(SimulationData& data);
   void RenderFoodAtPosition(const std::shared_ptr<Food> food, const std::pair<double, double>& position);
+  void RenderEggAtPosition(const std::shared_ptr<Egg> egg, const std::pair<double, double>& position);
   void RenderCreatureAtPosition(const std::shared_ptr<Creature> creature, const std::pair<double, double>& position);
   std::vector<std::pair<double, double>> getEntityRenderPositions(const std::shared_ptr<Entity> entity);
 

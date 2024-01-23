@@ -7,9 +7,9 @@
 #include <vector>
 
 #include "collision_functions.h"
-#include "settings.h"
 #include "food.h"
-
+#include "mathlib.h"
+#include "settings.h"
 
 /*!
  * @brief Retrieves the current environment of the simulation.
@@ -17,9 +17,7 @@
  * @return Returns the simulation's current environment.
  */
 
-Environment SimulationData::GetEnvironment() {
-  return environment_;
-}
+Environment SimulationData::GetEnvironment() { return environment_; }
 
 /*!
  * @brief Sets the environment for the simulation.
@@ -52,7 +50,6 @@ void SimulationData::UpdateStatistics() {
     creatureVelocityOverTime_.push_back(average_velocity);
   }
 }
-
 
 std::vector<int> SimulationData::GetCreatureCountOverTime() const {
   return creatureCountOverTime_;

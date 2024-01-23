@@ -3,17 +3,18 @@
 
 #include <SFML/Graphics.hpp>
 
-class TextureManager {
+class TextureManager
+{
 public:
-
   TextureManager();
 
-  void InitializeFile(sf::Shader& ValueSaved, std::string path);
-  void InitializeFile(sf::Font& ValueSaved, std::string path);
-  void InitializeFile(sf::Texture& ValueSaved, std::string path);
+  void InitializeFile(sf::Shader &ValueSaved, std::string path);
+  void InitializeFile(sf::Font &ValueSaved, std::string path);
+  void InitializeFile(sf::Texture &ValueSaved, std::string path);
 
   // Entity textures
   sf::Texture food_texture_;
+  sf::Texture egg_texture_;
   sf::Texture creature_texture_;
   sf::Texture eyes_texture_;
   sf::Texture tail_texture_;
@@ -26,7 +27,7 @@ public:
   sf::Texture health_texture_;
   sf::Texture energy_texture_;
 
-  //Shaders
+  // Shaders
   sf::Shader shader_;
   sf::Shader color_shader_;
   sf::Shader food_density_shader_;

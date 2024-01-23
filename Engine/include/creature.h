@@ -4,14 +4,14 @@
 #include <unordered_map>
 #include <memory>
 
-#include "config.h"
+#include "alive_entity.h"
+#include "digestive_system.h"
 #include "food.h"
 #include "movable_entity.h"
-#include "alive_entity.h"
-#include "vision_system.h"
-#include "digestive_system.h"
-#include "reproductive_system.h"
 #include "mutable.h"
+#include "neat/neat-neural-network.h"
+#include "reproduction.h"
+#include "vision_system.h"
 
 /*!
  * @file creature.h
@@ -36,12 +36,20 @@
  * for and consuming food, and managing its energy and health. The class also
  * supports evolutionary features like reproduction and genetic inheritance.
  */
-class Creature : virtual public MovableEntity, virtual public AliveEntity, virtual public VisionSystem, virtual public DigestiveSystem, virtual public ReproductiveSystem {
+class Creature : virtual public MovableEntity,
+                 virtual public AliveEntity,
+                 virtual public VisionSystem,
+                 virtual public DigestiveSystem,
+                 virtual public MaleReproductiveSystem,
+                 virtual public FemaleReproductiveSystem {
  public:
   Creature(neat::Genome genome, Mutable mutable_);
   virtual ~Creature() override {}
 
   void UpdateEnergy(double deltaTime);
+
+  void UpdateMatingDesire();
+
   void Update(double deltaTime, double const kMapWidth, double const kMapHeight,
               std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
               double GridCellSize, double frictional_coefficient);
@@ -54,8 +62,12 @@ class Creature : virtual public MovableEntity, virtual public AliveEntity, virtu
              double GridCellSize, double deltaTime, double width, double height);
   bool Compatible(const Creature& other_creature);
 
+  bool GetMatingDesire() const;
+
  protected:
   int think_count_; /*! Keeps track so that creatures think every 5 loops */
+  bool mating_desire_; /*! Indicates whether creature currently wants to mate <-
+                        TO BE INTEGRATED INTO REPRODUCTIVE SYSTEM*/
 };
 
 std::vector<Food *> get_food_at_distance(

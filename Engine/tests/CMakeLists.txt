@@ -6,6 +6,7 @@ add_executable(Engine_tests
     collisions.cpp
     creature.cpp
     movement.cpp
+    reproduction.cpp
 )
 
 # Link against Google Test and the Engine library

@@ -13,7 +13,7 @@ class Food : public Entity {
   Food(const double size, const double nutritional_value);
 
  public:
-  enum type { meat, plant };
+  enum type { meat, plant, egg };
   void Eat();
   void SetNutritionalValue(double value);
   double GetNutritionalValue() const;

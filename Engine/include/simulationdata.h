@@ -5,14 +5,17 @@
 #include <memory>
 
 #include "creature.h"
+#include "egg.h"
 #include "environment.h"
 #include "food.h"
-
 
 struct SimulationData {
  public:
   explicit SimulationData(Environment& env)
-      : environment_(env), creatures_(), food_entities_(), lastRecordedTime_(0.0){
+      : environment_(env),
+        creatures_(),
+        food_entities_(),
+        lastRecordedTime_(0.0) {
     // InitializeFood();
     // InitializeCreatures();
     // InitializeGrid();
@@ -31,6 +34,7 @@ struct SimulationData {
 
   std::vector<std::shared_ptr<Creature>> creatures_;
   std::vector<std::shared_ptr<Food>> food_entities_;
+  std::vector<std::shared_ptr<Egg>> eggs_;
   std::queue<std::shared_ptr<Creature>> reproduce_;
   std::queue<std::shared_ptr<Creature>> new_reproduce_;
 

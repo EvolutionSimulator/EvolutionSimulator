@@ -2,11 +2,11 @@
 #define ALIVEENTITY_H
 
 #include "entity.h"
-#include "neat/neat-neural-network.h"
 #include "mutable.h"
+#include "neat/neat-neural-network.h"
 
 class AliveEntity : virtual public Entity {
-public:
+ public:
   AliveEntity(neat::Genome genome, Mutable mutable_);
   virtual ~AliveEntity() override {}
 
@@ -25,6 +25,7 @@ public:
 
   double GetAge() const;
   void SetAge(double age);
+  void UpdateAge(double delta_time);
 
   neat::Genome GetGenome() const;
   Mutable GetMutable() const;
@@ -32,13 +33,13 @@ public:
   int GetGeneration() const;
   void SetGeneration(int generation);
 
-protected:
+ protected:
   double max_energy_;
   double energy_; /*!< Stores the current energy level of the creature. */
 
   double health_; /*!< Represents the current health status of the creature. */
 
-  double age_;    /*!< Tracks the age of the creature. */
+  double age_; /*!< Tracks the age of the creature. */
 
   Mutable mutable_;
 
@@ -48,7 +49,7 @@ protected:
   std::vector<double>
       neuron_data_; /*!< Neuron data used in the neural network. */
 
-  int generation_ = 0;           /*!< Generation count of the creature. */
+  int generation_ = 0; /*!< Generation count of the creature. */
 };
 
-#endif // ALIVEENTITY_H
+#endif  // ALIVEENTITY_H

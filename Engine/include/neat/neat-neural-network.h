@@ -1,8 +1,6 @@
 #ifndef NEATNEURALNETWORK_H
 #define NEATNEURALNETWORK_H
 
-#endif  // NEATNEURALNETWORK_H
-
 #include "neat/neat-genome.h"
 
 namespace neat {
@@ -74,3 +72,5 @@ std::vector<std::vector<Neuron> > get_layers(
 double activation_function(ActivationType function, double x);
 
 }  // end of namespace neat
+
+#endif  // NEATNEURALNETWORK_H

@@ -1,8 +1,9 @@
 #include "../include/entity_grid.h"
 
-#include "settings.h"
 #include <cmath>
 #include <vector>
+
+#include "settings.h"
 
 EntityGrid::EntityGrid() {
   num_columns_ = static_cast<int>(std::ceil(
@@ -158,17 +159,14 @@ const std::pair<int, int> EntityGrid::GetGridSize() const {
  *
  * @return A vector of pairs representing the coordinates of neighboring cells.
  */
-std::vector<std::pair<int, int>>
-EntityGrid::GetNeighbours(const std::pair<int, int> &center,
-                          const int &layer_number) {
+std::vector<std::pair<int, int>> EntityGrid::GetNeighbours(
+    const std::pair<int, int> &center, const int &layer_number) {
   std::vector<std::pair<int, int>> neighbours;
   int x_center = center.first;
   int y_center = center.second;
 
-  for (int y = y_center - layer_number; y <= y_center + layer_number;
-       y++) {
-    for (int x = x_center - layer_number;
-         x <= x_center + layer_number; x++) {
+  for (int y = y_center - layer_number; y <= y_center + layer_number; y++) {
+    for (int x = x_center - layer_number; x <= x_center + layer_number; x++) {
       neighbours.push_back(std::make_pair((x + num_columns_) % num_columns_,
                                           (y + num_rows_) % num_rows_));
     }

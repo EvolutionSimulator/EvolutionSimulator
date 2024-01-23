@@ -99,6 +99,10 @@ void Entity::SetCoordinates(const double x, const double y,
   if (y_coord_ < 0.0) y_coord_ += kMapHeight;
 }
 
+void Entity::SetCoordinatesNoWrap(const double x, const double y) {
+  x_coord_ = x;
+  y_coord_ = y;
+}
 /*!
  * @brief Generates a random floating-point number within a given range.
  *

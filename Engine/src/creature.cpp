@@ -6,6 +6,7 @@
 #include <set>
 
 #include "collision_functions.h"
+#include "mathlib.h"
 #include "settings.h"
 
 /*!
@@ -23,13 +24,17 @@
  *
  */
 Creature::Creature(neat::Genome genome, Mutable mutables)
-    : MovableEntity(),
+    : Entity(),
+      MovableEntity(),
       AliveEntity(genome, mutables),
       VisionSystem(genome, mutables),
       DigestiveSystem(genome, mutables),
-      ReproductiveSystem(genome,mutables)
+      ReproductiveSystem(genome, mutables),
+      MaleReproductiveSystem(genome, mutables),
+      FemaleReproductiveSystem(genome, mutables),
+      mating_desire_(false)
       {
-    int neural_inputs = settings::environment::kInputNeurons;
+    int neural_inputs = SETTINGS.environment.input_neurons;
     for (BrainModule module : genome.GetModules()){
         neural_inputs += module.GetInputNeuronIds().size();
     }
@@ -48,10 +53,12 @@ Creature::Creature(neat::Genome genome, Mutable mutables)
  * calculated.
  */
 void Creature::UpdateEnergy(double deltaTime) {
-  double movement_energy = (fabs(GetAcceleration()) + fabs(GetRotationalAcceleration())) * GetSize() * deltaTime/200;
-  double heat_loss = mutable_.GetEnergyLoss() * pow(size_, 1) * deltaTime/100;
+  double movement_energy =
+      (fabs(GetAcceleration()) + fabs(GetRotationalAcceleration())) *
+      GetSize() * deltaTime / 200;
+  double heat_loss = mutable_.GetEnergyLoss() * pow(size_, 1) * deltaTime / 100;
 
-  SetEnergy(GetEnergy() - movement_energy - heat_loss);
+  SetEnergy(GetEnergy() - movement_energy*pregnancy_hardship_ - heat_loss);
   BalanceHealthEnergy();
 
   if (GetHealth() <= 0) {
@@ -60,19 +67,70 @@ void Creature::UpdateEnergy(double deltaTime) {
 }
 
 /*!
- * @brief Determines if the current creature is compatible with another creature.
+ * @brief Updates the creature's desire to mate
  *
- * @details This function calculates the compatibility between the current creature and another creature based on their genomes and mutable characteristics. It sums the brain distance, derived from genome compatibility, with the mutable distance, derived from mutable characteristics compatibility. The creatures are considered compatible if the sum is less than a predefined compatibility threshold.
- *
- * @param other_creature A reference to another `Creature` object for compatibility comparison.
- * @return bool Returns `true` if the sum of brain and mutable distances is less than the compatibility threshold, indicating compatibility; otherwise returns `false`.
+ * @details This method modifies the boolean desire of creatures to mate.
+ * For females, can mate in the age range kMinReproducingAge to
+ * kMaxReproducingAge, with a probability that is inversely proportional to age,
+ * while for males can mate past kMinProducingAge with falling probability.
  */
-bool Creature::Compatible(const Creature& other_creature){
-  double brain_distance = this->GetGenome().CompatibilityBetweenGenomes(other_creature.GetGenome());
-  double mutable_distance = this->GetMutable().CompatibilityBetweenMutables(other_creature.GetMutable());
-  return brain_distance + mutable_distance < SETTINGS.compatibility.compatibility_threshold;
+void Creature::UpdateMatingDesire() {
+  if (!this->MaleReproductiveSystem::ReadyToProcreate() &&
+      !(this->FemaleReproductiveSystem::ReadyToProcreate())) {
+    mating_desire_ = false;
+    return;
+  }
+
+  if (this->GetAge() >= SETTINGS.physical_constraints.max_reproducing_age) {
+    mating_desire_ = false;
+    return;
+  }
+
+  double min_reproducing_age =
+      std::min(this->MaleReproductiveSystem::GetMaturityAge(),
+               this->FemaleReproductiveSystem::GetMaturityAge());
+
+  double probability =
+      1 - (this->GetAge() - min_reproducing_age) /
+              (SETTINGS.physical_constraints.max_reproducing_age -
+               min_reproducing_age) *
+              SETTINGS.physical_constraints.mating_desire_factor;
+  mating_desire_ = mathlib::RandomDouble(0, 1) < probability;
 }
 
+/*!
+ * @brief Determines if the current creature is compatible with another
+ * creature.
+ *
+ * @details This function calculates the compatibility between the current
+ * creature and another creature based on their genomes and mutable
+ * characteristics. It sums the brain distance, derived from genome
+ * compatibility, with the mutable distance, derived from mutable
+ * characteristics compatibility. The creatures are considered compatible if the
+ * sum is less than a predefined compatibility threshold.
+ *
+ * @param other_creature A reference to another `Creature` object for
+ * compatibility comparison.
+ * @return bool Returns `true` if the sum of brain and mutable distances is less
+ * than the compatibility threshold, indicating compatibility; otherwise returns
+ * `false`.
+ */
+bool Creature::Compatible(const Creature &other_creature) {
+  if (this == &other_creature) return false;
+  double brain_distance =
+      this->GetGenome().CompatibilityBetweenGenomes(other_creature.GetGenome());
+  double mutable_distance = this->GetMutable().CompatibilityBetweenMutables(
+      other_creature.GetMutable());
+  double physical_distance =
+      this->GetDistance(other_creature, SETTINGS.environment.map_width,
+                        SETTINGS.environment.map_height);
+  bool flag = brain_distance + mutable_distance <
+                  SETTINGS.compatibility.compatibility_threshold &&
+              physical_distance < SETTINGS.compatibility.compatibility_distance;
+  return brain_distance + mutable_distance <
+             SETTINGS.compatibility.compatibility_threshold &&
+         physical_distance < SETTINGS.compatibility.compatibility_distance;
+}
 
 /*!
  * @brief Updates the creature's state over a given time interval.
@@ -100,23 +158,18 @@ void Creature::Update(double deltaTime, double const kMapWidth,
   this->Rotate(deltaTime);
   this->Think(grid, GridCellSize, deltaTime, kMapWidth, kMapHeight);
   this->Digest(deltaTime);
-  age_ += deltaTime;
   this->Grow(energy_*deltaTime/1000);
-
-  if (reproduction_cooldown_ <= 0) {
-    reproduction_cooldown_ = 0.0;
-  } else {
-    reproduction_cooldown_ -= deltaTime;
-  }
+  this->UpdateMatingDesire();
+  this->FemaleReproductiveSystem::Update(deltaTime);
+  this->MaleReproductiveSystem::Update(deltaTime);
+  this->UpdateAge(deltaTime);
 
   if (eating_cooldown_ <= 0) {
     eating_cooldown_ = 0.0;
   } else {
     eating_cooldown_ -= deltaTime;
   }
-
 }
-
 
 /*!
  * @brief Handles the collision of the creature with another entity.
@@ -132,10 +185,10 @@ void Creature::Update(double deltaTime, double const kMapWidth,
 void Creature::OnCollision(Entity &other_entity, double const kMapWidth,
                            double const kMapHeight) {
   if (Food *food = dynamic_cast<Food *>(&other_entity)) {
-    if (food->GetState() == Entity::Alive && eating_cooldown_ == 0.0 && biting_ == 1) {
+    if (food->GetState() == Entity::Alive && eating_cooldown_ == 0.0 &&
+        biting_ == 1) {
       {
-        if (IsFoodInSight(food))
-        {
+        if (IsFoodInSight(food)) {
           Bite(food);
         }
       }
@@ -179,18 +232,17 @@ void Creature::Think(std::vector<std::vector<std::vector<std::shared_ptr<Entity>
   neuron_data_.at(10) = distance_meat_;
   neuron_data_.at(11) = meat_size_;
 
-
-  for (BrainModule module : GetGenome().GetModules()){
-    if (module.GetModuleId() == 1){ //Geolocation Module
-        int i  = module.GetFirstInputIndex();
-        neuron_data_.at(i) = x_coord_;
-        neuron_data_.at(i + 1) = y_coord_;
-        neuron_data_.at(i + 2) = orientation_;
+  for (BrainModule module : GetGenome().GetModules()) {
+    if (module.GetModuleId() == 1) {  // Geolocation Module
+      int i = module.GetFirstInputIndex();
+      neuron_data_.at(i) = x_coord_;
+      neuron_data_.at(i + 1) = y_coord_;
+      neuron_data_.at(i + 2) = orientation_;
     }
   }
 
   std::vector<double> output = brain_.Activate(neuron_data_);
-  SetAcceleration(std::tanh(output.at(0))*mutable_.GetMaxForce());
+  SetAcceleration(std::tanh(output.at(0)) * mutable_.GetMaxForce());
   SetAccelerationAngle(std::tanh(output.at(1)) * M_PI);
   SetRotationalAcceleration(std::tanh(output.at(2))*mutable_.GetMaxForce());
   // Grow(std::max(std::tanh(output.at(3)) * deltaTime, 0.0));
@@ -215,12 +267,16 @@ void Creature::Think(std::vector<std::vector<std::vector<std::shared_ptr<Entity>
  */
 void Creature::Grow(double energy) {
   double size = GetSize() + energy * mutable_.GetGrowthFactor();
-//  std::cout << "Size difference: "<< size - GetSize() << "Energy: " << energy << "Growth Factor: " << mutable_.GetGrowthFactor() << std::endl;
-  (size > mutable_.GetMaxSize()) ? SetSize(mutable_.GetMaxSize()) : SetSize(size);
+  //  std::cout << "Size difference: "<< size - GetSize() << "Energy: " <<
+  //  energy << "Growth Factor: " << mutable_.GetGrowthFactor() << std::endl;
+  (size > mutable_.GetMaxSize()) ? SetSize(mutable_.GetMaxSize())
+                                 : SetSize(size);
   SetEnergy(GetEnergy() - energy);
   stomach_capacity_ = mutable_.GetStomachCapacityFactor() * pow(size_, 2);
   bite_strength_ = mutable_.GetGeneticStrength() * size_;
 }
+
+bool Creature::GetMatingDesire() const { return mating_desire_; }
 
 /*!
  * @brief Finds the closest food entity in the vicinity of the creature.
@@ -241,7 +297,8 @@ void Creature::Grow(double energy) {
 //   std::pair<double, double> coordinates_creature = GetCoordinates();
 //   int i_creature = (int)coordinates_creature.first / (int)GridCellSize;
 //   int j_creature = (int)coordinates_creature.second /
-//                    (int)GridCellSize;  // position of the creature on the grid
+//                    (int)GridCellSize;  // position of the creature on the
+//                    grid
 //   std::vector<Food *> closest_food_entities = get_food_at_distance(
 //       grid, i_creature, j_creature,
 //       0);  // here we place the candidates for the closest food

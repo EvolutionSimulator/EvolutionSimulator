@@ -20,5 +20,6 @@
 	<file>Resources/Configuration.png</file>
 	<file>Resources/Health.png</file>
 	<file>Resources/Energy.png</file>
+    <file>Resources/Egg.png</file>
     </qresource>
 </RCC>

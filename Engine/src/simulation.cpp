@@ -1,8 +1,8 @@
 #include "simulation.h"
+
 #include <chrono>
 
-Simulation::Simulation(Environment& environment):
-    food_manager_() {
+Simulation::Simulation(Environment& environment) : food_manager_() {
   data_ = new SimulationData(environment);
   is_running_ = true;  // Initialize the flag to true
 }
@@ -46,6 +46,8 @@ void Simulation::FixedUpdate(double deltaTime) {
 
     creature_manager_.ReproduceCreatures(*data, environment);
     // print_duration("ReproduceCreatures");
+
+    creature_manager_.HatchEggs(*data, environment);
 
     food_manager_.GenerateMoreFood(*data_, environment, deltaTime);
     // print_duration("GenerateMoreFood");
