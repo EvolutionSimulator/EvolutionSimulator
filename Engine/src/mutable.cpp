@@ -28,7 +28,8 @@ Mutable::Mutable()
     stomach_capacity_factor_(SETTINGS.physical_constraints.d_stomach_capacity),
     diet_(SETTINGS.physical_constraints.d_diet),
     eating_speed_(SETTINGS.physical_constraints.d_eating_cooldown),
-    genetic_strength_(SETTINGS.physical_constraints.d_genetic_strength){}
+    genetic_strength_(SETTINGS.physical_constraints.d_genetic_strength),
+    gestation_ratio_to_incubation_(SETTINGS.physical_constraints.d_gestation_ratio_to_incubation){}
 
 /*!
  * @brief Calculates the complexity of the entity.
@@ -62,11 +63,8 @@ void Mutable::Mutate() {
         0.0, SETTINGS.physical_constraints.d_energy_density / 20);
     double delta = dis(gen);
     energy_density_ += delta;
-    if (energy_density_ > SETTINGS.physical_constraints.max_energy_density) {
-      energy_density_ = SETTINGS.physical_constraints.max_energy_density;
-    } else if (energy_density_ < 0) {
-      energy_density_ = 0;
-    }
+    energy_density_ = mathlib::bound(energy_density_, 0,
+                                     SETTINGS.physical_constraints.max_energy_density);
   }
 
   // Energy Loss
@@ -119,11 +117,8 @@ void Mutable::Mutate() {
         0.0, SETTINGS.physical_constraints.d_baby_size / 20);
     double delta = dis(gen);
     baby_size_ += delta;
-    if (baby_size_ < SETTINGS.environment.min_creature_size) {
-      baby_size_ = SETTINGS.environment.min_creature_size;
-    } else if (baby_size_ > max_size_) {
-      baby_size_ = max_size_;
-    }
+    baby_size_ = mathlib::bound(baby_size_, SETTINGS.environment.min_creature_size,
+                                max_size_);
   }
 
   // Max Force
@@ -191,9 +186,8 @@ void Mutable::Mutate() {
         0.0, SETTINGS.physical_constraints.d_stomach_capacity / 20);
     double delta = dis(gen);
     stomach_capacity_factor_ += delta;
-    if (stomach_capacity_factor_ < 1.0) {
-      stomach_capacity_factor_ = 1.0;
-    }
+
+    stomach_capacity_factor_ = mathlib::bound(stomach_capacity_factor_, 0, 1);
   }
 
   // Diet
@@ -202,12 +196,7 @@ void Mutable::Mutate() {
                                    SETTINGS.physical_constraints.d_diet / 10);
     double delta = dis(gen);
     diet_ += delta;
-    if (diet_ < 0.1) {
-      diet_ = 0.1;
-    }
-    if (diet_ > 0.9) {
-      diet_ = 0.9;
-    }
+    diet_ = mathlib::bound(diet_, 0.1, 0.9);
   }
 
   // Genetic Strength
@@ -216,12 +205,7 @@ void Mutable::Mutate() {
         0.0, SETTINGS.physical_constraints.d_genetic_strength / 10);
     double delta = dis(gen);
     genetic_strength_ += delta;
-    if (genetic_strength_ < 0.2) {
-      genetic_strength_ = 0.2;
-    }
-    if (genetic_strength_ > 1.2) {
-      genetic_strength_ = 1.2;
-    }
+    genetic_strength_ = mathlib::bound(genetic_strength_, 0.2, 1.2);
   }
 }
 
