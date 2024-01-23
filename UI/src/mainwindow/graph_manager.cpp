@@ -157,14 +157,19 @@ void GraphManager::DrawAreaGraph(const std::vector<std::tuple<double, double, do
   chart->legend()->setVisible(true);
   chart->legend()->setAlignment(Qt::AlignBottom);
 
-  QPushButton* saveButton = new QPushButton("Save Graph");
-
   QVBoxLayout* layout = new QVBoxLayout();
-  layout->addWidget(saveButton);
 
   QChartView* chartView = new QChartView(chart);
   chartView->setRenderHint(QPainter::Antialiasing);
   layout->addWidget(chartView);
+
+  QPushButton* saveButton = new QPushButton("Save Graph");
+  layout->addWidget(saveButton);
+
+  QDialog* dialog = new QDialog(parent_);
+  dialog->setWindowTitle(graphTitle);
+  dialog->setLayout(layout);
+  dialog->resize(800, 600);
 
   connect(saveButton, &QPushButton::clicked, [chartView, data, graphTitle, this]() {
       QString desktopPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
@@ -195,10 +200,6 @@ void GraphManager::DrawAreaGraph(const std::vector<std::tuple<double, double, do
       }
   });
 
-  QDialog* dialog = new QDialog(parent_);
-  dialog->setWindowTitle(graphTitle);
-  dialog->setLayout(layout);
-  dialog->resize(800, 600);
   connect(dialog, &QDialog::finished, dialog, &QObject::deleteLater);
   emit resetGraphMenuIndex();
   dialog->exec();
