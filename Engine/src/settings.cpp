@@ -89,6 +89,10 @@ void Settings::LoadFromFile(const std::string& filename) {
       environment_json["frictional_coefficient"].get<double>();
   environment.maturity_age_multiplier =
       environment_json["maturity_age_multiplier"].get<double>();
+  environment.male_reproduction_cost =
+      environment_json["male_reproduction_cost"].get<double>();
+  environment.pregnancy_hardship_modifier =
+      environment_json["pregnancy_hardship_modifier"].get<double>();
 
   // Load Engine settings
   auto& engine_json = config_json["engine"];

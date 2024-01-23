@@ -45,6 +45,10 @@ void MaleReproductiveSystem::MateWithFemale() {
   ResetReproductionClock();
 };
 
+void MaleReproductiveSystem::MaleAfterMate() {
+    SetEnergy(energy_ - max_energy_ * SETTINGS.environment.male_reproduction_cost);
+}
+
 GestatingEgg::GestatingEgg(neat::Genome genome, Mutable mutables,
                            int generation)
     : genome(genome),
@@ -117,6 +121,11 @@ std::shared_ptr<Egg> FemaleReproductiveSystem::GiveBirth(
   egg_.reset();
 
   ResetReproductionClock();
+  pregnancy_hardship_ = 1;
   return std::make_shared<Egg>(egg, coordinates);
 }
 
+void FemaleReproductiveSystem::FemaleAfterMate() {
+    SetEnergy(GetEnergy() - SETTINGS.physical_constraints.pregnancy_energy_factor * max_energy_);
+    pregnancy_hardship_ = SETTINGS.environment.pregnancy_hardship_modifier;
+}

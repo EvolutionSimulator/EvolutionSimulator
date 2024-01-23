@@ -18,6 +18,8 @@ void CreatureManager::UpdateAllCreatures(SimulationData& data,
                                          EntityGrid& entity_grid,
                                          double deltaTime) {
   auto grid = entity_grid.GetGrid();
+
+  #pragma omp parallel for
   for (auto& egg : data.eggs_) {
     egg->Update(deltaTime);
   }
@@ -32,18 +34,16 @@ void CreatureManager::UpdateAllCreatures(SimulationData& data,
                      SETTINGS.environment.grid_cell_size,
                      environment.GetFrictionalCoefficient());
 
-    if (creature->GetMatingDesire()) {
+    if (creature->GetMatingDesire() && !creature->WaitingToReproduce()) {
       int thread_id = omp_get_thread_num();
       local_reproduce_lists[thread_id].push_back(creature);
+      creature->SetWaitingToReproduce(true);
     }
 
     if (creature->FemaleReproductiveSystem::CanBirth()) {
       std::cerr << "Creature is ready to give birth" << std::endl;
       data.eggs_.push_back(creature->FemaleReproductiveSystem::GiveBirth(
           creature->GetCoordinates()));
-      creature->SetVelocity(
-          creature->GetVelocity() *
-          SETTINGS.physical_constraints.after_birth_velocity_factor);
     }
   }
 
@@ -143,8 +143,10 @@ void CreatureManager::ReproduceTwoCreatures(SimulationData& data,
                                             Creature& mother) {
   father.MaleReproductiveSystem::MateWithFemale();
   mother.FemaleReproductiveSystem::MateWithMale(&father, &mother);
-  father.AfterMate();
-  mother.AfterMate();
+  father.SetWaitingToReproduce(false);
+  mother.SetWaitingToReproduce(false);
+  father.MaleAfterMate();
+  mother.FemaleAfterMate();
 }
 
 /*!

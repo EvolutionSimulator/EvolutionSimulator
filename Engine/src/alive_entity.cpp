@@ -157,10 +157,13 @@ double AliveEntity::GetAge() const { return age_; }
 void AliveEntity::SetAge(double age) { age_ = age; }
 
 /*!
- * @brief Updates the age of the AliveEntity.
+ * @brief Updates the age of the AliveEntity and its health.
  */
 
-void AliveEntity::UpdateAge(double delta_time) { age_ += delta_time; }
+void AliveEntity::UpdateAge(double delta_time) {
+    age_ += delta_time;
+    health_ -= delta_time;
+}
 
 /*!
  * @brief Retrieves the AliveEntity's genetic genome.

@@ -19,8 +19,8 @@ TEST(ReproductionTest, SimulatePregnancy) {
 
   male.MaleReproductiveSystem::MateWithFemale();
   female.FemaleReproductiveSystem::MateWithMale(&male, &female);
-  male.AfterMate();
-  female.AfterMate();
+  male.MaleAfterMate();
+  female.FemaleAfterMate();
 
   double incubation_time =
       female.FemaleReproductiveSystem::GetEgg().incubation_time;

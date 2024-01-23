@@ -19,7 +19,6 @@ class ReproductiveSystem : virtual public AliveEntity {
 
   virtual bool IsMale() const { return false; };
   virtual bool IsFemale() const { return false; };
-  virtual bool IsPregnant() const { return false; }
   virtual bool ReadyToProcreate() const;
   virtual void Update(double delta_time);
 
@@ -49,6 +48,7 @@ class MaleReproductiveSystem : virtual public ReproductiveSystem {
 
   bool IsMale() const override { return true; }
   void MateWithFemale();
+  void MaleAfterMate();
 };
 
 struct GestatingEgg {
@@ -66,8 +66,9 @@ class FemaleReproductiveSystem : virtual public ReproductiveSystem {
   FemaleReproductiveSystem(neat::Genome genome, Mutable mutables);
 
   bool IsFemale() const override { return true; }
-  bool IsPregnant() const override { return egg_.has_value(); };
+  bool IsPregnant() const  { return egg_.has_value(); };
   GestatingEgg GetEgg() const { return egg_.value(); }
+  void FemaleAfterMate();
 
   virtual void Update(double delta_time) override;
   void MateWithMale(const Creature* const father, const Creature* const mother);
@@ -77,6 +78,7 @@ class FemaleReproductiveSystem : virtual public ReproductiveSystem {
  protected:
   std::optional<GestatingEgg> egg_;  // gestating egg
   double gestation_ratio_to_incubation_;
+  double pregnancy_hardship_;
 };
 
 #endif  // REPRODUCTION_H

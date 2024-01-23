@@ -75,7 +75,9 @@ class Settings {
     double default_lifespan = 30;
     double photosynthesis_factor = 0.01;
     double frictional_coefficient = 0.15; // Needs to be less than 1
-    double maturity_age_multiplier = 0.1;
+    double maturity_age_multiplier = 2;
+    double male_reproduction_cost = 0.75;
+    double pregnancy_hardship_modifier = 2; //1 for normal behavior do not make it 0
   } environment;
 
   struct EngineSettings {
@@ -114,8 +116,8 @@ class Settings {
     double mating_desire_factor = 0.05;
     double pregnancy_energy_factor =
         0.2;  // Causes the biggest change in number of creatures
-    double pregnancy_velocity_factor = 0.5;
-    double after_birth_velocity_factor = 1.5;
+    double pregnancy_velocity_factor = 0.5; //Not used currently
+    double after_birth_velocity_factor = 1.5; //Not used currently
   } physical_constraints;
 
   struct UISettings {

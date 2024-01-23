@@ -24,7 +24,8 @@
  *
  */
 Creature::Creature(neat::Genome genome, Mutable mutables)
-    : MovableEntity(),
+    : Entity(),
+      MovableEntity(),
       AliveEntity(genome, mutables),
       VisionSystem(genome, mutables),
       DigestiveSystem(genome, mutables),
@@ -57,7 +58,7 @@ void Creature::UpdateEnergy(double deltaTime) {
       GetSize() * deltaTime / 200;
   double heat_loss = mutable_.GetEnergyLoss() * pow(size_, 1) * deltaTime / 100;
 
-  SetEnergy(GetEnergy() - movement_energy - heat_loss);
+  SetEnergy(GetEnergy() - movement_energy*pregnancy_hardship_ - heat_loss);
   BalanceHealthEnergy();
 
   if (GetHealth() <= 0) {
@@ -95,14 +96,6 @@ void Creature::UpdateMatingDesire() {
                min_reproducing_age) *
               SETTINGS.physical_constraints.mating_desire_factor;
   mating_desire_ = mathlib::RandomDouble(0, 1) < probability;
-}
-
-void Creature::AfterMate() {
-  if (this->FemaleReproductiveSystem::IsPregnant()) {
-    SetEnergy(GetEnergy() - SETTINGS.physical_constraints.pregnancy_energy_factor * max_energy_);
-    SetVelocity(GetVelocity() *
-                SETTINGS.physical_constraints.pregnancy_velocity_factor);
-  }
 }
 
 /*!

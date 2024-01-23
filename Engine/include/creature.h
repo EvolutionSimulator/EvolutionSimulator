@@ -63,7 +63,6 @@ class Creature : virtual public MovableEntity,
   bool Compatible(const Creature& other_creature);
 
   bool GetMatingDesire() const;
-  void AfterMate();
 
  protected:
   int think_count_; /*! Keeps track so that creatures think every 5 loops */
