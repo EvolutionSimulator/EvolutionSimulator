@@ -22,6 +22,10 @@ InfoPanel::InfoPanel(QSFMLCanvas* canvas, TextureManager *texture_manager, Simul
 
 }
 
+void InfoPanel::SetUIView(sf::View view){ ui_view_ = view;}
+
+void InfoPanel::SetPanelView(sf::View view){ info_panel_view_ = view;}
+
 void InfoPanel::SetSelectedCreature(std::shared_ptr<Creature> creature) {
   selected_creature_ = creature;
 }
@@ -49,9 +53,9 @@ bool InfoPanel::IsVisible() const {
 void InfoPanel::Draw() {
   if (!is_visible_ || !selected_creature_ || !canvas_) return;
   sf::RenderTarget& target = *canvas_;
+  DrawStomach(target, *selected_creature_);
   DrawPanel(target);
   DrawVisionCone(target, *selected_creature_);
-  DrawStomach(target, *selected_creature_);
 }
 
 double round_double(double number, int decimal_places) {
@@ -87,6 +91,8 @@ std::string InfoPanel::FormatCreatureInfo(const Creature& creature) {
 }
 
 void InfoPanel::DrawPanel(sf::RenderTarget& target) {
+  target.setView(info_panel_view_);
+
   // Right info panel setup
   sf::Vector2f panelSize(200, target.getSize().y);  // Width of 200 and full height of the canvas
   sf::Vector2f panelPosition(target.getSize().x - panelSize.x, 0);  // Positioned on the right side
@@ -147,6 +153,17 @@ void InfoPanel::DrawPanel(sf::RenderTarget& target) {
   target.draw(healthBarOutline);
   target.draw(healthBar);
 
+  // Prepare and draw the creature info text inside the panel
+  sf::Text infoText;
+  infoText.setFont(texture_manager_->font_);
+  infoText.setString(creature_info.toStdString());
+  infoText.setCharacterSize(15);
+  infoText.setFillColor(sf::Color::White);
+  infoText.setPosition(panelPosition.x + 10, 10);  // Adjust the Y position as needed
+  target.draw(infoText);
+
+  target.setView(ui_view_);
+
   sf::CircleShape redCircle((*selected_creature_).GetSize()); // Adjust as needed
   redCircle.setOutlineColor(sf::Color::Red);
   redCircle.setOutlineThickness((*selected_creature_).GetSize()/5); // Adjust thickness as needed
@@ -173,17 +190,12 @@ void InfoPanel::DrawPanel(sf::RenderTarget& target) {
     target.draw(blueCircle);
   }
 
-  // Prepare and draw the creature info text inside the panel
-  sf::Text infoText;
-  infoText.setFont(texture_manager_->font_);
-  infoText.setString(creature_info.toStdString());
-  infoText.setCharacterSize(15);
-  infoText.setFillColor(sf::Color::White);
-  infoText.setPosition(panelPosition.x + 10, 10);  // Adjust the Y position as needed
-  target.draw(infoText);
+
 }
 
 void InfoPanel::DrawVisionCone(sf::RenderTarget& target, const Creature &creature) {
+
+  target.setView(ui_view_);
 
   double visionRadius = creature.GetVisionRadius();
   double visionAngle = creature.GetVisionAngle();
@@ -216,6 +228,8 @@ void InfoPanel::DrawVisionCone(sf::RenderTarget& target, const Creature &creatur
 }
 
 void InfoPanel::DrawStomach(sf::RenderTarget& target, const Creature& creature) {
+
+  target.setView(info_panel_view_);
   // Use the window size to determine the position of the stomach images
   sf::Vector2u windowSize = target.getSize();
   float margin = 10.0f;  // Margin from the bottom left corner
