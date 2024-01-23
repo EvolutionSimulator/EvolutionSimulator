@@ -186,7 +186,6 @@ void Mutable::Mutate() {
         0.0, SETTINGS.physical_constraints.d_stomach_capacity / 20);
     double delta = dis(gen);
     stomach_capacity_factor_ += delta;
-
     stomach_capacity_factor_ = mathlib::bound(stomach_capacity_factor_, 0, 1);
   }
 

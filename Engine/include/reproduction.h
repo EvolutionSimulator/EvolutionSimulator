@@ -3,15 +3,18 @@
 
 #include <limits>
 #include <optional>
+#include <memory>
 
 #include "mutable.h"
 #include "neat/neat-genome.h"
+#include "alive_entity.h"
 
 class Creature;
 class Egg;
 
-class ReproductiveSystem {
+class ReproductiveSystem : virtual public AliveEntity {
  public:
+  ReproductiveSystem(neat::Genome genome, Mutable mutables);
   virtual ~ReproductiveSystem() = default;
 
   virtual bool IsMale() const { return false; };
@@ -23,35 +26,29 @@ class ReproductiveSystem {
   double GetMaturityAge() const { return maturity_age_; };
   double GetReproductionCooldown() const { return reproduction_cooldown_; };
   double ReadyToReproduceAt() const { return ready_to_reproduce_at_; }
+  bool WaitingToReproduce() const { return waiting_to_reproduce_; }
 
+  void SetWaitingToReproduce(bool value);
  protected:
-  ReproductiveSystem(){};
 
   double maturity_age_;
   double reproduction_cooldown_;
 
-  double age_;
   double ready_to_reproduce_at_;
 
+  bool waiting_to_reproduce_;
+
   virtual double MaturityAge(const Mutable* const mutables) const;
-  virtual double ReproductionCooldown(const Mutable* const mutables) const = 0;
 
   virtual void ResetReproductionClock();
 };
 
-class MaleReproductiveSystem : public ReproductiveSystem {
+class MaleReproductiveSystem : virtual public ReproductiveSystem {
  public:
-  MaleReproductiveSystem(const Mutable* const mutables);
-  MaleReproductiveSystem(Mutable mutables)
-      : MaleReproductiveSystem(&mutables){};
-  MaleReproductiveSystem() : MaleReproductiveSystem(Mutable()) {}
+  MaleReproductiveSystem(neat::Genome genome, Mutable mutables);
 
   bool IsMale() const override { return true; }
   void MateWithFemale();
-
- protected:
-  virtual double ReproductionCooldown(
-      const Mutable* const mutables) const override;
 };
 
 struct GestatingEgg {
@@ -64,12 +61,9 @@ struct GestatingEgg {
   GestatingEgg(neat::Genome genome, Mutable mutables, int generation);
 };
 
-class FemaleReproductiveSystem : public ReproductiveSystem {
+class FemaleReproductiveSystem : virtual public ReproductiveSystem {
  public:
-  FemaleReproductiveSystem(const Mutable* const mutables);
-  FemaleReproductiveSystem(Mutable mutables)
-      : FemaleReproductiveSystem(&mutables){};
-  FemaleReproductiveSystem() : FemaleReproductiveSystem(Mutable()) {}
+  FemaleReproductiveSystem(neat::Genome genome, Mutable mutables);
 
   bool IsFemale() const override { return true; }
   bool IsPregnant() const override { return egg_.has_value(); };
@@ -79,10 +73,6 @@ class FemaleReproductiveSystem : public ReproductiveSystem {
   void MateWithMale(const Creature* const father, const Creature* const mother);
   bool CanBirth() const;
   std::shared_ptr<Egg> GiveBirth(const std::pair<double, double>& coordinates);
-
- protected:
-  virtual double ReproductionCooldown(
-      const Mutable* const mutables) const override;
 
  protected:
   std::optional<GestatingEgg> egg_;  // gestating egg

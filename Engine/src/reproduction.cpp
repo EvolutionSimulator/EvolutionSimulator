@@ -6,6 +6,13 @@
 #include "egg.h"
 #include "settings.h"
 
+ReproductiveSystem::ReproductiveSystem(neat::Genome genome, Mutable mutables)
+    : AliveEntity(genome, mutables){
+    maturity_age_ = MaturityAge(&mutables),
+    ready_to_reproduce_at_ = maturity_age_;
+}
+
+
 bool ReproductiveSystem::ReadyToProcreate() const {
   return age_ >= ready_to_reproduce_at_;
 };
@@ -22,16 +29,14 @@ double ReproductiveSystem::MaturityAge(const Mutable* const mutables) const {
          SETTINGS.environment.maturity_age_multiplier;
 }
 
-MaleReproductiveSystem::MaleReproductiveSystem(const Mutable* const mutables) {
-  age_ = 0;
-  maturity_age_ = MaturityAge(mutables),
-  reproduction_cooldown_ = ReproductionCooldown(mutables),
-  ready_to_reproduce_at_ = maturity_age_;
+void ReproductiveSystem::SetWaitingToReproduce(bool value){
+    waiting_to_reproduce_ = value;
 }
 
-double MaleReproductiveSystem::ReproductionCooldown(
-    const Mutable* const mutables) const {
-  return 0;
+MaleReproductiveSystem::MaleReproductiveSystem(neat::Genome genome, Mutable mutables)
+    : ReproductiveSystem(genome, mutables),
+      AliveEntity(genome, mutables){ //Not really sure why but this is required
+  reproduction_cooldown_ = 0;
 }
 
 void MaleReproductiveSystem::MateWithFemale() {
@@ -49,14 +54,12 @@ GestatingEgg::GestatingEgg(neat::Genome genome, Mutable mutables,
       incubation_time(mutables.Complexity() *
                       SETTINGS.environment.egg_incubation_time_multiplier) {}
 
-FemaleReproductiveSystem::FemaleReproductiveSystem(
-    const Mutable* const mutables)
-    : egg_() {
-  age_ = 0;
-  maturity_age_ = MaturityAge(mutables),
-  reproduction_cooldown_ = ReproductionCooldown(mutables),
-  ready_to_reproduce_at_ = maturity_age_;
-  gestation_ratio_to_incubation_ = mutables->GetGestationRatioToIncubation();
+FemaleReproductiveSystem::FemaleReproductiveSystem(neat::Genome genome, Mutable mutables)
+    : ReproductiveSystem(genome, mutables),
+      AliveEntity(genome, mutables), //Not really sure why but this is required
+      egg_(),
+      gestation_ratio_to_incubation_(mutables.GetGestationRatioToIncubation()){
+    reproduction_cooldown_ = 0.5 * mutables.Complexity();
 }
 
 void FemaleReproductiveSystem::Update(double delta_time) {
@@ -117,7 +120,3 @@ std::shared_ptr<Egg> FemaleReproductiveSystem::GiveBirth(
   return std::make_shared<Egg>(egg, coordinates);
 }
 
-double FemaleReproductiveSystem::ReproductionCooldown(
-    const Mutable* const mutables) const {
-  return mutables->Complexity() * 0.5;
-}

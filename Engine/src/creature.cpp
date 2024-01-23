@@ -28,8 +28,9 @@ Creature::Creature(neat::Genome genome, Mutable mutables)
       AliveEntity(genome, mutables),
       VisionSystem(genome, mutables),
       DigestiveSystem(genome, mutables),
-      MaleReproductiveSystem(mutables),
-      FemaleReproductiveSystem(mutables),
+      ReproductiveSystem(genome, mutables),
+      MaleReproductiveSystem(genome, mutables),
+      FemaleReproductiveSystem(genome, mutables),
       mating_desire_(false)
       {
     int neural_inputs = SETTINGS.environment.input_neurons;
