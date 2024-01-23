@@ -13,7 +13,7 @@ class Egg : virtual public Food, virtual public AliveEntity {
   double GetIncubationTime() const;
 
   void Break();
-  Creature Hatch();
+  std::shared_ptr<Creature> Hatch();
   void Update(double delta_time);
 
  protected:

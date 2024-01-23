@@ -5,7 +5,6 @@
 #include <unordered_set>
 #include <vector>
 
-#include "config.h"
 #include "neat-link.h"
 #include "neat-neuron.h"
 #include "brain_module.h"

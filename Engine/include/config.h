@@ -1,3 +1,5 @@
+// Unused, kept to save the value of the constants
+
 #ifndef CONFIG_H
 #define CONFIG_H
 #include <cmath>

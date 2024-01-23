@@ -4,15 +4,16 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "info_panel.h"
 #include "qwidgets/qsfmlcanvas.h"
 #include "simulation.h"
+#include "info_panel.h"
 #include "texture_manager.h"
 
 class SimulationCanvas : public QSFMLCanvas {
-  Q_OBJECT
+ Q_OBJECT
 
  public:
+
   SimulationCanvas(QWidget* Parent);
 
   void SetSimulation(Simulation* simulation);
@@ -22,29 +23,25 @@ class SimulationCanvas : public QSFMLCanvas {
 
   InfoPanel& GetInfoPanel();
 
- protected:
-  void mousePressEvent(QMouseEvent* event) override;
-  void wheelEvent(QWheelEvent* event) override;
+  protected:
+  void mousePressEvent(QMouseEvent *event) override;
+  void wheelEvent(QWheelEvent *event) override;
   void mouseMoveEvent(QMouseEvent* event) override;
   void mouseReleaseEvent(QMouseEvent* event) override;
   void resizeEvent(QResizeEvent* event) override;
   void zoom(float factor, sf::Vector2f& zoomPoint);
 
- private:
-  Simulation* simulation_ = nullptr;
+  private:
+  Simulation *simulation_ = nullptr;
   virtual void OnInit() override;
   void OnUpdate();
 
   // Rendering logic
-  void RenderSimulation(DataAccessor<SimulationData> data);
-  void RenderFoodAtPosition(const Food& food,
-                            const std::pair<double, double>& position);
-  void RenderEggAtPosition(const Egg& egg,
-                           const std::pair<double, double>& position);
-  void RenderCreatureAtPosition(const Creature& creature,
-                                const std::pair<double, double>& position);
-  std::vector<std::pair<double, double>> getEntityRenderPositions(
-      const Entity& entity);
+  void RenderSimulation(SimulationData& data);
+  void RenderFoodAtPosition(const std::shared_ptr<Food> food, const std::pair<double, double>& position);
+  void RenderEggAtPosition(const std::shared_ptr<Egg> egg, const std::pair<double, double>& position);
+  void RenderCreatureAtPosition(const std::shared_ptr<Creature> creature, const std::pair<double, double>& position);
+  std::vector<std::pair<double, double>> getEntityRenderPositions(const std::shared_ptr<Entity> entity);
 
   // Zoom logic
   float zoomFactor = 1.0f;
@@ -65,3 +62,4 @@ class SimulationCanvas : public QSFMLCanvas {
   void SetSelectedFood();
   void DrawMouseCoordinates();
 };
+

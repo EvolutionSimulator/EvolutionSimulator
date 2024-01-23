@@ -12,7 +12,7 @@
  * @brief Constructs a new Mutable object.
  *
  * @details Initializes the Mutable object with predefined values from the
- *          settings::physical_constraints namespace.
+ *          SETTINGS.physical_constraints namespace.
  */
 Mutable::Mutable()
   : energy_density_(SETTINGS.physical_constraints.d_energy_density),

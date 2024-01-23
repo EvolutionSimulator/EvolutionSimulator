@@ -70,7 +70,6 @@ add_library(Engine STATIC
 
   include/geometry_primitives.h src/geometry_primitives.cpp
   include/collision_functions.h src/collision_functions.cpp
-  include/config.h
 
   include/food_manager.h src/food_manager.cpp
   include/entity_grid.h src/entity_grid.cpp

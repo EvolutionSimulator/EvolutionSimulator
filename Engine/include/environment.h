@@ -4,8 +4,6 @@
 #include <vector>
 #include <functional>
 
-#include "config.h"
-
 class Environment {
  public:
   // Constructor

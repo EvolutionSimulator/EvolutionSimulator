@@ -47,14 +47,15 @@ void SimulationCanvas::UpdateFoodDensityTexture(SimulationData& data){
             // Get the density value from the function
             float densityValue = data.GetEnvironment().GetFoodDensity(x, y);
 
-      // Normalize the density value to the range 0 - 255 for the red channel
-      sf::Uint8 greenValue = static_cast<sf::Uint8>(
-          255 * std::min(std::max(densityValue, 0.0f) /
-                             settings::engine::kMaxFoodDensityColored,
-                         1.0));
+            // Normalize the density value to the range 0 - 255 for the red
+            // channel
+            sf::Uint8 greenValue = static_cast<sf::Uint8>(
+                255 * std::min(std::max(densityValue, 0.0f) /
+                                   SETTINGS.engine.max_food_density_colored,
+                               1.0));
 
-      // Set the pixel color in the image
-      densityImage.setPixel(x, y, sf::Color(0, greenValue, 0));
+            // Set the pixel color in the image
+            densityImage.setPixel(x, y, sf::Color(0, greenValue, 0));
     }
   }
   texture_manager_.food_density_texture_.setSmooth(true);
@@ -79,8 +80,9 @@ void SimulationCanvas::OnInit() {
 
 void SimulationCanvas::OnUpdate()
 {
-  auto data = simulation_->GetSimulationData();
-  RenderSimulation(*data);
+  DataAccessor<SimulationData> data = simulation_->GetSimulationData();
+  SimulationData& data_ref = *data;
+  RenderSimulation(data_ref);
 
   // Check if a creature is selected
   if (info_panel_.IsVisible() && info_panel_.GetSelectedCreature()) {
@@ -133,8 +135,12 @@ void SimulationCanvas::RenderSimulation(SimulationData& data) {
     }
   }
 
-  for (const auto& egg : data->eggs_) {
-    auto renderPositions = getEntityRenderPositions((AliveEntity) egg);
+  for (const auto& egg_ptr : data.eggs_) {
+    if (egg_ptr == nullptr) continue;
+    std::shared_ptr<Egg> egg = egg_ptr;
+    auto renderPositions = getEntityRenderPositions(
+        (std::shared_ptr<Food>)
+            egg);  // QUICK FIX - NEED FOOD TO INHERIT VIRTUALLY FROM ENTITY
     for (const auto& pos : renderPositions) {
       RenderEggAtPosition(egg, pos);
     }
@@ -181,13 +187,13 @@ void SimulationCanvas::RenderFoodAtPosition(const std::shared_ptr<Food> food, co
 }
 
 void SimulationCanvas::RenderEggAtPosition(
-    const Egg& egg, const std::pair<double, double>& position) {
+    std::shared_ptr<Egg> egg, const std::pair<double, double>& position) {
   sf::Sprite eggSprite;
   eggSprite.setTexture(texture_manager_.egg_texture_);
-  eggSprite.setScale(egg.Food::GetSize() / 50.0f, egg.Food::GetSize() / 50.0f);
+  eggSprite.setScale(egg->Food::GetSize() / 50.0f, egg->Food::GetSize() / 50.0f);
   eggSprite.setOrigin(128.0f, 128.0f);
 
-  std::pair<double, double> eggCoordinates = egg.Food::GetCoordinates();
+  std::pair<double, double> eggCoordinates = egg->Food::GetCoordinates();
   sf::Transform eggTransform;
   eggTransform.translate(eggCoordinates.first, eggCoordinates.second);
   draw(eggSprite, eggTransform);

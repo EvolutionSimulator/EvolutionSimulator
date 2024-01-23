@@ -47,7 +47,7 @@ GestatingEgg::GestatingEgg(neat::Genome genome, Mutable mutables,
       generation(generation),
       age(0),
       incubation_time(mutables.Complexity() *
-                      settings::environment::kEggIncubationTimeMultiplier) {}
+                      SETTINGS.environment.egg_incubation_time_multiplier) {}
 
 FemaleReproductiveSystem::FemaleReproductiveSystem(
     const Mutable* const mutables)
@@ -104,7 +104,7 @@ bool FemaleReproductiveSystem::CanBirth() const {
          egg_->age / egg_->incubation_time >= gestation_ratio_to_incubation_;
 }
 
-Egg FemaleReproductiveSystem::GiveBirth(
+std::shared_ptr<Egg> FemaleReproductiveSystem::GiveBirth(
     const std::pair<double, double>& coordinates) {
   if (not CanBirth()) {
     throw std::runtime_error("Egg not ready to hatch");
@@ -114,7 +114,7 @@ Egg FemaleReproductiveSystem::GiveBirth(
   egg_.reset();
 
   ResetReproductionClock();
-  return Egg(egg, coordinates);
+  return std::make_shared<Egg>(egg, coordinates);
 }
 
 double FemaleReproductiveSystem::ReproductionCooldown(

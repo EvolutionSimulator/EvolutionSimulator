@@ -25,7 +25,7 @@ class AliveEntity : virtual public Entity {
 
   double GetAge() const;
   void SetAge(double age);
-  void UpdateAge();
+  void UpdateAge(double delta_time);
 
   neat::Genome GetGenome() const;
   Mutable GetMutable() const;

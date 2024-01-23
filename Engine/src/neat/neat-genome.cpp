@@ -228,7 +228,7 @@ void Genome::Mutate() {
     MutateChangeBias();
   }
 
-  if (uniform(gen) < settings::neat::kModuleActivationMutationRate) {
+  if (uniform(gen) < SETTINGS.neat.module_activation_mutation_rate) {
       MutateActivateBrainModule();
   }
 }
@@ -751,11 +751,11 @@ double Genome::CompatibilityBetweenGenomes(const Genome& other) const {
     // Compute compatibility distance based on disjoint/excess neurons and
     // links, and average weight difference.
     double compatibility_distance =
-        settings::compatibility::kWeightSharedNeurons *
+        SETTINGS.compatibility.weight_shared_neurons *
             normalized_disjoint_neurons +
-        settings::compatibility::kWeightSharedLinks *
+        SETTINGS.compatibility.weight_shared_links *
             normalized_disjoint_links +
-        settings::compatibility::kAverageWeightSharedLinks *
+        SETTINGS.compatibility.average_weight_shared_links *
             average_weight_difference;
     return compatibility_distance;
 }

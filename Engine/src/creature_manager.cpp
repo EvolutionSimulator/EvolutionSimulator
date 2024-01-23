@@ -18,8 +18,8 @@ void CreatureManager::UpdateAllCreatures(SimulationData& data,
                                          EntityGrid& entity_grid,
                                          double deltaTime) {
   auto grid = entity_grid.GetGrid();
-  for (Egg& egg : data.eggs_) {
-    egg.Update(deltaTime);
+  for (auto& egg : data.eggs_) {
+    egg->Update(deltaTime);
   }
   // Vector to store thread-local reproduce lists
   std::vector<std::vector<std::shared_ptr<Creature>>> local_reproduce_lists(omp_get_max_threads());
@@ -38,6 +38,7 @@ void CreatureManager::UpdateAllCreatures(SimulationData& data,
     }
 
     if (creature->FemaleReproductiveSystem::CanBirth()) {
+      std::cerr << "Creature is ready to give birth" << std::endl;
       data.eggs_.push_back(creature->FemaleReproductiveSystem::GiveBirth(
           creature->GetCoordinates()));
       creature->SetVelocity(
@@ -50,13 +51,15 @@ void CreatureManager::UpdateAllCreatures(SimulationData& data,
   for (auto &list : local_reproduce_lists) {
     for (auto &creature : list) {
       data.new_reproduce_.push(creature);
+    }
   }
 }
 
 void CreatureManager::HatchEggs(SimulationData& data, Environment& environment) {
-  data.eggs_.erase(std::remove_if(data.eggs_.begin(), data.eggs_.end(), [this, &data](Egg& egg) {
-    if (egg.GetAge() >= egg.GetIncubationTime()) {
-      Creature new_creature = egg.Hatch();
+  data.eggs_.erase(std::remove_if(data.eggs_.begin(), data.eggs_.end(), [this, &data](std::shared_ptr<Egg>& egg) {
+    if (egg->GetAge() >= egg->GetIncubationTime()) {
+      std::shared_ptr<Creature> new_creature = egg->Hatch();
+      std::cerr << "Hatched creature" << std::endl;
       data.creatures_.push_back(new_creature);
       return true;
     }
@@ -74,8 +77,8 @@ void CreatureManager::ReproduceCreatures(SimulationData& data,
                                          Environment& environment) {
   double world_width = environment.GetMapWidth();
   double world_height = environment.GetMapHeight();
-  double max_creature_size = settings::environment::kMaxCreatureSize;
-  double min_creature_size = settings::environment::kMinCreatureSize;
+  double max_creature_size = SETTINGS.environment.max_creature_size;
+  double min_creature_size = SETTINGS.environment.min_creature_size;
 
   std::queue<std::shared_ptr<Creature>> not_reproduced;
   std::queue<std::shared_ptr<Creature>> temp_queue;
@@ -94,16 +97,17 @@ void CreatureManager::ReproduceCreatures(SimulationData& data,
       if (creature1->Compatible(*creature2) and
           creature1->MaleReproductiveSystem::ReadyToProcreate() and
           creature2->FemaleReproductiveSystem::ReadyToProcreate()) {
+        std::cerr << "Reproducing creatures" << std::endl;
         ReproduceTwoCreatures(data, *creature1, *creature2);
         paired = true;
       } else {
-        temp_queue.push(creature2_index);  // Save for next round
+        temp_queue.push(creature2);  // Save for next round
       }
     }
 
     // If the creature wasn't paired add it to not_reproduced
     if (!paired) {
-      not_reproduced.push(creature1_index);
+      not_reproduced.push(creature1);
     }
 
     // Refill newCreatures with unpaired creatures for next attempt

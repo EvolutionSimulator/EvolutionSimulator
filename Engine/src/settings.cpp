@@ -38,6 +38,8 @@ void Settings::LoadFromFile(const std::string& filename) {
       neat_json["adjustment_probability"].get<double>();
   neat.activation_function_mutation_rate =
       neat_json["activation_function_mutation_rate"].get<double>();
+  neat.module_activation_mutation_rate =
+      neat_json["module_activation_mutation_rate"].get<double>();
 
   // Load Environment settings
   auto& environment_json = config_json["environment"];
@@ -95,6 +97,8 @@ void Settings::LoadFromFile(const std::string& filename) {
   engine.eps = engine_json["eps"].get<double>();
   engine.max_cells_to_find_food =
       engine_json["max_cells_to_find_food"].get<size_t>();
+  engine.max_food_density_colored =
+      engine_json["max_food_density_colored"].get<size_t>();
 
   // Load PhysicalConstraints settings
   auto& physical_constraints_json = config_json["physical_constraints"];
@@ -122,8 +126,8 @@ void Settings::LoadFromFile(const std::string& filename) {
       physical_constraints_json["d_growth_factor"].get<double>();
   physical_constraints.d_vision_factor =
       physical_constraints_json["d_vision_factor"].get<double>();
-  physical_constraints.d_vision_factor =
-      physical_constraints_json["d_vision_factor"].get<double>();
+  physical_constraints.d_gestation_ratio_to_incubation =
+      physical_constraints_json["d_gestation_ratio_to_incubation"].get<double>();
   physical_constraints.vision_radius =
       physical_constraints_json["vision_radius"].get<double>();
   physical_constraints.vision_angle =

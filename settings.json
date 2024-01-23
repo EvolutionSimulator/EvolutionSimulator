@@ -14,7 +14,8 @@
     "min_bias": 0.0,
     "change_bias_mutation_rate": 0.6,
     "adjustment_probability": 0.8,
-    "activation_function_mutation_rate": 0.02
+    "activation_function_mutation_rate": 0.02,
+    "module_activation_mutation_rate": 0.01
   },
   "compatibility": {
     "weight_shared_neurons": 0.2,
@@ -23,7 +24,7 @@
     "color_compatibility": 0.1,
     "mutables_compatibility": 0.5,
     "compatibility_threshold": 2.0,
-    "compatibility_distance": 100
+    "compatibility_distance": 400.0
   },
   "environment": {
     "d_map_width": 1900.0,
@@ -39,7 +40,7 @@
     "plant_nutritional_value": 2.0,
     "meat_nutritional_value": 3.0,
     "egg_nutritional_value": 4.0,
-    "incubation_time_multiplier": 1.0,
+    "egg_incubation_time_multiplier": 0.1,
     "plant_proportion": 0.5,
     "rot_factor": 1.0,
     "grid_cell_size": 50.0,
@@ -52,12 +53,13 @@
     "default_lifespan": 30,
     "photosynthesis_factor": 0.1,
     "frictional_coefficient": 0.15,
-    "maturity_age_multiplier": 0.2
+    "maturity_age_multiplier": 0.1
   },
   "engine": {
     "fixed_update_interval": 0.05,
     "eps": 1e-07,
-    "max_cells_to_find_food": 30
+    "max_cells_to_find_food": 30,
+    "max_food_density_colored": 5e-4
   },
   "physical_constraints": {
     "mutation_rate": 0.2,
@@ -86,7 +88,7 @@
     "max_reproducing_age": 700,
     "mating_desire_max_prob": 0.05,
     "mating_desire_factor": 0.05,
-    "pregnancy_energy_factor": 0.7,
+    "pregnancy_energy_factor": 0.2,
     "pregnancy_velocity_factor": 0.5,
     "after_birth_velocity_factor": 1.5
   },

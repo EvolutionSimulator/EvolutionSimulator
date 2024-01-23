@@ -32,6 +32,7 @@ class Settings {
     double max_bias = 0.1;
     double min_bias = 0.0;
     double change_bias_mutation_rate = 0.6;
+    double module_activation_mutation_rate = 0.01;
     double adjustment_probability = 0.8;
     double activation_function_mutation_rate = 0.02;
   } neat;
@@ -43,7 +44,7 @@ class Settings {
     double color_compatibility = 0.1;
     double mutables_compatibility = 0.5;
     double compatibility_threshold = 2.0;
-    double compatibility_distance = 100.0;
+    double compatibility_distance = 400.0;
   } compatibility;
 
   struct EnvironmentSettings {
@@ -61,7 +62,7 @@ class Settings {
     double plant_nutritional_value = 0.5;
     double meat_nutritional_value = 1;
     double egg_nutritional_value = 1;
-    double egg_incubation_time_multiplier = 1.0;
+    double egg_incubation_time_multiplier = 0.1;
     double plant_proportion = 0.5; // PlantProportion + MeatProportion = 1
     double rot_factor = 0.03;
     double grid_cell_size = 50.0;
@@ -74,13 +75,14 @@ class Settings {
     double default_lifespan = 30;
     double photosynthesis_factor = 0.01;
     double frictional_coefficient = 0.15; // Needs to be less than 1
-    double maturity_age_multiplier = 0.2;
+    double maturity_age_multiplier = 0.1;
   } environment;
 
   struct EngineSettings {
     double fixed_update_interval = 0.05;
     double eps = 1e-7;
     size_t max_cells_to_find_food = 30;
+    double max_food_density_colored = 5e-4;
   } engine;
 
   struct PhysicalConstraintsSettings {
@@ -110,7 +112,8 @@ class Settings {
     double max_reproducing_age = 700;
     double mating_desire_max_prob = 0.05;
     double mating_desire_factor = 0.05;
-    double pregnancy_energy_factor = 0.7;
+    double pregnancy_energy_factor =
+        0.2;  // Causes the biggest change in number of creatures
     double pregnancy_velocity_factor = 0.5;
     double after_birth_velocity_factor = 1.5;
   } physical_constraints;

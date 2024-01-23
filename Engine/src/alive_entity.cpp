@@ -160,7 +160,7 @@ void AliveEntity::SetAge(double age) { age_ = age; }
  * @brief Updates the age of the AliveEntity.
  */
 
-void AliveEntity::UpdateAge() { age_ += 0.05; }
+void AliveEntity::UpdateAge(double delta_time) { age_ += delta_time; }
 
 /*!
  * @brief Retrieves the AliveEntity's genetic genome.

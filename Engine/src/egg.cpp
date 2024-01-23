@@ -1,4 +1,5 @@
 #include "egg.h"
+#include "settings.h"
 
 Egg::Egg(const GestatingEgg& gestating_egg,
          const std::pair<double, double>& coordinates)
@@ -21,13 +22,13 @@ void Egg::Update(double delta_time) {
   age_ += delta_time;
 
   Food::SetSize(age_ / incubation_time_ * AliveEntity::GetMutable().GetBabySize());
-  Food::SetNutritionalValue(settings::environment::kEggNutritionalValue *
+  Food::SetNutritionalValue(SETTINGS.environment.egg_nutritional_value *
                             Food::GetSize());
 }
 
 void Egg::Break() { AliveEntity::SetState(Dead); }
 
-Creature Egg::Hatch() {
+std::shared_ptr<Creature> Egg::Hatch() {
   if (AliveEntity::GetState() == Dead) {
     throw std::runtime_error("Cannot hatch a dead egg");
   }
@@ -35,9 +36,9 @@ Creature Egg::Hatch() {
     throw std::runtime_error("Cannot hatch an egg that has not incubated");
   }
 
-  Creature creature = Creature(genome_, mutable_);
+  std::shared_ptr<Creature> creature = std::make_shared<Creature>(genome_, mutable_);
   auto coordinates = Food::GetCoordinates();
-  creature.SetCoordinatesNoWrap(coordinates.first, coordinates.second);
-  creature.SetGeneration(generation_);
+  creature->SetCoordinatesNoWrap(coordinates.first, coordinates.second);
+  creature->SetGeneration(generation_);
   return creature;
 }

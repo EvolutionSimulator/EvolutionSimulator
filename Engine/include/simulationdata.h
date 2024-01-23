@@ -34,7 +34,7 @@ struct SimulationData {
 
   std::vector<std::shared_ptr<Creature>> creatures_;
   std::vector<std::shared_ptr<Food>> food_entities_;
-  std::vector<Egg> eggs_;
+  std::vector<std::shared_ptr<Egg>> eggs_;
   std::queue<std::shared_ptr<Creature>> reproduce_;
   std::queue<std::shared_ptr<Creature>> new_reproduce_;
 

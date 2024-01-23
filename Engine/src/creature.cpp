@@ -32,7 +32,7 @@ Creature::Creature(neat::Genome genome, Mutable mutables)
       FemaleReproductiveSystem(mutables),
       mating_desire_(false)
       {
-    int neural_inputs = settings::environment::kInputNeurons;
+    int neural_inputs = SETTINGS.environment.input_neurons;
     for (BrainModule module : genome.GetModules()){
         neural_inputs += module.GetInputNeuronIds().size();
     }
@@ -98,7 +98,7 @@ void Creature::UpdateMatingDesire() {
 
 void Creature::AfterMate() {
   if (this->FemaleReproductiveSystem::IsPregnant()) {
-    SetEnergy(GetEnergy() - 0.7 * max_energy_);
+    SetEnergy(GetEnergy() - SETTINGS.physical_constraints.pregnancy_energy_factor * max_energy_);
     SetVelocity(GetVelocity() *
                 SETTINGS.physical_constraints.pregnancy_velocity_factor);
   }
@@ -168,7 +168,7 @@ void Creature::Update(double deltaTime, double const kMapWidth,
   this->UpdateMatingDesire();
   this->FemaleReproductiveSystem::Update(deltaTime);
   this->MaleReproductiveSystem::Update(deltaTime);
-  this->UpdateAge();
+  this->UpdateAge(deltaTime);
 
   if (eating_cooldown_ <= 0) {
     eating_cooldown_ = 0.0;

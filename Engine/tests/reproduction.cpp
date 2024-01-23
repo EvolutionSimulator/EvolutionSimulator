@@ -29,7 +29,7 @@ TEST(ReproductionTest, SimulatePregnancy) {
   ASSERT_TRUE(female.FemaleReproductiveSystem::IsPregnant());
   ASSERT_TRUE(female.FemaleReproductiveSystem::CanBirth());
 
-  Egg egg =
+  std::shared_ptr<Egg> egg =
       female.FemaleReproductiveSystem::GiveBirth(female.GetCoordinates());
   ASSERT_FALSE(female.FemaleReproductiveSystem::IsPregnant());
   ASSERT_FALSE(female.FemaleReproductiveSystem::CanBirth());

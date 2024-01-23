@@ -5,7 +5,6 @@
 #include <memory>
 
 #include "alive_entity.h"
-#include "config.h"
 #include "digestive_system.h"
 #include "food.h"
 #include "movable_entity.h"
@@ -68,7 +67,8 @@ class Creature : virtual public MovableEntity,
 
  protected:
   int think_count_; /*! Keeps track so that creatures think every 5 loops */
-  bool mating_desire_; /*! Indicates whether creature currently wants to mate*/
+  bool mating_desire_; /*! Indicates whether creature currently wants to mate <-
+                        TO BE INTEGRATED INTO REPRODUCTIVE SYSTEM*/
 };
 
 std::vector<Food *> get_food_at_distance(

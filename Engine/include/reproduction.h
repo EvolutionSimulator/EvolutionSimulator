@@ -78,7 +78,7 @@ class FemaleReproductiveSystem : public ReproductiveSystem {
   virtual void Update(double delta_time) override;
   void MateWithMale(const Creature* const father, const Creature* const mother);
   bool CanBirth() const;
-  Egg GiveBirth(const std::pair<double, double>& coordinates);
+  std::shared_ptr<Egg> GiveBirth(const std::pair<double, double>& coordinates);
 
  protected:
   virtual double ReproductionCooldown(
