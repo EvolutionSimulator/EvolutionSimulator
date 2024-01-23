@@ -22,7 +22,7 @@ InfoPanel::InfoPanel(QSFMLCanvas* canvas, TextureManager *texture_manager, Simul
 
 }
 
-void InfoPanel::SetSelectedCreature(Creature* creature) {
+void InfoPanel::SetSelectedCreature(std::shared_ptr<Creature> creature) {
   selected_creature_ = creature;
 }
 
@@ -30,7 +30,7 @@ void InfoPanel::UpdateSelectedFood() {
   selected_food_ = selected_creature_->GetFoodID();
 }
 
-Creature* InfoPanel::GetSelectedCreature() const {
+std::shared_ptr<Creature> InfoPanel::GetSelectedCreature() const {
   return selected_creature_;
 }
 

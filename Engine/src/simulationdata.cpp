@@ -37,10 +37,10 @@ void SimulationData::UpdateStatistics() {
     double average_size = 0.0;
     double average_energy = 0.0;
     double average_velocity = 0.0;
-    for (const Creature& creature : creatures_) {
-      average_size += creature.GetSize();
-      average_energy += creature.GetEnergy();
-      average_velocity += creature.GetVelocity();
+    for (const auto creature : creatures_) {
+      average_size += creature->GetSize();
+      average_energy += creature->GetEnergy();
+      average_velocity += creature->GetVelocity();
     }
     average_size /= creatures_.size();
     average_energy /= creatures_.size();

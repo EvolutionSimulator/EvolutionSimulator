@@ -30,15 +30,15 @@ Creature::Creature(neat::Genome genome, Mutable mutables)
       DigestiveSystem(genome, mutables),
       MaleReproductiveSystem(mutables),
       FemaleReproductiveSystem(mutables),
-      mating_desire_(false) {
-  size_ = mutables.GetBabySize();
-  health_ = mutables.GetIntegrity() * pow(size_, 2);
-  energy_ = mutables.GetEnergyDensity() * pow(size_, 2);
-  int neural_inputs = settings::environment::kInputNeurons;
-  for (BrainModule module : genome.GetModules()) {
-    neural_inputs += module.GetInputNeuronIds().size();
-  }
-  neuron_data_ = std::vector<double>(neural_inputs, 0.0);
+      mating_desire_(false)
+      {
+    int neural_inputs = settings::environment::kInputNeurons;
+    for (BrainModule module : genome.GetModules()){
+        neural_inputs += module.GetInputNeuronIds().size();
+    }
+    neuron_data_ = std::vector<double>(neural_inputs, 0.0);
+    think_count_ = this->GetID();
+    color_hue_ = mutables.GetColor();
 }
 
 /*!
@@ -154,7 +154,7 @@ bool Creature::Compatible(const Creature &other_creature) {
  */
 void Creature::Update(double deltaTime, double const kMapWidth,
                       double const kMapHeight,
-                      std::vector<std::vector<std::vector<Entity *>>> &grid,
+                      std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
                       double GridCellSize, double frictional_coefficient) {
   this->frictional_coefficient_ = frictional_coefficient;
   this->UpdateMaxEnergy();
@@ -164,6 +164,7 @@ void Creature::Update(double deltaTime, double const kMapWidth,
   this->Rotate(deltaTime);
   this->Think(grid, GridCellSize, deltaTime, kMapWidth, kMapHeight);
   this->Digest(deltaTime);
+  this->Grow(energy_*deltaTime/1000);
   this->UpdateMatingDesire();
   this->FemaleReproductiveSystem::Update(deltaTime);
   this->MaleReproductiveSystem::Update(deltaTime);
@@ -212,19 +213,18 @@ void Creature::OnCollision(Entity &other_entity, double const kMapWidth,
  * @param grid The environmental grid.
  * @param GridCellSize Size of each cell in the grid.
  */
-void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
-                     double GridCellSize, double deltaTime, double width,
-                     double height) {
+void Creature::Think(std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
+                     double GridCellSize, double deltaTime, double width, double height) {
   // Not pretty but we'll figure out a better way in the future
 
-  think_count++;
-  if (think_count % 5 != 0) {
-    return;
+  think_count_++;
+  if (think_count_ % 5 != 0){
+      return;
   }
-  think_count = 0;
+  think_count_ = 0;
   // To allow creatures to use a module it should be included below
   ProcessVisionFood(grid, GridCellSize, width, height);
-
+  if (neuron_data_.size() == 0) return;
   neuron_data_.at(0) = 1;
   neuron_data_.at(1) = energy_;
   neuron_data_.at(2) = GetVelocity();
@@ -250,13 +250,15 @@ void Creature::Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
   std::vector<double> output = brain_.Activate(neuron_data_);
   SetAcceleration(std::tanh(output.at(0)) * mutable_.GetMaxForce());
   SetAccelerationAngle(std::tanh(output.at(1)) * M_PI);
-  SetRotationalAcceleration(std::tanh(output.at(2)) * mutable_.GetMaxForce());
-  Grow(std::max(std::tanh(output.at(3)) * deltaTime, 0.0));
+  SetRotationalAcceleration(std::tanh(output.at(2))*mutable_.GetMaxForce());
+  // Grow(std::max(std::tanh(output.at(3)) * deltaTime, 0.0));
   AddAcid(std::max(std::tanh(output.at(4)) * 10.0, 0.0));
-  biting_ = std::tanh(output.at(5)) > 0 ? 0 : 1;
+  biting_ = std::tanh(output.at(5)) > 0 ? 1 : 0;
 
-  for (BrainModule &module : GetGenome().GetModules()) {
-    // No module with outputs atm but they should be used as with the input
+
+
+  for (BrainModule& module : GetGenome().GetModules()){
+     //No module with outputs atm but they should be used as with the input
   }
 }
 

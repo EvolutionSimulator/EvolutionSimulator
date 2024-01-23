@@ -18,7 +18,7 @@ class SimulationCanvas : public QSFMLCanvas {
   void SetSimulation(Simulation* simulation);
   Simulation* GetSimulation();
 
-  void UpdateFoodDensityTexture(double width, double height);
+  void UpdateFoodDensityTexture(SimulationData& data);
 
   InfoPanel& GetInfoPanel();
 
@@ -33,7 +33,7 @@ class SimulationCanvas : public QSFMLCanvas {
  private:
   Simulation* simulation_ = nullptr;
   virtual void OnInit() override;
-  virtual void OnUpdate() override;
+  void OnUpdate();
 
   // Rendering logic
   void RenderSimulation(DataAccessor<SimulationData> data);

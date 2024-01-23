@@ -2,6 +2,7 @@
 #include <queue>
 #include <unordered_map>
 #include <vector>
+#include <memory>
 
 #include "creature.h"
 #include "egg.h"
@@ -22,7 +23,7 @@ struct SimulationData {
 
   Environment GetEnvironment();
   void SetEnvironment(Environment& environment);
-  std::vector<std::vector<std::vector<Entity*>>> GetGrid();
+  std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> GetGrid();
 
   void UpdateStatistics();
 
@@ -31,13 +32,11 @@ struct SimulationData {
   std::vector<double> GetCreatureEnergyOverTime() const;
   std::vector<double> GetCreatureVelocityOverTime() const;
 
-  std::vector<Creature> creatures_;
-  std::vector<Food> food_entities_;
+  std::vector<std::shared_ptr<Creature>> creatures_;
+  std::vector<std::shared_ptr<Food>> food_entities_;
   std::vector<Egg> eggs_;
-  std::queue<int>
-      reproduce_;  // Stores indices of creatures that are ready to reproduce
-  std::queue<int> new_reproduce_;  // Stores indices of creatures that are ready
-                                   // to reproduce
+  std::queue<std::shared_ptr<Creature>> reproduce_;
+  std::queue<std::shared_ptr<Creature>> new_reproduce_;
 
   double world_time_ = 0;
 

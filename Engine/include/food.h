@@ -22,6 +22,8 @@ class Food : public Entity {
   int GetLifespan() const;
   type GetType() const;
 
+  virtual void Update(double deltaTime);
+
  protected:
   Food::type type_;
   double nutritional_value_; /*!< Nutritional value per size unit of the Food. (depends on food type) */
@@ -34,7 +36,7 @@ class Plant : public Food {
   Plant(const double x_coord, const double y_coord);
   Plant(const double x_coord, const double y_coord, const double size);
   Plant(const double size);
-  void Grow(double deltaTime);
+  virtual void Update(double deltaTime) override;
 
  protected:
   double age_ = 0.0; /*!< Age of the Plant in simulation time units. */
@@ -46,7 +48,7 @@ class Meat : public Food {
   Meat(const double x_coord, const double y_coord);
   Meat(const double x_coord, const double y_coord, const double size);
   Meat(const double size);
-  void Rot();
+  virtual void Update(double deltaTime) override;
 };
 
 #endif  // FOOD_H

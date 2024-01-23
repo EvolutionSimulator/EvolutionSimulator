@@ -96,7 +96,9 @@ std::vector<double> NeuralNetwork::Activate(
   for (FeedForwardNeuron &ffneuron : ffneurons_) {
     // ffneuron.value = 0;
     for (const NeuronInput &neuron_input : ffneuron.inputs_from_cycles) {
-      ffneuron.value += neuron_input.weight * values[neuron_input.input_id];
+        if (abs(values[neuron_input.input_id]) > 1e10) continue;
+        ffneuron.value += neuron_input.weight * values[neuron_input.input_id];
+
     }
   }
   std::vector<double> result;

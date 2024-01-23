@@ -15,6 +15,8 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui_(new Ui::MainWindow), lastRecordedTime_(0.0) {
   ui_->setupUi(this);
 
+  ui_->canvas->SetRefreshInterval(1000.0 / 60);
+
   InitializeEngine();
   PauseSimulation();
   RunSimulation();
@@ -43,7 +45,7 @@ void MainWindow::InitializeEngine()
     int width = sf::VideoMode::getDesktopMode().width;
     int height = sf::VideoMode::getDesktopMode().height;
     engine_ = new Engine(width, height);
-    // engine_->SetSpeed(10);
+    engine_->SetSpeed(100);
     ui_->canvas->SetSimulation(engine_->GetSimulation());
   }
 
@@ -57,8 +59,7 @@ void MainWindow::InitializeEngine()
   auto data = engine_->GetSimulation()->GetSimulationData();
 
   data->GetEnvironment().SetFoodDensity(food_density_function); // Update the density
-  ui_->canvas->UpdateFoodDensityTexture(engine_->GetEnvironment().GetMapWidth(),
-                                        engine_->GetEnvironment().GetMapHeight());
+  ui_->canvas->UpdateFoodDensityTexture(*data);
 }
 
 

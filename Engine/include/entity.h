@@ -51,9 +51,13 @@ class Entity {
 
   int GetID() const;
 
+  float GetColor() const;
+  void SetColor(float value);
+
  protected:
   double x_coord_, y_coord_, orientation_, size_;
   states state_;
+  float color_hue_;
 
  private:
   static int next_id_;

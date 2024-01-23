@@ -2,6 +2,7 @@
 #define CREATURE_HPP
 
 #include <unordered_map>
+#include <memory>
 
 #include "alive_entity.h"
 #include "config.h"
@@ -44,33 +45,33 @@ class Creature : virtual public MovableEntity,
                  virtual public FemaleReproductiveSystem {
  public:
   Creature(neat::Genome genome, Mutable mutable_);
+  virtual ~Creature() override {}
 
   void UpdateEnergy(double deltaTime);
 
   void UpdateMatingDesire();
 
   void Update(double deltaTime, double const kMapWidth, double const kMapHeight,
-              std::vector<std::vector<std::vector<Entity *>>> &grid,
+              std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
               double GridCellSize, double frictional_coefficient);
 
   void OnCollision(Entity &other_entity, double const kMapWidth,
                    double const kMapHeight) override;
 
   void Grow(double energy);
-  void Think(std::vector<std::vector<std::vector<Entity *>>> &grid,
-             double GridCellSize, double deltaTime, double width,
-             double height);
-  bool Compatible(const Creature &other_creature);
+  void Think(std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
+             double GridCellSize, double deltaTime, double width, double height);
+  bool Compatible(const Creature& other_creature);
 
   bool GetMatingDesire() const;
   void AfterMate();
 
  protected:
-  int think_count;     /*! Keeps track so that creatures think every 5 loops */
+  int think_count_; /*! Keeps track so that creatures think every 5 loops */
   bool mating_desire_; /*! Indicates whether creature currently wants to mate*/
 };
 
 std::vector<Food *> get_food_at_distance(
-    std::vector<std::vector<std::vector<Entity *>>> &grid, int i_creature,
+    std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid, int i_creature,
     int j_creature, int grid_distance);
 #endif  // CREATURE_HPP

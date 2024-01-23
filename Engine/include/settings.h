@@ -54,26 +54,26 @@ class Settings {
     int max_creature_size = 15;
     double tolerance = 1e-3;
     double default_food_density = 0.005;
-    double food_spawn_rate = 1e-4;
+    double food_spawn_rate = 1e-5;
     double energy_to_health = 70.0;
     double health_to_energy = 10.0;
     double default_creature_density = 0.0001;
-    double plant_nutritional_value = 2.0;
-    double meat_nutritional_value = 3.0;
-    double egg_nutritional_value = 4.0;
+    double plant_nutritional_value = 0.5;
+    double meat_nutritional_value = 1;
+    double egg_nutritional_value = 1;
     double egg_incubation_time_multiplier = 1.0;
-    double plant_proportion = 0.5;  // PlantProportion + MeatProportion = 1
-    double rot_factor = 1.0;
+    double plant_proportion = 0.5; // PlantProportion + MeatProportion = 1
+    double rot_factor = 0.03;
     double grid_cell_size = 50.0;
     int min_creature_size = 2;
     double reproduction_threshold = 0.80;
     double reproduction_cooldown = 10;
     int input_neurons = 12;
     int output_neurons = 6;
-    double max_nutritional_value = 5;
+    double max_nutritional_value = 2;
     double default_lifespan = 30;
-    double photosynthesis_factor = 0.1;
-    double frictional_coefficient = 0.05;  // Needs to be less than 1
+    double photosynthesis_factor = 0.01;
+    double frictional_coefficient = 0.15; // Needs to be less than 1
     double maturity_age_multiplier = 0.2;
   } environment;
 
@@ -92,7 +92,7 @@ class Settings {
     double d_integrity = 3.0;
     double d_strafing_difficulty = 0.5;
     double d_max_size = 10;
-    double d_baby_size = 2;
+    double d_baby_size = 4;
     double d_max_force = 10;
     double d_growth_factor = 10;
     double d_vision_factor = 200;

@@ -14,7 +14,9 @@ int Entity::next_id_ = 0;
  * @brief Default constructor initializing an Entity at the origin with zero
  * size.
  */
-Entity::Entity() : x_coord_(0.0), y_coord_(0.0), size_(0.0), state_(Alive), orientation_(0), id_(next_id_++) {}
+Entity::Entity() : x_coord_(0.0), y_coord_(0.0),
+    size_(0.0), state_(Alive), orientation_(0),
+    id_(next_id_++), color_hue_(0) {}
 
 
 /*!
@@ -31,7 +33,8 @@ Entity::Entity(const double x_coord, const double y_coord, const double size)
       size_(size),
       orientation_(0),
       state_(Alive),
-      id_(next_id_++) {}
+      id_(next_id_++),
+      color_hue_(0) {}
 
 /*!
  * @brief Constructor to initialize an Entity with a specified size at the
@@ -44,12 +47,13 @@ Entity::Entity(const double size)
       size_(size),
       orientation_(0),
       state_(Alive),
-      id_(next_id_++) {}
+      id_(next_id_++),
+      color_hue_(0) {}
 
 /*!
  * @brief Destructor sets the state of the entity to Dead.
  */
-Entity::~Entity() { state_ = Dead; }
+Entity::~Entity() { }
 
 /*!
  * @brief Retrieves the size of the entity.
@@ -245,16 +249,14 @@ void Entity::OnCollision(Entity &other_entity, double const kMapWidth,
   double x_overlap = overlap * (x_coord_ - other_coordinates.first) / distance;
   double y_overlap = overlap * (y_coord_ - other_coordinates.second) / distance;
 
-  // If this entity is larger than the other entity, move the other entity
-  // Otherwise, move this entity
-  if (GetSize() > other_entity.GetSize()) {
-    other_entity.SetCoordinates(other_coordinates.first - x_overlap,
-                                other_coordinates.second - y_overlap, kMapWidth,
-                                kMapHeight);
-  } else {
-    SetCoordinates(x_coord_ + x_overlap, y_coord_ + y_overlap, kMapWidth,
-                   kMapHeight);
-  }
+  // Calculate how much should each entity move
+  double total_size = std::pow(size_, 2) + std::pow(other_size, 2);
+  this->SetCoordinates(x_coord_ + x_overlap*std::pow(size_, 2)/total_size,
+                       y_coord_ + y_overlap*std::pow(size_, 2)/total_size,
+                       kMapWidth, kMapHeight);
+  other_entity.SetCoordinates(other_coordinates.first - x_overlap*std::pow(other_size, 2)/total_size,
+                              other_coordinates.second - y_overlap*std::pow(other_size, 2)/total_size,
+                              kMapWidth, kMapHeight);
 
   // Assert that the entities are no longer overlapping
   // assert(size_ + other_size - GetDistance(other_entity, kMapWidth,
@@ -263,4 +265,12 @@ void Entity::OnCollision(Entity &other_entity, double const kMapWidth,
 
 int Entity::GetID() const {
   return id_;
+}
+
+float Entity::GetColor() const {
+  return color_hue_;
+}
+
+void Entity::SetColor(float value){
+  color_hue_ = fmod(value, 360);
 }

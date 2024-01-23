@@ -1,28 +1,10 @@
-#include "../include/creature_manager.h"
+#include "creature_manager.h"
 
 #include "settings.h"
 
+#include <omp.h>
+
 CreatureManager::CreatureManager() {}
-
-/*!
- * @brief Modifies the positions of all creatures in the simulation.
- *
- * @param delta_x The change in x-coordinate for each creature.
- * @param delta_y The change in y-coordinate for each creature.
- */
-
-void CreatureManager::ModifyAllCreatures(SimulationData& data, double delta_x,
-                                         double delta_y) {
-  std::pair<double, double> coordinates;
-  for (Creature& creature : data.creatures_) {
-    coordinates = creature.GetCoordinates();
-    coordinates.first = coordinates.first + delta_x;
-    coordinates.second = coordinates.second + delta_y;
-    creature.SetCoordinates(coordinates.first, coordinates.second,
-                            SETTINGS.environment.map_width,
-                            SETTINGS.environment.map_height);
-  }
-}
 
 /*!
  * @brief Updates the state of all creatures for a given time interval.
@@ -39,24 +21,35 @@ void CreatureManager::UpdateAllCreatures(SimulationData& data,
   for (Egg& egg : data.eggs_) {
     egg.Update(deltaTime);
   }
+  // Vector to store thread-local reproduce lists
+  std::vector<std::vector<std::shared_ptr<Creature>>> local_reproduce_lists(omp_get_max_threads());
 
-  for (int creature_index = 0; creature_index < data.creatures_.size();
-       creature_index++) {
-    Creature& creature = data.creatures_[creature_index];
-    creature.Update(deltaTime, SETTINGS.environment.map_width,
-                    SETTINGS.environment.map_height, grid,
-                    SETTINGS.environment.grid_cell_size,
-                    environment.GetFrictionalCoefficient());
-    if (creature.GetMatingDesire()) {
-      data.new_reproduce_.push(creature_index);
+  #pragma omp parallel for
+  for (int i = 0; i < data.creatures_.size(); ++i) {
+    auto& creature = data.creatures_[i];
+    creature->Update(deltaTime, SETTINGS.environment.map_width,
+                     SETTINGS.environment.map_height, grid,
+                     SETTINGS.environment.grid_cell_size,
+                     environment.GetFrictionalCoefficient());
+
+    if (creature->GetMatingDesire()) {
+      int thread_id = omp_get_thread_num();
+      local_reproduce_lists[thread_id].push_back(creature);
     }
-    if (creature.FemaleReproductiveSystem::CanBirth()) {
-      data.eggs_.push_back(creature.FemaleReproductiveSystem::GiveBirth(
-          creature.GetCoordinates()));
-      creature.SetVelocity(
-          creature.GetVelocity() *
+
+    if (creature->FemaleReproductiveSystem::CanBirth()) {
+      data.eggs_.push_back(creature->FemaleReproductiveSystem::GiveBirth(
+          creature->GetCoordinates()));
+      creature->SetVelocity(
+          creature->GetVelocity() *
           SETTINGS.physical_constraints.after_birth_velocity_factor);
     }
+  }
+
+  // Merge thread-local lists into the global reproduce list
+  for (auto &list : local_reproduce_lists) {
+    for (auto &creature : list) {
+      data.new_reproduce_.push(creature);
   }
 }
 
@@ -84,26 +77,24 @@ void CreatureManager::ReproduceCreatures(SimulationData& data,
   double max_creature_size = settings::environment::kMaxCreatureSize;
   double min_creature_size = settings::environment::kMinCreatureSize;
 
-  std::queue<int> not_reproduced;
-  std::queue<int> temp_queue;
+  std::queue<std::shared_ptr<Creature>> not_reproduced;
+  std::queue<std::shared_ptr<Creature>> temp_queue;
 
   while (!data.reproduce_.empty()) {
-    int creature1_index = data.reproduce_.front();
-    Creature& creature1 = data.creatures_[creature1_index];
+    auto creature1 = data.reproduce_.front();
     data.reproduce_.pop();
     bool paired = false;
 
     // Attempt to pair creature1 with a compatible new creature
     while (!data.new_reproduce_.empty() && !paired) {
-      int creature2_index = data.new_reproduce_.front();
-      Creature& creature2 = data.creatures_[creature2_index];
+      auto creature2 = data.new_reproduce_.front();
       data.new_reproduce_.pop();
-      // If these two creatures are compatible reproduce them otherwise
-      // save the creature in a temporary queue for the next pairing round
-      if (creature1.Compatible(creature2) and
-          creature1.MaleReproductiveSystem::ReadyToProcreate() and
-          creature2.FemaleReproductiveSystem::ReadyToProcreate()) {
-        ReproduceTwoCreatures(data, creature1, creature2);
+      //If these two creatures are compatible reproduce them otherwise
+      //save the creature in a temporary queue for the next pairing round
+      if (creature1->Compatible(*creature2) and
+          creature1->MaleReproductiveSystem::ReadyToProcreate() and
+          creature2->FemaleReproductiveSystem::ReadyToProcreate()) {
+        ReproduceTwoCreatures(data, *creature1, *creature2);
         paired = true;
       } else {
         temp_queue.push(creature2_index);  // Save for next round
@@ -176,9 +167,9 @@ void CreatureManager::InitializeCreatures(SimulationData& data,
         for (int i = 0; i < 40; i++) {
           mutables.Mutate();
         }
-        Creature new_creature(genome, mutables);
-        new_creature.RandomInitialization(world_width, world_height);
-        data.creatures_.emplace_back(new_creature);
+        std::shared_ptr<Creature> new_creature = std::make_shared<Creature>(genome, mutables);
+        new_creature->RandomInitialization(world_width, world_height);
+        data.creatures_.push_back(new_creature);
       }
     }
   }

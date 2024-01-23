@@ -8,10 +8,10 @@ AliveEntity::AliveEntity(neat::Genome genome, Mutable mutables)
       brain_(neat::NeuralNetwork(genome)),
       genome_(genome),
       neuron_data_(SETTINGS.environment.input_neurons, 0),
-      age_(0) {
-  size_ = mutables.GetBabySize();
-  health_ = mutables.GetIntegrity() * pow(size_, 2);
-  energy_ = mutables.GetEnergyDensity() * pow(size_, 2);
+      age_(0){
+    size_ = mutables.GetBabySize();
+    health_ = mutables.GetIntegrity() * pow(size_, 2)/2;
+    energy_ = mutables.GetEnergyDensity() * pow(size_, 2) /2;
 }
 
 /*!
@@ -136,7 +136,7 @@ void AliveEntity::SetMaxEnergy(double max_energy) { max_energy_ = max_energy; };
  * @param max_energy The desired maximum energy level.
  */
 void AliveEntity::UpdateMaxEnergy() {
-  max_energy_ = mutable_.GetEnergyDensity() * pow(size_, 2) * (1 - age_ / 1000);
+  max_energy_ = mutable_.GetEnergyDensity() * pow(size_, 2) * std::exp(-age_/50);
 }
 
 /*!

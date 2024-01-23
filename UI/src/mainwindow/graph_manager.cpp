@@ -21,28 +21,28 @@ void GraphManager::SetEngine(Engine* engine)
 }
 
 void GraphManager::DrawCreaturesOverTimeGraph() {
-  auto data = engine_->GetSimulation()->GetSimulationData()->GetCreatureCountOverTime();
-  DrawGraph(data, "Number of Creatures in the Simulation");
+  auto data = engine_->GetSimulation()->GetSimulationData();
+  DrawGraph(data->GetCreatureCountOverTime(), "Number of Creatures in the Simulation");
 }
 
 void GraphManager::DrawCreaturesSizeOverTimeGraph() {
-  auto data = engine_->GetSimulation()->GetSimulationData()->GetCreatureSizeOverTime();
-  DrawGraph(data, "Average Size of Creatures in the Simulation");
+  auto data = engine_->GetSimulation()->GetSimulationData();
+  DrawGraph(data->GetCreatureSizeOverTime(), "Average Size of Creatures in the Simulation");
 }
 
 void GraphManager::DrawCreaturesEnergyOverTimeGraph() {
-  auto data = engine_->GetSimulation()->GetSimulationData()->GetCreatureEnergyOverTime();
-  DrawGraph(data, "Average Energy of Creatures in the Simulation");
+  auto data = engine_->GetSimulation()->GetSimulationData();
+  DrawGraph(data->GetCreatureEnergyOverTime(), "Average Energy of Creatures in the Simulation");
 }
 
 void GraphManager::DrawCreaturesVelocityOverTimeGraph() {
-  auto data = engine_->GetSimulation()->GetSimulationData()->GetCreatureVelocityOverTime();
-  DrawGraph(data, "Average Velocity of Creatures in the Simulation");
+  auto data = engine_->GetSimulation()->GetSimulationData();
+  DrawGraph(data->GetCreatureVelocityOverTime(), "Average Velocity of Creatures in the Simulation");
 }
 
 void GraphManager::DrawSizeEnergyScatterplot() {
   auto& infoPanel = simulationCanvas_->GetInfoPanel();
-  Creature* selectedCreature = infoPanel.GetSelectedCreature();
+  auto selectedCreature = infoPanel.GetSelectedCreature();
 
   auto data = engine_->GetSimulation()->GetSimulationData();
 
@@ -51,11 +51,11 @@ void GraphManager::DrawSizeEnergyScatterplot() {
   std::vector<double> energies;
 
   for (const auto& creature : data->creatures_) {
-      float creatureSize = creature.GetSize();
-      float creatureEnergy = creature.GetEnergy();
+      float creatureSize = creature->GetSize();
+      float creatureEnergy = creature->GetEnergy();
 
       // Check if the creature is selected
-      if (selectedCreature && creature.GetID() == selectedCreature->GetID()) {
+      if (selectedCreature && creature->GetID() == selectedCreature->GetID()) {
           // If selected, make size and energy negative
           sizes.push_back(-creatureSize);
           energies.push_back(-creatureEnergy);
@@ -72,7 +72,7 @@ void GraphManager::DrawSizeEnergyScatterplot() {
 
 void GraphManager::DrawSizeVelocityScatterplot() {
   auto& infoPanel = simulationCanvas_->GetInfoPanel();
-  Creature* selectedCreature = infoPanel.GetSelectedCreature();
+  auto selectedCreature = infoPanel.GetSelectedCreature();
 
   auto data = engine_->GetSimulation()->GetSimulationData();
 
@@ -81,11 +81,11 @@ void GraphManager::DrawSizeVelocityScatterplot() {
   std::vector<double> velocities;
 
   for (const auto& creature : data->creatures_) {
-      float creatureSize = creature.GetSize();
-      float creatureVelocity = creature.GetVelocity();
+      float creatureSize = creature->GetSize();
+      float creatureVelocity = creature->GetVelocity();
 
       // Check if the creature is selected
-      if (selectedCreature && creature.GetID() == selectedCreature->GetID()) {
+      if (selectedCreature && creature->GetID() == selectedCreature->GetID()) {
           // If selected, make size and velocity negative
           sizes.push_back(-creatureSize);
           velocities.push_back(-creatureVelocity);
@@ -102,7 +102,7 @@ void GraphManager::DrawSizeVelocityScatterplot() {
 
 void GraphManager::DrawEnergyVelocityScatterplot() {
   auto& infoPanel = simulationCanvas_->GetInfoPanel();
-  Creature* selectedCreature = infoPanel.GetSelectedCreature();
+  auto selectedCreature = infoPanel.GetSelectedCreature();
 
   auto data = engine_->GetSimulation()->GetSimulationData();
 
@@ -111,11 +111,11 @@ void GraphManager::DrawEnergyVelocityScatterplot() {
   std::vector<double> velocities;
 
   for (const auto& creature : data->creatures_) {
-      float creatureEnergy = creature.GetEnergy();
-      float creatureVelocity = creature.GetVelocity();
+      float creatureEnergy = creature->GetEnergy();
+      float creatureVelocity = creature->GetVelocity();
 
       // Check if the creature is selected
-      if (selectedCreature && creature.GetID() == selectedCreature->GetID()) {
+      if (selectedCreature && creature->GetID() == selectedCreature->GetID()) {
           // If selected, make size and velocity negative
           energies.push_back(-creatureEnergy);
           velocities.push_back(-creatureVelocity);

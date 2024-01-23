@@ -1,6 +1,7 @@
 #include "collision_functions.h"
 
 #include <cmath>
+#include <assert.h>
 
 #include "geometry_primitives.h"
 #include "settings.h"
@@ -30,8 +31,8 @@
  */
 double EuclideanDistance(const std::pair<double, double>& point1,
                          const std::pair<double, double>& point2) {
-  return std::sqrt(std::pow(point1.first - point2.first, 2) +
-                   std::pow(point1.second - point2.second, 2));
+  return std::sqrt(std::abs(std::pow(point1.first - point2.first, 2) +
+                   std::pow(point1.second - point2.second, 2)));
 }
 
 /*!
@@ -60,8 +61,9 @@ double ShortestDistancePointLineSegment(
              linePoint1.first * linePoint2.second;
 
   // Calculate the distance using the formula for an infinite line
+  assert(std::abs(A*A + B*B) != 0);
   double dist = std::fabs(A * point.first + B * point.second + C) /
-                std::sqrt(A * A + B * B);
+                std::sqrt(std::abs(A * A + B * B));
 
   // Calculate the squared length of the line segment
   double lineSegmentLengthSquared = EuclideanDistance(linePoint1, linePoint2) *

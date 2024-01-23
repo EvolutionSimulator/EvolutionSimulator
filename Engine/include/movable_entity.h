@@ -6,6 +6,7 @@
 class MovableEntity : virtual public Entity {
  public:
   MovableEntity();
+  virtual ~MovableEntity() override {}
 
   double GetAcceleration() const;
   double GetAccelerationAngle()
@@ -35,7 +36,7 @@ class MovableEntity : virtual public Entity {
   void Rotate(double deltaTime);
 
   virtual void OnCollision(Entity &other_entity, double const kMapWidth,
-                           double const kMapHeight);
+                           double const kMapHeight) override;
 
  protected:
   double acceleration_, acceleration_angle_, rotational_acceleration_;
