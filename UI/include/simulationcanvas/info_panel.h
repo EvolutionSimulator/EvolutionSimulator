@@ -28,6 +28,7 @@ public:
 
   void SetUIView(sf::View view);
   void SetPanelView(sf::View view);
+  void SetOffset(float offset_x, float offset_y);
 
 private:
   QSFMLCanvas* canvas_;
@@ -42,5 +43,8 @@ private:
 
   sf::View ui_view_;
   sf::View info_panel_view_;
+
+  float offset_x_;
+  float offset_y_;
 };
 #endif // INFO_PANEL_H

@@ -339,6 +339,11 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
 
   // Needed for differentiating clicking and dragging
   initialClickPosition = mousePos;
+
+  sf::Vector2f warpedMousePos;
+  warpedMousePos.x = fmod(mousePos.x + static_cast<float>(SETTINGS.environment.map_width), static_cast<float>(SETTINGS.environment.map_width));
+  warpedMousePos.y = fmod(mousePos.y + static_cast<float>(SETTINGS.environment.map_height), static_cast<float>(SETTINGS.environment.map_height));
+
   isClicking = true;
 
   qDebug() << "Mouse Pressed at: " << mousePos.x << ", " << mousePos.y;
@@ -351,10 +356,11 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
     float creatureSize = creature->GetSize();
     sf::Vector2f creaturePos(creatureX, creatureY);
 
-    if (sqrt(pow(mousePos.x - creaturePos.x, 2) + pow(mousePos.y - creaturePos.y, 2)) <= creatureSize) {
+    if (sqrt(pow(warpedMousePos.x - creaturePos.x, 2) + pow(warpedMousePos.y - creaturePos.y, 2)) <= creatureSize) {
       qDebug() << "Creature Clicked: ID" << creature->GetID();
       info_panel_.Show();
       info_panel_.SetSelectedCreature(creature);
+      info_panel_.SetOffset(mousePos.x - warpedMousePos.x, mousePos.y - warpedMousePos.y);
       repaint();
       return;
     }

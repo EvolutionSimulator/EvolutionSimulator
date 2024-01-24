@@ -26,7 +26,12 @@ void InfoPanel::SetUIView(sf::View view){ ui_view_ = view;}
 
 void InfoPanel::SetPanelView(sf::View view){ info_panel_view_ = view;}
 
-void InfoPanel::SetSelectedCreature(std::shared_ptr<Creature> creature) {selected_creature_ = creature;}
+
+void InfoPanel::SetOffset(float offset_x, float offset_y) {offset_x_ = offset_x; offset_y_ = offset_y; };
+
+void InfoPanel::SetSelectedCreature(std::shared_ptr<Creature> creature) {
+  selected_creature_ = creature;
+}
 
 void InfoPanel::UpdateSelectedFood() {closest_entity_ = selected_creature_->GetFoodID();}
 
@@ -165,6 +170,9 @@ void InfoPanel::DrawPanel(sf::RenderTarget& target) {
   redCircle.setOutlineColor(sf::Color::Red);
   redCircle.setOutlineThickness((*selected_creature_).GetSize()/5); // Adjust thickness as needed
   redCircle.setFillColor(sf::Color::Transparent);
+  redCircle.setPosition((*selected_creature_).GetCoordinates().first - (*selected_creature_).GetSize() + offset_x_,
+                        (*selected_creature_).GetCoordinates().second - (*selected_creature_).GetSize() + offset_y_);
+  target.draw(redCircle);
   redCircle.setPosition((*selected_creature_).GetCoordinates().first - (*selected_creature_).GetSize(),
                         (*selected_creature_).GetCoordinates().second - (*selected_creature_).GetSize());
   target.draw(redCircle);
@@ -182,8 +190,12 @@ void InfoPanel::DrawPanel(sf::RenderTarget& target) {
     blueCircle.setOutlineColor(sf::Color::Blue);
     blueCircle.setOutlineThickness(2); // Adjust thickness as needed
     blueCircle.setFillColor(sf::Color::Transparent);
+
     blueCircle.setPosition(closest_entity_->GetCoordinates().first - closest_entity_->GetSize(),
                            closest_entity_->GetCoordinates().second - closest_entity_->GetSize());
+    target.draw(blueCircle);
+    blueCircle.setPosition(closest_entity_->GetCoordinates().first - closest_entity_->GetSize() + offset_x_,
+                           closest_entity_->GetCoordinates().second - closest_entity_->GetSize() + offset_y_);
     target.draw(blueCircle);
   }
 
@@ -203,6 +215,8 @@ void InfoPanel::DrawVisionCone(sf::RenderTarget& target, const Creature &creatur
   double rightRad = creatureOrientation + visionAngle / 2.0;
 
   auto [creatureX, creatureY] = creature.GetCoordinates();
+  creatureX += offset_x_;
+  creatureY += offset_y_;
 
   std::vector<sf::Vertex> triangleFan;
   triangleFan.push_back(sf::Vertex(sf::Vector2f(creatureX, creatureY), sf::Color::Transparent));
