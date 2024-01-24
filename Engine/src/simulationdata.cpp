@@ -207,6 +207,7 @@ void SimulationData::WriteDataToFile() {
 
         simulation_json["creatures"] += creature_entry;
     }
+    WriteSimulation << simulation_json.dump(4);
 }
 
 void SimulationData::RetrieveDataFromFile() {
