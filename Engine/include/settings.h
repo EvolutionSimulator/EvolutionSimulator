@@ -75,7 +75,7 @@ class Settings {
     double default_lifespan = 30;
     double photosynthesis_factor = 0.01;
     double frictional_coefficient = 0.15; // Needs to be less than 1
-    double maturity_age_multiplier = 2;
+    double maturity_age_multiplier = 0.1;
     double male_reproduction_cost = 0.75;
     double pregnancy_hardship_modifier = 2; //1 for normal behavior do not make it 0
   } environment;
@@ -118,7 +118,7 @@ class Settings {
         0.2;  // Causes the biggest change in number of creatures
     double pregnancy_velocity_factor = 0.5; //Not used currently
     double after_birth_velocity_factor = 1.5; //Not used currently
-    double d_bite_damage_ratio = 1.0;
+    double d_bite_damage_ratio = 0.1;
     double d_bite_energy_consumption_ratio = 0.01;
     double d_bite_nutritional_value = 1.0;
     double d_eating_speed = 0.6;

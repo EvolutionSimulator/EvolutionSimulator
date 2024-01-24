@@ -64,15 +64,16 @@ void CreatureManager::UpdateAllCreatures(SimulationData& data,
 }
 
 void CreatureManager::HatchEggs(SimulationData& data, Environment& environment) {
-  data.eggs_.erase(std::remove_if(data.eggs_.begin(), data.eggs_.end(), [this, &data](std::shared_ptr<Egg>& egg) {
-    if (egg->GetAge() >= egg->GetIncubationTime()) {
-      std::shared_ptr<Creature> new_creature = egg->Hatch();
-      std::cerr << "Hatched creature" << std::endl;
-      data.creatures_.push_back(new_creature);
-      return true;
-    }
-    return false;
-  }), data.eggs_.end());
+  for (auto& egg : data.eggs_) {
+      if (egg->GetAge() >= egg->GetIncubationTime()){
+          std::shared_ptr<Creature> new_creature = egg->Hatch();
+          std::cerr << "Hatched creature" << std::endl;
+          data.creatures_.push_back(new_creature);
+          egg->SetState(Entity::Dead);
+      }
+  }
+  data.eggs_.erase(std::remove_if(data.eggs_.begin(), data.eggs_.end(), [](auto& egg) {
+      return egg->GetState() == Entity::Dead;}), data.eggs_.end());
 }
 
 /*!

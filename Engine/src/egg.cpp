@@ -3,11 +3,10 @@
 
 Egg::Egg(const GestatingEgg& gestating_egg,
          const std::pair<double, double>& coordinates)
-    : Food(coordinates.first, coordinates.second, 0, 0),
+    : Entity(coordinates.first, coordinates.second, 0),
       AliveEntity(gestating_egg.genome, gestating_egg.mutables),
       generation_(gestating_egg.generation),
       incubation_time_(gestating_egg.incubation_time) {
-  type_ = egg;
   age_ = gestating_egg.age;
   Update(0);
 }
@@ -21,9 +20,9 @@ void Egg::Update(double delta_time) {
 
   age_ += delta_time;
 
-  Food::SetSize(age_ / incubation_time_ * AliveEntity::GetMutable().GetBabySize());
-  Food::SetNutritionalValue(SETTINGS.environment.egg_nutritional_value *
-                            Food::GetSize());
+  SetSize(age_ / incubation_time_ * AliveEntity::GetMutable().GetBabySize());
+  SetNutritionalValue(SETTINGS.environment.egg_nutritional_value *
+                            GetSize());
 }
 
 void Egg::Break() { AliveEntity::SetState(Dead); }
@@ -37,7 +36,7 @@ std::shared_ptr<Creature> Egg::Hatch() {
   }
 
   std::shared_ptr<Creature> creature = std::make_shared<Creature>(genome_, mutable_);
-  auto coordinates = Food::GetCoordinates();
+  auto coordinates = GetCoordinates();
   creature->SetCoordinatesNoWrap(coordinates.first, coordinates.second);
   creature->SetGeneration(generation_);
   return creature;
