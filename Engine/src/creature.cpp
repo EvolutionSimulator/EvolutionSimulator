@@ -103,7 +103,10 @@ void Creature::UpdateMatingDesire() {
   double min_reproducing_age =
       std::min(this->MaleReproductiveSystem::GetMaturityAge(),
                this->FemaleReproductiveSystem::GetMaturityAge());
-
+  if (energy_ < std::max(mutable_.GetEnergyDensity() * pow(size_, 2) * 0.25, max_energy_ * 0.6)) {
+      mating_desire_ = false; //To avoid creatures that just reproduce
+      return;
+  }
   double probability =
       1 - (this->GetAge() - min_reproducing_age) /
               (SETTINGS.physical_constraints.max_reproducing_age -
@@ -177,7 +180,7 @@ void Creature::Update(double deltaTime, double const kMapWidth,
   this->Rotate(deltaTime);  //, kMapWidth, kMapHeight);
   this->Think(grid, GridCellSize, deltaTime, kMapWidth, kMapHeight);
   this->Digest(deltaTime);
-  this->Grow(energy_*deltaTime/1000);
+  this->Grow(energy_/(1 + max_energy_) * deltaTime / 100);
   this->UpdateMatingDesire();
   this->FemaleReproductiveSystem::Update(deltaTime);
   this->MaleReproductiveSystem::Update(deltaTime);

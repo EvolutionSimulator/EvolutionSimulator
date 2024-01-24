@@ -54,7 +54,7 @@ class Settings {
     int max_food_size = 15;  // Influences vision
     int max_creature_size = 15;
     double tolerance = 1e-3;
-    double default_food_density = 0.005;
+    double default_food_density = 0.015;
     double food_spawn_rate = 1e-5;
     double energy_to_health = 70.0;
     double health_to_energy = 10.0;
@@ -76,7 +76,7 @@ class Settings {
     double photosynthesis_factor = 0.01;
     double frictional_coefficient = 0.15; // Needs to be less than 1
     double maturity_age_multiplier = 0.1;
-    double male_reproduction_cost = 0.75;
+    double male_reproduction_cost = 0.5;
     double pregnancy_hardship_modifier = 2; //1 for normal behavior do not make it 0
   } environment;
 
@@ -90,9 +90,9 @@ class Settings {
   struct PhysicalConstraintsSettings {
     double mutation_rate = 0.2;
     double max_energy_density = 10.0;
-    double min_energy_loss = 0.1;
+    double min_energy_loss = 0.5;
     double d_energy_density = 5.0;
-    double d_energy_loss = 0.5;
+    double d_energy_loss = 1;
     double d_integrity = 3.0;
     double d_strafing_difficulty = 0.5;
     double d_max_size = 10;
@@ -111,7 +111,7 @@ class Settings {
     double d_digestion_rate = 3;
     double d_genetic_strength = 0.6;
     double d_acid_to_energy = 5;  // Increase for easier survival
-    double max_reproducing_age = 700;
+    double max_reproducing_age = 1000;
     double mating_desire_max_prob = 0.05;
     double mating_desire_factor = 0.05;
     double pregnancy_energy_factor =
