@@ -422,7 +422,7 @@ std::vector<Food *> get_food_at_distance(
  */
 std::shared_ptr<Creature> Creature::GetClosestEnemyInSight(
     std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
-    double grid_cell_size){
+    double grid_cell_size, double map_width, double map_heigth){
   int grid_width = grid.size();
   int grid_height = grid[0].size();
 
@@ -461,7 +461,7 @@ std::shared_ptr<Creature> Creature::GetClosestEnemyInSight(
 
         auto direction = OrientedAngle(cone_center, point);
 
-        double distance = point.dist(cone_center);
+        double distance = point.dist(cone_center, map_width, map_heigth);
 
         bool is_in_field_of_view =
             (direction.IsInsideCone(cone_left_boundary, cone_right_boundary));
@@ -506,7 +506,8 @@ std::shared_ptr<Creature> Creature::GetClosestEnemyInSight(
           if (IsGridCellPotentiallyInsideCone(
                   Point(nx * grid_cell_size, ny * grid_cell_size),
                   grid_cell_size, cone_center, vision_radius_,
-                  cone_left_boundary, cone_right_boundary)) {
+                  cone_left_boundary, cone_right_boundary,
+                  map_width, map_heigth)) {
             visited_cells.insert({nx, ny});
             cells_queue.push({nx, ny});
           }
@@ -521,7 +522,7 @@ std::shared_ptr<Creature> Creature::GetClosestEnemyInSight(
 void Creature::ProcessVisionEnemies(std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
                        double grid_cell_size, double width, double height)
 {
-  std::shared_ptr<Creature> closeEnemy = GetClosestEnemyInSight(grid, grid_cell_size);
+  std::shared_ptr<Creature> closeEnemy = GetClosestEnemyInSight(grid, grid_cell_size, width, height);
 
   if (closeEnemy){
     distance_enemy_ = this->GetDistance(closeEnemy, width, height) - closeEnemy->GetSize();

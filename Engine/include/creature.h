@@ -72,9 +72,8 @@ class Creature : virtual public MovableEntity,
 
 
 
-  std::shared_ptr<Creature> GetClosestEnemyInSight(
-      std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
-      double grid_cell_size);
+  std::shared_ptr<Creature> GetClosestEnemyInSight(std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
+      double grid_cell_size, double map_width, double map_heigth);
   void ProcessVisionEnemies(std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
                             double grid_cell_size, double width, double height);
 

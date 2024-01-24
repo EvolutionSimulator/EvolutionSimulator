@@ -30,7 +30,7 @@ class Point {
   Point(std::pair<double, double> coordinates);
   double GetX() const;
   double GetY() const;
-  double dist(const Point &other) const;
+  double dist(const Point &other, double map_width, double map_heigth) const;
   Point operator-(const Point &other) const;
 
  private:
