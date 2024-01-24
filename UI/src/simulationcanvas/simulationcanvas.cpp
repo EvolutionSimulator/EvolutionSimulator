@@ -260,7 +260,6 @@ std::vector<std::pair<double, double>> SimulationCanvas::getEntityRenderPosition
 
 void SimulationCanvas::centerViewAroundCreature(const sf::Vector2f& creaturePosition) {
     sf::View view = getView();
-
     // Calculate the new center directly based on the creature position
     sf::Vector2f newCenter = creaturePosition;
     // Set the new center of the view
@@ -281,7 +280,8 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
     float mouseWindowHeight = sf::Mouse::getPosition(*this).y;
     float mouseWindowWidth = sf::Mouse::getPosition(*this).x;
 
-    //qDebug() << "Mouse x and y: " << scaledX << "  " << scaledY;
+    qDebug() << "Following?: " << followCreature;
+    qDebug() << "This one: " << followedCreature;
 
     qDebug() << "Height of box: " << scaledScreenHeight;
     sf::Vector2i scaledPos(static_cast<int>(event->position().x() * scaleFactor),
@@ -311,40 +311,52 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
 
     if (event->button() == Qt::RightButton) {
         // Right-clicked, check if the mouse position coincides with any creature
+        bool foundCreature = false;
+
         for (auto& creature : simulation_->GetSimulationData()->creatures_) {
             auto [creatureX, creatureY] = creature.GetCoordinates();
             float creatureSize = creature.GetSize();
             sf::Vector2f creaturePos(creatureX, creatureY);
-            //double scaledCreaturePosX = fmod(creaturePos.x, static_cast<float>(settings::environment::kDMapWidth));
-            //double scaledCreaturePosY = fmod(creaturePos.x, static_cast<float>(settings::environment::kDMapHeight));
-            if (sqrt(pow(scaledX - creaturePos.x, 2) + pow(scaledY - creaturePos.y, 2)) <= 1.5*creatureSize) {
-                // Mouse position coincides with the creature, toggle the followCreature flag
-                followCreature = !followCreature;
 
-                if (followCreature) {
-                    // If following, set the creature to be followed
+            if (sqrt(pow(scaledX - creaturePos.x, 2) + pow(scaledY - creaturePos.y, 2)) <= 1.5 * creatureSize) {
+                if (!followCreature || (followCreature && followedCreature != &creature)) {
+                    // If not following any creature or following a different creature,
+                    // update the following creature immediately
+                    foundCreature = true;
+                    followCreature = true;
                     followedCreature = &creature;
                     centerViewAroundCreature(creaturePos);
-                } else {
-                    // If not following, stop following the creature
-                    followedCreature = nullptr;
-                }
 
-                // Update the view
-                info_panel_.Hide();
-                info_panel_.SetSelectedCreature(nullptr);
-                update();
-                return;
+                    // Update the view
+                    info_panel_.Show();
+                    info_panel_.SetSelectedCreature(&creature);
+                    repaint();
+                    update();
+                    currTopLeft = getView().getCenter() - sf::Vector2f(getView().getSize().x / 2, getView().getSize().x / 2);
+                }
+                break;  // Exit the loop after finding the first creature at the clicked position
             }
         }
+
+        // If no creature was found at the clicked position, reset followCreature
+        if (!foundCreature && followCreature) {
+            followCreature = false;
+            followedCreature = nullptr;
+            update();
+            currTopLeft = getView().getCenter() - sf::Vector2f(getView().getSize().x / 2, getView().getSize().x / 2);
+        }
+
+        return;
     } else {
         // Any other mouse click while following a creature stops following
         if (followCreature) {
             followCreature = false;
             followedCreature = nullptr;
             update();
+            currTopLeft = getView().getCenter() - sf::Vector2f(getView().getSize().x / 2, getView().getSize().x / 2);
         }
     }
+
 
     // Checking if we need to display info panel
     for (auto& creature : data->creatures_) {
@@ -472,9 +484,41 @@ void SimulationCanvas::mouseMoveEvent(QMouseEvent* event) {
         averagedDelta /= static_cast<float>(deltaHistory.size());
 
         sf::View view = getView();
+        view.move(averagedDelta);
+        // Get map dimensions
+        double mapWidth = simulation_->GetSimulationData()->GetEnvironment().GetMapWidth();
+        double mapHeight = simulation_->GetSimulationData()->GetEnvironment().GetMapHeight();
+
+        // Get the new center of the view
+        sf::Vector2f newCenter = view.getCenter();
+
+        // Wrap around horizontally
+        if (newCenter.x < 0) {
+            currentMousePosition.x += mapWidth;
+            newCenter.x += mapWidth;
+        }
+        else if (newCenter.x > mapWidth) {
+            currentMousePosition.x -= mapWidth;
+            newCenter.x -= mapWidth;
+        }
         sf::Vector2f currentCenter = view.getCenter();
         float viewWidth = view.getSize().x;
         float viewHeight = view.getSize().y;
+
+        // Wrap around vertically
+        if (newCenter.y < 0) {
+            currentMousePosition.y += mapHeight;
+            newCenter.y += mapHeight;
+        }
+        else if (newCenter.y > mapHeight) {
+            currentMousePosition.y -= mapHeight;
+            newCenter.y -= mapHeight;
+        }
+        // Set the wrapped center back to the view
+        view.setCenter(newCenter);
+//        sf::Vector2f currentCenter = view.getCenter();
+//        float viewWidth = view.getSize().x;
+//        float viewHeight = view.getSize().y;
 
         // Adjust the averaged delta based on the view size
         averagedDelta.x *= viewWidth / getSize().x;

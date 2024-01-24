@@ -50,6 +50,7 @@ class SimulationCanvas : public QSFMLCanvas {
   float zoomFactor = 1.0f;
   sf::Vector2f initialViewSize;
   sf::Vector2f initialViewCenter;
+  std::deque<sf::Vector2f> creatureViewHistory; //Following creature smoothly
 
   // CLick and drag logic
   bool isDragging = false;
