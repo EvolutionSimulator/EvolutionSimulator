@@ -79,6 +79,8 @@ void SimulationCanvas::OnUpdate()
 {
     if (followCreature && followedCreature) {
         // Update the view to follow the creature
+        sf::Vector2f currPos(followedCreature->GetCoordinates().first, followedCreature->GetCoordinates().second);
+        creatureViewHistory.push_back(currPos);
         centerViewAroundCreature({static_cast<float>(followedCreature->GetCoordinates().first), static_cast<float>(followedCreature->GetCoordinates().second)});
     }
 
@@ -260,17 +262,30 @@ std::vector<std::pair<double, double>> SimulationCanvas::getEntityRenderPosition
 
 void SimulationCanvas::centerViewAroundCreature(const sf::Vector2f& creaturePosition) {
     sf::View view = getView();
-    // Calculate the new center directly based on the creature position
-    sf::Vector2f newCenter = creaturePosition;
-    // Set the new center of the view
-    view.setCenter(newCenter);
+
+    // Keep a history of the last 10 creature positions
+    if (creatureViewHistory.size() > 5) {
+        while(creatureViewHistory.size() > 5){
+            creatureViewHistory.pop_front();
+        }
+    }
+
+    // Calculate the averaged position based on the history
+    sf::Vector2f averagedPosition = std::accumulate(
+        creatureViewHistory.begin(), creatureViewHistory.end(), sf::Vector2f(0, 0)
+    ) / static_cast<float>(creatureViewHistory.size());
+
+    // Set the new center of the view based on the averaged position
+    view.setCenter(averagedPosition);
     // Set the new size of the view (you may adjust this based on your requirements)
     view.setSize(getView().getSize().x, getView().getSize().y);
     // Apply the new view
     setView(view);
 }
 
+
 void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
+    creatureViewHistory.clear();
     float scaleFactor = this->devicePixelRatioF();
     qDebug() << "Top Left: " << currTopLeft.x << "  " << currTopLeft.y;
     float screenHeight = sf::VideoMode::getDesktopMode().height;
