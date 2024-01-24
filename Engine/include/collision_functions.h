@@ -46,7 +46,7 @@ bool CollisionRectangleRectangle(const double tolerance,
 bool IsGridCellPotentiallyInsideCone(Point grid_point, double grid_cell_size,
                                      Point cone_center, double cone_radius,
                                      OrientedAngle cone_left_boundary,
-                                     OrientedAngle cone_right_boundary);
+                                     OrientedAngle cone_right_boundary, double map_width, double map_heigth);
 
 std::vector<std::pair<int, int>> SupercoverBresenhamLine(int x0, int y0, int x1, int y1);
 #endif  // COLLISION_FUNCTIONS_H

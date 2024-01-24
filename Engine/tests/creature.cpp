@@ -189,19 +189,19 @@ TEST(CreatureTests, IsGridCellPotentiallyInsideCone) {
 
   auto grid_in_sight_1 = IsGridCellPotentiallyInsideCone(
       Point(5, 5), grid_cell_size, Point(5, 5), 3.0, OrientedAngle(-M_PI / 4),
-      OrientedAngle(M_PI / 4));
+      OrientedAngle(M_PI / 4), 10.0, 10.0);
 
   auto grid_in_sight_2 = IsGridCellPotentiallyInsideCone(
       Point(6, 4), grid_cell_size, Point(5, 5), 3.0, OrientedAngle(-M_PI / 4),
-      OrientedAngle(M_PI / 4));
+      OrientedAngle(M_PI / 4), 10.0, 10.0);
 
   auto grid_in_sight_3 = IsGridCellPotentiallyInsideCone(
       Point(7, 6), grid_cell_size, Point(5, 5), 3.0, OrientedAngle(-M_PI / 4),
-      OrientedAngle(M_PI / 4));
+      OrientedAngle(M_PI / 4), 10.0, 10.0);
 
   auto grid_out_of_sight = IsGridCellPotentiallyInsideCone(
       Point(15, 19), grid_cell_size, Point(1, 1), 3.0, OrientedAngle(-M_PI / 4),
-      OrientedAngle(M_PI / 4));
+      OrientedAngle(M_PI / 4), 10.0, 10.0);
 
   EXPECT_TRUE(grid_in_sight_1);
   EXPECT_TRUE(grid_in_sight_2);
@@ -235,7 +235,7 @@ TEST(CreatureTests, GetClosestFoodInSight_MultipleFoods) {
   creature.SetVision(2.0, M_PI / 3);
 
   auto closest_food =
-      creature.GetClosestFoodInSight(grid, gridCellSize, Food::type::meat);
+      creature.GetClosestFoodInSight(grid, gridCellSize, Food::type::meat, 10.0, 10.0);
 
   ASSERT_EQ(closest_food, meat_1);
 }
@@ -270,7 +270,7 @@ TEST(CreatureTests, GetClosestFoodInSight_NoFoodInSight) {
   creature.SetVision(1, M_PI / 3);
 
   auto closest_food =
-      creature.GetClosestFoodInSight(grid, gridCellSize, Food::type::meat);
+      creature.GetClosestFoodInSight(grid, gridCellSize, Food::type::meat, 10.0, 10.0);
 
   ASSERT_EQ(closest_food, nullptr);
 }
