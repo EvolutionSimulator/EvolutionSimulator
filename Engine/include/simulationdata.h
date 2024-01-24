@@ -46,6 +46,9 @@ struct SimulationData {
 
   double world_time_ = 0;
 
+  void WriteDataToFile();
+  void RetrieveDataFromFile();
+
  private:
   double lastRecordedTime_;
   Environment& environment_;
