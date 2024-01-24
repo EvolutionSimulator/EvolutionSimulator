@@ -103,7 +103,7 @@ void Creature::UpdateMatingDesire() {
   double min_reproducing_age =
       std::min(this->MaleReproductiveSystem::GetMaturityAge(),
                this->FemaleReproductiveSystem::GetMaturityAge());
-  if (energy_ < std::max(mutable_.GetEnergyDensity() * pow(size_, 2) * 0.25, max_energy_ * 0.6)) {
+  if (energy_ < std::max(mutable_.GetEnergyDensity() * pow(size_, 2) * 0.25, max_energy_ * SETTINGS.environment.male_reproduction_cost)) {
       mating_desire_ = false; //To avoid creatures that just reproduce
       return;
   }

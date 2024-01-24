@@ -73,10 +73,10 @@ class Settings {
     int output_neurons = 6;
     double max_nutritional_value = 2;
     double default_lifespan = 30;
-    double photosynthesis_factor = 0.01;
+    double photosynthesis_factor = 0.001;
     double frictional_coefficient = 0.15; // Needs to be less than 1
     double maturity_age_multiplier = 0.1;
-    double male_reproduction_cost = 0.5;
+    double male_reproduction_cost = 0.65;
     double pregnancy_hardship_modifier = 2; //1 for normal behavior do not make it 0
   } environment;
 
