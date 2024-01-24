@@ -141,9 +141,14 @@ void MainWindow::ToggleSimulation() {
 void MainWindow::RestartSimulation() {
   KillEngine();
   InitializeEngine();
+  // Point graphs and config to new engine
   graph_manager_->SetEngine(engine_);
   config_manager_->SetEngine(engine_);
+  // Start new simulation
+  PauseSimulation();
   RunSimulation();
+  // De-select creature in info panel
+  ui_->canvas->GetInfoPanel().Hide();
 }
 
 
