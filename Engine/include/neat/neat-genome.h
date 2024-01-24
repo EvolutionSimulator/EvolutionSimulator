@@ -72,8 +72,8 @@ namespace neat {
     std::vector<BrainModule> modules_; /*! A vector of BrainModule objects
                                          representing the modules activated. */
 
-    std::vector<BrainModule> AvailableModules = {BrainModule(3, 0, 1), BrainModule(1, 1, 2, true)}; //Geolocation Module and Pheromone Module
-    //To add more modules you also have to change the think function of the creature.
+    std::vector<BrainModule> AvailableModules = {BrainModule(3, 0, 1) }; //Geolocation Module and Pheromone Module
+    //To add more modules you also have to change the think function of the creature. //BrainModule(1, 1, 2, true)
 
   };
 
