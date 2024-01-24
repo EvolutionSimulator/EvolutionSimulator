@@ -148,9 +148,7 @@ void SimulationCanvas::RenderSimulation(SimulationData& data) {
   for (const auto& egg_ptr : data.eggs_) {
     if (egg_ptr == nullptr) continue;
     std::shared_ptr<Egg> egg = egg_ptr;
-    auto renderPositions = getEntityRenderPositions(
-        (std::shared_ptr<Food>)
-            egg);  // QUICK FIX - NEED FOOD TO INHERIT VIRTUALLY FROM ENTITY
+    auto renderPositions = getEntityRenderPositions(egg);  // QUICK FIX - NEED FOOD TO INHERIT VIRTUALLY FROM ENTITY
     for (const auto& pos : renderPositions) {
       RenderEggAtPosition(egg, pos);
     }
@@ -207,10 +205,10 @@ void SimulationCanvas::RenderEggAtPosition(
     std::shared_ptr<Egg> egg, const std::pair<double, double>& position) {
   sf::Sprite eggSprite;
   eggSprite.setTexture(texture_manager_.egg_texture_);
-  eggSprite.setScale(egg->Food::GetSize() / 50.0f, egg->Food::GetSize() / 50.0f);
+  eggSprite.setScale(egg->GetSize() / 50.0f, egg->GetSize() / 50.0f);
   eggSprite.setOrigin(128.0f, 128.0f);
 
-  std::pair<double, double> eggCoordinates = egg->Food::GetCoordinates();
+  std::pair<double, double> eggCoordinates = egg->GetCoordinates();
   sf::Transform eggTransform;
   eggTransform.translate(eggCoordinates.first, eggCoordinates.second);
   draw(eggSprite, eggTransform);

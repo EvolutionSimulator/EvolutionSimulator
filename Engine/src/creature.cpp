@@ -287,9 +287,11 @@ void Creature::Think(std::vector<std::vector<std::vector<std::shared_ptr<Entity>
 
 
   for (BrainModule& module : GetGenome().GetModules()){
-      int i = module.GetFirstOutputIndex();
-      int type = module.GetType();
-      pheromone_emissions_.at(type) = output.at(i);
+      if (module.GetModuleId() == 2){
+          int i = module.GetFirstOutputIndex();
+          int type = module.GetType();
+          pheromone_emissions_.at(type) = output.at(i);
+      }
   }
 
   // grabbing_ = std::tanh(output.at(6)) > 0 ? 0 : 1;

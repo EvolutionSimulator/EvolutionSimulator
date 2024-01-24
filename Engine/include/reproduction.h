@@ -51,7 +51,8 @@ class MaleReproductiveSystem : virtual public ReproductiveSystem {
   void MaleAfterMate();
 };
 
-struct GestatingEgg {
+class GestatingEgg {
+public:
   neat::Genome genome;
   Mutable mutables;
   int generation;
