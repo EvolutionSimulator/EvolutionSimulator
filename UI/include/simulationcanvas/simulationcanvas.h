@@ -34,7 +34,7 @@ class SimulationCanvas : public QSFMLCanvas {
   private:
   Simulation *simulation_ = nullptr;
   virtual void OnInit() override;
-  void OnUpdate();
+  virtual void OnUpdate() override;
 
   // Rendering logic
   void RenderSimulation(SimulationData& data);
