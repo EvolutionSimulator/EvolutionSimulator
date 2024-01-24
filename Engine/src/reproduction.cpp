@@ -17,7 +17,7 @@ bool ReproductiveSystem::ReadyToProcreate() const {
   return age_ >= ready_to_reproduce_at_;
 };
 
-void ReproductiveSystem::Update(double delta_time) { age_ += delta_time; }
+void ReproductiveSystem::Update(double delta_time) { }
 
 void ReproductiveSystem::ResetReproductionClock() {
   ready_to_reproduce_at_ = age_ + reproduction_cooldown_;

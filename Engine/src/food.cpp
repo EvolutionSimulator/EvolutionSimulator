@@ -107,7 +107,8 @@ void Plant::Update(double deltaTime) {
 
   if (updated_nutritional_value <=
       SETTINGS.environment.max_nutritional_value * std::exp(-aging_factor * age_)) {
-    SetNutritionalValue(updated_nutritional_value);
+    updated_nutritional_value  = SETTINGS.environment.max_nutritional_value *
+            std::exp(-aging_factor * age_);
   }
   age_ += deltaTime;
     // Adjust this factor
