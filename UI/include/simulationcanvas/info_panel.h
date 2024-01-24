@@ -22,7 +22,7 @@ public:
   void Hide();
   bool IsVisible() const;
   void Draw();
-  void DrawVisionCone(sf::RenderTarget& target, const Creature &creature);
+  void DrawVisionCone(sf::RenderTarget& target, const Creature &creature, std::pair<double, double> position);
   void DrawStomach(sf::RenderTarget& target, const Creature& creature);
   std::string FormatCreatureInfo(const Creature& creature);
 
