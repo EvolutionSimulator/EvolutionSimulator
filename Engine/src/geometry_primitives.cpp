@@ -36,8 +36,11 @@ double Point::GetY() const { return y_; }
  * @param other The other Point to which the distance is calculated.
  * @return The Euclidean distance as a double.
  */
-double Point::dist(const Point &other) const {
-  return hypot(x_ - other.GetX(), y_ - other.GetY());
+double Point::dist(const Point &other, double map_width, double map_heigth) const {
+  const double x_diff = fabs(x_ - other.GetX());
+  const double y_diff = fabs(y_ - other.GetY());
+  return std::hypot(fmin(x_diff, map_width - x_diff),
+                    fmin(y_diff, map_heigth - y_diff));
 }
 
 /*!
@@ -61,8 +64,28 @@ OrientedAngle::OrientedAngle(double angle) : angle_(angle) { Normalize(); }
  * @param from The starting Point.
  * @param to The ending Point.
  */
-OrientedAngle::OrientedAngle(const Point &from, const Point &to)
-    : angle_(atan2(to.GetY() - from.GetY(), to.GetX() - from.GetX())) {
+OrientedAngle::OrientedAngle(const Point &from, const Point &to) {
+
+  auto diff_x = to.GetX() - from.GetX();
+  if (diff_x > SETTINGS.environment.map_width/2)
+  {
+    diff_x -=  SETTINGS.environment.map_width;
+  }
+  if (diff_x < - SETTINGS.environment.map_width/2)
+  {
+    diff_x +=  SETTINGS.environment.map_width;
+  }
+
+  auto diff_y = to.GetY() - from.GetY();
+  if (diff_y > SETTINGS.environment.map_height/2)
+  {
+    diff_y -=  SETTINGS.environment.map_height;
+  }
+  if (diff_y < - SETTINGS.environment.map_height/2)
+  {
+    diff_y +=  SETTINGS.environment.map_height;
+  }
+  angle_ = atan2(diff_y, diff_x);
   Normalize();
 }
 

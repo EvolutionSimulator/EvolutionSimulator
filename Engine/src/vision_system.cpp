@@ -37,15 +37,15 @@ double VisionSystem::GetVisionAngle() const { return vision_angle_; }
 
 std::shared_ptr<Food> VisionSystem::GetClosestMeatInSight(
     std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
-    double grid_cell_size) const {
-    return (GetClosestFoodInSight(grid, grid_cell_size, Food::type::meat));
+    double grid_cell_size, double map_width, double map_heigth) const {
+    return (GetClosestFoodInSight(grid, grid_cell_size, Food::type::meat, map_width, map_heigth));
 }
 
 // Function to get the closest plant in sight
 std::shared_ptr<Food> VisionSystem::GetClosestPlantInSight(
     std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
-    double grid_cell_size) const {
-    return (GetClosestFoodInSight(grid, grid_cell_size, Food::type::plant));
+    double grid_cell_size, double map_width, double map_heigth) const {
+    return (GetClosestFoodInSight(grid, grid_cell_size, Food::type::plant, map_width, map_heigth));
 }
 
 /*!
@@ -65,7 +65,7 @@ std::shared_ptr<Food> VisionSystem::GetClosestPlantInSight(
  */
 std::shared_ptr<Food> VisionSystem::GetClosestFoodInSight(
     std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
-    double grid_cell_size, Food::type food_type) const {
+    double grid_cell_size, Food::type food_type, double map_width, double map_heigth) const {
   int grid_width = grid.size();
   int grid_height = grid[0].size();
 
@@ -101,35 +101,11 @@ std::shared_ptr<Food> VisionSystem::GetClosestFoodInSight(
       std::shared_ptr<Food> food = std::dynamic_pointer_cast<Food>(entity);
 
       if (food && food->GetType()==food_type) {
-        auto food_point = Point(entity->GetCoordinates());
-
-        auto food_direction = OrientedAngle(cone_center, food_point);
-
-        double distance = food_point.dist(cone_center);
-
-        bool is_in_field_of_view = (food_direction.IsInsideCone(
-            cone_left_boundary, cone_right_boundary));
-
-        bool is_on_edge = (food_direction.AngleDistanceToCone(cone_left_boundary, cone_right_boundary) <= M_PI/2) && (distance * sin(food_direction.AngleDistanceToCone(cone_left_boundary, cone_right_boundary)) <= food->GetSize() + SETTINGS.engine.eps);
-
-        if (is_in_field_of_view) {
-          bool is_within_vision_radius =
-              distance <= vision_radius_ + food->GetSize() + SETTINGS.engine.eps;
-          if (is_within_vision_radius && distance < smallest_distance_food) {
-            smallest_distance_food = distance;
-            closest_food = food;
-            break;
-          }
-        }
-
-        if (is_on_edge) {
-          bool is_within_vision_radius =
-              (distance * cos(food_direction.AngleDistanceToCone(cone_left_boundary, cone_right_boundary)) <= vision_radius_ + SETTINGS.engine.eps);
-          if (is_within_vision_radius && distance < smallest_distance_food) {
-            smallest_distance_food = distance;
-            closest_food = food;
-            break;
-          }
+        if (IsInVisionCone(food, map_width, map_heigth))
+        {
+          smallest_distance_food = GetDistance(food, map_width, map_heigth);
+          closest_food = food;
+          break;
         }
       }
     }
@@ -151,7 +127,8 @@ std::shared_ptr<Food> VisionSystem::GetClosestFoodInSight(
           if (IsGridCellPotentiallyInsideCone(
                   Point(nx * grid_cell_size, ny * grid_cell_size),
                   grid_cell_size, cone_center, vision_radius_,
-                  cone_left_boundary, cone_right_boundary)) {
+                  cone_left_boundary, cone_right_boundary,
+                  map_width, map_heigth)) {
             visited_cells.insert({nx, ny});
             cells_queue.push({nx, ny});
           }
@@ -176,6 +153,35 @@ bool VisionSystem::IsInSight(std::shared_ptr<Entity> entity)
   return entity_direction.IsInsideCone(cone_left_boundary, cone_right_boundary);
 }
 
+bool VisionSystem::IsInVisionCone(std::shared_ptr<Entity> entity, double map_width, double map_heigth) const
+{
+  auto cone_center = Point(x_coord_, y_coord_);
+  auto cone_orientation = GetOrientation();
+  auto cone_left_boundary = OrientedAngle(cone_orientation - vision_angle_ / 2);
+  auto cone_right_boundary = OrientedAngle(cone_orientation + vision_angle_ / 2);
+
+  auto entity_point = Point(entity->GetCoordinates());
+
+  auto food_direction = OrientedAngle(cone_center, entity_point);
+
+  double distance = entity_point.dist(cone_center, map_width, map_heigth);
+
+  bool is_in_field_of_view = (food_direction.IsInsideCone(cone_left_boundary, cone_right_boundary));
+
+  bool is_on_edge = (food_direction.AngleDistanceToCone(cone_left_boundary, cone_right_boundary) <= M_PI/2) && (distance * sin(food_direction.AngleDistanceToCone(cone_left_boundary, cone_right_boundary)) <= entity->GetSize() + SETTINGS.engine.eps);
+
+  if (is_in_field_of_view) {
+    bool is_within_vision_radius =
+        distance <= vision_radius_ + entity->GetSize() + SETTINGS.engine.eps;
+    if (is_within_vision_radius) { return true; }
+  }
+
+  if (is_on_edge) {
+    bool is_within_vision_radius =
+        (distance * cos(food_direction.AngleDistanceToCone(cone_left_boundary, cone_right_boundary)) <= vision_radius_ + SETTINGS.engine.eps);
+    if (is_within_vision_radius) { return true;}
+  }
+}
 
 /*!
  * @brief Processes the VisionSystem's vision to locate food.
@@ -192,8 +198,8 @@ bool VisionSystem::IsInSight(std::shared_ptr<Entity> entity)
 void VisionSystem::ProcessVisionFood(
     std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
     double GridCellSize, double width, double height) {
-  std::shared_ptr<Food> closePlant = GetClosestPlantInSight(grid, GridCellSize);
-  std::shared_ptr<Food> closeMeat = GetClosestMeatInSight(grid, GridCellSize);
+  std::shared_ptr<Food> closePlant = GetClosestPlantInSight(grid, GridCellSize, width, height);
+  std::shared_ptr<Food> closeMeat = GetClosestMeatInSight(grid, GridCellSize, width, height);
 
   if (closePlant){
         distance_plant_ = this->GetDistance(closePlant, width, height) - closePlant->GetSize();

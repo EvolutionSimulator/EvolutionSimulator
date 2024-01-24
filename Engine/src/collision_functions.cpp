@@ -169,9 +169,11 @@ bool CollisionCircleLine(const double& tolerance,
 bool IsGridCellPotentiallyInsideCone(Point grid_point, double grid_cell_size,
                                      Point cone_center, double cone_radius,
                                      OrientedAngle cone_left_boundary,
-                                     OrientedAngle cone_right_boundary) {
+                                     OrientedAngle cone_right_boundary,
+                                     double map_width,
+                                     double map_heigth) {
   auto EPS = SETTINGS.engine.eps;
-  double distance = grid_point.dist(cone_center);
+  double distance = grid_point.dist(cone_center, map_width, map_heigth);
   if (distance < EPS) {
     return true;
   }

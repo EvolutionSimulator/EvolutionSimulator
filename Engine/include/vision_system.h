@@ -19,16 +19,17 @@ public:
                        double GridCellSize) const;
   std::shared_ptr<Food> GetClosestFoodInSight(
       std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
-      double grid_cell_size, Food::type type) const;
+      double grid_cell_size, Food::type type, double map_width, double map_heigth) const;
 
   void ProcessVisionFood(std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
                          double grid_cell_size, double width, double height);
   std::shared_ptr<Food> GetFoodID() const;
   std::shared_ptr<Food> GetClosestPlantInSight(std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
-          double grid_cell_size) const;
+          double grid_cell_size, double map_width, double map_heigth) const;
   std::shared_ptr<Food> GetClosestMeatInSight(std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
-          double grid_cell_size) const;
+          double grid_cell_size, double map_width, double map_heigth) const;
   bool IsInSight(std::shared_ptr<Entity> entity);
+  bool IsInVisionCone(std::shared_ptr<Entity> entity, double map_width, double map_heigth) const;
 
 protected:
   double distance_plant_;       /*!< Distance to the nearest plant source. */
