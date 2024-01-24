@@ -56,7 +56,12 @@ void InfoPanel::Draw() {
   sf::RenderTarget& target = *canvas_;
   DrawStomach(target, *selected_creature_);
   DrawPanel(target);
-  DrawVisionCone(target, *selected_creature_);
+
+  auto creature_position = selected_creature_->GetCoordinates();
+  DrawVisionCone(target, *selected_creature_, creature_position);
+  creature_position.first += offset_x_;
+  creature_position.second += offset_y_;
+  DrawVisionCone(target, *selected_creature_, creature_position);
 }
 
 double round_double(double number, int decimal_places) {
@@ -197,12 +202,15 @@ void InfoPanel::DrawPanel(sf::RenderTarget& target) {
     blueCircle.setPosition(closest_entity_->GetCoordinates().first - closest_entity_->GetSize() + offset_x_,
                            closest_entity_->GetCoordinates().second - closest_entity_->GetSize() + offset_y_);
     target.draw(blueCircle);
+    blueCircle.setPosition(selected_food_->GetCoordinates().first - selected_food_->GetSize(),
+                           selected_food_->GetCoordinates().second - selected_food_->GetSize());
+    target.draw(blueCircle);
   }
 
 
 }
 
-void InfoPanel::DrawVisionCone(sf::RenderTarget& target, const Creature &creature) {
+void InfoPanel::DrawVisionCone(sf::RenderTarget& target, const Creature &creature, std::pair<double, double> position) {
 
   target.setView(ui_view_);
 
@@ -214,18 +222,14 @@ void InfoPanel::DrawVisionCone(sf::RenderTarget& target, const Creature &creatur
   double leftRad = creatureOrientation - visionAngle / 2.0;
   double rightRad = creatureOrientation + visionAngle / 2.0;
 
-  auto [creatureX, creatureY] = creature.GetCoordinates();
-  creatureX += offset_x_;
-  creatureY += offset_y_;
-
   std::vector<sf::Vertex> triangleFan;
-  triangleFan.push_back(sf::Vertex(sf::Vector2f(creatureX, creatureY), sf::Color::Transparent));
+  triangleFan.push_back(sf::Vertex(sf::Vector2f(position.first, position.second), sf::Color::Transparent));
 
   int numPoints = 30;
   for (int i = 0; i <= numPoints; ++i) {
     double angle = leftRad + (i * (rightRad - leftRad) / numPoints);
-    double x = creatureX + visionRadius * cos(angle);
-    double y = creatureY + visionRadius * sin(angle);
+    double x = position.first + visionRadius * cos(angle);
+    double y = position.second + visionRadius * sin(angle);
     triangleFan.push_back(sf::Vertex(sf::Vector2f(x, y), sf::Color(255, 255, 255, 150)));
   }
 
