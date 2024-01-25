@@ -275,7 +275,7 @@ TEST(CollisionTests, OnCollisionWithFood) {
   neat::Genome genome(2, 3);
   Mutable mutables;
   std::shared_ptr<Creature> creature = std::make_shared<Creature>(genome, mutables);
-  std::shared_ptr<Plant> food = std::make_shared<Plant>(1.0);
+  std::shared_ptr<Plant> food = std::make_shared<Plant>(10,10,1.0);
 
   // Case 1: Food is alive, and Creature collides with it
   food->SetState(Entity::Alive);

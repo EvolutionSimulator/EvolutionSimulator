@@ -6,6 +6,7 @@
 class MovableEntity : virtual public Entity {
  public:
   MovableEntity();
+
   virtual ~MovableEntity() override {}
 
   double GetAcceleration() const;
@@ -38,7 +39,6 @@ class MovableEntity : virtual public Entity {
 
   virtual void OnCollision(std::shared_ptr<Entity> other_entity, double const kMapWidth,
                            double const kMapHeight) override;
-
  protected:
   double acceleration_, acceleration_angle_, rotational_acceleration_;
   double velocity_, velocity_angle_, rotational_velocity_;

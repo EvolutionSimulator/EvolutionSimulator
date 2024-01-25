@@ -11,9 +11,10 @@
  * value.
  */
 Food::Food(const double nutritional_value)
-    : Entity(std::rand() % SETTINGS.environment.max_food_size),
+    : Entity(),
+      MovableEntity(),
       nutritional_value_(nutritional_value) {
-  // Constructor implementation
+  size_ = std::rand() % SETTINGS.environment.max_food_size;
 }
 
 /*!
@@ -24,9 +25,13 @@ Food::Food(const double nutritional_value)
  */
 Food::Food(const double x_coord, const double y_coord,
            const double nutritional_value)
-    : Entity(x_coord, y_coord,
-             std::rand() % SETTINGS.environment.max_food_size),
-      nutritional_value_(nutritional_value) {}
+    : Entity(),
+      MovableEntity(),
+      nutritional_value_(nutritional_value) {
+    x_coord_ = x_coord;
+    y_coord_ = y_coord;
+    size_ = std::rand() % SETTINGS.environment.max_food_size;
+}
 
 /*!
  * @brief Constructor for Food with specified coordinates and size.
@@ -37,15 +42,13 @@ Food::Food(const double x_coord, const double y_coord,
  */
 Food::Food(const double x_coord, const double y_coord, const double size,
            const double nutritional_value)
-    : Entity(x_coord, y_coord, size), nutritional_value_(nutritional_value) {}
-
-/*!
- * @brief Constructor for Food with specified size.
- *
- * @param size Size of the Food.
- */
-Food::Food(const double size, const double nutritional_value)
-    : Entity(size), nutritional_value_(nutritional_value) {}
+    : Entity(),
+      MovableEntity(),
+      nutritional_value_(nutritional_value){
+    x_coord_ = x_coord;
+    y_coord_ = y_coord;
+    size_ = size;
+}
 
 /*!
  * @brief Simulates the consumption of the Food, setting its state to Dead.
@@ -83,10 +86,6 @@ Plant::Plant(double x_coord, double y_coord)
 }
 Plant::Plant(double x_coord, double y_coord, double size)
     : Food(x_coord, y_coord, size, SETTINGS.environment.plant_nutritional_value){
-    type_ = plant;
-}
-Plant::Plant(double size)
-    : Food(size, SETTINGS.environment.plant_nutritional_value){
     type_ = plant;
 }
 
@@ -130,10 +129,6 @@ Meat::Meat(double x_coord, double y_coord)
 }
 Meat::Meat(double x_coord, double y_coord, double size)
     : Food(x_coord, y_coord, size, SETTINGS.environment.meat_nutritional_value){
-    type_ = meat;
-}
-Meat::Meat(double size)
-    : Food(size, SETTINGS.environment.meat_nutritional_value){
     type_ = meat;
 }
 

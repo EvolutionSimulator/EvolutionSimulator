@@ -282,7 +282,7 @@ TEST(CreatureTests, Digest) {
   Creature creature(genome, mutables);
 
   double deltaTime = 1.0;
-  std::shared_ptr<Plant> plant = std::make_shared<Plant>(3.0);
+  std::shared_ptr<Plant> plant = std::make_shared<Plant>(10,10,3.0);
   creature.DigestiveSystem::Bite(plant);
   creature.AddAcid(1.0);
 
@@ -300,7 +300,7 @@ TEST(CreatureTests, BiteFood) {
   neat::Genome genome(3, 4);
   Mutable mutables;
   Creature creature(genome, mutables);
-  std::shared_ptr<Plant> food = std::make_shared<Plant>(3.0);
+  std::shared_ptr<Plant> food = std::make_shared<Plant>(10,10,3.0);
 
   double initialFoodSize = food->GetSize();
   double initialStomachFullness = creature.GetStomachFullness();
@@ -350,7 +350,7 @@ TEST(CreatureTests, EmptinessPercent) {
 
   ASSERT_EQ(creature.GetEmptinessPercent(), 100.0);
 
-  std::shared_ptr<Plant> food = std::make_shared<Plant>(3.0);
+  std::shared_ptr<Plant> food = std::make_shared<Plant>(10,10,3.0);
   creature.DigestiveSystem::Bite(food);
 
   ASSERT_LT(creature.GetStomachFullness(), 100.0);
