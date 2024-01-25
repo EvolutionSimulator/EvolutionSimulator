@@ -272,15 +272,22 @@ void SimulationCanvas::RenderCreatureAtPosition(
 }
 
 void SimulationCanvas::RenderPheromoneAtPosition(const std::shared_ptr<Pheromone> pheromone, const std::pair<double, double>& position){
-  sf::Sprite foodSprite;
-  foodSprite.setTexture(texture_manager_.pheromone_texture_);
-  foodSprite.setOrigin(128.0f, 128.0f);
+  sf::Sprite pheromoneSprite;
+  pheromoneSprite.setTexture(texture_manager_.pheromone_texture_);
+  pheromoneSprite.setOrigin(128.0f, 128.0f);
 
-  foodSprite.setScale(pheromone->GetSize()/128.0f, pheromone->GetSize()/128.0f);
+  pheromoneSprite.setScale(pheromone->GetSize()/128.0f, pheromone->GetSize()/128.0f);
+
+  texture_manager_.color_shader_.setUniform("hueShift", pheromone->GetColor());
 
   sf::Transform pheromoneTransform;
   pheromoneTransform.translate(position.first, position.second);
-  draw(foodSprite, pheromoneTransform);
+
+  sf::RenderStates states;
+  states.shader = &texture_manager_.color_shader_;
+  states.transform = pheromoneTransform;
+
+  draw(pheromoneSprite, states);
 }
 
 std::vector<std::pair<double, double>> SimulationCanvas::getEntityRenderPositions(const std::shared_ptr<Entity> entity) {

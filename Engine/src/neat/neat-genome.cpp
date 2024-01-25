@@ -612,6 +612,10 @@ void Genome::MutateActivateBrainModule(){
   int randomIndex = distribution(generator);
   BrainModule module = AvailableModules.at(randomIndex);
 
+  std::vector<BrainModule> modules = GetModules();
+  if (std::any_of(modules.begin(), modules.end(), [module](BrainModule module_){
+                return module.GetModuleId() == module_.GetModuleId() && module.GetMultiple();
+   })) return;
 
   int input_size = module.GetInputNeuronIds().size();
   std::vector<int> input_ids(input_size, 0);

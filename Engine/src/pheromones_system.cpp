@@ -56,7 +56,7 @@ void PheromoneSystem::ProcessPheromoneDetection(
 std::vector<std::shared_ptr<Pheromone>> PheromoneSystem::EmitPheromones(double deltaTime){
     std::vector<std::shared_ptr<Pheromone>> pheromones;
     for (int type = 0; type < 16; type++){
-        if (pheromone_emissions_.at(type) < 0){
+        if (pheromone_emissions_.at(type) > 0){
             std::random_device rd;  // Will be used to obtain a seed for the random number engine
             std::mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd()
             std::uniform_real_distribution<> dis(0, 1);
