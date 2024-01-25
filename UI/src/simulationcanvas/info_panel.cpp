@@ -202,9 +202,6 @@ void InfoPanel::DrawPanel(sf::RenderTarget& target) {
     blueCircle.setPosition(closest_entity_->GetCoordinates().first - closest_entity_->GetSize() + offset_x_,
                            closest_entity_->GetCoordinates().second - closest_entity_->GetSize() + offset_y_);
     target.draw(blueCircle);
-    blueCircle.setPosition(selected_food_->GetCoordinates().first - selected_food_->GetSize(),
-                           selected_food_->GetCoordinates().second - selected_food_->GetSize());
-    target.draw(blueCircle);
   }
 
 
