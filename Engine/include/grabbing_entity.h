@@ -45,7 +45,7 @@ class GrabbingEntity : virtual public MovableEntity {
           movable_entity_);  // Adding the entity that is affected by me to the
                              // set of my grab affected entities
 
-  bool grabbing_;  /*! Indicates whether creature is grabbing or not*/
+  bool grabbing_ = false;  /*! Indicates whether creature is grabbing or not*/
 
   void SetAffectedByGrabbedEntity(bool affected);
   void SetAffectedByGrabbedEnttityAll(bool affected);

@@ -60,7 +60,7 @@ class Mutable {
   double growth_factor_; /*!< Determines how the creature grows in relation to
                             energy intake. */
   double vision_factor_;
-  double gestation_ratio_to_incubation_;
+
   float color_;
   double stomach_capacity_factor_; /*!< Determines the stomach capacity in
                             relation to its size. */
@@ -69,6 +69,7 @@ class Mutable {
   double eating_speed_; /*! Determines eating and digestion cooldown */
 
   double pheromone_emission_;/*! Determines the rate of pheromone emission */
+  double gestation_ratio_to_incubation_;
 };
 
 Mutable MutableCrossover(const Mutable& dominant, const Mutable& recessive);

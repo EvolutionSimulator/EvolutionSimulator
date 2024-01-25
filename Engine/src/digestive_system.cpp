@@ -5,9 +5,12 @@ DigestiveSystem::DigestiveSystem(neat::Genome genome, Mutable mutables)
     : AliveEntity(genome, mutables),
       eating_cooldown_ (mutables.GetEatingSpeed()),
       stomach_acid_ (0.0),
-      potential_energy_in_stomach_(0.0)
+      potential_energy_in_stomach_(0.0),
+      stomach_fullness_(0),
+      biting_(false)
 {
-  stomach_capacity_ = mutables.GetStomachCapacityFactor() * pow(size_, 2);
+  stomach_capacity_ = mutables.GetStomachCapacityFactor() *
+          pow(size_, SETTINGS.environment.volume_dimension);
   bite_strength_ = mutables.GetGeneticStrength() * size_;
 }
 

@@ -31,7 +31,8 @@ MovableEntity::MovableEntity()
       velocity_(0),
       velocity_angle_(0),
       rotational_velocity_(0),
-      strafing_difficulty_(0.5) {}
+      strafing_difficulty_(0.5),
+      frictional_coefficient_(SETTINGS.environment.frictional_coefficient){}
 
 /*!
  * @brief Returns the linear acceleration.

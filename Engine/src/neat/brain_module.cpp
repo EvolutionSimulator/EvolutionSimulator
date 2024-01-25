@@ -4,7 +4,8 @@
 
 BrainModule::BrainModule(int input, int output, int module_id, bool multiple)
     : input_neuron_ids_(input, 0), output_neuron_ids_(output, 0),
-      module_id_(module_id), multiple_(multiple) {
+      module_id_(module_id), multiple_(multiple),
+      first_input_index_(0), first_output_index_(0){
     // Create a random number generator
     std::random_device rd;  // Will be used to obtain a seed for the random number engine
     std::mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd()

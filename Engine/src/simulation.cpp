@@ -3,7 +3,12 @@
 #include <chrono>
 
 
-Simulation::Simulation(Environment& environment) : food_manager_() {
+Simulation::Simulation(Environment& environment)
+    : food_manager_(),
+      entity_grid_(),
+      collision_manager_(),
+      creature_manager_()
+{
   data_ = new SimulationData(environment);
   is_running_ = true;  // Initialize the flag to true
 }
@@ -78,7 +83,7 @@ void Simulation::FixedUpdate(double deltaTime) {
     print_duration("UpdateGrid");
     #endif
 
-    collision_manager_.CheckCollisions(entity_grid_);
+   collision_manager_.CheckCollisions(entity_grid_);
 #ifdef ENABLE_TIMING
     print_duration("CheckCollisions");
     #endif
