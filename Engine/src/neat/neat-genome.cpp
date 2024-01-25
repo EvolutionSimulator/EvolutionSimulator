@@ -13,6 +13,8 @@
 
 namespace neat {
 
+Genome::Genome() : neurons_(), links_() {}
+
 /*!
  * @brief Constructs a Genome with a specified number of input and output
  * neurons.
@@ -68,6 +70,24 @@ const std::vector<Neuron>& Genome::GetNeurons() const { return neurons_; }
 const std::vector<Link>& Genome::GetLinks() const { return links_; }
 
 /*!
+ * @brief Retrieves the list of modules currently in the Genome.
+ *
+ * @return A vector of BrainModule objects representing the modules currently in
+ * the genome.
+ */
+std::vector<BrainModule> Genome::GetModules() const { return modules_; }
+
+/*!
+ * @brief Retrieves the list of available modules.
+ *
+ * @return A vector of BrainModule objects representing the modules that are
+ * available.
+ */
+std::vector<BrainModule> Genome::GetAvailableModules() const {
+  return AvailableModules;
+}
+
+/*!
  * @brief Adds a neuron to the Genome.
  *
  * @param neuron The Neuron to be added.
@@ -101,6 +121,10 @@ neuron.GetId()==link.GetOutId()){ DisableLink(link.GetId());
 
 void Genome::SetModules(const std::vector<BrainModule>& modules) {
   modules_ = modules;
+}
+
+void Genome::SetAvailableModules(const std::vector<BrainModule>& modules) {
+  AvailableModules = modules;
 }
 
 /*!
@@ -533,6 +557,10 @@ Genome Crossover(const Genome& dominant, const Genome& recessive) {
   std::vector<BrainModule> modules_dominant = dominant.GetModules();
   offspring.SetModules(modules_dominant);
 
+  std::vector<BrainModule> available_modules_dominant =
+      dominant.GetAvailableModules();
+  offspring.SetAvailableModules(available_modules_dominant);
+
   // Return the new Genome that is a combination of both parents.
   return offspring;
 }
@@ -623,17 +651,11 @@ void Genome::MutateDisableBrainModule(){
 }
 
 /*!
- * @brief Retrieves the list of modules currently in the Genome.
- *
- * @return A vector of BrainModule objects representing the modules currently in the genome.
- */
-std::vector<BrainModule> Genome::GetModules() const { return modules_; }
-
-/*!
  * @brief Finds a neuron in the Genome by its ID.
  *
  * @param targetId The ID of the neuron to find.
- * @param foundNeuron A reference to a Neuron object where the found neuron will be stored.
+ * @param foundNeuron A reference to a Neuron object where the found neuron will
+ * be stored.
  * @return True if the neuron is found, false otherwise.
  */
 bool Genome::FindNeuronById(int targetId, Neuron& foundNeuron) const{
