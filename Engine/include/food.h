@@ -5,14 +5,13 @@
 
 #include "environment.h"
 
-class Food : virtual public MovableEntity {
+class Food : public MovableEntity {
  protected:
   Food(const double nutritional_value);
   Food(const double x_coord, const double y_coord,
        const double nutritional_value);
   Food(const double x_coord, const double y_coord, const double size,
        const double nutritional_value);
-  Food(const double size, const double nutritional_value);
 
  public:
   enum type { meat, plant, egg };
@@ -37,7 +36,6 @@ class Plant : public Food {
   Plant();
   Plant(const double x_coord, const double y_coord);
   Plant(const double x_coord, const double y_coord, const double size);
-  Plant(const double size);
   virtual void Update(double deltaTime) override;
 
  protected:
@@ -49,7 +47,6 @@ class Meat : public Food {
   Meat();
   Meat(const double x_coord, const double y_coord);
   Meat(const double x_coord, const double y_coord, const double size);
-  Meat(const double size);
   virtual void Update(double deltaTime) override;
 
 };

@@ -229,40 +229,7 @@ void Entity::SetState(Entity::states state) { state_ = state; }
  * @param kMapHeight Height of the map, used for position adjustments.
  */
 void Entity::OnCollision(std::shared_ptr<Entity> other_entity, double const kMapWidth,
-                         double const kMapHeight) {
-  // Check if the entity is colliding with itself
-  if (this->id_ == other_entity->GetID()) return;
-
-  // Get the coordinates and size of the other entity
-  std::pair<double, double> other_coordinates = other_entity->GetCoordinates();
-  double other_size = other_entity->GetSize();
-
-  // Calculate the distance between the two entities
-  double distance = GetDistance(other_entity, kMapWidth, kMapHeight);
-
-  // If the distance is zero, return
-  if (distance == 0.0) return;
-
-  // Calculate the overlap between the two entities
-  double overlap = size_ + other_size - distance;
-
-  // Calculate the overlap in the x and y directions
-  double x_overlap = overlap * (x_coord_ - other_coordinates.first) / distance;
-  double y_overlap = overlap * (y_coord_ - other_coordinates.second) / distance;
-
-  // Calculate how much should each entity move
-  double total_size = std::pow(size_, 2) + std::pow(other_size, 2);
-  this->SetCoordinates(x_coord_ + x_overlap*std::pow(size_, 2)/total_size,
-                       y_coord_ + y_overlap*std::pow(size_, 2)/total_size,
-                       kMapWidth, kMapHeight);
-  other_entity->SetCoordinates(other_coordinates.first - x_overlap*std::pow(other_size, 2)/total_size,
-                              other_coordinates.second - y_overlap*std::pow(other_size, 2)/total_size,
-                              kMapWidth, kMapHeight);
-
-  // Assert that the entities are no longer overlapping
-  // assert(size_ + other_size - GetDistance(other_entity, kMapWidth,
-  // kMapHeight) < 0.0001);
-}
+                         double const kMapHeight) { }
 
 int Entity::GetID() const {
   return id_;

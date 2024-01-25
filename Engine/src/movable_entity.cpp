@@ -261,5 +261,40 @@ void MovableEntity::Rotate(double deltaTime) {
  */
 void MovableEntity::OnCollision(std::shared_ptr<Entity> other_entity, double const kMapWidth,
                                 double const kMapHeight) {
-  Entity::OnCollision(other_entity, kMapWidth, kMapHeight);
+    std::shared_ptr<MovableEntity> other_movable = std::dynamic_pointer_cast<MovableEntity>(other_entity);
+
+    if (!other_movable) return;
+    //Check if the entity is colliding with itself
+    if (this->GetID() == other_movable->GetID()) return;
+
+    // Get the coordinates and size of the other entity
+    std::pair<double, double> other_coordinates = other_movable->GetCoordinates();
+    double other_size = other_movable->GetSize();
+
+    // Calculate the distance between the two entities
+    double distance = GetDistance(other_movable, kMapWidth, kMapHeight);
+
+    // If the distance is zero, return
+    if (distance == 0.0) return;
+
+    // Calculate the overlap between the two entities
+    double overlap = size_ + other_size - distance;
+
+    // Calculate the overlap in the x and y directions
+    double x_overlap = overlap * (x_coord_ - other_coordinates.first) / distance;
+    double y_overlap = overlap * (y_coord_ - other_coordinates.second) / distance;
+
+    // Calculate how much should each entity move
+    double total_size = std::pow(size_, 2) + std::pow(other_size, 2);
+    this->SetCoordinates(x_coord_ + x_overlap*std::pow(size_, 2)/total_size,
+                         y_coord_ + y_overlap*std::pow(size_, 2)/total_size,
+                         kMapWidth, kMapHeight);
+    other_movable->SetCoordinates(other_coordinates.first - x_overlap*std::pow(other_size, 2)/total_size,
+                                 other_coordinates.second - y_overlap*std::pow(other_size, 2)/total_size,
+                                 kMapWidth, kMapHeight);
+
+    // Assert that the entities are no longer overlapping
+    // assert(size_ + other_size - GetDistance(other_movable, kMapWidth,
+    // kMapHeight) < 0.0001);
 }
+
