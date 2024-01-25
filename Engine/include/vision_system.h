@@ -15,37 +15,28 @@ public:
   double GetVisionRadius() const;
   double GetVisionAngle() const;
 
-  std::shared_ptr<Food> GetClosestFood(std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
-                       double GridCellSize) const;
-  std::shared_ptr<Food> GetClosestFoodInSight(
-      std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
-      double grid_cell_size, Food::type type, double map_width, double map_heigth) const;
+  std::shared_ptr<Entity> GetFoodID() const;
 
-  void ProcessVisionFood(std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
-                         double grid_cell_size, double width, double height);
-  std::shared_ptr<Food> GetFoodID() const;
-  std::shared_ptr<Food> GetClosestPlantInSight(std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
-          double grid_cell_size, double map_width, double map_heigth) const;
-  std::shared_ptr<Food> GetClosestMeatInSight(std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
-          double grid_cell_size, double map_width, double map_heigth) const;
-  bool IsInSight(std::shared_ptr<Entity> entity);
+  bool IsInRightDirection(std::shared_ptr<Entity> entity, double map_width, double map_heigth);
   bool IsInVisionCone(std::shared_ptr<Entity> entity, double map_width, double map_heigth) const;
 
+  std::vector<std::shared_ptr<Entity>> GetClosestEntityInSight(std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
+                                              double grid_cell_size, double map_width, double map_heigth) const;
+
 protected:
-  double distance_plant_;       /*!< Distance to the nearest plant source. */
-  double distance_meat_;        /*!< Distance to the nearest meat source. */
-  double orientation_plant_;   /*!< Orientation relative to the nearest plant
-                                 source. */
-  double plant_size_;          /*! Size of the closest plant*/
-  double meat_size_;          /*! Size of the closest meat*/
-  std::shared_ptr<Food> closest_plant_ = nullptr;       /*! Closest plant to show in the UI */
-  std::shared_ptr<Food> closest_meat_ = nullptr;      /*! Closest meat to show in the UI */
-  double orientation_meat_;   /*!< Orientation relative to the nearest meat
-                                source. */
+  double distance_entity_;       /*!< Distance to the nearest entity */
+  double orientation_entity_;   /*!< Orientation relative to the nearest entity */
+  double entity_compatibility_; /*! Compatibility with closest entity*/
+  double entity_size_;          /*! Size of the closest entity*/
+  double entity_color_;  /*! Color of the closest entity*/
+  std::shared_ptr<Entity> closest_entity_;       /*! Closest entity to show in the UI */
+
   double vision_radius_; /*!< The radius within which the creature can detect
                             other entities. */
   double vision_angle_;  /*!< The angle of vision for the creature, representing
                             the field of view. */
+
+  int number_entities_to_return_; /*!< Number of entities in sight to return when processing vision */
 };
 
 double GetRandomFloat(double min_value, double max_value);

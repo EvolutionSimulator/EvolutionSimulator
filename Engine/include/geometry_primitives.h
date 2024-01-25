@@ -52,7 +52,7 @@ class Point {
 class OrientedAngle {
  public:
   OrientedAngle(double angle);
-  OrientedAngle(const Point &from, const Point &to);
+  OrientedAngle(const Point &from, const Point &to, double map_width, double map_heigth);
   double GetAngle() const;
   OrientedAngle operator+(const OrientedAngle &other) const;
   OrientedAngle operator-(const OrientedAngle &other) const;
