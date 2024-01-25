@@ -7,10 +7,13 @@ VisionSystem::VisionSystem(neat::Genome genome, Mutable mutables)
     : AliveEntity(genome, mutables),
       vision_radius_(mutables.GetVisionFactor()),
       vision_angle_(SETTINGS.physical_constraints.vision_ar_ratio
-                    / mutables.GetVisionFactor())
-{
-
-}
+                    / mutables.GetVisionFactor()),
+      distance_plant_(0),
+      distance_meat_(0),
+      orientation_plant_(0),
+      orientation_meat_(0),
+      plant_size_(0),
+      meat_size_(0) { }
 
 /*!
  * @brief Sets the vision parameters for the VisionSystem.

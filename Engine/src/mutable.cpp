@@ -27,10 +27,14 @@ Mutable::Mutable()
     color_(0.0f),
     stomach_capacity_factor_(SETTINGS.physical_constraints.d_stomach_capacity),
     diet_(SETTINGS.physical_constraints.d_diet),
-    eating_speed_(SETTINGS.physical_constraints.d_eating_cooldown),
     genetic_strength_(SETTINGS.physical_constraints.d_genetic_strength),
+    eating_speed_(SETTINGS.physical_constraints.d_eating_cooldown),
     pheromone_emission_(SETTINGS.physical_constraints.d_pheromone_emission),
-    gestation_ratio_to_incubation_(SETTINGS.physical_constraints.d_gestation_ratio_to_incubation){}
+    gestation_ratio_to_incubation_(SETTINGS.physical_constraints.
+                                   d_gestation_ratio_to_incubation)
+{
+
+}
 
 /*!
  * @brief Calculates the complexity of the entity.

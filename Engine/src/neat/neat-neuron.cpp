@@ -19,7 +19,8 @@ int Neuron::next_id_ = 1;
  * @param bias The bias of the neuron.
  */
 Neuron::Neuron(NeuronType type, double bias)
-    : id_(next_id_++), type_(type), bias_(bias), active_(true) {}
+    : id_(next_id_++), type_(type), bias_(bias), active_(true),
+      activation_(ActivationType::linear){}
 
 /*!
  * @brief Gets the unique identifier of the neuron.

@@ -7,7 +7,9 @@
 #include "settings.h"
 
 ReproductiveSystem::ReproductiveSystem(neat::Genome genome, Mutable mutables)
-    : AliveEntity(genome, mutables){
+    : AliveEntity(genome, mutables),
+      reproduction_cooldown_(0.0),
+      waiting_to_reproduce_(false){
     maturity_age_ = MaturityAge(&mutables),
     ready_to_reproduce_at_ = maturity_age_;
 }

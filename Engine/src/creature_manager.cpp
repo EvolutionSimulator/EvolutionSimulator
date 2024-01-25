@@ -178,6 +178,7 @@ void CreatureManager::InitializeCreatures(SimulationData& data,
       if (std::rand() / (RAND_MAX + 1.0) < creature_density) {
         // neat::Genome genome(SETTINGS.environment.input_neurons,
         //                     SETTINGS.environment.output_neurons);
+
         Mutable mutables;
         for (int i = 0; i < 40; i++) {
           mutables.Mutate();

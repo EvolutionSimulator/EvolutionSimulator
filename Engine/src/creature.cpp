@@ -48,13 +48,11 @@ Creature::Creature(neat::Genome genome, Mutable mutables)
       PheromoneSystem(genome, mutables),
       mating_desire_(false)
       {
-    int neural_inputs = SETTINGS.environment.input_neurons;
-    for (BrainModule module : genome.GetModules()){
-        neural_inputs += module.GetInputNeuronIds().size();
-    }
-    neuron_data_ = std::vector<double>(neural_inputs, 0.0);
     think_count_ = this->GetID();
     color_hue_ = mutables.GetColor();
+    distance_enemy_ = mutables.GetVisionFactor();
+    orientation_enemy_ = 0;
+    enemy_size_ = 0;
 }
 
 /*!

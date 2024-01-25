@@ -37,8 +37,8 @@ protected:
                                  source. */
   double plant_size_;          /*! Size of the closest plant*/
   double meat_size_;          /*! Size of the closest meat*/
-  std::shared_ptr<Food> closest_plant_;       /*! Closest plant to show in the UI */
-  std::shared_ptr<Food> closest_meat_;      /*! Closest meat to show in the UI */
+  std::shared_ptr<Food> closest_plant_ = nullptr;       /*! Closest plant to show in the UI */
+  std::shared_ptr<Food> closest_meat_ = nullptr;      /*! Closest meat to show in the UI */
   double orientation_meat_;   /*!< Orientation relative to the nearest meat
                                 source. */
   double vision_radius_; /*!< The radius within which the creature can detect

@@ -76,8 +76,10 @@ class Settings {
     double photosynthesis_factor = 0.01;
     double frictional_coefficient = 0.15; // Needs to be less than 1
     double maturity_age_multiplier = 0.1;
-    double male_reproduction_cost = 0.5;
+    double male_reproduction_cost = 0.52;
     double pregnancy_hardship_modifier = 2; //1 for normal behavior do not make it 0
+    int surface_dimension = 1;
+    int volume_dimension = 2;
   } environment;
 
   struct EngineSettings {

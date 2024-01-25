@@ -2,6 +2,8 @@
 
 #include "settings.h"
 
+#include <algorithm>
+
 PheromoneSystem::PheromoneSystem(neat::Genome genome, Mutable mutables)
     : AliveEntity(genome, mutables), pheromone_densities_(16, 0),
       pheromone_emissions_(16, 0), pheromone_types_(16,0) {//We use 16 as that is the established number of pheromones avaialable atm
@@ -22,7 +24,7 @@ std::vector<double> PheromoneSystem::GetPheromoneDensities(
     int grid_height = grid[0].size();
 
     std::vector<double> pheromone_densities(16, 0);
-
+    if (std::any_of(pheromone_types_.begin(), pheromone_types_.end(), [](int i){ return i == 1; })) return std::vector<double>(16, 0.0);
     std::vector<std::pair<int, int>> cells;
     int reach = std::floor(size_/GridCellSize);
     for (int i = -reach; i <= reach; i++){

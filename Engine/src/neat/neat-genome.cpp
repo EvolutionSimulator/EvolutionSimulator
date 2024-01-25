@@ -605,7 +605,7 @@ void Genome::MutateActivationFunction() {
  * neurons of the module to reflect the current state of the genome.
  */
 void Genome::MutateActivateBrainModule(){
-
+  if (AvailableModules.size() == 0) return;
   std::random_device rd;
   std::mt19937 generator(rd());
   std::uniform_int_distribution<int> distribution(0, AvailableModules.size() - 1);

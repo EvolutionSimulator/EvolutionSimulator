@@ -9,8 +9,11 @@ AliveEntity::AliveEntity(neat::Genome genome, Mutable mutables)
       genome_(genome),
       age_(0) {
     size_ = mutables.GetBabySize();
-    health_ = mutables.GetIntegrity() * pow(size_, 2)/2;
-    energy_ = mutables.GetEnergyDensity() * pow(size_, 2)/2;
+    health_ = mutables.GetIntegrity() *
+            pow(size_, SETTINGS.environment.volume_dimension)/2;
+    max_energy_ = mutables.GetEnergyDensity() *
+            pow(size_, SETTINGS.environment.volume_dimension);
+    energy_ = max_energy_/2;
     int neural_inputs = SETTINGS.environment.input_neurons;
     for (BrainModule module : genome.GetModules()){
         neural_inputs += module.GetInputNeuronIds().size();
