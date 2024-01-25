@@ -118,16 +118,23 @@ void UpdateQueue(std::queue<std::shared_ptr<Creature>> &reproduce) {
 }
 
 void UpdateGridPheromones(
-        std::vector<std::shared_ptr<Pheromone>> pheromones,
+        std::vector<std::shared_ptr<Pheromone>> &pheromones,
         std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>>& entityGrid,
         double cellSize,
         double deltaTime){
+
+    for (std::shared_ptr<Pheromone> pheromone : pheromones){
+        pheromone->SetSize(pheromone->GetSize() - deltaTime);
+        if (pheromone->GetSize() < 0.5){
+            pheromone->SetState(Entity::Dead);
+        }
+    }
+
     pheromones.erase(std::remove_if(pheromones.begin(), pheromones.end(),
-                                     [&deltaTime](std::shared_ptr<Pheromone> pheromone){
-                                       pheromone->SetSize(pheromone->GetSize() - deltaTime);
-                                       return pheromone->GetSize() < 0.5;
-                                    }),
-            pheromones.end());
+                               [](const std::shared_ptr<Pheromone> pheromone) {
+                                   return pheromone->GetState() == Entity::Dead;
+                               }),
+                pheromones.end());
     for (std::shared_ptr<Pheromone> pheromone: pheromones) {
         std::pair<double, double> coordinates = pheromone->GetCoordinates();
         int gridX = static_cast<int>(coordinates.first / cellSize);
