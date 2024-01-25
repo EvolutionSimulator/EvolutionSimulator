@@ -1,11 +1,12 @@
 # Week 1
 - Organized Notion infrastructure
-- Divided tasks for the "entity creation" project
+- Defined the road map for the project
+- Project leader for the "entity creation" project
 - Created a Food Generation function
 - Helped define some of the class structure of the project
 
 # Week 2
-- Divided tasks for the "system links" project
+- Project leader for the "system links" project
 - Created a reproduction function with all of the corresponding adjustments 
 - Implemented reproduction into the game loop using a queue
 
@@ -27,9 +28,21 @@
 - Research how to deal with files during compilation and figure out how to access files using the QResources handler
 - Worked on a complete revamp of the UI looks and created different sprites to substitute the previous buttons
 - Created sprites with procedural generation depending on size, eye type, and tail type (which depend on mutable properties)
-- Implemented simple shaders to be able to have sprites with a similar color palette for different hues.
+- Implemented simple shaders to have sprites with a similar color palette for different hues.
 - Implemented zoom capabilities
-- Implemented the reproduction restrictions so that only species within compatibility range reproduce
+- Implemented the reproduction restrictions so that only species within the compatibility range reproduce
 
 # Week 6
-- 
+- Implemented brain modules (sets of input and output neurons that creatures don't have by default but may evolve through mutations; i.e. pheromone emission/detection)
+- Worked on the visualization of the food density along the map using a shader (sadly even though the code is there this functionality was never made compatible with the zoom capabilities and it cannot be seen on the final project)
+- Refactored the creature class into a set of smaller classes with more specific functionalities.
+- Reworked the entire project to use shared pointers to entities in the heap instead of them being stored in vectors of the SimulationData class
+
+# Week 7
+- Helped merge with main the reproduction and attack projects after the creature refactor and the stack to heap change
+- Implemented pheromones as a brain module
+
+
+
+
+On top of all of this on a weekly basis I created guidelines for what each project was supposed to implement/accomplish and I worked closely with Nikola to decide what our next objectives in the road map were. Moreover, extensive hours were spent helping other members with questions about the objectives of specific implementations and finding hidden bugs all over the code.
