@@ -347,7 +347,8 @@ Mutable MutableCrossover(const Mutable &dominant, const Mutable &recessive) {
  * @return double The calculated compatibility distance. A lower value indicates
  * higher compatibility between the two `Mutable` objects.
  */
-double Mutable::CompatibilityBetweenMutables(const Mutable &other_mutable) {
+double Mutable::CompatibilityBetweenMutables(
+    const Mutable &other_mutable) const {
   double distance = 0;
   // Energy Density
   distance +=
