@@ -182,12 +182,10 @@ double Entity::GetDistance(const std::shared_ptr<Entity> other_entity, const dou
  *
  * @return The relative orientation angle in radians between [-pi,pi].
  */
-double Entity::GetRelativeOrientation(const std::shared_ptr<Entity> other_entity) const {
+double Entity::GetRelativeOrientation(const std::shared_ptr<Entity> other_entity, double map_width, double map_heigth) const {
   // assumes orientation = 0 is the x axis
   return (OrientedAngle(Point(GetCoordinates()),
-                        Point(other_entity->GetCoordinates())) -
-          OrientedAngle(orientation_))
-      .GetAngle();
+                        Point(other_entity->GetCoordinates()), map_width, map_heigth) - OrientedAngle(orientation_)).GetAngle();
 }
 
 /*!

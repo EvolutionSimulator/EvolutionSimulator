@@ -230,14 +230,14 @@ TEST(CreatureTests, GetClosestFoodInSight_MultipleFoods) {
   creature.SetCoordinates(creature_x, creature_y, 10, 10);
   double target_x = 2.84687, target_y = 2.26958;
   creature.SetOrientation(
-      OrientedAngle(Point(creature_x, creature_y), Point(target_x, target_y))
+      OrientedAngle(Point(creature_x, creature_y), Point(target_x, target_y), 10.0, 10.0)
           .GetAngle());
   creature.SetVision(2.0, M_PI / 3);
 
   auto closest_food =
-      creature.GetClosestFoodInSight(grid, gridCellSize, Food::type::meat, 10.0, 10.0);
+      creature.GetClosestEntityInSight(grid, gridCellSize, 10.0, 10.0);
 
-  ASSERT_EQ(closest_food, meat_1);
+  ASSERT_EQ(closest_food[0], meat_1);
 }
 
 TEST(CreatureTests, GetClosestFoodInSight_NoFoodInSight) {
@@ -265,14 +265,14 @@ TEST(CreatureTests, GetClosestFoodInSight_NoFoodInSight) {
   creature.SetCoordinates(creature_x, creature_y, 10, 10);
   double target_x = 2.84687, target_y = 2.26958;
   creature.SetOrientation(
-      OrientedAngle(Point(creature_x, creature_y), Point(target_x, target_y))
+      OrientedAngle(Point(creature_x, creature_y), Point(target_x, target_y), 10.0, 10.0)
           .GetAngle());
   creature.SetVision(1, M_PI / 3);
 
   auto closest_food =
-      creature.GetClosestFoodInSight(grid, gridCellSize, Food::type::meat, 10.0, 10.0);
+      creature.GetClosestEntityInSight(grid, gridCellSize, 10.0, 10.0);
 
-  ASSERT_EQ(closest_food, nullptr);
+  ASSERT_EQ(closest_food[0], nullptr);
 }
 
 TEST(CreatureTests, Digest) {

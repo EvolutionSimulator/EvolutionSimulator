@@ -26,13 +26,9 @@ void InfoPanel::SetUIView(sf::View view){ ui_view_ = view;}
 
 void InfoPanel::SetPanelView(sf::View view){ info_panel_view_ = view;}
 
-void InfoPanel::SetSelectedCreature(std::shared_ptr<Creature> creature) {
-  selected_creature_ = creature;
-}
+void InfoPanel::SetSelectedCreature(std::shared_ptr<Creature> creature) {selected_creature_ = creature;}
 
-void InfoPanel::UpdateSelectedFood() {
-  selected_food_ = selected_creature_->GetFoodID();
-}
+void InfoPanel::UpdateSelectedFood() {closest_entity_ = selected_creature_->GetFoodID();}
 
 std::shared_ptr<Creature> InfoPanel::GetSelectedCreature() const {
   return selected_creature_;
@@ -181,13 +177,13 @@ void InfoPanel::DrawPanel(sf::RenderTarget& target) {
     creature_info = QString::fromStdString(FormatCreatureInfo(*selected_creature_));
   }
 
-  if(selected_food_){
-    sf::CircleShape blueCircle(selected_food_->GetSize()); // Adjust as needed
+  if(closest_entity_){
+    sf::CircleShape blueCircle(closest_entity_->GetSize()); // Adjust as needed
     blueCircle.setOutlineColor(sf::Color::Blue);
     blueCircle.setOutlineThickness(2); // Adjust thickness as needed
     blueCircle.setFillColor(sf::Color::Transparent);
-    blueCircle.setPosition(selected_food_->GetCoordinates().first - selected_food_->GetSize(),
-                           selected_food_->GetCoordinates().second - selected_food_->GetSize());
+    blueCircle.setPosition(closest_entity_->GetCoordinates().first - closest_entity_->GetSize(),
+                           closest_entity_->GetCoordinates().second - closest_entity_->GetSize());
     target.draw(blueCircle);
   }
 
