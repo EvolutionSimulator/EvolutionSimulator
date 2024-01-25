@@ -182,7 +182,7 @@ bool IsGridCellPotentiallyInsideCone(Point grid_point, double grid_cell_size,
                      SETTINGS.environment.max_food_size + EPS) {
     return false;
   }
-  OrientedAngle cell_relative_angle(cone_center, grid_point);
+  OrientedAngle cell_relative_angle(cone_center, grid_point, map_width, map_heigth);
   double angle_distance = cell_relative_angle.AngleDistanceToCone(
       cone_left_boundary, cone_right_boundary);
   if (sin(angle_distance) >

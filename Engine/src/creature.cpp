@@ -207,8 +207,8 @@ void Creature::Update(double deltaTime, double const kMapWidth,
  * @param kMapWidth Width of the map.
  * @param kMapHeight Height of the map.
  */
-void Creature::OnCollision(std::shared_ptr<Entity>other_entity, double const kMapWidth, double const kMapHeight) {
-  if (other_entity->GetState() == Entity::Alive && eating_cooldown_ == 0.0 && biting_ == 1 && IsInSight(other_entity)) {
+void Creature::OnCollision(std::shared_ptr<Entity>other_entity, double kMapWidth, double kMapHeight) {
+  if (other_entity->GetState() == Entity::Alive && eating_cooldown_ == 0.0 && biting_ == 1 && IsInRightDirection(other_entity, kMapWidth, kMapHeight)) {
     SetEnergy(GetEnergy() - bite_strength_ * SETTINGS.physical_constraints.d_bite_energy_consumption_ratio);
     if (std::shared_ptr<Food> food_entity = std::dynamic_pointer_cast<Food>(other_entity)) {
       DigestiveSystem::Bite(food_entity);
@@ -243,8 +243,7 @@ void Creature::Think(std::vector<std::vector<std::vector<std::shared_ptr<Entity>
   }
   think_count_ = 0;
   // To allow creatures to use a module it should be included below
-  ProcessVisionFood(grid, GridCellSize, width, height);
-  ProcessVisionEnemies(grid, GridCellSize, width, height);
+  ProcessVision(grid, GridCellSize, width, height);
   ProcessPheromoneDetection(grid, GridCellSize);
 
   if (neuron_data_.size() == 0) return;
@@ -254,15 +253,11 @@ void Creature::Think(std::vector<std::vector<std::vector<std::shared_ptr<Entity>
   neuron_data_.at(3) = GetVelocityAngle();
   neuron_data_.at(4) = GetRotationalVelocity();
   neuron_data_.at(5) = GetEmptinessPercent();
-  neuron_data_.at(6) = orientation_plant_;
-  neuron_data_.at(7) = distance_plant_;
-  neuron_data_.at(8) = plant_size_;
-  neuron_data_.at(9) = orientation_meat_;
-  neuron_data_.at(10) = distance_meat_;
-  neuron_data_.at(11) = meat_size_;
-  neuron_data_.at(12) = orientation_enemy_;
-  neuron_data_.at(13) = distance_enemy_;
-  neuron_data_.at(14) = enemy_size_;
+  neuron_data_.at(6) = orientation_entity_;
+  neuron_data_.at(7) = distance_entity_;
+  neuron_data_.at(8) = entity_size_;
+  neuron_data_.at(9) = entity_color_;
+  neuron_data_.at(10) = entity_compatibility_;
 
   for (BrainModule module : GetGenome().GetModules()) {
     if (module.GetModuleId() == 1) {  // Geolocation Module
@@ -459,7 +454,7 @@ std::shared_ptr<Creature> Creature::GetClosestEnemyInSight(
       if (creature && creature->GetState() == Entity::states::Alive && Compatible(creature) == 0) {
         auto point = Point(entity->GetCoordinates());
 
-        auto direction = OrientedAngle(cone_center, point);
+        auto direction = OrientedAngle(cone_center, point, map_width, map_heigth);
 
         double distance = point.dist(cone_center, map_width, map_heigth);
 
@@ -526,7 +521,7 @@ void Creature::ProcessVisionEnemies(std::vector<std::vector<std::vector<std::sha
 
   if (closeEnemy){
     distance_enemy_ = this->GetDistance(closeEnemy, width, height) - closeEnemy->GetSize();
-    orientation_enemy_ = this->GetRelativeOrientation(closeEnemy);
+    orientation_enemy_ = this->GetRelativeOrientation(closeEnemy, width, height);
     enemy_size_ = closeEnemy->GetSize();
   }
   else {
@@ -578,3 +573,44 @@ void Creature::Grab(std::shared_ptr<Entity> entity){
     }
 }
 */
+
+/*!
+ * @brief Processes the VisionSystem's vision to locate food.
+ *
+ * @details Determines the closest food entity based on the VisionSystem's position
+ * and updates the VisionSystem's orientation and distance metrics towards the
+ * located food. If there is no food in sight, it assumes the distance to food is
+ * the vision radius (so far away), and the orientation is something random
+ * in its field of view.
+ *
+ * @param grid The environmental grid.
+ * @param GridCellSize Size of each cell in the grid.
+ */
+void Creature::ProcessVision(
+    std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
+    double GridCellSize, double width, double height) {
+  std::vector<std::shared_ptr<Entity>> closeEntities = GetClosestEntityInSight(grid, GridCellSize, width, height);
+  auto closeEntity = closeEntities[0];
+
+  if (closeEntity){
+    distance_entity_ = this->GetDistance(closeEntity, width, height) - closeEntity->GetSize();
+    orientation_entity_ = this->GetRelativeOrientation(closeEntity, width, height);
+    closest_entity_ = closeEntity;
+    entity_size_ = closeEntity->GetSize();
+    entity_color_ = closeEntity->GetColor();
+
+    std::shared_ptr<Creature> otherCreature = std::dynamic_pointer_cast<Creature>(closeEntity);
+
+    if (otherCreature && Compatible(otherCreature)) { entity_compatibility_ = 1;}
+    else{ entity_compatibility_ = 0; }
+
+  }
+  else {
+    distance_entity_ =  vision_radius_;
+    orientation_entity_ = remainder(GetRandomFloat(orientation_- vision_angle_/2, orientation_+ vision_angle_/2), 2*M_PI);
+    closest_entity_ =  nullptr;
+    entity_size_ = -1;
+    entity_compatibility_ = 0;
+    entity_color_ = 0;
+  }
+}

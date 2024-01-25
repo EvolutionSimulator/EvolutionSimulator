@@ -69,6 +69,9 @@ class Creature : virtual public MovableEntity,
   bool Compatible(const std::shared_ptr<Creature> other_creature);
 
   void Grab(std::shared_ptr<Entity>entity);
+  void ProcessVision(
+      std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
+      double GridCellSize, double width, double height);
 
 
 

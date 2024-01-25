@@ -48,7 +48,7 @@ class Entity {
                                  otherEntity->GetCoordinates(),
                                  otherEntity->GetSize());
   }
-  double GetRelativeOrientation(const std::shared_ptr<Entity> otherEntity) const;
+  double GetRelativeOrientation(const std::shared_ptr<Entity> otherEntity, double map_width, double map_heigth) const;
 
   int GetID() const;
 

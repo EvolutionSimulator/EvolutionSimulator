@@ -64,26 +64,26 @@ OrientedAngle::OrientedAngle(double angle) : angle_(angle) { Normalize(); }
  * @param from The starting Point.
  * @param to The ending Point.
  */
-OrientedAngle::OrientedAngle(const Point &from, const Point &to) {
+OrientedAngle::OrientedAngle(const Point &from, const Point &to, double map_width, double map_heigth) {
 
   auto diff_x = to.GetX() - from.GetX();
-  if (diff_x > SETTINGS.environment.map_width/2)
+  if (diff_x > map_width/2)
   {
-    diff_x -=  SETTINGS.environment.map_width;
+    diff_x -=  map_width;
   }
-  if (diff_x < - SETTINGS.environment.map_width/2)
+  if (diff_x < - map_width/2)
   {
-    diff_x +=  SETTINGS.environment.map_width;
+    diff_x +=  map_width;
   }
 
   auto diff_y = to.GetY() - from.GetY();
-  if (diff_y > SETTINGS.environment.map_height/2)
+  if (diff_y > map_heigth/2)
   {
-    diff_y -=  SETTINGS.environment.map_height;
+    diff_y -=  map_heigth;
   }
-  if (diff_y < - SETTINGS.environment.map_height/2)
+  if (diff_y < - map_heigth/2)
   {
-    diff_y +=  SETTINGS.environment.map_height;
+    diff_y +=  map_heigth;
   }
   angle_ = atan2(diff_y, diff_x);
   Normalize();

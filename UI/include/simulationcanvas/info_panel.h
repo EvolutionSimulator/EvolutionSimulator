@@ -33,7 +33,7 @@ private:
   QSFMLCanvas* canvas_;
   Simulation* simulation_;
   std::shared_ptr<Creature> selected_creature_;
-  std::shared_ptr<Food> selected_food_;
+  std::shared_ptr<Entity> closest_entity_;
   bool is_visible_;
   TextureManager* texture_manager_;
 
