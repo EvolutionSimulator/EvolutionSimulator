@@ -44,7 +44,7 @@ class Mutable {
   void SetEatingSpeed(double value);
   void SetPheromoneEmission(double value);
 
-  double CompatibilityBetweenMutables(const Mutable& other_mutable);
+  double CompatibilityBetweenMutables(const Mutable& other_mutable) const;
 
  private:
   // Any values added here need to be included in the complexity, mutation, and

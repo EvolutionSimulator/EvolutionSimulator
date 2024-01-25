@@ -20,15 +20,19 @@ namespace neat {
  */
   class Genome {
    public:
+    explicit Genome();
     explicit Genome(int input_count, int output_count);
     int GetInputCount() const;
     int GetOutputCount() const;
     const std::vector<Neuron>& GetNeurons() const;
     const std::vector<Link>& GetLinks() const;
+    std::vector<BrainModule> GetModules() const;
+    std::vector<BrainModule> GetAvailableModules() const;
 
     void AddNeuron(const Neuron& neuron);
     void AddLink(const Link& link);
     void SetModules(const std::vector<BrainModule>& modules);
+    void SetAvailableModules(const std::vector<BrainModule>& modules);
 
     void DisableNeuron(int id);  // don't use this for now
     void DisableLink(int id);
@@ -49,8 +53,6 @@ namespace neat {
     void MutateActivationFunction();
     void MutateActivateBrainModule();
     void MutateDisableBrainModule();
-
-    std::vector<BrainModule> GetModules() const;
 
     bool FindNeuronById(int targetId, Neuron& foundNeuron) const;
 
