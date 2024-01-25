@@ -206,6 +206,7 @@ void Creature::Update(double deltaTime, double const kMapWidth,
  * @param kMapHeight Height of the map.
  */
 void Creature::OnCollision(std::shared_ptr<Entity>other_entity, double const kMapWidth, double const kMapHeight) {
+  if (std::dynamic_pointer_cast<Pheromone>(other_entity) != nullptr) return;
   if (other_entity->GetState() == Entity::Alive && eating_cooldown_ == 0.0 && biting_ == 1 && IsInSight(other_entity)) {
     SetEnergy(GetEnergy() - bite_strength_ * SETTINGS.physical_constraints.d_bite_energy_consumption_ratio);
     if (std::shared_ptr<Food> food_entity = std::dynamic_pointer_cast<Food>(other_entity)) {
@@ -214,6 +215,7 @@ void Creature::OnCollision(std::shared_ptr<Entity>other_entity, double const kMa
             Bite(creature_entity);
     }
   }
+
   // if (other_entity->GetState() == Entity::Alive && grabbing_ && IsInSight(other_entity) && !(this->GetGrabbedEntity())){
   //   //checking if the creature wants to grab, has the entity in sight and if he is not already grabbing something
   //     Grab(other_entity);

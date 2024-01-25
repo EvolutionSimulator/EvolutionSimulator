@@ -8,23 +8,23 @@ class BrainModule
 public:
     BrainModule(int input, int output, int module_id, bool multiple = false);
 
-    int GetFirstInputIndex();
+    int GetFirstInputIndex() const;
     void SetFirstInputIndex(const int index);
 
-    int GetFirstOutputIndex();
+    int GetFirstOutputIndex() const;
     void SetFirstOutputIndex(const int index);
 
-    std::vector<int> GetInputNeuronIds();
+    std::vector<int> GetInputNeuronIds() const;
     void SetInputNeuronIds(const std::vector<int> input_neuron_ids);
 
-    std::vector<int> GetOutputNeuronIds();
+    std::vector<int> GetOutputNeuronIds() const;
     void SetOutputNeuronIds(const std::vector<int> input_neuron_ids);
 
-    int GetModuleId();
+    int GetModuleId() const;
 
-    bool GetMultiple();
+    bool GetMultiple() const;
 
-    int GetType();
+    int GetType() const;
 
 private:
     int first_input_index_;

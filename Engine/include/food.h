@@ -1,11 +1,11 @@
 #ifndef FOOD_H
 #define FOOD_H
 
-#include <entity.h>
+#include "movable_entity.h"
 
 #include "environment.h"
 
-class Food : public Entity {
+class Food : virtual public MovableEntity {
  protected:
   Food(const double nutritional_value);
   Food(const double x_coord, const double y_coord,

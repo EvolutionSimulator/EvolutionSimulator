@@ -15,7 +15,7 @@ BrainModule::BrainModule(int input, int output, int module_id, bool multiple)
     type_ = dis(gen);
 }
 
-int BrainModule::GetFirstInputIndex() {
+int BrainModule::GetFirstInputIndex() const {
     return first_input_index_;
 }
 
@@ -23,7 +23,7 @@ void BrainModule::SetFirstInputIndex(const int index) {
     first_input_index_ = index;
 }
 
-int BrainModule::GetFirstOutputIndex() {
+int BrainModule::GetFirstOutputIndex() const {
     return first_output_index_;
 }
 
@@ -31,7 +31,7 @@ void BrainModule::SetFirstOutputIndex(const int index) {
     first_output_index_ = index;
 }
 
-std::vector<int> BrainModule::GetInputNeuronIds() {
+std::vector<int> BrainModule::GetInputNeuronIds() const {
     return input_neuron_ids_;
 }
 
@@ -39,7 +39,7 @@ void BrainModule::SetInputNeuronIds(const std::vector<int> input_neuron_ids) {
     input_neuron_ids_ = input_neuron_ids;
 }
 
-std::vector<int> BrainModule::GetOutputNeuronIds() {
+std::vector<int> BrainModule::GetOutputNeuronIds() const {
     return output_neuron_ids_;
 }
 
@@ -47,14 +47,14 @@ void BrainModule::SetOutputNeuronIds(const std::vector<int> output_neuron_ids) {
     output_neuron_ids_ = output_neuron_ids;
 }
 
-int BrainModule::GetModuleId() {
+int BrainModule::GetModuleId() const {
     return module_id_;
 }
 
-bool BrainModule::GetMultiple() {
+bool BrainModule::GetMultiple() const {
     return multiple_;
 }
 
-int BrainModule::GetType() {
+int BrainModule::GetType() const {
     return type_;
 }
