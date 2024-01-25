@@ -47,7 +47,7 @@ struct SimulationData {
   double world_time_ = 0;
 
   void WriteDataToFile();
-  void RetrieveDataFromFile();
+  void RetrieveDataFromFile(const std::string&);
 
  private:
   double lastRecordedTime_;
