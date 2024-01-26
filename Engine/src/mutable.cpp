@@ -2,7 +2,7 @@
 
 #include <algorithm>
 #include <iostream>
-#include <random>
+#include "random.h"
 
 #include "math.h"
 #include "mathlib.h"
@@ -63,25 +63,20 @@ double Mutable::Complexity() const {
  * integrity, and size within certain constraints.
  */
 void Mutable::Mutate() {
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_real_distribution<> uniform(0.0, 1.0);
 
   // Energy Density
-  if (uniform(gen) < SETTINGS.physical_constraints.mutation_rate) {
-    std::normal_distribution<> dis(
+  if (Random::Double(0.0, 1.0) < SETTINGS.physical_constraints.mutation_rate) {
+    double delta = Random::Normal(
         0.0, SETTINGS.physical_constraints.d_energy_density / 20);
-    double delta = dis(gen);
     energy_density_ += delta;
     energy_density_ = mathlib::bound(energy_density_, 0,
                                      SETTINGS.physical_constraints.max_energy_density);
   }
 
   // Energy Loss
-  if (uniform(gen) < SETTINGS.physical_constraints.mutation_rate) {
-    std::normal_distribution<> dis(
-        0.0, SETTINGS.physical_constraints.d_energy_loss / 20);
-    double delta = dis(gen);
+  if (Random::Double(0.0, 1.0) < SETTINGS.physical_constraints.mutation_rate) {
+    double delta = Random::Normal(
+        0.0, SETTINGS.physical_constraints.d_energy_loss / 20);    
     energy_loss_ += delta;
     if (energy_loss_ < SETTINGS.physical_constraints.min_energy_loss) {
       energy_loss_ = SETTINGS.physical_constraints.min_energy_loss;
@@ -89,10 +84,9 @@ void Mutable::Mutate() {
   }
 
   // Integrity
-  if (uniform(gen) < SETTINGS.physical_constraints.mutation_rate) {
-    std::normal_distribution<> dis(
-        0.0, SETTINGS.physical_constraints.d_energy_density / 20);
-    double delta = dis(gen);
+  if (Random::Double(0.0, 1.0) < SETTINGS.physical_constraints.mutation_rate) {
+    double delta = Random::Normal(
+        0.0, SETTINGS.physical_constraints.d_energy_density / 20);    
     integrity_ += delta;
     if (integrity_ < 0) {
       integrity_ = 0;
@@ -100,10 +94,9 @@ void Mutable::Mutate() {
   }
 
   // Strafing Difficulty
-  if (uniform(gen) < SETTINGS.physical_constraints.mutation_rate) {
-    std::normal_distribution<> dis(
-        0.0, SETTINGS.physical_constraints.d_strafing_difficulty / 20);
-    double delta = dis(gen);
+  if (Random::Double(0.0, 1.0) < SETTINGS.physical_constraints.mutation_rate) {
+    double delta = Random::Normal(
+        0.0, SETTINGS.physical_constraints.d_strafing_difficulty / 20);   
     strafing_difficulty_ += delta;
     if (strafing_difficulty_ < 0) {
       strafing_difficulty_ = 0;
@@ -111,10 +104,9 @@ void Mutable::Mutate() {
   }
 
   // Max Size
-  if (uniform(gen) < SETTINGS.physical_constraints.mutation_rate) {
-    std::normal_distribution<> dis(
-        0.0, SETTINGS.physical_constraints.d_max_size / 20);
-    double delta = dis(gen);
+  if (Random::Double(0.0, 1.0) < SETTINGS.physical_constraints.mutation_rate) {
+    double delta = Random::Normal(
+        0.0, SETTINGS.physical_constraints.d_max_size / 20);    
     max_size_ += delta;
     if (max_size_ < SETTINGS.environment.min_creature_size) {
       max_size_ = SETTINGS.environment.min_creature_size;
@@ -122,20 +114,18 @@ void Mutable::Mutate() {
   }
 
   // Baby Size
-  if (uniform(gen) < SETTINGS.physical_constraints.mutation_rate) {
-    std::normal_distribution<> dis(
-        0.0, SETTINGS.physical_constraints.d_baby_size / 20);
-    double delta = dis(gen);
+  if (Random::Double(0.0, 1.0) < SETTINGS.physical_constraints.mutation_rate) {
+    double delta = Random::Normal(
+        0.0, SETTINGS.physical_constraints.d_baby_size / 20);    
     baby_size_ += delta;
     baby_size_ = mathlib::bound(baby_size_, SETTINGS.environment.min_creature_size,
                                 max_size_);
   }
 
   // Max Force
-  if (uniform(gen) < SETTINGS.physical_constraints.mutation_rate) {
-    std::normal_distribution<> dis(
-        0.0, SETTINGS.physical_constraints.d_max_force / 20);
-    double delta = dis(gen);
+  if (Random::Double(0.0, 1.0) < SETTINGS.physical_constraints.mutation_rate) {
+    double delta = Random::Normal(
+        0.0, SETTINGS.physical_constraints.d_max_force / 20);    
     max_force_ += delta;
     if (max_force_ < 0) {
       max_force_ = 0;
@@ -143,10 +133,9 @@ void Mutable::Mutate() {
   }
 
   // Growth Factor
-  if (uniform(gen) < SETTINGS.physical_constraints.mutation_rate) {
-    std::normal_distribution<> dis(
-        0.0, SETTINGS.physical_constraints.d_max_force / 20);
-    double delta = dis(gen);
+  if (Random::Double(0.0, 1.0) < SETTINGS.physical_constraints.mutation_rate) {
+    double delta = Random::Normal(
+        0.0, SETTINGS.physical_constraints.d_max_force / 20);    
     growth_factor_ += delta;
     if (growth_factor_ < 0) {
       growth_factor_ = 0;
@@ -154,10 +143,9 @@ void Mutable::Mutate() {
   }
 
   // Vision Factor
-  if (uniform(gen) < SETTINGS.physical_constraints.mutation_rate) {
-    std::normal_distribution<> dis(
-        0.0, SETTINGS.physical_constraints.d_vision_factor / 20);
-    double delta = dis(gen);
+  if (Random::Double(0.0, 1.0) < SETTINGS.physical_constraints.mutation_rate) {
+    double delta = Random::Normal(
+        0.0, SETTINGS.physical_constraints.d_vision_factor / 20);    
     vision_factor_ += delta;
     if (SETTINGS.physical_constraints.vision_ar_ratio / vision_factor_ >
         2 * M_PI) {
@@ -167,22 +155,21 @@ void Mutable::Mutate() {
   }
 
   // Gestation Ratio To Incubation
-  if (uniform(gen) < SETTINGS.physical_constraints.mutation_rate) {
-    std::normal_distribution<> dis(
+  if (Random::Double(0.0, 1.0) < SETTINGS.physical_constraints.mutation_rate) {
+    double delta = Random::Normal(
         0.0,
-        SETTINGS.physical_constraints.d_gestation_ratio_to_incubation / 20);
-    double delta = dis(gen);
+        SETTINGS.physical_constraints.d_gestation_ratio_to_incubation / 20);    
     gestation_ratio_to_incubation_ += delta;
     gestation_ratio_to_incubation_ =
         mathlib::bound(gestation_ratio_to_incubation_, 0, 1);
   }
 
   // Color
-  if (uniform(gen) < SETTINGS.physical_constraints.mutation_rate) {
-    std::normal_distribution<> dis(
+  if (Random::Double(0.0, 1.0) < SETTINGS.physical_constraints.mutation_rate) {
+    double delta = Random::Normal(
         0.0, SETTINGS.physical_constraints.color_mutation_factor);
-    float delta = dis(gen);
-    color_ += delta;
+    float float_delta = delta; //as shaders use floats
+    color_ += float_delta;
     if (color_ > 1) {
       color_ -= 1;
     } else if (color_ < 0) {
@@ -191,37 +178,33 @@ void Mutable::Mutate() {
   }
 
   // Stomach capacity
-  if (uniform(gen) < SETTINGS.physical_constraints.mutation_rate) {
-    std::normal_distribution<> dis(
+  if (Random::Double(0.0, 1.0) < SETTINGS.physical_constraints.mutation_rate) {
+    double delta = Random::Normal(
         0.0, SETTINGS.physical_constraints.d_stomach_capacity / 20);
-    double delta = dis(gen);
     stomach_capacity_factor_ += delta;
     stomach_capacity_factor_ = mathlib::bound(stomach_capacity_factor_, 0, 1);
   }
 
   // Diet
-  if (uniform(gen) < SETTINGS.physical_constraints.mutation_rate) {
-    std::normal_distribution<> dis(0.0,
+  if (Random::Double(0.0, 1.0) < SETTINGS.physical_constraints.mutation_rate) {
+    double delta = Random::Normal(0.0,
                                    SETTINGS.physical_constraints.d_diet / 10);
-    double delta = dis(gen);
     diet_ += delta;
     diet_ = mathlib::bound(diet_, 0.1, 0.9);
   }
 
   // Genetic Strength
-  if (uniform(gen) < SETTINGS.physical_constraints.mutation_rate) {
-    std::normal_distribution<> dis(
+  if (Random::Double(0.0, 1.0) < SETTINGS.physical_constraints.mutation_rate) {
+    double delta = Random::Normal(
         0.0, SETTINGS.physical_constraints.d_genetic_strength / 10);
-    double delta = dis(gen);
     genetic_strength_ += delta;
     genetic_strength_ = mathlib::bound(genetic_strength_, 0.2, 1.2);
   }
 
   //Eating Speed
-  if (uniform(gen) < SETTINGS.physical_constraints.mutation_rate){
-    std::normal_distribution<> dis(0.0,
+  if (Random::Double(0.0, 1.0) < SETTINGS.physical_constraints.mutation_rate){
+    double delta = Random::Normal(0.0,
                                    SETTINGS.physical_constraints.d_eating_speed/10);
-    double delta = dis(gen);
     eating_speed_ += delta;
     if (eating_speed_  < 0.2) {
         eating_speed_ = 0.2;
@@ -231,10 +214,9 @@ void Mutable::Mutate() {
     }
   }
 
-  if (uniform(gen) < SETTINGS.physical_constraints.mutation_rate){
-    std::normal_distribution<> dis(0.0,
+  if (Random::Double(0.0, 1.0) < SETTINGS.physical_constraints.mutation_rate){
+    double delta = Random::Normal(0.0,
                                    SETTINGS.physical_constraints.d_pheromone_emission/10);
-    double delta = dis(gen);
     pheromone_emission_ += delta;
     if (pheromone_emission_  < 0) {
         pheromone_emission_ = 0;

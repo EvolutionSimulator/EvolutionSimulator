@@ -8,7 +8,7 @@
 
 #include <algorithm>
 #include <optional>
-#include <random>
+#include "random.h"
 #include "settings.h"
 
 namespace neat {
@@ -200,35 +200,32 @@ void Genome::RemoveNeuron(int id) {
  * predefined probabilities.
  */
 void Genome::Mutate() {
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_real_distribution<> uniform(0.0, 1.0);
 
-  if (uniform(gen) < SETTINGS.neat.add_neuron_mutation_rate) {
+  if (Random::Double(0.0, 1.0) < SETTINGS.neat.add_neuron_mutation_rate) {
     MutateAddNeuron();
   }
 
-  if (uniform(gen) < SETTINGS.neat.add_link_mutation_rate) {
+  if (Random::Double(0.0, 1.0) < SETTINGS.neat.add_link_mutation_rate) {
     MutateAddLink();
   }
   /* Removing things can mess up the cycles
-    if (uniform(gen) < SETTINGS.neat.remove_neuron_mutation_rate) {
+    if (Random::Double(0.0, 1.0) < SETTINGS.neat.remove_neuron_mutation_rate) {
       MutateRemoveNeuron();
     }
 
-    if (uniform(gen) < SETTINGS.neat.remove_link_mutation_rate) {
+    if (Random::Double(0.0, 1.0) < SETTINGS.neat.remove_link_mutation_rate) {
       MutateRemoveLink();
     }
   */
-  if (uniform(gen) < SETTINGS.neat.change_weight_mutation_rate) {
+  if (Random::Double(0.0, 1.0) < SETTINGS.neat.change_weight_mutation_rate) {
     MutateChangeWeight();
   }
 
-  if (uniform(gen) < SETTINGS.neat.change_bias_mutation_rate) {
+  if (Random::Double(0.0, 1.0) < SETTINGS.neat.change_bias_mutation_rate) {
     MutateChangeBias();
   }
 
-  if (uniform(gen) < SETTINGS.neat.module_activation_mutation_rate) {
+  if (Random::Double(0.0, 1.0) < SETTINGS.neat.module_activation_mutation_rate) {
       MutateActivateBrainModule();
   }
 }
@@ -247,11 +244,7 @@ void Genome::MutateRemoveNeuron() {
     }
   }
   if (!hiddenIDs.empty()) {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(0, hiddenIDs.size() - 1);
-
-    RemoveNeuron(hiddenIDs[dis(gen)]);
+    RemoveNeuron(hiddenIDs[Random::Int(0, hiddenIDs.size() - 1)]);
   }
 }
 
@@ -261,14 +254,8 @@ void Genome::MutateRemoveNeuron() {
  * @details Randomly selects and removes a link between neurons in the Genome.
  */
 void Genome::MutateRemoveLink() {
-  if (!links_.empty()) {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(0, links_.size() - 1);
-
-    int index = dis(gen);
-    int idToRemove = links_[index].GetId();
-
+  if (!links_.empty()) { 
+    int idToRemove = links_[Random::Int(0, links_.size()-1)].GetId();
     RemoveLink(idToRemove);
   }
 }
@@ -316,14 +303,9 @@ void Genome::RemoveLink(int id) {
  * distribution.
  */
 void Genome::MutateChangeWeight() {
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_real_distribution<> uniform(0.0, 1.0);
-  std::normal_distribution<> dis(0.0, SETTINGS.neat.standard_deviation_weight);
-
   for (Link& link : links_) {
-    if (uniform(gen) < SETTINGS.neat.weight_mutation_rate) {
-      double delta = dis(gen);
+    if (Random::Double(0.0, 1.0) < SETTINGS.neat.weight_mutation_rate) {
+      double delta = Random::Normal(0.0, SETTINGS.neat.standard_deviation_weight);
       link.SetWeight(link.GetWeight() + delta);
 
       if (link.GetWeight() > SETTINGS.neat.max_weight) {
@@ -342,14 +324,9 @@ void Genome::MutateChangeWeight() {
  * distribution.
  */
 void Genome::MutateChangeBias() {
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_real_distribution<> uniform(0.0, 1.0);
-  std::normal_distribution<> dis(0.0, SETTINGS.neat.standard_deviation_weight);
-
   for (Neuron& neuron : neurons_) {
-    if (uniform(gen) < SETTINGS.neat.bias_mutation_rate) {
-      double delta = dis(gen);
+    if (Random::Double(0.0, 1.0) < SETTINGS.neat.bias_mutation_rate) {
+      double delta = Random::Normal(0.0, SETTINGS.neat.standard_deviation_weight);
       neuron.SetBias(neuron.GetBias() + delta);
       if (neuron.GetBias() > SETTINGS.neat.max_bias) {
         neuron.SetBias(SETTINGS.neat.max_bias);
@@ -445,16 +422,13 @@ bool Genome::DetectLoops(const Neuron& startNeuron) {
  * and its parameter cyclic_ is set to true.
  */
 void Genome::MutateAddLink() {
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_int_distribution<size_t> dist(0, neurons_.size() - 1);
-  size_t indexRandomNeuron1 = dist(gen);
-  size_t indexRandomNeuron2 = dist(gen);
+  size_t indexRandomNeuron1 = Random::Int(0, neurons_.size() - 1);
+  size_t indexRandomNeuron2 = Random::Int(0, neurons_.size() - 1);
   while (neurons_[indexRandomNeuron1].GetType() == NeuronType::kOutput) {
-    indexRandomNeuron1 = dist(gen);
+    indexRandomNeuron1 = Random::Int(0, neurons_.size() - 1);
   }
   while (neurons_[indexRandomNeuron2].GetType() == NeuronType::kInput) {
-    indexRandomNeuron2 = dist(gen);
+    indexRandomNeuron2 = Random::Int(0, neurons_.size() - 1);
   }
 
   int n1 = neurons_[indexRandomNeuron1].GetId();  // id of in neuron
@@ -482,10 +456,7 @@ void Genome::MutateAddNeuron() {
   if (links_.size() == 0) {
     return;
   }
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_int_distribution<size_t> dist(0, links_.size() - 1);
-  size_t randIndex = dist(gen);
+  size_t randIndex = Random::Int(0, links_.size() - 1);
   Link RandomLink = links_[randIndex];
   DisableLink(RandomLink.GetId());  // test
 
@@ -577,12 +548,9 @@ void Genome::MutateActivationFunction() {
     if (GetInputCount()+GetOutputCount()==neurons_.size()){
         return ;
     }
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<size_t> dist(0, neurons_.size() - 1);
-    size_t indexRandomNeuronHidden = dist(gen);
+    size_t indexRandomNeuronHidden = Random::Int(0, neurons_.size() - 1);
     while (neurons_[indexRandomNeuronHidden].GetType() != NeuronType::kHidden) {
-      indexRandomNeuronHidden = dist(gen);
+      indexRandomNeuronHidden = Random::Int(0, neurons_.size() - 1);
     }
     std::vector<ActivationType> activationTypes = {
             ActivationType::sigmoid,
@@ -592,9 +560,7 @@ void Genome::MutateActivationFunction() {
             ActivationType::binary,
             ActivationType::linear
         };
-    std::mt19937 generator(rd());
-    std::uniform_int_distribution<int> distribution(0, activationTypes.size() - 1);
-    int randomIndex = distribution(generator);
+    int randomIndex = Random::Int(0, activationTypes.size() - 1);
     neurons_[indexRandomNeuronHidden].SetActivation(activationTypes[randomIndex]);
 }
 
@@ -606,10 +572,7 @@ void Genome::MutateActivationFunction() {
  */
 void Genome::MutateActivateBrainModule(){
   if (AvailableModules.size() == 0) return;
-  std::random_device rd;
-  std::mt19937 generator(rd());
-  std::uniform_int_distribution<int> distribution(0, AvailableModules.size() - 1);
-  int randomIndex = distribution(generator);
+  int randomIndex = Random::Int(0, AvailableModules.size() - 1);
   BrainModule module = AvailableModules.at(randomIndex);
 
   std::vector<BrainModule> modules = GetModules();
@@ -648,10 +611,7 @@ void Genome::MutateActivateBrainModule(){
  * input and output neurons.
  */
 void Genome::MutateDisableBrainModule(){
-  std::random_device rd;
-  std::mt19937 generator(rd());
-  std::uniform_int_distribution<int> distribution(0, modules_.size() - 1);
-  int randomIndex = distribution(generator);
+  int randomIndex = Random::Int(0, modules_.size() -1);
   BrainModule module = modules_.at(randomIndex);
   modules_.erase(modules_.begin() + randomIndex);
   for (const int i : module.GetInputNeuronIds()){
