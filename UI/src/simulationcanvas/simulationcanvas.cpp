@@ -93,6 +93,7 @@ void SimulationCanvas::OnUpdate()
           sf::Vector2f currPos(followedCreature->GetCoordinates().first, followedCreature->GetCoordinates().second);
           //creatureViewHistory.push_back(currPos);
           centerViewAroundCreature({static_cast<float>(followedCreature->GetCoordinates().first), static_cast<float>(followedCreature->GetCoordinates().second)});
+          currTopLeft = ui_view_.getCenter() - sf::Vector2f(ui_view_.getSize().x / 2, ui_view_.getSize().x / 2);
       }
 
   DataAccessor<SimulationData> data = simulation_->GetSimulationData();
@@ -394,6 +395,7 @@ void SimulationCanvas::centerViewAroundCreature(const sf::Vector2f& creaturePosi
     ui_view_.setSize(ui_view_.getSize().x, ui_view_.getSize().y);
     // Apply the new view
     setView(ui_view_);
+    currTopLeft = ui_view_.getCenter() - sf::Vector2f(ui_view_.getSize().x / 2, ui_view_.getSize().x / 2);
 }
 
 void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
@@ -441,7 +443,6 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
           rightClickCreature_ = nullptr;
           // Right-clicked, check if the mouse position coincides with any creature
           bool foundCreature = false;
-
           for (auto& creature : simulation_->GetSimulationData()->creatures_) {
               auto [creatureX, creatureY] = creature->GetCoordinates();
               float creatureSize = creature->GetSize();
@@ -450,7 +451,8 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
               if (sqrt(pow(scaledX - creaturePos.x, 2) + pow(scaledY - creaturePos.y, 2)) <= 1.5 * creatureSize) {
                   // If not following any creature or following a different creature,
                   // update the following creature immediately
-                  if (!followCreature || (followCreature && followedCreature != creature)) {
+                  qDebug() << "First case";
+                  if (!followCreature ) {
                       foundCreature = true;
                       followCreature = true;
                       followedCreature = creature;  // Pass the shared pointer directly
@@ -461,10 +463,18 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
                       info_panel_.SetSelectedCreature(creature);
                       repaint();
                       update();
-                      currTopLeft = ui_view_.getCenter() - sf::Vector2f(ui_view_.getSize().x / 2, ui_view_.getSize().x / 2);
+                      float viewWidth = ui_view_.getSize().x;
+                      float viewHeight = ui_view_.getSize().y;
+                      currTopLeft = ui_view_.getCenter() - sf::Vector2f(viewWidth / 2, viewHeight / 2);
                   }
-                  else{
-
+                  else if ((followedCreature->GetCoordinates() != creature->GetCoordinates())){
+                    qDebug() << "HAPPENING";
+                    followedCreature = creature;
+                    centerViewAroundCreature(creaturePos);
+                    info_panel_.Show();
+                    info_panel_.SetSelectedCreature(creature);
+                    repaint();
+                    update();
                   }
                   break;  // Exit the loop after finding the first creature at the clicked position
               }
