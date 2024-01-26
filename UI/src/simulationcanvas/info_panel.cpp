@@ -81,9 +81,9 @@ std::string InfoPanel::FormatCreatureInfo(const Creature& creature) {
   ss << "Max Energy: " <<round_double(creature.GetMaxEnergy(), 2) << "\n";
   ss << "Velocity: " << round_double(creature.GetVelocity(), 2) << "\n";
   ss << "Rot. Velocity: " << round_double(creature.GetRotationalVelocity(), 2) << "\n\n";
-  ss << "Stomach capacity: " << creature.GetStomachCapacity() << "\n\n";
-  ss << "Stomach fullness: " << creature.GetStomachFullness() << "\n\n";
-  ss << "Stomach acid: " << creature.GetAcid() << "\n\n";
+  ss << "Is Compatible with " << "\n";
+  ss<< "what is sees?: " << creature.GetEntityCompatibility() << "\n\n";
+
   auto [x, y] = creature.GetCoordinates();
   ss << "(x=" << x << ", y=" << y << ")\n \n";
   ss << "Mutables information: \n";
@@ -94,6 +94,10 @@ std::string InfoPanel::FormatCreatureInfo(const Creature& creature) {
   ss << "Max force: " << mutables.GetMaxForce() << "\n";
   ss << "Max size: " << mutables.GetMaxSize() << "\n";
   ss << "Baby size: " << mutables.GetBabySize() << "\n";
+  ss << "Diet: " << mutables.GetDiet() << "\n";
+  ss << "Genetic strength: " << mutables.GetGeneticStrength() << "\n";
+  ss << "Pheromone rate: " << mutables.GetPheromoneEmission() << "\n";
+
   return ss.str();
 }
 

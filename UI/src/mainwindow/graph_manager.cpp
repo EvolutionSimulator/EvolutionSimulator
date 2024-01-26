@@ -40,6 +40,11 @@ void GraphManager::DrawCreaturesVelocityOverTimeGraph() {
   DrawGraph(data->GetCreatureVelocityOverTime(), "Average Velocity of Creatures in the Simulation");
 }
 
+void GraphManager::DrawCreaturesDietOverTimeGraph() {
+  auto data = engine_->GetSimulation()->GetSimulationData();
+  DrawGraph(data->GetCreatureDietOverTime(), "Average diet of Creatures in the Simulation");
+}
+
 void GraphManager::DrawSizeEnergyScatterplot() {
   auto& infoPanel = simulationCanvas_->GetInfoPanel();
   auto selectedCreature = infoPanel.GetSelectedCreature();
@@ -138,27 +143,31 @@ void GraphManager::handleDropdownSelection(int index) {
     DrawCreaturesOverTimeGraph();
   }
   if (index == 2) {
-    qDebug() << "Calling DrawCreaturesOverTimeGraph";
+    qDebug() << "Calling DrawCreaturesSizeOverTimeGraph";
     DrawCreaturesSizeOverTimeGraph();
   }
   if (index == 3) {
-    qDebug() << "Calling DrawCreaturesOverTimeGraph";
+    qDebug() << "Calling DrawCreaturesEneergyOverTimeGraph";
     DrawCreaturesEnergyOverTimeGraph();
   }
   if (index == 4) {
-    qDebug() << "Calling DrawCreaturesOverTimeGraph";
+    qDebug() << "Calling DrawCreaturesVelocityOverTimeGraph";
     DrawCreaturesVelocityOverTimeGraph();
   }
   if (index == 5) {
-    qDebug() << "Calling DrawCreaturesOverTimeGraph";
-    DrawSizeEnergyScatterplot();
+    qDebug() << "Calling DrawCreaturesDietOverTimeGraph";
+    DrawCreaturesDietOverTimeGraph();
   }
   if (index == 6) {
-    qDebug() << "Calling DrawCreaturesOverTimeGraph";
-    DrawSizeVelocityScatterplot();
+    qDebug() << "Calling DrawCreaturesScatterplot";
+    DrawSizeEnergyScatterplot();
   }
   if (index == 7) {
-    qDebug() << "Calling DrawCreaturesOverTimeGraph";
+    qDebug() << "Calling DrawCreaturesScatterplot";
+    DrawSizeVelocityScatterplot();
+  }
+  if (index == 8) {
+    qDebug() << "Calling DrawCreaturesScatterploth";
     DrawEnergyVelocityScatterplot();
   }
 

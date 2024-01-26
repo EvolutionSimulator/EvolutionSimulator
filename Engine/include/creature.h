@@ -87,11 +87,6 @@ class Creature : virtual public MovableEntity,
   bool mating_desire_; /*! Indicates whether creature currently wants to mate <-
                         TO BE INTEGRATED INTO REPRODUCTIVE SYSTEM*/
 
-
-  double distance_enemy_;  /*!< Distance to the nearest enemy creature. */
-  double orientation_enemy_; /*!< Orientation relative to the nearest enemy creature. */
-  double enemy_size_; /*! Size of the closest enemy*/
-
 };
 
 std::vector<Food *> get_food_at_distance(

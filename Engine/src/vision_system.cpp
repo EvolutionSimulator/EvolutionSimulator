@@ -8,7 +8,7 @@ VisionSystem::VisionSystem(neat::Genome genome, Mutable mutables)
       vision_radius_(mutables.GetVisionFactor()),
       vision_angle_(SETTINGS.physical_constraints.vision_ar_ratio
                     / mutables.GetVisionFactor()),
-      distance_entity_(0),
+      distance_entity_(mutables.GetVisionFactor()),
       entity_compatibility_(0),
       orientation_entity_(0),
       entity_color_(0),
@@ -39,6 +39,8 @@ void VisionSystem::SetVision(double radius, double angle) {
 double VisionSystem::GetVisionRadius() const { return vision_radius_; }
 
 double VisionSystem::GetVisionAngle() const { return vision_angle_; }
+
+double VisionSystem::GetEntityCompatibility() const { return entity_compatibility_; }
 
 
 std::vector<std::shared_ptr<Entity>> VisionSystem::GetClosestEntityInSight(std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
