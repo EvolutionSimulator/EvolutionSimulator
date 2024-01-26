@@ -31,14 +31,25 @@ class SimulationCanvas : public QSFMLCanvas {
   void mouseMoveEvent(QMouseEvent* event) override;
   void mouseReleaseEvent(QMouseEvent* event) override;
   void resizeEvent(QResizeEvent* event) override;
+
   void zoom(float factor);
+  void centerViewAroundCreature(const sf::Vector2f& creaturePosition);
+
 
   private:
   Simulation *simulation_ = nullptr;
   virtual void OnInit() override;
+
   virtual void OnUpdate() override;
+
   bool gestureEvent(QGestureEvent* event);
   void pinchTriggered(QPinchGesture* gesture);
+
+  std::shared_ptr<Creature> followedCreature = nullptr;
+  bool followCreature = false;
+  sf::Vector2f currTopLeft = sf::Vector2f(0,0);
+  sf::Vector2i rightClickStartPosition_;
+  std::shared_ptr<Creature> rightClickCreature_;
 
   // Rendering logic
   void RenderSimulation(SimulationData& data);
