@@ -34,6 +34,7 @@ struct SimulationData {
   std::vector<double> GetCreatureSizeOverTime() const;
   std::vector<double> GetCreatureEnergyOverTime() const;
   std::vector<double> GetCreatureVelocityOverTime() const;
+  std::vector<double> GetCreatureDietOverTime() const;
 
   std::vector<std::shared_ptr<Creature>> creatures_;
   std::vector<std::shared_ptr<Food>> food_entities_;
@@ -52,6 +53,7 @@ struct SimulationData {
   std::vector<double> creatureSizeOverTime_;
   std::vector<double> creatureEnergyOverTime_;
   std::vector<double> creatureVelocityOverTime_;
+  std::vector<double> creatureDietOverTime_;
 };
 
 std::vector<std::pair<int, int>> GetNeighbours(

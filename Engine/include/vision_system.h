@@ -14,6 +14,7 @@ public:
   void SetVision(double radius, double angle);
   double GetVisionRadius() const;
   double GetVisionAngle() const;
+  double GetEntityCompatibility() const;
 
   std::shared_ptr<Entity> GetFoodID() const;
 
