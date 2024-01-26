@@ -2,7 +2,7 @@
 
 #include <cassert>
 #include <cmath>
-#include <random>
+#include "random.h"
 
 #include "environment.h"
 #include "geometry_primitives.h"
@@ -34,7 +34,7 @@ Entity::Entity(const double x_coord, const double y_coord, const double size)
       state_(Alive),
       id_(next_id_++),
       color_hue_(0) {
-    orientation_ = GetRandomFloat(2*M_PI);
+    orientation_ = Random::Double(0.0, 2*M_PI);
 }
 
 /*!
@@ -104,25 +104,7 @@ void Entity::SetCoordinatesNoWrap(const double x, const double y) {
   x_coord_ = x;
   y_coord_ = y;
 }
-/*!
- * @brief Generates a random floating-point number within a given range.
- *
- * @details This function uses a uniform distribution to ensure an even spread
- * of values.
- *
- * @param world_size The upper limit of the random number range.
- *
- * @return A random floating-point number between 0 and world_size.
- */
-double GetRandomFloat(double world_size) {
-  // Create a random number generator engine
-  std::random_device rd;
-  std::mt19937 gen(rd());
 
-  // Define a distribution for random floats between 0 and world_size
-  std::uniform_real_distribution<double> dis(0.0, world_size);
-  return dis(gen);
-}
 
 /*!
  * @brief Randomly initializes the entity's position and size within the world
@@ -137,18 +119,17 @@ void Entity::RandomInitialization(const double world_width,
                                   const double world_height,
                                   const double max_creature_size,
                                   const double min_creature_size) {
-  x_coord_ = GetRandomFloat(world_width);
-  y_coord_ = GetRandomFloat(world_height);
-  size_ =
-      GetRandomFloat(max_creature_size - min_creature_size) + min_creature_size;
-  orientation_ = GetRandomFloat(2*M_PI) - M_PI;
+  x_coord_ = Random::Double(0.0, world_width);
+  y_coord_ = Random::Double(0.0, world_height);
+  size_ = Random::Double(min_creature_size, max_creature_size);
+  orientation_ = Random::Double(-M_PI, M_PI);
 }
 
 void Entity::RandomInitialization(const double world_width,
                                   const double world_height) {
-  x_coord_ = GetRandomFloat(world_width);
-  y_coord_ = GetRandomFloat(world_height);
-  orientation_ = GetRandomFloat(2*M_PI);
+  x_coord_ = Random::Double(0.0, world_width);
+  y_coord_ = Random::Double(0.0, world_height);
+  orientation_ = Random::Double(0.0, 2*M_PI);
 }
 
 /*!

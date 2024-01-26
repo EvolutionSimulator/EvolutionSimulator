@@ -5,7 +5,7 @@
  * @brief Defines the Link class and related functions for NEAT.
  */
 
-#include "random"
+#include "random.h"
 #include "stdexcept"
 
 namespace neat {
@@ -126,13 +126,9 @@ Link CrossoverLink(const Link &a, const Link &b) {
     throw std::invalid_argument("Links must have the same id");
   }
 
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_real_distribution<double> distribution(0.0, 1.0);
-
   Link crossover_link = a;
 
-  crossover_link.SetWeight(distribution(gen) < 0.5 ? a.GetWeight()
+  crossover_link.SetWeight(Random::Double(0.0, 1.0) < 0.5 ? a.GetWeight()
                                                    : b.GetWeight());
 
   return crossover_link;

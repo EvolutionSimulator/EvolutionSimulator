@@ -1,6 +1,7 @@
 #include "pheromones_system.h"
 
 #include "settings.h"
+#include "random.h"
 
 #include <algorithm>
 
@@ -57,14 +58,10 @@ std::vector<std::shared_ptr<Pheromone>> PheromoneSystem::EmitPheromones(double d
     std::vector<std::shared_ptr<Pheromone>> pheromones;
     for (int type = 0; type < 16; type++){
         if (pheromone_emissions_.at(type) > 0){
-            std::random_device rd;  // Will be used to obtain a seed for the random number engine
-            std::mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd()
-            std::uniform_real_distribution<> dis(0, 1);
-            std::normal_distribution<> nor(0, 0.5);
-            if (dis(gen) < pheromone_emissions_.at(type) * size_
+            if (Random::Double(0.0, 1.0) < pheromone_emissions_.at(type) * size_
                     * SETTINGS.physical_constraints.d_pheromone_emission * deltaTime){
-                double x_coord = x_coord_ + nor(gen) * size_;
-                double y_coord = y_coord_ + nor(gen) * size_;
+                double x_coord = x_coord_ + Random::Normal(0.0, 1.0) * size_;
+                double y_coord = y_coord_ + Random::Normal(0.0, 1.0) * size_;
                 double size = std::sqrt(size_);
                 pheromones.push_back(std::make_shared<Pheromone>(Pheromone(type, x_coord, y_coord, size)));
             }

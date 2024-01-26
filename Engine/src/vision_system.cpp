@@ -166,21 +166,3 @@ bool VisionSystem::IsInVisionCone(std::shared_ptr<Entity> entity, double map_wid
 std::shared_ptr<Entity> VisionSystem::GetFoodID() const {
   return closest_entity_;
 }
-
-/*!
- * @brief Generates a random floating-point number within a given range.
- *
- * @details This function uses a uniform distribution to ensure an even spread
- * of values.
- *
- * @param max_value The upper limit of the random number range.
- *
- * @return A random floating-point number between 0 and max_value.
- */
-double GetRandomFloat(double min_value, double max_value) {
-  std::random_device rd;
-  std::mt19937 gen(rd());
-
-  std::uniform_real_distribution<double> dis(min_value, max_value);
-  return dis(gen);
-}

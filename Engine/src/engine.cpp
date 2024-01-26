@@ -4,9 +4,19 @@
 #include <thread>
 
 #include "simulation.h"
+#include "random.h"
 
 Engine::Engine(double width, double height)
-    : environment_(width, height), simulation_(new Simulation(environment_)), engine_speed_(1.0) {}
+    : environment_(width, height), simulation_(new Simulation(environment_)), engine_speed_(1.0) {
+
+    if (!SETTINGS.random.input_seed){
+        std::random_device rd;
+        SETTINGS.random.seed = rd();
+        std::cout << "Seed of the simulation: " << SETTINGS.random.seed << "\n";
+    }
+    Random::SetSeed(SETTINGS.random.seed);
+
+}
 
 Engine::Engine(double width, double height, double food_density,
                double creature_density)

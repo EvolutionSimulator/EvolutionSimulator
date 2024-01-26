@@ -133,6 +133,11 @@ class Settings {
     double dragging_sensitivity = 1.0f;
   } ui;
 
+  struct Random {
+    unsigned int seed = 4002944851;
+    bool input_seed = true; //Change to load your own seed
+  } random;
+
  private:
   Settings() {}
 };

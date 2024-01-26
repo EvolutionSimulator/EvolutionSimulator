@@ -5,7 +5,7 @@
  * @brief Defines the Neuron class and related functions for NEAT.
  */
 
-#include "random"
+#include "random.h"
 #include "stdexcept"
 
 namespace neat {
@@ -106,13 +106,9 @@ Neuron CrossoverNeuron(const Neuron &a, const Neuron &b) {
   int id = a.GetId();
   NeuronType type = a.GetType();
 
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_real_distribution<double> distribution(0.0, 1.0);
-
   Neuron crossover_neuron = a;
 
-  crossover_neuron.SetBias(distribution(gen) < 0.5 ? a.GetBias() : b.GetBias());
+  crossover_neuron.SetBias(Random::Double(0.0, 1.0) < 0.5 ? a.GetBias() : b.GetBias());
 
   return crossover_neuron;
 }

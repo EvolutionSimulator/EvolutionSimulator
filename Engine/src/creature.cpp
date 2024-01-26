@@ -6,7 +6,7 @@
 #include <set>
 
 #include "collision_functions.h"
-#include "mathlib.h"
+#include "random.h"
 #include "settings.h"
 #include "grabbing_entity.h"
 
@@ -107,7 +107,7 @@ void Creature::UpdateMatingDesire() {
               (SETTINGS.physical_constraints.max_reproducing_age -
                min_reproducing_age) *
               SETTINGS.physical_constraints.mating_desire_factor;
-  mating_desire_ = mathlib::RandomDouble(0, 1) < probability;
+  mating_desire_ = Random::Double(0, 1) < probability;
 }
 
 
@@ -473,7 +473,7 @@ void Creature::ProcessVision(
   }
   else {
     distance_entity_ =  vision_radius_;
-    orientation_entity_ = remainder(GetRandomFloat(orientation_- vision_angle_/2, orientation_+ vision_angle_/2), 2*M_PI);
+    orientation_entity_ = remainder(Random::Double(orientation_- vision_angle_/2, orientation_+ vision_angle_/2), 2*M_PI);
     closest_entity_ =  nullptr;
     entity_size_ = -1;
     entity_compatibility_ = 0;
