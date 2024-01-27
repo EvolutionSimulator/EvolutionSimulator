@@ -40,20 +40,24 @@ void SimulationData::UpdateStatistics() {
     double average_energy = 0.0;
     double average_velocity = 0.0;
     double average_diet = 0.0;
+    double average_offspring = 0.0;
     for (const auto creature : creatures_) {
       average_size += creature->GetSize();
       average_energy += creature->GetEnergy();
       average_velocity += creature->GetVelocity();
       average_diet += creature->GetMutable().GetDiet();
+      average_offspring += creature->GetOffspringNumber();
     }
     average_size /= creatures_.size();
     average_energy /= creatures_.size();
     average_velocity /= creatures_.size();
     average_diet /= creatures_.size();
+    average_offspring /= creatures_.size();
     creatureSizeOverTime_.push_back(average_size);
     creatureEnergyOverTime_.push_back(average_energy);
     creatureVelocityOverTime_.push_back(average_velocity);
     creatureDietOverTime_.push_back(average_diet);
+    creatureOffspringOverTime_.push_back(average_offspring);
   }
 }
 
@@ -75,4 +79,8 @@ std::vector<double> SimulationData::GetCreatureVelocityOverTime() const {
 
 std::vector<double> SimulationData::GetCreatureDietOverTime() const {
   return creatureDietOverTime_;
+}
+
+std::vector<double> SimulationData::GetCreatureOffspringOverTime() const {
+  return creatureOffspringOverTime_;
 }

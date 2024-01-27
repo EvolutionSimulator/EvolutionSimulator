@@ -158,6 +158,8 @@ void CreatureManager::ReproduceTwoCreatures(SimulationData& data,
   mother->SetWaitingToReproduce(false);
   father->MaleAfterMate();
   mother->FemaleAfterMate();
+  father->IncreaseOffspringNumber();
+  mother->IncreaseOffspringNumber();
 }
 
 /*!

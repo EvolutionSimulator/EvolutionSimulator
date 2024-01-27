@@ -208,6 +208,7 @@ void MainWindow::DrawUI()
     comboBox->addItem("Creatures Energy Over Time");
     comboBox->addItem("Creatures Velocity Over Time");
     comboBox->addItem("Creatures Diet Over Time");
+    comboBox->addItem("Creatures Offspring Over Time");
     comboBox->addItem("Size and Energy Scatterplot");
     comboBox->addItem("Size and Velocity Scatterplot");
     comboBox->addItem("Energy and Velocity Scatterplot");

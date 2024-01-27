@@ -45,6 +45,11 @@ void GraphManager::DrawCreaturesDietOverTimeGraph() {
   DrawGraph(data->GetCreatureDietOverTime(), "Average diet of Creatures in the Simulation");
 }
 
+void GraphManager::DrawCreaturesOffspringOverTimeGraph() {
+  auto data = engine_->GetSimulation()->GetSimulationData();
+  DrawGraph(data->GetCreatureOffspringOverTime(), "Average children of Creatures in the Simulation");
+}
+
 void GraphManager::DrawSizeEnergyScatterplot() {
   auto& infoPanel = simulationCanvas_->GetInfoPanel();
   auto selectedCreature = infoPanel.GetSelectedCreature();
@@ -159,14 +164,18 @@ void GraphManager::handleDropdownSelection(int index) {
     DrawCreaturesDietOverTimeGraph();
   }
   if (index == 6) {
-    qDebug() << "Calling DrawCreaturesScatterplot";
-    DrawSizeEnergyScatterplot();
+    qDebug() << "Calling DrawCreaturesOffspringOverTimeGraph";
+    DrawCreaturesDietOverTimeGraph();
   }
   if (index == 7) {
     qDebug() << "Calling DrawCreaturesScatterplot";
-    DrawSizeVelocityScatterplot();
+    DrawSizeEnergyScatterplot();
   }
   if (index == 8) {
+    qDebug() << "Calling DrawCreaturesScatterplot";
+    DrawSizeVelocityScatterplot();
+  }
+  if (index == 9) {
     qDebug() << "Calling DrawCreaturesScatterploth";
     DrawEnergyVelocityScatterplot();
   }

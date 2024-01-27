@@ -9,7 +9,8 @@
 ReproductiveSystem::ReproductiveSystem(neat::Genome genome, Mutable mutables)
     : AliveEntity(genome, mutables),
       reproduction_cooldown_(0.0),
-      waiting_to_reproduce_(false){
+      waiting_to_reproduce_(false),
+      offspring_number_(0){
     maturity_age_ = MaturityAge(&mutables),
     ready_to_reproduce_at_ = maturity_age_;
 }
@@ -34,6 +35,10 @@ double ReproductiveSystem::MaturityAge(const Mutable* const mutables) const {
 void ReproductiveSystem::SetWaitingToReproduce(bool value){
     waiting_to_reproduce_ = value;
 }
+
+void ReproductiveSystem::IncreaseOffspringNumber(){ offspring_number_++; }
+
+int ReproductiveSystem::GetOffspringNumber(){return offspring_number_;}
 
 MaleReproductiveSystem::MaleReproductiveSystem(neat::Genome genome, Mutable mutables)
     : ReproductiveSystem(genome, mutables),
