@@ -3,6 +3,7 @@
 #include <cassert>
 #include <cmath>
 #include "random.h"
+#include "settings.h"
 
 #include "environment.h"
 #include "geometry_primitives.h"
@@ -100,11 +101,11 @@ void Entity::SetCoordinates(const double x, const double y,
   if (y_coord_ < 0.0) y_coord_ += kMapHeight;
 }
 
-void Entity::SetCoordinatesNoWrap(const double x, const double y) {
-  x_coord_ = x;
-  y_coord_ = y;
+void Entity::SetCoordinates(const double x, const double y) {
+  this->SetCoordinates(x, y,
+                       SETTINGS.environment.map_width,
+                       SETTINGS.environment.map_height);
 }
-
 
 /*!
  * @brief Randomly initializes the entity's position and size within the world

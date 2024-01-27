@@ -36,7 +36,7 @@ std::shared_ptr<Creature> Egg::Hatch() {
 
   std::shared_ptr<Creature> creature = std::make_shared<Creature>(genome_, mutable_);
   auto coordinates = GetCoordinates();
-  creature->SetCoordinatesNoWrap(coordinates.first, coordinates.second);
+  creature->SetCoordinates(coordinates.first, coordinates.second);
   creature->SetGeneration(generation_);
   return creature;
 }

@@ -43,7 +43,7 @@ double VisionSystem::GetVisionAngle() const { return vision_angle_; }
 double VisionSystem::GetEntityCompatibility() const { return entity_compatibility_; }
 
 
-std::vector<std::shared_ptr<Entity>> VisionSystem::GetClosestEntityInSight(std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
+std::vector<std::shared_ptr<Entity>> VisionSystem::GetClosestEntitiesInSight(std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
                                               double grid_cell_size, double map_width, double map_heigth) const
 {
     int grid_width = grid.size();

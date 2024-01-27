@@ -84,10 +84,6 @@ void CreatureManager::HatchEggs(SimulationData& data, Environment& environment) 
  */
 void CreatureManager::ReproduceCreatures(SimulationData& data,
                                          Environment& environment) {
-  double world_width = environment.GetMapWidth();
-  double world_height = environment.GetMapHeight();
-  double max_creature_size = SETTINGS.environment.max_creature_size;
-  double min_creature_size = SETTINGS.environment.min_creature_size;
 
   std::queue<std::shared_ptr<Creature>> not_reproduced;
   std::queue<std::shared_ptr<Creature>> temp_queue;

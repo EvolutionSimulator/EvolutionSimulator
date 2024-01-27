@@ -17,6 +17,11 @@ MainWindow::MainWindow(QWidget *parent)
 
   ui_->canvas->SetRefreshInterval(1000.0 / 60);
 
+  int width = sf::VideoMode::getDesktopMode().width;
+  int height = sf::VideoMode::getDesktopMode().height;
+  SETTINGS.environment.map_width = width * SETTINGS.ui.zoom;
+  SETTINGS.environment.map_height = height * SETTINGS.ui.zoom;
+
   InitializeEngine();
   PauseSimulation();
   RunSimulation();
@@ -42,8 +47,8 @@ void MainWindow::InitializeEngine()
 {
   if (!engine_) {
     std::cout << "Creating new engine..." << std::endl;
-    int width = sf::VideoMode::getDesktopMode().width;
-    int height = sf::VideoMode::getDesktopMode().height;
+    int width = SETTINGS.environment.map_width;
+    int height = SETTINGS.environment.map_height;
     engine_ = new Engine(width, height);
     engine_->SetSpeed(100);
     ui_->canvas->SetSimulation(engine_->GetSimulation());
@@ -52,14 +57,14 @@ void MainWindow::InitializeEngine()
   // If this function changes change the kMaxFoodDensityColor in config.h as for a correct shade of the backgroung we need this measure
   auto food_density_function = [this](double x, double y) {
     auto data = engine_->GetSimulation()->GetSimulationData();
-    return x * y * 2 / (data->GetEnvironment().GetMapWidth() *
-                        data->GetEnvironment().GetMapHeight()) * 5e-5;
+    return x * y * 2 / (SETTINGS.environment.map_width *
+                        SETTINGS.environment.map_height) * 5e-5;
   };
 
   auto data = engine_->GetSimulation()->GetSimulationData();
 
   data->GetEnvironment().SetFoodDensity(food_density_function); // Update the density
-  ui_->canvas->UpdateFoodDensityTexture(*data);
+  //ui_->canvas->UpdateFoodDensityTexture(*data);
 }
 
 
@@ -67,8 +72,8 @@ void MainWindow::InitializeEngineWithDensities(double food_density, double creat
 {
   if (!engine_) {
     std::cout << "Creating new engine..." << std::endl;
-    int width = sf::VideoMode::getDesktopMode().width;
-    int height = sf::VideoMode::getDesktopMode().height;
+    int width = SETTINGS.environment.map_width;
+    int height = SETTINGS.environment.map_height;
     engine_ = new Engine(width, height, food_density, creature_density);
     ui_->canvas->SetSimulation(engine_->GetSimulation());
   }

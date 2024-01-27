@@ -543,12 +543,12 @@ TEST(SimulationDataTest, GridInitialization) {
 
   int expectedNumCellsX =
       static_cast<int>(
-          std::ceil(static_cast<double>(environment.GetMapWidth()) /
+          std::ceil(static_cast<double>(SETTINGS.environment.map_width) /
                     SETTINGS.environment.grid_cell_size)) +
       1;
   int expectedNumCellsY =
       static_cast<int>(
-          std::ceil(static_cast<double>(environment.GetMapHeight()) /
+          std::ceil(static_cast<double>(SETTINGS.environment.map_height) /
                     SETTINGS.environment.grid_cell_size)) +
       1;
 

@@ -21,7 +21,7 @@ public:
   bool IsInRightDirection(std::shared_ptr<Entity> entity, double map_width, double map_heigth);
   bool IsInVisionCone(std::shared_ptr<Entity> entity, double map_width, double map_heigth) const;
 
-  std::vector<std::shared_ptr<Entity>> GetClosestEntityInSight(std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
+  std::vector<std::shared_ptr<Entity>> GetClosestEntitiesInSight(std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
                                               double grid_cell_size, double map_width, double map_heigth) const;
 
 protected:
