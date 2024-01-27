@@ -52,6 +52,8 @@ void MainWindow::InitializeEngine()
     engine_ = new Engine(width, height);
     engine_->SetSpeed(100);
     ui_->canvas->SetSimulation(engine_->GetSimulation());
+
+    cluster_ = new Cluster(SETTINGS.environment.reproduction_threshold, 3);
   }
 
   // If this function changes change the kMaxFoodDensityColor in config.h as for a correct shade of the backgroung we need this measure
@@ -84,6 +86,10 @@ void MainWindow::RunSimulation() {
   if (engine_ && !engine_thread_.joinable()) {
     std::cout << "Starting engine on a separate thread..." << std::endl;
     engine_thread_ = std::thread(&Engine::Run, engine_);
+
+    std::cout << "Starting cluster on a separate thread..." << std::endl;
+    cluster_thread_ =
+        std::thread(&Cluster::start, cluster_, engine_->GetSimulation());
   }
 }
 
@@ -110,8 +116,18 @@ void MainWindow::ResumeSimulation()
 void MainWindow::KillEngine()
 {
   if (engine_) {
+    std::cout << "Stopping cluster..." << std::endl;
+    cluster_->stop();
+    std::cout << "Cluster stopped." << std::endl;
+
     std::cout << "Stopping engine..." << std::endl;
     engine_->Stop();
+    std::cout << "Engine stopped." << std::endl;
+  }
+
+  if (cluster_thread_.joinable()) {
+    std::cout << "Joining cluster thread..." << std::endl;
+    cluster_thread_.join();
   }
 
   if (engine_thread_.joinable()) {
@@ -119,10 +135,16 @@ void MainWindow::KillEngine()
     engine_thread_.join();
   }
 
+  std::cout << "Deleting cluster..." << std::endl;
+  delete cluster_;
+  std::cout << "Cluster deleted." << std::endl;
+
   std::cout << "Deleting engine..." << std::endl;
   delete engine_;
   std::cout << "Engine deleted." << std::endl;
+
   engine_ = nullptr;
+  cluster_ = nullptr;
 }
 
 void MainWindow::ToggleSimulation() {
@@ -138,6 +160,13 @@ void MainWindow::ToggleSimulation() {
     QPixmap pixMap2(":/Resources/Run.png");
     QIcon icon2(pixMap2);
     ui_->runButton->setIcon(icon2);
+
+    auto cluster_data = cluster_->getSpeciesData();
+    for (const auto& sample : cluster_data) {
+      std::cout << "ID: " << std::get<0>(sample)
+                << "; size: " << std::get<1>(sample)
+                << "; time: " << std::get<2>(sample) << std::endl;
+    }
   }
 }
 

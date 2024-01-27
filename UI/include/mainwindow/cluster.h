@@ -4,9 +4,11 @@
 #endif // CLUSTER_H
 
 #include <unordered_map>
+#include <mutex>
 
 #include "creature.h"
 #include "neat/neat-genome.h"
+#include "simulation.h"
 
 struct CreatureData {
   neat::Genome genome;
@@ -30,16 +32,29 @@ class Cluster {
   double epsilon;
   int minPts;
 
+  volatile bool running_;
+  double lastRecordedTime_;
+
+  std::mutex mutex_;
+
+  void init(Simulation* simulation);
+
  public:
   Cluster(double epsilon, int minPts);
 
-  void setPoints(const std::vector<Creature>& creatures);
+  void start(Simulation* simulation);
+  void stop();
+
+  void setPoints(const std::vector<std::shared_ptr<Creature>>& creatures);
   void run();
-  void add_newborns(const std::vector<Creature>& new_creatures);
-  void update_dead_creatures(const std::vector<Creature>& dead_creatures);
+  void add_newborns(const std::vector<std::shared_ptr<Creature>>& new_creatures);
+  void update_dead_creatures(const std::vector<std::shared_ptr<Creature>>& dead_creatures);
+  void update_all_creatures(const std::vector<std::shared_ptr<Creature>>& creatures);
 
   std::unordered_map<int, int> getSpecies() const;
   std::unordered_map<int, int> speciesSizes();
+
+  std::vector<std::tuple<double, int, double>> getSpeciesData();
 
  private:
   std::vector<int> GetNeighbors(int id);
