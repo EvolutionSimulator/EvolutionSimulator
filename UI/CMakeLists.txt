@@ -111,8 +111,8 @@ set(CONFIG_DEST "${CMAKE_BINARY_DIR}/UI")
 add_custom_command(
     TARGET UI PRE_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy
-        ${CONFIG_FILE}
-        ${CONFIG_DEST}
+        "${CONFIG_FILE}"
+        "${CONFIG_DEST}"
     COMMENT "Copying settings.json to build directory"
 )
 
