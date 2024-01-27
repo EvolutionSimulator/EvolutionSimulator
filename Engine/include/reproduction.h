@@ -28,6 +28,9 @@ class ReproductiveSystem : virtual public AliveEntity {
   bool WaitingToReproduce() const { return waiting_to_reproduce_; }
 
   void SetWaitingToReproduce(bool value);
+
+  void IncreaseOffspringNumber();
+  int GetOffspringNumber();
  protected:
 
   double maturity_age_;
@@ -36,6 +39,8 @@ class ReproductiveSystem : virtual public AliveEntity {
   double ready_to_reproduce_at_;
 
   bool waiting_to_reproduce_;
+
+  int offspring_number_;
 
   virtual double MaturityAge(const Mutable* const mutables) const;
 

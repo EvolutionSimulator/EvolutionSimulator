@@ -227,6 +227,7 @@ public:
 public slots:
   void DrawCreaturesOverTimeGraph();
   void DrawCreaturesDietOverTimeGraph();
+  void DrawCreaturesOffspringOverTimeGraph();
   void DrawCreaturesSizeOverTimeGraph();
   void DrawCreaturesEnergyOverTimeGraph();
   void DrawCreaturesVelocityOverTimeGraph();
