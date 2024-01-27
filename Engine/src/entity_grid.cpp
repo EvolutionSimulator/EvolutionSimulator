@@ -124,7 +124,7 @@ void UpdateGridPheromones(
         double deltaTime){
 
     for (std::shared_ptr<Pheromone> pheromone : pheromones){
-        pheromone->SetSize(pheromone->GetSize() - deltaTime);
+        pheromone->SetSize(pheromone->GetSize() - deltaTime/5);
         if (pheromone->GetSize() < 0.5){
             pheromone->SetState(Entity::Dead);
         }

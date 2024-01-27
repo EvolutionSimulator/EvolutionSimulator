@@ -24,7 +24,7 @@ Mutable::Mutable()
     max_force_(SETTINGS.physical_constraints.d_max_force),
     growth_factor_(SETTINGS.physical_constraints.d_growth_factor),
     vision_factor_(SETTINGS.physical_constraints.d_vision_factor),
-    color_(0.0f),
+    color_(Random::Double(0, 1)),
     stomach_capacity_factor_(SETTINGS.physical_constraints.d_stomach_capacity),
     diet_(SETTINGS.physical_constraints.d_diet),
     genetic_strength_(SETTINGS.physical_constraints.d_genetic_strength),
