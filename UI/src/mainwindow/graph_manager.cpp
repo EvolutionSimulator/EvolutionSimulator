@@ -165,7 +165,7 @@ void GraphManager::handleDropdownSelection(int index) {
   }
   if (index == 6) {
     qDebug() << "Calling DrawCreaturesOffspringOverTimeGraph";
-    DrawCreaturesDietOverTimeGraph();
+    DrawCreaturesOffspringOverTimeGraph();
   }
   if (index == 7) {
     qDebug() << "Calling DrawCreaturesScatterplot";
