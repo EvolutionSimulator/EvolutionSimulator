@@ -49,6 +49,8 @@ qt_add_executable(UI
     src/simulationcanvas/texture_manager.cpp
     include/simulationcanvas/info_panel.h
     src/simulationcanvas/info_panel.cpp
+    include/mainwindow/cluster.h
+    src/mainwindow/cluster.cpp
 
 
 

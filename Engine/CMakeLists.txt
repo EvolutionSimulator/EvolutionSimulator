@@ -85,8 +85,6 @@ add_library(Engine STATIC
   include/creature_manager.h src/creature_manager.cpp
 
   include/random.h src/random.cpp
-  include/cluster.h
-  src/cluster.cpp
 )
 
 add_subdirectory(tests)
