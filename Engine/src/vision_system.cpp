@@ -16,6 +16,11 @@ VisionSystem::VisionSystem(neat::Genome genome, Mutable mutables)
       closest_entity_(nullptr)
 {
   number_entities_to_return_ = 1;
+  for(BrainModule module : genome.GetModules()){
+    if (module.GetModuleId() == 3){
+      number_entities_to_return_++;
+    }
+  }
 }
 
 
