@@ -42,6 +42,8 @@ class Entity {
                            double const kMapHeight);
   double GetDistance(const std::shared_ptr<Entity> otherEntity, double const kMapWidth,
                      double const kMapHeight) const;
+  double GetDistance(const std::shared_ptr<Entity> otherEntity) const;
+
   bool CheckCollisionWithEntity(const double tolerance,
                                 const std::shared_ptr<Entity> otherEntity) const {
     return CollisionCircleCircle(tolerance, GetCoordinates(), GetSize(),

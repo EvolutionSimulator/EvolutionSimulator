@@ -8,17 +8,13 @@ Environment::Environment()
     : food_density_func_(
       [](double x, double y) { return SETTINGS.environment.default_food_density; }),
       creature_density_(SETTINGS.environment.default_creature_density),
-      friction_coefficient_(SETTINGS.environment.frictional_coefficient),
-      map_width_(SETTINGS.environment.map_width),
-      map_height_(SETTINGS.environment.map_height) {}
+      friction_coefficient_(SETTINGS.environment.frictional_coefficient) {}
 
 Environment::Environment(double width, double height)
     : food_density_func_(
           [](double x, double y) { return SETTINGS.environment.default_food_density; }),
       creature_density_(SETTINGS.environment.default_creature_density),
-      friction_coefficient_(SETTINGS.environment.frictional_coefficient),
-      map_width_(width),
-      map_height_(height) {}
+      friction_coefficient_(SETTINGS.environment.frictional_coefficient) {}
 
 void Environment::SetFoodDensity(double density)
 {

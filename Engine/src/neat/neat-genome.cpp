@@ -701,8 +701,13 @@ double Genome::CompatibilityBetweenGenomes(const Genome& other) const {
         }
       }
     }
-    average_weight_difference =
-        average_weight_difference / (double)(Nshared_neurons + Nshared_links);
+    if (Nshared_neurons + Nshared_links == 0){
+        average_weight_difference = 0;
+    } else {
+        average_weight_difference =
+            average_weight_difference / (double)(Nshared_neurons + Nshared_links);
+    }
+
 
     int Ndisjoint_neurons =
         neurons_.size() + other.neurons_.size() - 2 * Nshared_neurons;
@@ -730,64 +735,65 @@ double Genome::CompatibilityBetweenGenomes(const Genome& other) const {
 
 
 
-Genome minimallyViableGenome() {
-  int start_id = neat::Neuron::next_id_ - 1;
-  Genome genome(SETTINGS.environment.input_neurons,
-                SETTINGS.environment.output_neurons);
-  Link constant_acceleration(
-      start_id + 1, start_id + SETTINGS.environment.input_neurons + 1, 1);
-  genome.AddLink(constant_acceleration);
-  Link digest(start_id + 1, start_id + SETTINGS.environment.input_neurons + 5,
-              1);
-  genome.AddLink(digest);
-  Link orient_towards_food(
-      start_id + 7, start_id + SETTINGS.environment.input_neurons + 3, 1);
-  genome.AddLink(orient_towards_food);
+// Genome minimallyViableGenome() {
+//   //Not to be used (will crash simulation)
+//   int start_id = neat::Neuron::next_id_ - 1;
+//   Genome genome(SETTINGS.environment.input_neurons,
+//                 SETTINGS.environment.output_neurons);
+//   Link constant_acceleration(
+//       start_id + 1, start_id + SETTINGS.environment.input_neurons + 1, 1);
+//   genome.AddLink(constant_acceleration);
+//   Link digest(start_id + 1, start_id + SETTINGS.environment.input_neurons + 5,
+//               1);
+//   genome.AddLink(digest);
+//   Link orient_towards_food(
+//       start_id + 7, start_id + SETTINGS.environment.input_neurons + 3, 1);
+//   genome.AddLink(orient_towards_food);
 
-  Link activation_bite(start_id + 1, start_id + SETTINGS.environment.input_neurons + 6,
-                       1);
-  genome.AddLink(activation_bite);
-  Link slow_rotation(start_id + 5,
-                     start_id + SETTINGS.environment.input_neurons + 3, -0.1);
-  genome.AddLink(slow_rotation);
-  return genome;
-}
+//   Link activation_bite(start_id + 1, start_id + SETTINGS.environment.input_neurons + 6,
+//                        1);
+//   genome.AddLink(activation_bite);
+//   Link slow_rotation(start_id + 5,
+//                      start_id + SETTINGS.environment.input_neurons + 3, -0.1);
+//   genome.AddLink(slow_rotation);
+//   return genome;
+// }
 
 
-Genome predatorGenome(){
-  int start_id = neat::Neuron::next_id_;
-  Genome genome(SETTINGS.environment.input_neurons,
-                SETTINGS.environment.output_neurons);
+// Genome predatorGenome(){
+//   int start_id = neat::Neuron::next_id_;
+//   Genome genome(SETTINGS.environment.input_neurons,
+//                 SETTINGS.environment.output_neurons);
 
-  Link constant_acceleration(start_id, start_id +SETTINGS.environment.input_neurons, 1);
-  genome.AddLink(constant_acceleration);
+//   Link constant_acceleration(start_id, start_id +SETTINGS.environment.input_neurons, 1);
+//   genome.AddLink(constant_acceleration);
 
-  Link digest(start_id, start_id + SETTINGS.environment.input_neurons + 5, 1);
-  Link stop_digesting(start_id + 5, start_id +SETTINGS.environment.input_neurons + 5, - 1);
-  genome.AddLink(digest);
-  genome.AddLink(stop_digesting);
+//   Link digest(start_id, start_id + SETTINGS.environment.input_neurons + 5, 1);
+//   Link stop_digesting(start_id + 5, start_id +SETTINGS.environment.input_neurons + 5, - 1);
+//   genome.AddLink(digest);
+//   genome.AddLink(stop_digesting);
 
-  Link orient_towards_enemy(start_id + 12, start_id + SETTINGS.environment.input_neurons + 2, 1/2);
-  genome.AddLink(orient_towards_enemy);
+//   Link orient_towards_enemy(start_id + 12, start_id + SETTINGS.environment.input_neurons + 2, 1/2);
+//   genome.AddLink(orient_towards_enemy);
 
-  Link orient_towards_meat(start_id + 9, start_id + SETTINGS.environment.input_neurons + 2, 1);
-  genome.AddLink(orient_towards_meat);
+//   Link orient_towards_meat(start_id + 9, start_id + SETTINGS.environment.input_neurons + 2, 1);
+//   genome.AddLink(orient_towards_meat);
 
-  Neuron BiteManager(NeuronType::kHidden, 1);
-  BiteManager.SetActivation(ActivationType::sigmoid);
-  int id = BiteManager.GetId();
-  genome.AddNeuron(BiteManager);
+//   Neuron BiteManager(NeuronType::kHidden, 1);
+//   BiteManager.SetActivation(ActivationType::sigmoid);
+//   int id = BiteManager.GetId();
+//   genome.AddNeuron(BiteManager);
 
-  Link distance_bite(start_id + 13, id, -1);
-  Link distance_meat(start_id + 10, id, -1);
-  Link activation_bite(id, start_id + SETTINGS.environment.input_neurons + 4, 1);
-  genome.AddLink(distance_bite);
-  genome.AddLink(distance_meat);
-  genome.AddLink(activation_bite);
+//   Link distance_bite(start_id + 13, id, -1);
+//   Link distance_meat(start_id + 10, id, -1);
+//   Link activation_bite(id, start_id + SETTINGS.environment.input_neurons + 4, 1);
+//   genome.AddLink(distance_bite);
+//   genome.AddLink(distance_meat);
+//   genome.AddLink(activation_bite);
 
-  Link slow_rotation(start_id + 4, start_id + SETTINGS.environment.input_neurons + 2, -0.1);
-  genome.AddLink(slow_rotation);
+//   Link slow_rotation(start_id + 4, start_id + SETTINGS.environment.input_neurons + 2, -0.1);
+//   genome.AddLink(slow_rotation);
 
-  return genome;
-}
+//   return genome;
+// }
 }  // namespace neat

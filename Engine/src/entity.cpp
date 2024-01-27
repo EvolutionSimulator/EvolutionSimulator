@@ -156,6 +156,16 @@ double Entity::GetDistance(const std::shared_ptr<Entity> other_entity, const dou
                     fmin(y_diff, kMapHeight - y_diff));
 }
 
+double Entity::GetDistance(const std::shared_ptr<Entity> other_entity) const {
+  std::pair<double, double> other_coordinates = other_entity->GetCoordinates();
+
+  // Use std::hypot for optimized distance calculation
+  const double x_diff = fabs(x_coord_ - other_coordinates.first);
+  const double y_diff = fabs(y_coord_ - other_coordinates.second);
+  return std::hypot(fmin(x_diff, SETTINGS.environment.map_width - x_diff),
+                    fmin(y_diff, SETTINGS.environment.map_height - y_diff));
+}
+
 /*!
  * @brief Calculates the relative orientation from this entity to another
  * entity.
