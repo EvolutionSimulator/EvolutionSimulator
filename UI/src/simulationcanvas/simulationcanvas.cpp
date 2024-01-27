@@ -90,6 +90,7 @@ void SimulationCanvas::OnUpdate()
   RenderSimulation(data_ref);
 
   // Check if a creature is selected
+  DrawMouseCoordinates();
   if (info_panel_.IsVisible() && info_panel_.GetSelectedCreature()) {
     if (info_panel_.GetSelectedCreature()->GetState() == AliveEntity::Alive)
     {
@@ -102,12 +103,15 @@ void SimulationCanvas::OnUpdate()
     std::cout << "Info panel flag is set, but no creature position is recorded."
               << std::endl;
   }
-  DrawMouseCoordinates();
+  setView(ui_view_);
 }
 
 void SimulationCanvas::DrawMouseCoordinates() {
   sf::Vector2i mousePixelPos = sf::Mouse::getPosition(*this);
   sf::Vector2f mousePos = mapPixelToCoords(mousePixelPos);
+
+  mousePos.x = fmod(mousePos.x + static_cast<float>(SETTINGS.environment.map_width), static_cast<float>(SETTINGS.environment.map_width));
+  mousePos.y = fmod(mousePos.y + static_cast<float>(SETTINGS.environment.map_height), static_cast<float>(SETTINGS.environment.map_height));
 
   // Prepare the text to display the mouse coordinates
   sf::Text mouseCoordsText;
@@ -118,13 +122,17 @@ void SimulationCanvas::DrawMouseCoordinates() {
   mouseCoordsText.setCharacterSize(12);
   mouseCoordsText.setFillColor(sf::Color::White);
 
-  // Position the text on the bottom right corner
-  sf::FloatRect textRect = mouseCoordsText.getLocalBounds();
-  mouseCoordsText.setOrigin(textRect.left + textRect.width,
-                            textRect.top + textRect.height);
-  mouseCoordsText.setPosition(getSize().x - 10, getSize().y - 5);
+  setView(info_panel_view_);
 
-  // Draw the mouse coordinates text
+  // Estimate the size of the text box (e.g., 140x18 pixels)
+  int estimatedTextWidth = 140; // This is an example, adjust based on your text
+  int estimatedTextHeight = 20; // Adjust based on your font and character size
+
+  // Position the text on the bottom right corner of the info_panel_view
+  float textX = getSize().x - estimatedTextWidth - 10; // 10 pixels padding from the right edge
+  float textY = getSize().y - estimatedTextHeight - 5; // 5 pixels padding from the bottom edge
+
+  mouseCoordsText.setPosition(textX, textY);
   draw(mouseCoordsText);
 }
 
