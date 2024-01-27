@@ -34,8 +34,9 @@ class Cluster {
 
   volatile bool running_;
   double lastRecordedTime_;
+  double lastReclusterTime_;
 
-  std::mutex mutex_;
+  std::recursive_mutex mutex_;
 
   void init(Simulation* simulation);
 
@@ -47,6 +48,7 @@ class Cluster {
 
   void setPoints(const std::vector<std::shared_ptr<Creature>>& creatures);
   void run();
+  void recluster();
   void add_newborns(const std::vector<std::shared_ptr<Creature>>& new_creatures);
   void update_dead_creatures(const std::vector<std::shared_ptr<Creature>>& dead_creatures);
   void update_all_creatures(const std::vector<std::shared_ptr<Creature>>& creatures);
