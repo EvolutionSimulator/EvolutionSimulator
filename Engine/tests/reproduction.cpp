@@ -18,7 +18,7 @@ TEST(ReproductionTest, SimulatePregnancy) {
   ASSERT_TRUE(female.FemaleReproductiveSystem::ReadyToProcreate());
 
   male.MaleReproductiveSystem::MateWithFemale();
-  female.FemaleReproductiveSystem::MateWithMale(&male, &female);
+  female.FemaleReproductiveSystem::MateWithMale(std::make_shared<Creature>(male), std::make_shared<Creature>(female));
   male.MaleAfterMate();
   female.FemaleAfterMate();
 

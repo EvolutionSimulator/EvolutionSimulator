@@ -620,12 +620,12 @@ TEST(SimulationDataTest, CorrectEntityPlacementInGrid) {
 
   Mutable mutables;
   auto creature_1 = std::make_shared<Creature>(neat::Genome(2, 3), mutables);
-  creature_1->SetCoordinates(200.1, 300.4, environment.GetMapWidth(), environment.GetMapHeight());
+  creature_1->SetCoordinates(200.1, 300.4, SETTINGS.environment.map_width, SETTINGS.environment.map_height);
   creature_1->SetSize(10.0);
   simData.creatures_.push_back(creature_1);
 
   auto creature_2 = std::make_shared<Creature>(neat::Genome(2, 3), mutables);
-  creature_2->SetCoordinates(100.1, 350.4, environment.GetMapWidth(), environment.GetMapHeight());
+  creature_2->SetCoordinates(100.1, 350.4, SETTINGS.environment.map_width, SETTINGS.environment.map_height);
   creature_2->SetSize(10.0);
   creature_2->SetState(Entity::Dead);
   simData.creatures_.push_back(creature_2);

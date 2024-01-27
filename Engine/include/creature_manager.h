@@ -18,6 +18,7 @@ class CreatureManager {
   void ReproduceCreatures(SimulationData& data, Environment& environment);
 
  private:
-  void ReproduceTwoCreatures(SimulationData& data, Creature& creature1,
-                             Creature& creature2);
+  void ReproduceTwoCreatures(SimulationData& data,
+                             std::shared_ptr<Creature> creature1,
+                             std::shared_ptr<Creature> creature2);
 };

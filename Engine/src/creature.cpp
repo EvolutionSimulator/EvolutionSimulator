@@ -140,8 +140,7 @@ bool Creature::Compatible(const std::shared_ptr<Creature>other_creature) {
       this->GetDistance(other_creature, SETTINGS.environment.map_width,
                         SETTINGS.environment.map_height);
   return brain_distance + mutable_distance <
-             SETTINGS.compatibility.compatibility_threshold &&
-         physical_distance < SETTINGS.compatibility.compatibility_distance;
+             SETTINGS.compatibility.compatibility_threshold;
 }
 
 /*!
@@ -173,6 +172,7 @@ void Creature::Update(double deltaTime, double const kMapWidth,
   this->Think(grid, GridCellSize, deltaTime, kMapWidth, kMapHeight);
   this->Digest(deltaTime);
   this->Grow(energy_/(1 + max_energy_) * deltaTime / 100);
+  this->AddAcid(energy_ * deltaTime );
   this->UpdateMatingDesire();
   this->FemaleReproductiveSystem::Update(deltaTime);
   this->MaleReproductiveSystem::Update(deltaTime);
@@ -201,20 +201,25 @@ void Creature::Update(double deltaTime, double const kMapWidth,
  */
 
 void Creature::OnCollision(std::shared_ptr<Entity>other_entity, double kMapWidth, double kMapHeight) {
-  if (other_entity->GetState() == Entity::Alive && eating_cooldown_ == 0.0 && biting_ == 1 && IsInRightDirection(other_entity, kMapWidth, kMapHeight)) {
-    SetEnergy(GetEnergy() - bite_strength_ * SETTINGS.physical_constraints.d_bite_energy_consumption_ratio);
-    if (std::shared_ptr<Food> food_entity = std::dynamic_pointer_cast<Food>(other_entity)) {
-      DigestiveSystem::Bite(food_entity);
-    } else if (std::shared_ptr<Creature>creature_entity = std::dynamic_pointer_cast<Creature>(other_entity)) {
-            Bite(creature_entity);
-    }
+  if (other_entity->GetState() != Entity::Alive || !IsInRightDirection(other_entity, kMapWidth, kMapHeight) || eating_cooldown_ != 0.0){
+      MovableEntity::OnCollision(other_entity, kMapWidth, kMapHeight);
+      return;
   }
+  SetEnergy(GetEnergy() - bite_strength_ * SETTINGS.physical_constraints.d_bite_energy_consumption_ratio);
+
+  if (std::shared_ptr<Food> food_entity = std::dynamic_pointer_cast<Food>(other_entity)) {
+      DigestiveSystem::Bite(food_entity);
+  }
+
+  if (std::shared_ptr<Creature>creature_entity = std::dynamic_pointer_cast<Creature>(other_entity)) {
+      if (attack_) Bite(creature_entity);
+  }
+  MovableEntity::OnCollision(other_entity, kMapWidth, kMapHeight);
 
   // if (other_entity->GetState() == Entity::Alive && grabbing_ && IsInSight(other_entity) && !(this->GetGrabbedEntity())){
   //   //checking if the creature wants to grab, has the entity in sight and if he is not already grabbing something
   //     Grab(other_entity);
   // }
-  MovableEntity::OnCollision(other_entity, kMapWidth, kMapHeight);
 }
 
 /*!
@@ -269,14 +274,11 @@ void Creature::Think(std::vector<std::vector<std::vector<std::shared_ptr<Entity>
   }
 
   std::vector<double> output = brain_.Activate(neuron_data_);
+
   SetAcceleration(std::tanh(output.at(0)) * mutable_.GetMaxForce());
   SetAccelerationAngle(std::tanh(output.at(1)) * M_PI);
   SetRotationalAcceleration(std::tanh(output.at(2))*mutable_.GetMaxForce());
-  // Grow(std::max(std::tanh(output.at(3)) * deltaTime, 0.0));
-  AddAcid(std::max(std::tanh(output.at(4)) * 10.0, 0.0));
-  biting_ = std::tanh(output.at(5)) > 0 ? 1 : 0;
-
-
+  attack_ = std::tanh(output.at(3)) > 0 ? 1 : 0;
 
   for (BrainModule& module : GetGenome().GetModules()){
       if (module.GetModuleId() == 2){

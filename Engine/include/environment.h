@@ -23,12 +23,6 @@ class Environment {
   void SetFrictionalCoefficient(double friction_coefficient) {friction_coefficient_ = friction_coefficient; }
   double GetFrictionalCoefficient() const { return friction_coefficient_; }
 
-  void SetMapWidth(double map_width) { map_width_ = map_width; }
-  double GetMapWidth() const { return map_width_; }
-
-  void SetMapHeight(double map_height) { map_height_ = map_height; }
-  double GetMapHeight() const { return map_height_; }
-
  private:
   // lambda for food density
   std::function <double(double, double)> food_density_func_;

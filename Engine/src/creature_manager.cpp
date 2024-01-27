@@ -84,55 +84,61 @@ void CreatureManager::HatchEggs(SimulationData& data, Environment& environment) 
  */
 void CreatureManager::ReproduceCreatures(SimulationData& data,
                                          Environment& environment) {
+    std::queue<std::shared_ptr<Creature>> not_reproduced;
 
-  std::queue<std::shared_ptr<Creature>> not_reproduced;
-  std::queue<std::shared_ptr<Creature>> temp_queue;
+    while (!data.reproduce_.empty()) {
+      auto creature1 = data.reproduce_.front();
+      data.reproduce_.pop();
+      bool paired = false;
+      bool readded = false;  // Flag to track if creature1 is re-added to the queue
 
-  while (!data.reproduce_.empty()) {
-    auto creature1 = data.reproduce_.front();
-    data.reproduce_.pop();
-    bool paired = false;
+      std::queue<std::shared_ptr<Creature>> next_round_queue;
+      while (!data.new_reproduce_.empty() && !paired) {
+        auto creature2 = data.new_reproduce_.front();
+        data.new_reproduce_.pop();
 
-    // Attempt to pair creature1 with a compatible new creature
-    while (!data.new_reproduce_.empty() && !paired) {
-      auto creature2 = data.new_reproduce_.front();
-      data.new_reproduce_.pop();
-      //If these two creatures are compatible reproduce them otherwise
-      //save the creature in a temporary queue for the next pairing round
-      if (creature1->Compatible(creature2) and
-          creature1->MaleReproductiveSystem::ReadyToProcreate() and
-          creature2->FemaleReproductiveSystem::ReadyToProcreate()) {
-        std::cerr << "Reproducing creatures" << std::endl;
-        ReproduceTwoCreatures(data, *creature1, *creature2);
-        paired = true;
-      } else {
-        temp_queue.push(creature2);  // Save for next round
+        if (creature1->Compatible(creature2) &&
+            creature1->MaleReproductiveSystem::ReadyToProcreate() &&
+            creature2->FemaleReproductiveSystem::ReadyToProcreate()) {
+          if (creature1->GetDistance(creature2) < SETTINGS.compatibility.compatibility_distance) {
+            std::cerr << "Reproducing creatures" << std::endl;
+            ReproduceTwoCreatures(data, creature1, creature2);
+            paired = true;
+          } else {
+            // Compatible but not close enough, add both back for next round
+            next_round_queue.push(creature1);
+            next_round_queue.push(creature2);
+            readded = true;  // Mark creature1 as re-added
+            break; // Break out of the loop to prevent re-pairing of creature1
+          }
+        } else {
+          next_round_queue.push(creature2);  // Save for next round
+        }
+      }
+
+      // If creature1 wasn't paired and not re-added, add it to not_reproduced
+      if (!paired && !readded) {
+        not_reproduced.push(creature1);
+      }
+
+      // Refill new_reproduce_ with unpaired creatures for the next attempt
+      while (!next_round_queue.empty()) {
+        data.new_reproduce_.push(next_round_queue.front());
+        next_round_queue.pop();
       }
     }
 
-    // If the creature wasn't paired add it to not_reproduced
-    if (!paired) {
-      not_reproduced.push(creature1);
+    // Refill reproduce_ with creatures for the next iteration
+    while (!data.new_reproduce_.empty()) {
+      data.reproduce_.push(data.new_reproduce_.front());
+      data.new_reproduce_.pop();
     }
 
-    // Refill newCreatures with unpaired creatures for next attempt
-    while (!temp_queue.empty()) {
-      data.new_reproduce_.push(temp_queue.front());
-      temp_queue.pop();
+    // Refill reproduce_ with the remaining creatures
+    while (!not_reproduced.empty()) {
+      data.reproduce_.push(not_reproduced.front());
+      not_reproduced.pop();
     }
-  }
-
-  // Refill reproduce_ with creatures for the next iteration
-  while (!data.new_reproduce_.empty()) {
-    data.reproduce_.push(data.new_reproduce_.front());
-    data.new_reproduce_.pop();
-  }
-
-  // Refill reproduce_ with the remaining creatures
-  while (!not_reproduced.empty()) {
-    data.reproduce_.push(not_reproduced.front());
-    not_reproduced.pop();
-  }
 }
 
 /*!
@@ -144,14 +150,14 @@ void CreatureManager::ReproduceCreatures(SimulationData& data,
  * the moment of reproduction
  */
 void CreatureManager::ReproduceTwoCreatures(SimulationData& data,
-                                            Creature& father,
-                                            Creature& mother) {
-  father.MaleReproductiveSystem::MateWithFemale();
-  mother.FemaleReproductiveSystem::MateWithMale(&father, &mother);
-  father.SetWaitingToReproduce(false);
-  mother.SetWaitingToReproduce(false);
-  father.MaleAfterMate();
-  mother.FemaleAfterMate();
+                                            std::shared_ptr<Creature> father,
+                                            std::shared_ptr<Creature> mother) {
+  father->MaleReproductiveSystem::MateWithFemale();
+  mother->FemaleReproductiveSystem::MateWithMale(father, mother);
+  father->SetWaitingToReproduce(false);
+  mother->SetWaitingToReproduce(false);
+  father->MaleAfterMate();
+  mother->FemaleAfterMate();
 }
 
 /*!
@@ -168,12 +174,14 @@ void CreatureManager::InitializeCreatures(SimulationData& data,
   double min_creature_size = SETTINGS.environment.min_creature_size;
 
   data.creatures_.clear();
-  neat::Genome genome = neat::minimallyViableGenome();
   for (double x = 0; x < world_width; x += 2.0) {
     for (double y = 0; y < world_height; y += 2.0) {
       if (std::rand() / (RAND_MAX + 1.0) < creature_density) {
-        // neat::Genome genome(SETTINGS.environment.input_neurons,
-        //                     SETTINGS.environment.output_neurons);
+        neat::Genome genome(SETTINGS.environment.input_neurons,
+                             SETTINGS.environment.output_neurons);
+        for (int i = 0; i < 10; i++){
+            genome.Mutate();
+        }
         Mutable mutables;
         for (int i = 0; i < 40; i++) {
           mutables.Mutate();

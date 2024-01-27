@@ -75,8 +75,8 @@ void FemaleReproductiveSystem::Update(double delta_time) {
   }
 }
 
-void FemaleReproductiveSystem::MateWithMale(const Creature* const father,
-                                            const Creature* const mother) {
+void FemaleReproductiveSystem::MateWithMale(const std::shared_ptr<Creature> father,
+                                            const std::shared_ptr<Creature> mother) {
   if (not ReadyToProcreate())
     throw std::runtime_error("Not ready to procreate");
 
