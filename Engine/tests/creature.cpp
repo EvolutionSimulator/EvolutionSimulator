@@ -235,7 +235,7 @@ TEST(CreatureTests, GetClosestFoodInSight_MultipleFoods) {
   creature.SetVision(2.0, M_PI / 3);
 
   auto closest_food =
-      creature.GetClosestEntityInSight(grid, gridCellSize, 10.0, 10.0);
+      creature.GetClosestEntitiesInSight(grid, gridCellSize, 10.0, 10.0);
 
   ASSERT_EQ(closest_food[0], meat_1);
 }
@@ -270,7 +270,7 @@ TEST(CreatureTests, GetClosestFoodInSight_NoFoodInSight) {
   creature.SetVision(1, M_PI / 3);
 
   auto closest_food =
-      creature.GetClosestEntityInSight(grid, gridCellSize, 10.0, 10.0);
+      creature.GetClosestEntitiesInSight(grid, gridCellSize, 10.0, 10.0);
 
   ASSERT_EQ(closest_food[0], nullptr);
 }

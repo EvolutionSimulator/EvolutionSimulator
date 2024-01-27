@@ -139,9 +139,6 @@ bool Creature::Compatible(const std::shared_ptr<Creature>other_creature) {
   double physical_distance =
       this->GetDistance(other_creature, SETTINGS.environment.map_width,
                         SETTINGS.environment.map_height);
-  bool flag = brain_distance + mutable_distance <
-                  SETTINGS.compatibility.compatibility_threshold &&
-              physical_distance < SETTINGS.compatibility.compatibility_distance;
   return brain_distance + mutable_distance <
              SETTINGS.compatibility.compatibility_threshold &&
          physical_distance < SETTINGS.compatibility.compatibility_distance;
@@ -455,7 +452,7 @@ void Creature::Grab(std::shared_ptr<Entity> entity){
 void Creature::ProcessVision(
     std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
     double GridCellSize, double width, double height) {
-  std::vector<std::shared_ptr<Entity>> closeEntities = GetClosestEntityInSight(grid, GridCellSize, width, height);
+  std::vector<std::shared_ptr<Entity>> closeEntities = GetClosestEntitiesInSight(grid, GridCellSize, width, height);
   auto closeEntity = closeEntities[0];
 
   if (closeEntity){

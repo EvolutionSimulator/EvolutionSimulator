@@ -30,7 +30,7 @@ class Entity {
   std::pair<double, double> GetCoordinates() const;
   void SetCoordinates(const double x, const double y, const double kMapWidth,
                       const double kMapHeight);
-  void SetCoordinatesNoWrap(const double x, const double y);
+  void SetCoordinates(const double x, const double y);
 
   double GetOrientation() const;
   void SetOrientation(double orientation);

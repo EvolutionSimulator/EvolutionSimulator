@@ -35,8 +35,8 @@ SimulationCanvas::SimulationCanvas(QWidget* Parent)
 
 
 void SimulationCanvas::UpdateFoodDensityTexture(SimulationData& data){
-    int width = data.GetEnvironment().GetMapWidth();
-    int height = data.GetEnvironment().GetMapHeight();
+    double width = SETTINGS.environment.map_width;
+    double height = SETTINGS.environment.map_height;
 
     texture_manager_.food_density_texture_.create(width, height);
     sf::Image densityImage;
@@ -403,9 +403,8 @@ void SimulationCanvas::wheelEvent(QWheelEvent* event) {
 void SimulationCanvas::zoom(float factor, sf::Vector2f& zoomPoint) {
 
   // Check for maximum zoom
-  if (zoomFactor * factor > 1) {
-    zoomFactor = 1;
-    ui_view_.setCenter(initialViewCenter);
+  if (zoomFactor * factor > SETTINGS.ui.zoom) {
+    zoomFactor = SETTINGS.ui.zoom;
   } else {
     zoomFactor *= factor;
 

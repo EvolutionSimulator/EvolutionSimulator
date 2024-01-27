@@ -131,11 +131,14 @@ class Settings {
 
   struct UISettings {
     double dragging_sensitivity = 1.0f;
+    double zoom = 1; //This really takes a toll on performance handle with care
+    //Values of up to 5 should work but take into account it increases exponentially
+    // Also UI takes the most to work in this situation so try not to render the entire map constantly
   } ui;
 
   struct Random {
     unsigned int seed = 4002944851;
-    bool input_seed = true; //Change to load your own seed
+    bool input_seed = false; //Change to load your own seed
   } random;
 
  private:
