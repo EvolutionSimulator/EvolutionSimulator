@@ -182,7 +182,7 @@ void Mutable::Mutate() {
     double delta = Random::Normal(
         0.0, SETTINGS.physical_constraints.d_stomach_capacity / 20);
     stomach_capacity_factor_ += delta;
-    stomach_capacity_factor_ = mathlib::bound(stomach_capacity_factor_, 0, 1);
+    stomach_capacity_factor_ = mathlib::bound(stomach_capacity_factor_, 0.01, 1);
   }
 
   // Diet
