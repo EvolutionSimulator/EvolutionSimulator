@@ -7,6 +7,7 @@
 #include "engine.h"
 #include "graph_manager.h"
 #include "config_manager.h"
+#include "cluster.h"
 
 QT_BEGIN_NAMESPACE  //
     namespace Ui {
@@ -49,4 +50,7 @@ QT_END_NAMESPACE  //
 
   GraphManager* graph_manager_;
   ConfigManager* config_manager_;
+
+  Cluster* cluster_;
+  std::thread cluster_thread_;
 };
