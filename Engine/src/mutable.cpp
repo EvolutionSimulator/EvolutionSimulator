@@ -69,7 +69,7 @@ void Mutable::Mutate() {
     double delta = Random::Normal(
         0.0, SETTINGS.physical_constraints.d_energy_density / 20);
     energy_density_ += delta;
-    energy_density_ = mathlib::bound(energy_density_, 0,
+    energy_density_ = mathlib::bound(energy_density_, 0.01,
                                      SETTINGS.physical_constraints.max_energy_density);
   }
 
@@ -88,8 +88,8 @@ void Mutable::Mutate() {
     double delta = Random::Normal(
         0.0, SETTINGS.physical_constraints.d_energy_density / 20);    
     integrity_ += delta;
-    if (integrity_ < 0) {
-      integrity_ = 0;
+    if (integrity_ < 0.01) {
+      integrity_ = 0.01;
     }
   }
 
@@ -98,8 +98,8 @@ void Mutable::Mutate() {
     double delta = Random::Normal(
         0.0, SETTINGS.physical_constraints.d_strafing_difficulty / 20);   
     strafing_difficulty_ += delta;
-    if (strafing_difficulty_ < 0) {
-      strafing_difficulty_ = 0;
+    if (strafing_difficulty_ < 0.01) {
+      strafing_difficulty_ = 0.01;
     }
   }
 
@@ -127,8 +127,8 @@ void Mutable::Mutate() {
     double delta = Random::Normal(
         0.0, SETTINGS.physical_constraints.d_max_force / 20);    
     max_force_ += delta;
-    if (max_force_ < 0) {
-      max_force_ = 0;
+    if (max_force_ < 0.01) {
+      max_force_ = 0.01;
     }
   }
 
@@ -137,8 +137,8 @@ void Mutable::Mutate() {
     double delta = Random::Normal(
         0.0, SETTINGS.physical_constraints.d_max_force / 20);    
     growth_factor_ += delta;
-    if (growth_factor_ < 0) {
-      growth_factor_ = 0;
+    if (growth_factor_ < 0.01) {
+      growth_factor_ = 0.01;
     }
   }
 
@@ -161,7 +161,7 @@ void Mutable::Mutate() {
         SETTINGS.physical_constraints.d_gestation_ratio_to_incubation / 20);    
     gestation_ratio_to_incubation_ += delta;
     gestation_ratio_to_incubation_ =
-        mathlib::bound(gestation_ratio_to_incubation_, 0, 1);
+        mathlib::bound(gestation_ratio_to_incubation_, 0.01, 0.99);
   }
 
   // Color
