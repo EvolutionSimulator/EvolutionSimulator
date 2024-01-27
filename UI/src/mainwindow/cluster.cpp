@@ -7,13 +7,16 @@ Cluster::Cluster(double epsilon, int minPts)
       minPts(minPts),
       running_(false),
       lastRecordedTime_(0.0),
+      lastReclusterTime_(0.0),
       species(),
       points() {}
 
 void Cluster::start(Simulation* simulation) {
-  running_ = false;
+  running_ = true;
   init(simulation);
-  run();
+  recluster();
+  lastRecordedTime_ = 0.0;
+  lastReclusterTime_ = 0.0;
 
   while (running_) {
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
@@ -21,8 +24,24 @@ void Cluster::start(Simulation* simulation) {
     auto data = simulation->GetSimulationData();
 
     // std::cout << "Simulation time: " << data->world_time_ << std::endl;
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     update_all_creatures(data->creatures_);
+
+    if (data->world_time_ - lastReclusterTime_ > 100.0) {
+      std::cout << "Reclustering" << std::endl;
+      for(auto it = begin(points); it != end(points);) {
+        if(!(it->second.alive)) {
+          it = points.erase(it);
+        } else {
+          ++it;
+        }
+      }
+
+      recluster();
+
+      lastReclusterTime_ = data->world_time_;
+    }
+
     lastRecordedTime_ = data->world_time_;
   }
 }
@@ -87,7 +106,7 @@ void Cluster::expandCluster(int id, std::vector<int>& neighbors,
 
 void Cluster::run() {
   // std::cout << "Running cluster" << std::endl;
-  std::lock_guard<std::mutex> lock(mutex_);
+  std::lock_guard<std::recursive_mutex> lock(mutex_);
 
   int speciesLabel = 0;
 
@@ -103,6 +122,13 @@ void Cluster::run() {
       expandCluster(pair.first, neighbors, ++speciesLabel);
     }
   }
+}
+
+void Cluster::recluster() {
+  std::unordered_map<int, int> old_species = species;
+  species.clear();
+  core_points_ids.clear();
+  run();
 }
 
 std::unordered_map<int, int> Cluster::getSpecies() const { return species; }
@@ -123,7 +149,7 @@ std::unordered_map<int, int> Cluster::speciesSizes() {
 }
 
 std::vector<std::tuple<double, int, double>> Cluster::getSpeciesData() {
-  std::lock_guard<std::mutex> lock(mutex_);
+  std::lock_guard<std::recursive_mutex> lock(mutex_);
 
   std::unordered_map<int, int> species_sizes = this->speciesSizes();
   std::vector<std::tuple<double, int, double>> species_data;
