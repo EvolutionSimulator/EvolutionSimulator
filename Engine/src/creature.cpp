@@ -242,22 +242,22 @@ void Creature::Think(std::vector<std::vector<std::vector<std::shared_ptr<Entity>
   }
   think_count_ = 0;
   // To allow creatures to use a module it should be included below
-  ProcessVision(grid, GridCellSize, width, height);
   ProcessPheromoneDetection(grid, GridCellSize);
+
+  std::vector<std::shared_ptr<Entity>> closeEntities = GetClosestEntitiesInSight(grid, GridCellSize, width, height);
+  if(closeEntities[0]) closest_entity_ = closeEntities[0];
 
   if (neuron_data_.size() == 0) return;
   neuron_data_.at(0) = 1;
   neuron_data_.at(1) = energy_;
-  neuron_data_.at(2) = GetVelocity();
-  neuron_data_.at(3) = GetVelocityAngle();
-  neuron_data_.at(4) = GetRotationalVelocity();
-  neuron_data_.at(5) = GetEmptinessPercent();
-  neuron_data_.at(6) = orientation_entity_;
-  neuron_data_.at(7) = distance_entity_;
-  neuron_data_.at(8) = entity_size_;
-  neuron_data_.at(9) = entity_color_;
-  neuron_data_.at(10) = entity_compatibility_;
+  neuron_data_.at(2) = health_;
+  neuron_data_.at(3) = GetVelocity();
+  neuron_data_.at(4) = GetVelocityAngle();
+  neuron_data_.at(5) = GetRotationalVelocity();
+  neuron_data_.at(6) = GetEmptinessPercent();
+  ProcessVision(closeEntities[0], 7);
 
+  int entity_counter = 1;
   for (BrainModule module : GetGenome().GetModules()) {
     if (module.GetModuleId() == 1) {  // Geolocation Module
       int i = module.GetFirstInputIndex();
@@ -270,6 +270,12 @@ void Creature::Think(std::vector<std::vector<std::vector<std::shared_ptr<Entity>
         int i = module.GetFirstInputIndex();
         int type = module.GetType();
         neuron_data_.at(i) = pheromone_densities_.at(type);
+    }
+
+    if (module.GetModuleId() == 3){ //Vision Module
+        int i = module.GetFirstInputIndex();
+        ProcessVision(closeEntities[entity_counter], i);
+        entity_counter++;
     }
   }
 
@@ -313,89 +319,6 @@ void Creature::Grow(double energy) {
 }
 
 bool Creature::GetMatingDesire() const { return mating_desire_; }
-
-/*!
- * @brief Identifies food entities within a specified grid distance.
- *
- * @details Searches the grid within a specified distance from the creature's
- * location to find food entities. Returns a vector containing pointers to all
- * food entities found within this range.
- *
- * @param grid The environmental grid.
- * @param i_creature The i-coordinate of the creature on the grid.
- * @param j_creature The j-coordinate of the creature on the grid.
- * @param grid_distance The distance to search for food on the grid.
- *
- * @return A vector of pointers to food entities within the specified distance.
- */
-std::vector<Food *> get_food_at_distance(
-    std::vector<std::vector<std::vector<Entity *>>> &grid, int i_creature,
-    int j_creature, int grid_distance) {
-  std::vector<Food *> food;
-  if (grid.empty()) return food;
-  int grid_width = grid.size();
-  int grid_height = grid[0].size();
-
-  if (i_creature + grid_distance < grid_width) {
-    for (int j = std::max(0, j_creature - grid_distance);
-         j < std::min(grid_height, j_creature + grid_distance + 1); j++) {
-      // std:: cout << "checking " << i_creature + grid_distance << ", " << j <<
-      // std::endl;
-      for (std::vector<Entity *>::iterator it =
-               grid[i_creature + grid_distance][j].begin();
-           it != grid[i_creature + grid_distance][j].end(); it++) {
-        Entity *entity_ptr = *it;
-        Food *food_ptr = dynamic_cast<Food *>(entity_ptr);
-        if (food_ptr != nullptr) {
-          food.push_back(food_ptr);
-        }
-      }
-    }
-  }
-  if (i_creature - grid_distance >= 0) {
-    for (int j = std::max(0, j_creature - grid_distance);
-         j < std::min(grid_height, j_creature + grid_distance + 1); j++) {
-      for (std::vector<Entity *>::iterator it =
-               grid[i_creature - grid_distance][j].begin();
-           it != grid[i_creature - grid_distance][j].end(); it++) {
-        Entity *entity_ptr = *it;
-        Food *food_ptr = dynamic_cast<Food *>(entity_ptr);
-        if (food_ptr != nullptr) {
-          food.push_back(food_ptr);
-        }
-      }
-    }
-  }
-  if (j_creature + grid_distance < grid_height) {
-    for (int i = std::max(0, i_creature - grid_distance + 1);
-         i < std::min(grid_width, i_creature + grid_distance); i++) {
-      for (std::vector<Entity *>::iterator it =
-               grid[i][j_creature + grid_distance].begin();
-           it != grid[i][j_creature + grid_distance].end(); it++) {
-        Entity *entity_ptr = *it;
-        Food *food_ptr = dynamic_cast<Food *>(entity_ptr);
-        if (food_ptr != nullptr) {
-          food.push_back(food_ptr);
-        }
-      }
-    }
-  }
-  if (j_creature - grid_distance >= 0) {
-    for (int i = std::max(0, i_creature - grid_distance + 1);
-         i < std::min(grid_width, i_creature + grid_distance); i++) {
-      for (std::vector<Entity *>::iterator it =
-               grid[i][j_creature - grid_distance].begin();
-           it != grid[i][j_creature - grid_distance].end(); it++) {
-        Entity *entity_ptr = *it;
-        Food *food_ptr = dynamic_cast<Food *>(entity_ptr);
-        if (food_ptr != nullptr) {
-          food.push_back(food_ptr);
-        }
-      }
-    }
-  }
-  return food;
-}
 
 /*!
  * @brief Handles the biting of the creature.
@@ -451,31 +374,24 @@ void Creature::Grab(std::shared_ptr<Entity> entity){
  * @param grid The environmental grid.
  * @param GridCellSize Size of each cell in the grid.
  */
-void Creature::ProcessVision(
-    std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
-    double GridCellSize, double width, double height) {
-  std::vector<std::shared_ptr<Entity>> closeEntities = GetClosestEntitiesInSight(grid, GridCellSize, width, height);
-  auto closeEntity = closeEntities[0];
+void Creature::ProcessVision(std::shared_ptr<Entity> entity, int start) {
+  if (entity){
+    neuron_data_.at(start) = this->GetDistance(entity) - entity->GetSize();
+    neuron_data_.at(start + 1)= this->GetRelativeOrientation(entity);
+    neuron_data_.at(start + 2) = entity->GetSize();
+    neuron_data_.at(start + 3) = entity->GetColor();
 
-  if (closeEntity){
-    distance_entity_ = this->GetDistance(closeEntity, width, height) - closeEntity->GetSize();
-    orientation_entity_ = this->GetRelativeOrientation(closeEntity, width, height);
-    closest_entity_ = closeEntity;
-    entity_size_ = closeEntity->GetSize();
-    entity_color_ = closeEntity->GetColor();
+    std::shared_ptr<Creature> otherCreature = std::dynamic_pointer_cast<Creature>(entity);
 
-    std::shared_ptr<Creature> otherCreature = std::dynamic_pointer_cast<Creature>(closeEntity);
-
-    if (otherCreature && Compatible(otherCreature)) { entity_compatibility_ = 1;}
-    else{ entity_compatibility_ = 0; }
+    if (otherCreature && Compatible(otherCreature)) { neuron_data_.at(start + 4) = 1;}
+    else{ neuron_data_.at(start + 4) = 0; }
 
   }
   else {
-    distance_entity_ =  vision_radius_;
-    orientation_entity_ = remainder(Random::Double(orientation_- vision_angle_/2, orientation_+ vision_angle_/2), 2*M_PI);
-    closest_entity_ =  nullptr;
-    entity_size_ = -1;
-    entity_compatibility_ = 0;
-    entity_color_ = 0;
+    neuron_data_.at(start) =  vision_radius_;
+    neuron_data_.at(start + 1) = remainder(Random::Double(orientation_- vision_angle_/2, orientation_+ vision_angle_/2), 2*M_PI);
+    neuron_data_.at(start + 2) = -1;
+    neuron_data_.at(start + 3) = 0;
+    neuron_data_.at(start + 4) = 0;
   }
 }

@@ -69,16 +69,12 @@ class Creature : virtual public MovableEntity,
   bool Compatible(const std::shared_ptr<Creature> other_creature);
 
   void Grab(std::shared_ptr<Entity>entity);
-  void ProcessVision(
-      std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
-      double GridCellSize, double width, double height);
+  void ProcessVision(std::shared_ptr<Entity> entity, int start);
 
 
 
   std::shared_ptr<Creature> GetClosestEnemyInSight(std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
       double grid_cell_size, double map_width, double map_heigth);
-  void ProcessVisionEnemies(std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid,
-                            double grid_cell_size, double width, double height);
 
   bool GetMatingDesire() const;
 
@@ -89,8 +85,4 @@ class Creature : virtual public MovableEntity,
   bool attack_; /*! Indicates whether creature currently wants to attack */
 
 };
-
-std::vector<Food *> get_food_at_distance(
-    std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &grid, int i_creature,
-    int j_creature, int grid_distance);
 #endif  // CREATURE_HPP

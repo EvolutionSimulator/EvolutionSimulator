@@ -69,8 +69,8 @@ class Settings {
     int min_creature_size = 2;
     double reproduction_threshold = 0.80;
     double reproduction_cooldown = 10;
-    int input_neurons = 11;
-    int output_neurons = 6;
+    int input_neurons = 12;
+    int output_neurons = 4;
     double max_nutritional_value = 2;
     double default_lifespan = 30;
     double photosynthesis_factor = 0.01;
