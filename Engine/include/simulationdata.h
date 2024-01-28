@@ -48,6 +48,7 @@ struct SimulationData {
 
   void WriteDataToFile();
   void RetrieveDataFromFile(const int&);
+  void RetrieveLastSimulation();
 
  private:
   double lastRecordedTime_;
