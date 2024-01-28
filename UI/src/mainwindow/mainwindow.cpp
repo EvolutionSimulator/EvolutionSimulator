@@ -260,15 +260,20 @@ void MainWindow::handleDropdownSelectionSave(int index) {
   qDebug() << "Dropdown selection changed to index:" << index;
 
   if (index == 1) {
+    qDebug() << "Load Button";
+      // load the last save
+      SimulationData data = *engine_->GetSimulation()->GetSimulationData();
+      data.RetrieveLastSimulation();
+  }
+  if (index == 2) {
+    qDebug() << "Save button";
     // save the data to a new file
     SimulationData data = *engine_->GetSimulation()->GetSimulationData();
     data.WriteDataToFile();
     qDebug() << "Saving simulation";
   }
-  if (index == 2) {
-    // load the last save
-    SimulationData data = *engine_->GetSimulation()->GetSimulationData();
-    data.RetrieveLastSimulation();
-  }
+  // if (index == 2) {
+
+  // }
   ui_->saveMenu->setCurrentIndex(0);
 }
