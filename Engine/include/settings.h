@@ -124,7 +124,7 @@ class Settings {
     double after_birth_velocity_factor = 1.5; //Not used currently
     double d_bite_damage_ratio = 0.1;
     double d_bite_energy_consumption_ratio = 0.01;
-    double d_bite_nutritional_value = 1.0;
+    double d_bite_nutritional_value = 0;
     double d_eating_speed = 0.6;
     double d_pheromone_emission = 0.5;
     double pheromone_detection_sensitivity = 1;
