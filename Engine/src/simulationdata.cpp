@@ -92,11 +92,11 @@ void SimulationData::WriteDataToFile() {
     // identifying the correct path for each platform
     std::string file_path;
     #ifdef _WIN32
-        file_path = "C:\\Program Files\\EvolutionSimulator\\";
+        file_path = "C:\\Program Files\\EvolutionSimulator\\simulations\\";
     #elif __APPLE__
-        file_path = "~/Library/Application Support/EvolutionSimulator/";
-    #elif __unix__
-        file_path = "/.EvolutionSimulator/";
+        file_path = "~/Library/Application Support/EvolutionSimulator/simulations/";
+    #elif __linux__
+        file_path = "/.EvolutionSimulator/simulations/";
     #endif
 
     // getting the file count
@@ -221,11 +221,11 @@ void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
     // identifying the correct path for each platform
     std::string file_path;
     #ifdef _WIN32
-        file_path = "C:\\Program Files\\EvolutionSimulator\\";
+        file_path = "C:\\Program Files\\EvolutionSimulator\\simulations\\";
     #elif __APPLE__
-        file_path = "~/Library/Application Support/EvolutionSimulator/";
-    #elif __unix__
-        file_path = "/.EvolutionSimulator/";
+        file_path = "~/Library/Application Support/EvolutionSimulator/simulations/";
+    #elif __linux__
+        file_path = "/.EvolutionSimulator/simulations/";
     #endif
 
     // reading the data from the file
@@ -323,6 +323,34 @@ void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
         creature->SetVelocity(creature_item["velocity"]);
         creature->SetGeneration(creature_item["generation"]);
         SimulationData::creatures_.push_back(creature);
+    }  
+}
+
+void SimulationData::RetrieveLastSimulation() {
+    // identifying the correct path for each platform
+    std::string file_path;
+    #ifdef _WIN32
+        file_path = "C:\\Program Files\\EvolutionSimulator\\simulations\\";
+    #elif __APPLE__
+        file_path = "~/Library/Application Support/EvolutionSimulator/simulations/";
+    #elif __linux__
+        file_path = "/.EvolutionSimulator/simulations/";
+    #endif
+
+    // getting the file count
+    int n, simulation_count = 0;
+    std::string file_number;
+    for (const auto& simulation_saves : std::filesystem::directory_iterator(file_path)) {
+        n = simulation_saves.path().stem().string().length();
+        file_number = "";
+        for (int i = 11; i < n-4; i++) {
+            file_number += simulation_saves.path().stem().string()[i];
+        }
+        if (std::stoi(file_number) > simulation_count) {
+            simulation_count = std::stoi(file_number);
+        }
     }
-        
+
+    // call the function to retrieve the data from the file
+    SimulationData::RetrieveDataFromFile(simulation_count);
 }
