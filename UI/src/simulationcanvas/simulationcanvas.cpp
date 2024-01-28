@@ -505,11 +505,11 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
     float creatureSize = creature->GetSize();
     sf::Vector2f creaturePos(creatureX, creatureY);
 
-    if (sqrt(pow(warpedMousePos.x - creaturePos.x, 2) + pow(warpedMousePos.y - creaturePos.y, 2)) <= creatureSize) {
+    if (sqrt(pow(scaledX - creaturePos.x, 2) + pow(scaledY - creaturePos.y, 2)) <= creatureSize) {
       qDebug() << "Creature Clicked: ID" << creature->GetID();
       info_panel_.Show();
       info_panel_.SetSelectedCreature(creature);
-      info_panel_.SetOffset(mousePos.x - warpedMousePos.x, mousePos.y - warpedMousePos.y);
+      info_panel_.SetOffset(mousePos.x - scaledX, mousePos.y - scaledY);
       repaint();
       return;
     }
