@@ -15,7 +15,7 @@
 	<file>Resources/Stomach.png</file>
 	<file>Resources/EmptyStomach.png</file>   	
 	<file>Shaders/stomachShader.frag</file>
-	<file>Resources/Egg.png</file>	
+	<file>Resources/Final_egg.png</file>	
         <file>Resources/Food_32x32.png</file>
         <file>Resources/Creature_base.png</file>
         <file>Resources/Creature_eyes.png</file>

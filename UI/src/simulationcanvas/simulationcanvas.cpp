@@ -213,13 +213,20 @@ void SimulationCanvas::RenderEggAtPosition(
     std::shared_ptr<Egg> egg, const std::pair<double, double>& position) {
   sf::Sprite eggSprite;
   eggSprite.setTexture(texture_manager_.egg_texture_);
-  eggSprite.setScale(egg->GetSize() / 50.0f, egg->GetSize() / 50.0f);
-  eggSprite.setOrigin(128.0f, 128.0f);
+  eggSprite.setScale(egg->GetSize()/160.0f , egg->GetSize()/160.0f);
+  eggSprite.setOrigin(160.0f, 160.0f);
+
+  texture_manager_.color_shader_.setUniform("hueShift", egg->GetMutable().GetColor());
 
   std::pair<double, double> eggCoordinates = egg->GetCoordinates();
   sf::Transform eggTransform;
   eggTransform.translate(eggCoordinates.first, eggCoordinates.second);
-  draw(eggSprite, eggTransform);
+
+  sf::RenderStates states;
+  states.shader = &texture_manager_.color_shader_;
+  states.transform = eggTransform;
+
+  draw(eggSprite, states);
 }
 
 void SimulationCanvas::RenderCreatureAtPosition(

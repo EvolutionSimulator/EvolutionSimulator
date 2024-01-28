@@ -9,6 +9,7 @@ Egg::Egg(const GestatingEgg& gestating_egg,
       incubation_time_(gestating_egg.incubation_time),
       nutritional_value_(SETTINGS.environment.egg_nutritional_value){
   age_ = gestating_egg.age;
+  color_hue_ = mutable_.GetColor();
   Update(0);
 }
 

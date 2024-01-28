@@ -22,7 +22,7 @@ TextureManager::TextureManager()
   InitializeFile(eyes_texture_, ":/Resources/Creature_eyes.png");
   InitializeFile(tail_texture_, ":/Resources/Creature_tails.png");
   InitializeFile(food_texture_, ":/Resources/Food_32x32.png");
-  InitializeFile(egg_texture_, ":/Resources/Egg.png");
+  InitializeFile(egg_texture_, ":/Resources/Final_egg.png");
   InitializeFile(energy_texture_, ":/Resources/Energy.png");
   InitializeFile(health_texture_, ":/Resources/Health.png");
   InitializeFile(stomach_texture_, ":/Resources/EmptyStomach.png");
