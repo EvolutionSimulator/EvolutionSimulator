@@ -79,14 +79,17 @@ Food::type Food::GetType() const { return type_;}
 Plant::Plant()
     : Food(SETTINGS.environment.plant_nutritional_value) {
     type_ = plant;
+    color_hue_ = 0.32;
 }
 Plant::Plant(double x_coord, double y_coord)
     : Food(x_coord, y_coord, SETTINGS.environment.plant_nutritional_value) {
     type_ = plant;
+    color_hue_ = 0.32;
 }
 Plant::Plant(double x_coord, double y_coord, double size)
     : Food(x_coord, y_coord, size, SETTINGS.environment.plant_nutritional_value){
     type_ = plant;
+    color_hue_ = 0.32;
 }
 
 /*!
@@ -116,7 +119,7 @@ void Plant::Update(double deltaTime) {
   } else {
     SetState(Entity::Dead);
   }
-  SetColor((updated_nutritional_value/SETTINGS.environment.plant_nutritional_value - 1)*0.06);
+  SetColor(0.32 + (updated_nutritional_value/SETTINGS.environment.plant_nutritional_value - 1)*0.06);
 }
 
 Meat::Meat()
