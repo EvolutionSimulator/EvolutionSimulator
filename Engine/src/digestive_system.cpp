@@ -94,8 +94,8 @@ void DigestiveSystem::Bite(std::shared_ptr<Food> food)
          // Check if creature eats the whole food or a part of it
   if (food_to_eat >= food->GetSize())
   {
-    max_nutrition = food->GetNutritionalValue() * food->GetSize();
-    SetStomachFullness(GetStomachFullness()+  M_PI*pow(food->GetSize(), 2));
+    max_nutrition = food->GetNutritionalValue() * M_PI * pow(food->GetSize(), 2);
+    SetStomachFullness(GetStomachFullness()+  pow(food->GetSize(), 2));
     food->Eat();
   }
   else
@@ -103,8 +103,8 @@ void DigestiveSystem::Bite(std::shared_ptr<Food> food)
     double initial_food_size = food->GetSize();
     double new_radius = std::sqrt(std::abs(pow(initial_food_size,2) - pow(food_to_eat,2)));
     food->SetSize(new_radius);
-    SetStomachFullness(GetStomachFullness()+ M_PI*pow(food_to_eat, 2));
-    max_nutrition =  food->GetNutritionalValue() * food_to_eat;
+    SetStomachFullness(GetStomachFullness() + pow(food_to_eat, 2));
+    max_nutrition =  food->GetNutritionalValue() * M_PI * pow(food_to_eat, 2);
   }
 
          // Herbivore/carnivore multiplier
@@ -115,7 +115,7 @@ void DigestiveSystem::Bite(std::shared_ptr<Food> food)
     max_nutrition = max_nutrition * 2 * mutable_.GetDiet();
   }
 
-         //Add nutrition to stomach, make sure capacity is not surpassed
+  //Add nutrition to stomach, make sure capacity is not surpassed
   potential_energy_in_stomach_ += max_nutrition;
 }
 

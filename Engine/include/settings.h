@@ -107,12 +107,12 @@ class Settings {
     double vision_angle = M_PI / 3;  // Default values or not used, not sure
     double vision_ar_ratio = 200 * M_PI / 3;
     double color_mutation_factor = 0.05;
-    double d_stomach_capacity = 2;
+    double d_stomach_capacity = 4;
     double d_diet = 0.5;           // Default omnivores
     double d_eating_cooldown = 1;  // Decrease for easier survival
     double d_digestion_rate = 3;
     double d_genetic_strength = 0.6;
-    double d_acid_to_energy = 5;  // Increase for easier survival
+    double d_acid_to_energy = 7;  // Increase for easier survival
     double max_reproducing_age = 1500;
     double mating_desire_max_prob = 0.05;
     double mating_desire_factor = 0.05;
@@ -131,7 +131,7 @@ class Settings {
 
   struct UISettings {
     double dragging_sensitivity = 1.0f;
-    double zoom = 3; //This really takes a toll on performance handle with care
+    double zoom = 1; //This really takes a toll on performance handle with care
     //Values of up to 5 should work but take into account it increases exponentially
     // Also UI takes the most to work in this situation so try not to render the entire map constantly
   } ui;

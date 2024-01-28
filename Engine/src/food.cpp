@@ -116,7 +116,7 @@ void Plant::Update(double deltaTime) {
   } else {
     SetState(Entity::Dead);
   }
-  SetColor((updated_nutritional_value/SETTINGS.environment.plant_nutritional_value - 1)*0.03);
+  SetColor((updated_nutritional_value/SETTINGS.environment.plant_nutritional_value - 1)*0.06);
 }
 
 Meat::Meat()
