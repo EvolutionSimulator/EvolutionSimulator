@@ -217,6 +217,18 @@ void MainWindow::DrawUI()
         ui_->graphMenu->setCurrentIndex(0);
     });
 
+    // Draw save menu
+    QComboBox *comboBox2 = ui_->saveMenu;
+    QPixmap originalPixmap2(":/Resources/save.png");
+    QPixmap scaledPixmap2 = originalPixmap2.scaled(20, 20, Qt::KeepAspectRatio);
+    comboBox2->setIconSize(scaledPixmap2.size());
+    comboBox2->addItem(QIcon(scaledPixmap2), "Save / Load");
+    comboBox2->addItem("1");
+    comboBox2->addItem("2");
+    connect(graph_manager_, &GraphManager::resetGraphMenuIndex, this, [this]() {
+        ui_->saveMenu->setCurrentIndex(0);
+    });
+
     // Set up run, restart
     QRect rect(2,2,45,45);
     QRect rect3(2,2,45,45);
@@ -241,4 +253,17 @@ void MainWindow::DrawUI()
     ui_->runButton->setIconSize(size);
     ui_->configurationButton->setIconSize(size);
     ui_->restartButton->setIconSize(size);
+}
+
+void MainWindow::handleDropdownSelectionSave(int index) {
+  qDebug() << "Dropdown selection changed to index:" << index;
+
+  if (index == 1) {
+    qDebug() << "Calling DrawCreaturesOverTimeGraph";
+    //DrawCreaturesSizeOverTimeGraph();
+  }
+  if (index == 2) {
+    qDebug() << "Calling DrawCreaturesOverTimeGraph";
+    //DrawCreaturesSizeOverTimeGraph();
+  }
 }
