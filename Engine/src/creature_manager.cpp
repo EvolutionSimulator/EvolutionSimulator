@@ -176,14 +176,20 @@ void CreatureManager::InitializeCreatures(SimulationData& data,
   double min_creature_size = SETTINGS.environment.min_creature_size;
 
   data.creatures_.clear();
+  int creatures_genome_ = 0;
+  neat::Genome genome(SETTINGS.environment.input_neurons,
+                      SETTINGS.environment.output_neurons);
   for (double x = 0; x < world_width; x += 2.0) {
     for (double y = 0; y < world_height; y += 2.0) {
       if (std::rand() / (RAND_MAX + 1.0) < creature_density) {
-        neat::Genome genome(SETTINGS.environment.input_neurons,
-                             SETTINGS.environment.output_neurons);
-        for (int i = 0; i < 10; i++){
+        if(creatures_genome_ % 3 == 0){
+          genome = neat::Genome(SETTINGS.environment.input_neurons,
+                                SETTINGS.environment.output_neurons);
+          for(int i = 0; i < 10; i++){
             genome.Mutate();
+          }
         }
+        creatures_genome_++;
         Mutable mutables;
         for (int i = 0; i < 40; i++) {
           mutables.Mutate();

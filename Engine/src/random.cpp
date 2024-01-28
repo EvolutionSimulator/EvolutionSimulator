@@ -1,4 +1,4 @@
 #include "random.h"
 
 std::random_device Random::rd;
-std::mt19937_64 Random::engine(rd());
+thread_local std::mt19937_64 Random::engine;

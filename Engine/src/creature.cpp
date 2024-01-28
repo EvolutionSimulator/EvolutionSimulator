@@ -168,11 +168,11 @@ void Creature::Update(double deltaTime, double const kMapWidth,
   // this->SetGrabValues();
   this->UpdateVelocities(deltaTime);
   this->Move(deltaTime, kMapWidth, kMapHeight);
-  this->Rotate(deltaTime);  //, kMapWidth, kMapHeight);
+  this->Rotate(deltaTime);
   this->Think(grid, GridCellSize, deltaTime, kMapWidth, kMapHeight);
   this->Digest(deltaTime);
   this->Grow(energy_/(1 + max_energy_) * deltaTime / 100);
-  this->AddAcid(energy_ * deltaTime );
+  this->AddAcid((energy_ + 10) * deltaTime );
   this->UpdateMatingDesire();
   this->FemaleReproductiveSystem::Update(deltaTime);
   this->MaleReproductiveSystem::Update(deltaTime);
