@@ -217,7 +217,7 @@ void SimulationData::WriteDataToFile() {
     WriteSimulation << simulation_json.dump(4);
 }
 
-void SimulationData::RetrieveDataFromFile(const std::string& simulationNumber) {
+void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
     // identifying the correct path for each platform
     std::string file_path;
     #ifdef _WIN32
@@ -229,7 +229,7 @@ void SimulationData::RetrieveDataFromFile(const std::string& simulationNumber) {
     #endif
 
     // reading the data from the file
-    std::ifstream ReadSimulation(file_path + "simulation_" + simulationNumber);
+    std::ifstream ReadSimulation(file_path + "simulation_" + std::to_string(simulationNumber));
     nlohmann::json simulation_json;
     ReadSimulation >> simulation_json;
 
@@ -248,20 +248,20 @@ void SimulationData::RetrieveDataFromFile(const std::string& simulationNumber) {
         double y = food_item["y_coord"];
         Food::type type = food_item["type"];
         if (type == Food::plant) {
-            Plant* food = new Plant(x, y);
+            std::shared_ptr<Plant> food = std::make_shared<Plant>(x, y, nutritional_value);
             food->SetSize(food_item["size"]);
             food->SetOrientation(food_item["orientation"]);
             food->SetState(food_item["state"]);
             food->SetColor(food_item["color"]);
-            SimulationData::food_entities_.push_back(std::make_shared<Plant>(food));
+            SimulationData::food_entities_.push_back(food);
         }
         else {
-            Meat* food = new Meat(x, y);
+            std::shared_ptr<Meat> food = std::make_shared<Meat>(x, y);
             food->SetSize(food_item["size"]);
             food->SetOrientation(food_item["orientation"]);
             food->SetState(food_item["state"]);
             food->SetColor(food_item["color"]);
-            SimulationData::food_entities_.push_back(std::shared_ptr<Meat>(food));
+            SimulationData::food_entities_.push_back(food);
         }
     }
 
@@ -284,12 +284,12 @@ void SimulationData::RetrieveDataFromFile(const std::string& simulationNumber) {
             // new_neuron.id_ = neuron["id"];
             genome.AddNeuron(new_neuron);
         }
-        Egg* egg = new Egg(GestatingEgg(genome, Mutable(), egg_item["generation"]), coords);
+        std::shared_ptr<Egg> egg = std::make_shared<Egg>(GestatingEgg(genome, Mutable(), egg_item["generation"]), coords);
         // egg->SetIncubationTime(egg_item["incubation time"]);
         egg->SetHealth(egg_item["health"]);
         egg->SetAge(egg_item["age"]);
         // egg->SetGenome(genome);
-        SimulationData::eggs_.push_back(std::make_shared<Egg>(egg));
+        SimulationData::eggs_.push_back(egg);
     }
 
     // load the creatures into the current simulation
@@ -312,7 +312,7 @@ void SimulationData::RetrieveDataFromFile(const std::string& simulationNumber) {
             genome.AddNeuron(new_neuron);
         }
 
-        Creature* creature = new Creature(genome, Mutable());
+        std::shared_ptr<Creature> creature = std::make_shared<Creature>(genome, Mutable());
         creature->SetHealth(creature_item["health"]);
         creature->SetAge(creature_item["age"]);
         creature->SetSize(creature_item["size"]);
@@ -322,7 +322,7 @@ void SimulationData::RetrieveDataFromFile(const std::string& simulationNumber) {
         creature->SetEnergy(creature_item["energy"]);
         creature->SetVelocity(creature_item["velocity"]);
         creature->SetGeneration(creature_item["generation"]);
-        SimulationData::creatures_.push_back(std::make_shared<Creature>(creature));
+        SimulationData::creatures_.push_back(creature);
     }
         
 }
