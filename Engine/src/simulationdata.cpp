@@ -14,6 +14,8 @@
 #include "mathlib.h"
 #include "settings.h"
 
+#include <QDebug>
+
 /*!
  * @brief Retrieves the current environment of the simulation.
  *
@@ -89,15 +91,20 @@ std::vector<double> SimulationData::GetCreatureOffspringOverTime() const {
 }
 
 void SimulationData::WriteDataToFile() {
+    #include <fstream>
+    #include <filesystem>
+
     // identifying the correct path for each platform
     std::string file_path;
     #ifdef _WIN32
         file_path = "C:\\Program Files\\EvolutionSimulator\\simulations\\";
     #elif __APPLE__
-        file_path = "~/Library/Application Support/EvolutionSimulator/simulations/";
+        file_path = std::string(getenv("HOME")) + "/Library/Application Support/EvolutionSimulator/simulations/";
     #elif __linux__
-        file_path = "/.EvolutionSimulator/simulations/";
+        file_path = std::string(getenv("HOME")) + "/.EvolutionSimulator/simulations/";
     #endif
+
+    std::filesystem::create_directories(file_path);
 
     // getting the file count
     int n, simulation_count = 0;
@@ -105,15 +112,16 @@ void SimulationData::WriteDataToFile() {
     for (const auto& simulation_saves : std::filesystem::directory_iterator(file_path)) {
         n = simulation_saves.path().stem().string().length();
         file_number = "";
-        for (int i = 11; i < n-4; i++) {
+        for (int i = 11; i < n; i++) {
             file_number += simulation_saves.path().stem().string()[i];
         }
+        qDebug() << file_number;
         if (std::stoi(file_number) > simulation_count) {
             simulation_count = std::stoi(file_number);
         }
     }
     // writing the data to the new file
-    std::ofstream WriteSimulation(file_path + "simulation_" + std::to_string(simulation_count));
+    std::ofstream WriteSimulation(file_path + "simulation_" + std::to_string(simulation_count+1) + ".json");
     nlohmann::json simulation_json;
 
     // load simulation settings
@@ -181,6 +189,8 @@ void SimulationData::WriteDataToFile() {
     simulation_json["creatures"] = nlohmann::json::array();
     for (const auto& creature_item : SimulationData::creatures_) {
         nlohmann::json creature_entry;
+        creature_entry["x_coord"] = creature_item->GetCoordinates().first;
+        creature_entry["y_coord"] = creature_item->GetCoordinates().second;
         creature_entry["health"] = creature_item->GetHealth();
         creature_entry["age"] = creature_item->GetAge();
         creature_entry["size"] = creature_item->GetSize();
@@ -192,6 +202,8 @@ void SimulationData::WriteDataToFile() {
         creature_entry["generation"] = creature_item->GetGeneration();
 
         // decompose the genome
+        creature_entry["genome"]["in_count"] = creature_item->GetGenome().GetInputCount();
+        creature_entry["genome"]["out_count"] = creature_item->GetGenome().GetOutputCount();
         creature_entry["genome"]["links"] = nlohmann::json::array();
         for (const auto& link : creature_item->GetGenome().GetLinks()) {
             nlohmann::json link_entry;
@@ -204,6 +216,8 @@ void SimulationData::WriteDataToFile() {
         }
 
         creature_entry["genome"]["neurons"] = nlohmann::json::array();
+        creature_entry["genome"]["in_count"] = creature_item->GetGenome().GetInputCount();
+        creature_entry["genome"]["out_count"] = creature_item->GetGenome().GetOutputCount();
         for (const auto& neuron : creature_item->GetGenome().GetNeurons()) {
             nlohmann::json neuron_entry;
             neuron_entry["id"] = neuron.GetId();
@@ -223,13 +237,13 @@ void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
     #ifdef _WIN32
         file_path = "C:\\Program Files\\EvolutionSimulator\\simulations\\";
     #elif __APPLE__
-        file_path = "~/Library/Application Support/EvolutionSimulator/simulations/";
+        file_path = std::string(getenv("HOME")) + "/Library/Application Support/EvolutionSimulator/simulations/";
     #elif __linux__
-        file_path = "/.EvolutionSimulator/simulations/";
+        file_path = std::string(getenv("HOME")) + "/.EvolutionSimulator/simulations/";
     #endif
 
     // reading the data from the file
-    std::ifstream ReadSimulation(file_path + "simulation_" + std::to_string(simulationNumber));
+    std::ifstream ReadSimulation(file_path + "simulation_" + std::to_string(simulationNumber) + ".json");
     nlohmann::json simulation_json;
     ReadSimulation >> simulation_json;
 
@@ -266,30 +280,32 @@ void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
     }
 
     // load the eggs from the current simulation
-    for (const auto& egg_item : simulation_json["eggs"]) {
-        auto coords = std::make_pair(egg_item["x_coord"], egg_item["y_coord"]);
+    if (!simulation_json["eggs"].empty()) {
+        for (const auto& egg_item : simulation_json["eggs"]) {
+            auto coords = std::make_pair(egg_item["x_coord"], egg_item["y_coord"]);
 
-        // reconstruct the genome
-        neat::Genome genome = neat::Genome(egg_item["in_count"], egg_item["out_count"]);
-        for (const auto& link : egg_item["genome"]["links"]) {
-            neat::Link new_link = neat::Link(link["id"], link["in"], link["out"]);
-            new_link.SetWeight(link["weight"]);
-            if (link["active"] == true)
-                new_link.SetActive();
-            genome.AddLink(new_link);
-        }
+            // reconstruct the genome
+            neat::Genome genome = neat::Genome(egg_item["in_count"], egg_item["out_count"]);
+            for (const auto& link : egg_item["genome"]["links"]) {
+                neat::Link new_link = neat::Link(link["id"], link["in"], link["out"]);
+                new_link.SetWeight(link["weight"]);
+                if (link["active"] == true)
+                    new_link.SetActive();
+                genome.AddLink(new_link);
+            }
 
-        for (const auto& neuron : egg_item["genome"]["neurons"]) {
-            neat::Neuron new_neuron = neat::Neuron(neuron["type"], neuron["bias"]);
-            // new_neuron.id_ = neuron["id"];
-            genome.AddNeuron(new_neuron);
+            for (const auto& neuron : egg_item["genome"]["neurons"]) {
+                neat::Neuron new_neuron = neat::Neuron(neuron["type"], neuron["bias"]);
+                // new_neuron.id_ = neuron["id"];
+                genome.AddNeuron(new_neuron);
+            }
+            std::shared_ptr<Egg> egg = std::make_shared<Egg>(GestatingEgg(genome, Mutable(), egg_item["generation"]), coords);
+            // egg->SetIncubationTime(egg_item["incubation time"]);
+            egg->SetHealth(egg_item["health"]);
+            egg->SetAge(egg_item["age"]);
+            // egg->SetGenome(genome);
+            SimulationData::eggs_.push_back(egg);
         }
-        std::shared_ptr<Egg> egg = std::make_shared<Egg>(GestatingEgg(genome, Mutable(), egg_item["generation"]), coords);
-        // egg->SetIncubationTime(egg_item["incubation time"]);
-        egg->SetHealth(egg_item["health"]);
-        egg->SetAge(egg_item["age"]);
-        // egg->SetGenome(genome);
-        SimulationData::eggs_.push_back(egg);
     }
 
     // load the creatures into the current simulation
@@ -298,6 +314,7 @@ void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
 
         // reconstruct the genome
         neat::Genome genome = neat::Genome(creature_item["genome"]["in_count"], creature_item["genome"]["out_count"]);
+        qDebug() << "Exists";
         for (const auto& link : creature_item["genome"]["links"]) {
             neat::Link new_link = neat::Link(link["id"], link["in"], link["out"]);
             new_link.SetWeight(link["weight"]);
@@ -312,6 +329,7 @@ void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
             genome.AddNeuron(new_neuron);
         }
 
+
         std::shared_ptr<Creature> creature = std::make_shared<Creature>(genome, Mutable());
         creature->SetHealth(creature_item["health"]);
         creature->SetAge(creature_item["age"]);
@@ -323,7 +341,7 @@ void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
         creature->SetVelocity(creature_item["velocity"]);
         creature->SetGeneration(creature_item["generation"]);
         SimulationData::creatures_.push_back(creature);
-    }  
+    }
 }
 
 void SimulationData::RetrieveLastSimulation() {
@@ -332,9 +350,9 @@ void SimulationData::RetrieveLastSimulation() {
     #ifdef _WIN32
         file_path = "C:\\Program Files\\EvolutionSimulator\\simulations\\";
     #elif __APPLE__
-        file_path = "~/Library/Application Support/EvolutionSimulator/simulations/";
+        file_path = std::string(getenv("HOME")) + "/Library/Application Support/EvolutionSimulator/simulations/";
     #elif __linux__
-        file_path = "/.EvolutionSimulator/simulations/";
+        file_path = std::string(getenv("HOME")) + "/.EvolutionSimulator/simulations/";
     #endif
 
     // getting the file count
@@ -343,10 +361,11 @@ void SimulationData::RetrieveLastSimulation() {
     for (const auto& simulation_saves : std::filesystem::directory_iterator(file_path)) {
         n = simulation_saves.path().stem().string().length();
         file_number = "";
-        for (int i = 11; i < n-4; i++) {
+        for (int i = 11; i < n; i++) {
             file_number += simulation_saves.path().stem().string()[i];
         }
         if (std::stoi(file_number) > simulation_count) {
+            qDebug() << file_number;
             simulation_count = std::stoi(file_number);
         }
     }
