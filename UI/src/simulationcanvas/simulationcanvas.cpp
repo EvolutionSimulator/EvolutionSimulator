@@ -430,8 +430,8 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
 
   auto data = simulation_->GetSimulationData();
 
-  float scaledX = initialClickPosition.x;
-  float scaledY = initialClickPosition.y;
+  float scaledX = warpedMousePos.x;
+  float scaledY = warpedMousePos.y;
   if (QSysInfo::kernelType() == "darwin") {
           qDebug() << "True";
           scaledX=currTopLeft.x+ui_view_.getSize().x*(mouseWindowWidth/scaledScreenWidth);
