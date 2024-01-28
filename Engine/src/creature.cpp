@@ -64,8 +64,9 @@ Creature::Creature(neat::Genome genome, Mutable mutables)
 void Creature::UpdateEnergy(double deltaTime) {
   double movement_energy =
       (fabs(GetAcceleration()) + fabs(GetRotationalAcceleration())) *
-      GetSize() * deltaTime / 200;
-  double heat_loss = mutable_.GetEnergyLoss() * pow(size_, 1) * deltaTime / 100;
+      GetSize() * deltaTime * SETTINGS.environment.movement_energy;
+  double heat_loss = mutable_.GetEnergyLoss() * pow(size_, 1) * deltaTime
+          * SETTINGS.environment.heat_energy;
 
   SetEnergy(GetEnergy() - movement_energy*pregnancy_hardship_ - heat_loss);
   BalanceHealthEnergy();

@@ -80,6 +80,8 @@ class Settings {
     double pregnancy_hardship_modifier = 1.5; //1 for normal behavior do not make it 0
     int surface_dimension = 1;
     int volume_dimension = 2;
+    double movement_energy = 0.005;
+    double heat_energy = 0.01;
   } environment;
 
   struct EngineSettings {
@@ -131,7 +133,7 @@ class Settings {
 
   struct UISettings {
     double dragging_sensitivity = 1.0f;
-    double zoom = 1; //This really takes a toll on performance handle with care
+    double zoom = 3; //This really takes a toll on performance handle with care
     //Values of up to 5 should work but take into account it increases exponentially
     // Also UI takes the most to work in this situation so try not to render the entire map constantly
   } ui;
