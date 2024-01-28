@@ -65,7 +65,7 @@ void AliveEntity::BalanceHealthEnergy() {
   if (GetEnergy() < 0) {
     SetHealth(GetHealth() + GetEnergy() - 0.1);
     SetEnergy(0.1);
-  } else if (GetHealth() < GetEnergy() && GetEnergy() >= 0.1 * max_energy_) {
+  } else if (GetHealth() < mutable_.GetIntegrity() * pow(GetSize(), SETTINGS.environment.volume_dimension) && GetEnergy() >= 0.7 * max_energy_) {
     SetEnergy(GetEnergy() - 0.1);
     SetHealth(GetHealth() + 0.1);
   }

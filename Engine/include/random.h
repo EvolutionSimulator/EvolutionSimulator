@@ -4,13 +4,14 @@
 #pragma once
 
 #include <random>
+#include "settings.h"
 #include <cstdint>
 
 class Random
 {
 private:
     static std::random_device rd; //Tbh I think this is a lil useless but I can't think of a better way rn
-    static std::mt19937_64 engine;
+    static thread_local std::mt19937_64 engine;
 
 public:
     template<typename U, typename V>
@@ -48,5 +49,14 @@ public:
         {
             engine.seed(seed);
         }
+
+    static void InitializeThreadLocalEngine() {
+        if (SETTINGS.random.input_seed){
+            engine.seed(SETTINGS.random.seed);
+        } else {
+            std::random_device rd;
+                engine.seed(rd());
+        }
+    }
 };
 #endif // RANDOM_H

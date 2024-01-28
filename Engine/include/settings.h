@@ -32,7 +32,7 @@ class Settings {
     double max_bias = 0.1;
     double min_bias = 0.0;
     double change_bias_mutation_rate = 0.6;
-    double module_activation_mutation_rate = 0.01;
+    double module_activation_mutation_rate = 0.001;
     double adjustment_probability = 0.8;
     double activation_function_mutation_rate = 0.02;
   } neat;
@@ -54,7 +54,7 @@ class Settings {
     int max_food_size = 15;  // Influences vision
     int max_creature_size = 15;
     double tolerance = 1e-3;
-    double default_food_density = 0.015;
+    double default_food_density = 0.06;
     double food_spawn_rate = 1e-5;
     double energy_to_health = 70.0;
     double health_to_energy = 10.0;
@@ -76,8 +76,8 @@ class Settings {
     double photosynthesis_factor = 0.01;
     double frictional_coefficient = 0.15; // Needs to be less than 1
     double maturity_age_multiplier = 0.1;
-    double male_reproduction_cost = 0.52;
-    double pregnancy_hardship_modifier = 2; //1 for normal behavior do not make it 0
+    double male_reproduction_cost = 0.51;
+    double pregnancy_hardship_modifier = 1.5; //1 for normal behavior do not make it 0
     int surface_dimension = 1;
     int volume_dimension = 2;
   } environment;
@@ -113,7 +113,7 @@ class Settings {
     double d_digestion_rate = 3;
     double d_genetic_strength = 0.6;
     double d_acid_to_energy = 5;  // Increase for easier survival
-    double max_reproducing_age = 1000;
+    double max_reproducing_age = 1500;
     double mating_desire_max_prob = 0.05;
     double mating_desire_factor = 0.05;
     double pregnancy_energy_factor =
@@ -131,13 +131,13 @@ class Settings {
 
   struct UISettings {
     double dragging_sensitivity = 1.0f;
-    double zoom = 2.5; //This really takes a toll on performance handle with care
+    double zoom = 3; //This really takes a toll on performance handle with care
     //Values of up to 5 should work but take into account it increases exponentially
     // Also UI takes the most to work in this situation so try not to render the entire map constantly
   } ui;
 
   struct Random {
-    unsigned int seed = 4002944851;
+    unsigned int seed = 2148664747;
     bool input_seed = false; //Change to load your own seed
   } random;
 

@@ -232,5 +232,5 @@ float Entity::GetColor() const {
 }
 
 void Entity::SetColor(float value){
-  color_hue_ = fmod(value, 360);
+  color_hue_ = fmod(value, 1);
 }

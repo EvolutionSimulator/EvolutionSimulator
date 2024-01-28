@@ -69,7 +69,8 @@ FemaleReproductiveSystem::FemaleReproductiveSystem(neat::Genome genome, Mutable 
     : ReproductiveSystem(genome, mutables),
       AliveEntity(genome, mutables), //Not really sure why but this is required
       egg_(),
-      gestation_ratio_to_incubation_(mutables.GetGestationRatioToIncubation()){
+      gestation_ratio_to_incubation_(mutables.GetGestationRatioToIncubation()),
+      pregnancy_hardship_(1){
     reproduction_cooldown_ = 0.5 * mutables.Complexity();
 }
 
