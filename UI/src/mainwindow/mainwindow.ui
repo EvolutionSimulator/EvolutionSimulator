@@ -577,11 +577,49 @@
                      }</string>
     </property>
    </widget>
+   <widget class="QComboBox" name="saveMenu">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>30</y>
+      <width>241</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QComboBox {
+                         border: 1px solid #999999; /* Border color */
+                         border-radius: 0px; /* Rounded corners */
+                         padding: 1px 18px 1px 3px; /* Adjust padding as needed*/
+                         background-color: lightgray; /* Background color */
+                     }
+
+                     QComboBox::drop-down {
+                         subcontrol-origin: padding;
+                         subcontrol-position: right;
+                         width: 20px; /* Adjust the width of the drop-down indicator */
+                         border-left: 1px solid #999999; /* Border color of the drop-down indicator */
+                         right: 0; /* Align to the far right */
+                     }
+
+                     QComboBox::down-arrow {
+                         subcontrol-origin: margin;
+                        subcontrol-position: center;
+                        width: 20px; /* Width of the down arrow icon */
+                        height: 20px; /* Height of the down arrow icon */
+                         image: url(:/Resources/down.png);
+                     }</string>
+    </property>
+   </widget>
    <zorder>canvas</zorder>
    <zorder>runButton</zorder>
    <zorder>restartButton</zorder>
    <zorder>graphMenu</zorder>
    <zorder>configurationButton</zorder>
+   <zorder>saveMenu</zorder>
   </widget>
  </widget>
  <customwidgets>

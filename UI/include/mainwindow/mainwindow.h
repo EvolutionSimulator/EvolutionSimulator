@@ -37,6 +37,7 @@ QT_END_NAMESPACE  //
   void ToggleSimulation();
   void RestartSimulation();
   void handleRestartSimulationRequested(double food_density, double creature_density);
+  void handleDropdownSelectionSave(int index);
 
   private:
 

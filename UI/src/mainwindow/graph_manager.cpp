@@ -348,8 +348,6 @@ void GraphManager::handleDropdownSelection(int index) {
     qDebug() << "Calling DrawCreaturesScatterploth";
     DrawEnergyVelocityScatterplot();
   }
-  if (index == 8) {
-    qDebug() << "Calling DrawSpeciesArea";
-    DrawSpeciesArea();
-  }
+
+
 }
