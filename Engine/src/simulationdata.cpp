@@ -95,14 +95,10 @@ void SimulationData::WriteDataToFile() {
     #include <filesystem>
 
     // identifying the correct path for each platform
-    std::string file_path;
-    #ifdef _WIN32
-        file_path = "C:\\Program Files\\EvolutionSimulator\\simulations\\";
-    #elif __APPLE__
-        file_path = std::string(getenv("HOME")) + "/Library/Application Support/EvolutionSimulator/simulations/";
-    #elif __linux__
-        file_path = std::string(getenv("HOME")) + "/.EvolutionSimulator/simulations/";
-    #endif
+    std::filesystem::path currentFilePath = __FILE__;
+    std::filesystem::path evolutionSimulatorPath = currentFilePath.parent_path().parent_path().parent_path();
+    std::filesystem::path file_path = evolutionSimulatorPath / "Simulations";
+
 
     std::filesystem::create_directories(file_path);
 
@@ -115,19 +111,20 @@ void SimulationData::WriteDataToFile() {
         for (int i = 11; i < n; i++) {
             file_number += simulation_saves.path().stem().string()[i];
         }
-        qDebug() << file_number;
+        // qDebug() << file_number;
         if (std::stoi(file_number) > simulation_count) {
             simulation_count = std::stoi(file_number);
         }
     }
     // writing the data to the new file
-    std::ofstream WriteSimulation(file_path + "simulation_" + std::to_string(simulation_count+1) + ".json");
+    std::filesystem::path simulationFilePath = file_path / ("simulation_" + std::to_string(simulation_count + 1) + ".json");
+    std::ofstream WriteSimulation(simulationFilePath);
     nlohmann::json simulation_json;
 
     // load simulation settings
-    //simulation_json["width"] = Settings.envi
-    //simulation_json["height"] = SimulationData::GetEnvironment().GetMapHeight();
-    // simulation_json["food density"] = SimulationData::GetEnvironment().GetFoodDensity(SimulationData::GetEnvironment().GetMapWidth(), SimulationData::GetEnvironment().GetMapHeight());
+    simulation_json["width"] = SETTINGS.environment.map_width;
+    simulation_json["height"] = SETTINGS.environment.map_height;
+    simulation_json["food density"] = SimulationData::GetEnvironment().GetFoodDensity(SETTINGS.environment.map_width,  SETTINGS.environment.map_height);
     simulation_json["creature density"] = SimulationData::GetEnvironment().GetCreatureDensity();
 
     // load the food from the current simulation
@@ -233,24 +230,30 @@ void SimulationData::WriteDataToFile() {
 
 void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
     // identifying the correct path for each platform
-    std::string file_path;
-    #ifdef _WIN32
-        file_path = "C:\\Program Files\\EvolutionSimulator\\simulations\\";
-    #elif __APPLE__
-        file_path = std::string(getenv("HOME")) + "/Library/Application Support/EvolutionSimulator/simulations/";
-    #elif __linux__
-        file_path = std::string(getenv("HOME")) + "/.EvolutionSimulator/simulations/";
-    #endif
+    std::filesystem::path currentFilePath = __FILE__;
+    std::filesystem::path evolutionSimulatorPath = currentFilePath.parent_path().parent_path().parent_path();
+    std::filesystem::path file_path = evolutionSimulatorPath / "Simulations";
 
     // reading the data from the file
-    std::ifstream ReadSimulation(file_path + "simulation_" + std::to_string(simulationNumber) + ".json");
+    std::filesystem::path simulationFilePath = file_path / ("simulation_" + std::to_string(simulationNumber) + ".json");
+    std::ifstream ReadSimulation(simulationFilePath);
     nlohmann::json simulation_json;
-    ReadSimulation >> simulation_json;
+    if (ReadSimulation.is_open()) {
+        ReadSimulation >> simulation_json;
+    } else {
+        std::cerr << "Failed to open file for reading: " << simulationFilePath << std::endl;
+    }
+
+    // Delete old data
+    SimulationData::creatures_.clear();
+    SimulationData::food_entities_.clear();
+    SimulationData::eggs_.clear();
 
     // load simulation settings
     Environment environment;
-    // environment.SetMapWidth(simulation_json["width"]);
-    // environment.SetMapHeight(simulation_json["height"]);
+    SETTINGS.environment.map_width = simulation_json["width"];
+    SETTINGS.environment.map_height = simulation_json["height"];
+
     environment.SetFoodDensity(simulation_json["food density"]);
     environment.SetCreatureDensity(simulation_json["creature density"]);
     SimulationData::SetEnvironment(environment);
@@ -285,7 +288,7 @@ void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
             auto coords = std::make_pair(egg_item["x_coord"], egg_item["y_coord"]);
 
             // reconstruct the genome
-            neat::Genome genome = neat::Genome(egg_item["in_count"], egg_item["out_count"]);
+            neat::Genome genome = neat::Genome(egg_item["genome"]["in_count"], egg_item["genome"]["out_count"]);
             for (const auto& link : egg_item["genome"]["links"]) {
                 neat::Link new_link = neat::Link(link["id"], link["in"], link["out"]);
                 new_link.SetWeight(link["weight"]);
@@ -303,18 +306,18 @@ void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
             // egg->SetIncubationTime(egg_item["incubation time"]);
             egg->SetHealth(egg_item["health"]);
             egg->SetAge(egg_item["age"]);
-            // egg->SetGenome(genome);
+            //egg->SetGenome(genome);
             SimulationData::eggs_.push_back(egg);
         }
     }
-
+    qDebug() << "Done Loading Eggs";
     // load the creatures into the current simulation
     for (const auto& creature_item : simulation_json["creatures"]) {
         auto coords = std::make_pair(creature_item["x_coord"], creature_item["y_coord"]);
 
         // reconstruct the genome
         neat::Genome genome = neat::Genome(creature_item["genome"]["in_count"], creature_item["genome"]["out_count"]);
-        qDebug() << "Exists";
+
         for (const auto& link : creature_item["genome"]["links"]) {
             neat::Link new_link = neat::Link(link["id"], link["in"], link["out"]);
             new_link.SetWeight(link["weight"]);
@@ -342,18 +345,14 @@ void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
         creature->SetGeneration(creature_item["generation"]);
         SimulationData::creatures_.push_back(creature);
     }
+    qDebug() << "Done Loading Creature";
 }
 
 void SimulationData::RetrieveLastSimulation() {
     // identifying the correct path for each platform
-    std::string file_path;
-    #ifdef _WIN32
-        file_path = "C:\\Program Files\\EvolutionSimulator\\simulations\\";
-    #elif __APPLE__
-        file_path = std::string(getenv("HOME")) + "/Library/Application Support/EvolutionSimulator/simulations/";
-    #elif __linux__
-        file_path = std::string(getenv("HOME")) + "/.EvolutionSimulator/simulations/";
-    #endif
+    std::filesystem::path currentFilePath = __FILE__;
+    std::filesystem::path evolutionSimulatorPath = currentFilePath.parent_path().parent_path().parent_path();
+    std::filesystem::path file_path = evolutionSimulatorPath / "Simulations";
 
     // getting the file count
     int n, simulation_count = 0;
@@ -365,7 +364,7 @@ void SimulationData::RetrieveLastSimulation() {
             file_number += simulation_saves.path().stem().string()[i];
         }
         if (std::stoi(file_number) > simulation_count) {
-            qDebug() << file_number;
+            // qDebug() << file_number;
             simulation_count = std::stoi(file_number);
         }
     }

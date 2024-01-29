@@ -223,12 +223,20 @@ void MainWindow::DrawUI()
     QPixmap originalPixmap2(":/Resources/save.png");
     QPixmap scaledPixmap2 = originalPixmap2.scaled(20, 20, Qt::KeepAspectRatio);
     comboBox2->setIconSize(scaledPixmap2.size());
+<<<<<<< HEAD
     comboBox2->addItem(QIcon(scaledPixmap2), "Save / Load");
     comboBox2->addItem("Save");
     comboBox2->addItem("Load last save");
     connect(graph_manager_, &GraphManager::resetGraphMenuIndex, this, [this]() {
         ui_->saveMenu->setCurrentIndex(0);
     });
+=======
+    comboBox2->addItem(QIcon(scaledPixmap2), "Load / Save");
+    comboBox2->addItem("Load Data");
+    comboBox2->addItem("Save Data");
+    connect(ui_->saveMenu, QOverload<int>::of(&QComboBox::currentIndexChanged),
+    this, &MainWindow::handleDropdownSelectionSave);
+>>>>>>> 6555f50 (Fix relative path)
 
     // Set up run, restart
     QRect rect(2,2,45,45);
@@ -262,8 +270,8 @@ void MainWindow::handleDropdownSelectionSave(int index) {
   if (index == 1) {
     qDebug() << "Load Button";
       // load the last save
-      SimulationData data = *engine_->GetSimulation()->GetSimulationData();
-      data.RetrieveLastSimulation();
+      // SimulationData data = *engine_->GetSimulation()->GetSimulationData();
+      // data.RetrieveLastSimulation();
   }
   if (index == 2) {
     qDebug() << "Save button";
