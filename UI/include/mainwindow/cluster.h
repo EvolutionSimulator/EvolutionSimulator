@@ -31,7 +31,7 @@ class Cluster {
   double epsilon;
   int minPts;
 
-  std::vector<std::tuple<double, double, double>> species_data_;
+  std::vector<std::tuple<int, double, int>> species_data_;
 
   volatile bool running_;
   double lastRecordedTime_;
@@ -56,12 +56,12 @@ class Cluster {
   void update_creatures_species(
       std::vector<std::shared_ptr<Creature>>& creatures);
 
-  std::vector<std::tuple<double, double, double>> getSpeciesData();
+  std::vector<std::tuple<int, double, int>> getSpeciesData();
 
   std::unordered_map<int, int> getSpecies() const;
   std::unordered_map<int, int> speciesSizes();
 
-  std::vector<std::tuple<double, double, double>> getCurrentSpeciesData();
+  std::vector<std::tuple<int, double, int>> getCurrentSpeciesData();
 
  private:
   std::vector<int> GetNeighbors(int id);
