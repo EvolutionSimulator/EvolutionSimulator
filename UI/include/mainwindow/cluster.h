@@ -27,6 +27,7 @@ class Cluster {
   std::unordered_map<int, int>
       species;  //'keys' are creature ids, values are species labels
   std::vector<int> core_points_ids;
+  int next_species_label;
   double epsilon;
   int minPts;
 
@@ -52,6 +53,9 @@ class Cluster {
   void add_newborns(const std::vector<std::shared_ptr<Creature>>& new_creatures);
   void update_dead_creatures(const std::vector<std::shared_ptr<Creature>>& dead_creatures);
   void update_all_creatures(const std::vector<std::shared_ptr<Creature>>& creatures);
+  void update_creatures_species(
+      std::vector<std::shared_ptr<Creature>>& creatures);
+
   std::vector<std::tuple<double, double, double>> getSpeciesData();
 
   std::unordered_map<int, int> getSpecies() const;
@@ -61,7 +65,7 @@ class Cluster {
 
  private:
   std::vector<int> GetNeighbors(int id);
-  void expandCluster(int id, std::vector<int>& neighbors, int speciesLabel);
+  void expandCluster(int id, std::vector<int>& neighbors);
 };
 
 #endif // CLUSTER_H

@@ -3,8 +3,14 @@
 #include <thread>
 
 Cluster::Cluster(double epsilon, int minPts)
-    : epsilon(epsilon), minPts(minPts), running_(false), lastRecordedTime_(0.0),
-      lastReclusterTime_(0.0), species(), points() {}
+    : epsilon(epsilon),
+      minPts(minPts),
+      running_(false),
+      lastRecordedTime_(0.0),
+      lastReclusterTime_(0.0),
+      species(),
+      points(),
+      next_species_label(0) {}
 
 void Cluster::start(Simulation* simulation) {
   running_ = true;
@@ -22,6 +28,7 @@ void Cluster::start(Simulation* simulation) {
     if (data->world_time_ - lastRecordedTime_ > 10.0) {
       std::lock_guard<std::recursive_mutex> lock(mutex_);
       update_all_creatures(data->creatures_);
+      update_creatures_species(data->creatures_);
 
       if (data->world_time_ - lastReclusterTime_ > 100.0) {
         std::cout << "Reclustering" << std::endl;
@@ -78,9 +85,8 @@ std::vector<int> Cluster::GetNeighbors(int id) {
   return neighbors;
 }
 
-void Cluster::expandCluster(int id, std::vector<int>& neighbors,
-                            int speciesLabel) {
-  species[id] = speciesLabel;
+void Cluster::expandCluster(int id, std::vector<int>& neighbors) {
+  species[id] = next_species_label;
   core_points_ids.push_back(id);
   for (size_t i = 0; i < neighbors.size(); ++i) {
     int neighborId = neighbors[i];
@@ -88,11 +94,11 @@ void Cluster::expandCluster(int id, std::vector<int>& neighbors,
     if (species.find(neighborId) != species.end()) {
       if (species[neighborId] == 0) {
         species[neighborId] =
-            speciesLabel;  // Change noise point to border point
+            next_species_label;  // Change noise point to border point
       }
       // else this point already belongs to a different species, so do nothing
     } else {  // point is not labeled
-      species[neighborId] = speciesLabel;
+      species[neighborId] = next_species_label;
 
       std::vector<int> newNeighbors = GetNeighbors(neighborId);
 
@@ -109,7 +115,7 @@ void Cluster::run() {
   // std::cout << "Running cluster" << std::endl;
   std::lock_guard<std::recursive_mutex> lock(mutex_);
 
-  int speciesLabel = 0;
+  // int speciesLabel = 0;
 
   for (const auto& pair : points) {
     if (species.find(pair.first) != species.end())
@@ -120,7 +126,8 @@ void Cluster::run() {
     if (neighbors.size() < minPts) {
       species[pair.first] = 0;  // Mark as noise
     } else {
-      expandCluster(pair.first, neighbors, ++speciesLabel);
+      next_species_label++;
+      expandCluster(pair.first, neighbors);
     }
   }
 }
@@ -225,6 +232,13 @@ void Cluster::update_all_creatures(const std::vector<std::shared_ptr<Creature>>&
     if (!assigned_species) {
       species[creature->GetID()] = 0;  // noise
     }
+  }
+}
+
+void Cluster::update_creatures_species(
+    std::vector<std::shared_ptr<Creature>>& creatures) {
+  for (auto& creatureptr : creatures) {
+    creatureptr->SetSpecies(species[creatureptr->GetID()]);
   }
 }
 
