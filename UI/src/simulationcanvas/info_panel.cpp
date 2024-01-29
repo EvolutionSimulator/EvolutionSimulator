@@ -59,6 +59,9 @@ void InfoPanel::Draw() {
 
   auto creature_position = selected_creature_->GetCoordinates();
   DrawVisionCone(target, *selected_creature_, creature_position);
+  if (QSysInfo::kernelType() == "darwin") {
+          return;
+  }
   creature_position.first += offset_x_;
   creature_position.second += offset_y_;
   DrawVisionCone(target, *selected_creature_, creature_position);
