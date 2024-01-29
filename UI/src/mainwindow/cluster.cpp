@@ -3,13 +3,8 @@
 #include <thread>
 
 Cluster::Cluster(double epsilon, int minPts)
-    : epsilon(epsilon),
-      minPts(minPts),
-      running_(false),
-      lastRecordedTime_(0.0),
-      lastReclusterTime_(0.0),
-      species(),
-      points() {}
+    : epsilon(epsilon), minPts(minPts), running_(false), lastRecordedTime_(0.0),
+      lastReclusterTime_(0.0), species(), points() {}
 
 void Cluster::start(Simulation* simulation) {
   running_ = true;
@@ -19,30 +14,36 @@ void Cluster::start(Simulation* simulation) {
   lastReclusterTime_ = 0.0;
 
   while (running_) {
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-    auto data = simulation->GetSimulationData();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     // std::cout << "Simulation time: " << data->world_time_ << std::endl;
-    std::lock_guard<std::recursive_mutex> lock(mutex_);
-    update_all_creatures(data->creatures_);
 
-    if (data->world_time_ - lastReclusterTime_ > 100.0) {
-      std::cout << "Reclustering" << std::endl;
-      for(auto it = begin(points); it != end(points);) {
-        if(!(it->second.alive)) {
-          it = points.erase(it);
-        } else {
-          ++it;
+    auto data = simulation->GetSimulationData();
+    if (data->world_time_ - lastRecordedTime_ > 10.0) {
+      std::lock_guard<std::recursive_mutex> lock(mutex_);
+      update_all_creatures(data->creatures_);
+
+      if (data->world_time_ - lastReclusterTime_ > 100.0) {
+        std::cout << "Reclustering" << std::endl;
+        for(auto it = begin(points); it != end(points);) {
+          if(!(it->second.alive)) {
+            it = points.erase(it);
+          } else {
+            ++it;
+          }
         }
+
+        recluster();
+
+        lastReclusterTime_ = data->world_time_;
       }
 
-      recluster();
+      lastRecordedTime_ = data->world_time_;
 
-      lastReclusterTime_ = data->world_time_;
+      auto species_data = getCurrentSpeciesData();
+      species_data_.insert(species_data_.end(), species_data.begin(),
+                           species_data.end());
     }
-
-    lastRecordedTime_ = data->world_time_;
   }
 }
 
@@ -148,7 +149,7 @@ std::unordered_map<int, int> Cluster::speciesSizes() {
   return species_sizes;
 }
 
-std::vector<std::tuple<double, double, double>> Cluster::getSpeciesData() {
+std::vector<std::tuple<double, double, double>> Cluster::getCurrentSpeciesData() {
   std::lock_guard<std::recursive_mutex> lock(mutex_);
 
   std::unordered_map<int, int> species_sizes = this->speciesSizes();
@@ -156,7 +157,7 @@ std::vector<std::tuple<double, double, double>> Cluster::getSpeciesData() {
 
   for (const auto& pair : species_sizes) {
     species_data.push_back(
-        std::make_tuple((double)pair.first, pair.second, lastRecordedTime_));
+        std::make_tuple(pair.first, lastRecordedTime_, pair.second));
   }
 
   return species_data;
@@ -225,4 +226,10 @@ void Cluster::update_all_creatures(const std::vector<std::shared_ptr<Creature>>&
       species[creature->GetID()] = 0;  // noise
     }
   }
+}
+
+std::vector<std::tuple<double, double, double>> Cluster::getSpeciesData() {
+  std::lock_guard<std::recursive_mutex> lock(mutex_);
+
+  return species_data_;
 }
