@@ -27,7 +27,7 @@ MainWindow::MainWindow(QWidget *parent)
   InitializeEngine();
   PauseSimulation();
   RunSimulation();
-  graph_manager_ = new GraphManager(this, engine_, ui_->canvas);
+  graph_manager_ = new GraphManager(this, engine_, cluster_, ui_->canvas);
   config_manager_ = new ConfigManager(this, engine_);
 
   DrawUI();
@@ -83,6 +83,9 @@ void MainWindow::InitializeEngineWithDensities(double food_density, double creat
   }
 }
 
+Cluster* MainWindow::GetCluster() {
+  return cluster_;
+}
 
 void MainWindow::RunSimulation() {
   if (engine_ && !engine_thread_.joinable()) {
