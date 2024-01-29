@@ -10,17 +10,22 @@
 #include <QValueAxis>
 #include <algorithm>  // Add this include for std::sort
 
-GraphManager::GraphManager(QWidget* parent, Engine *engine, SimulationCanvas* simulationCanvas) :
-    QObject(nullptr),
-    parent_(parent),
-    engine_(engine),
-    simulationCanvas_(simulationCanvas){
-    testData = {
-        std::make_tuple(0.0, 0.0, 0.0), std::make_tuple(0.0, 1.0, 1.0), std::make_tuple(0.0, 2.0, 2.0), std::make_tuple(0.0, 3.0, 3.0), std::make_tuple(0.0, 4.0, 4.0),   // Series with ID 0
-        std::make_tuple(1.0, 0.0, 2.0), std::make_tuple(1.0, 1.0, 4.0), std::make_tuple(1.0, 2.0, 3.0), std::make_tuple(1.0, 3.0, 7.0), std::make_tuple(1.0, 4.0, 1.0),  // Series with ID 1
-        std::make_tuple(2.0, 0.0, 5.0), std::make_tuple(2.0, 1.0, 3.0), std::make_tuple(2.0, 2.0, 8.0), std::make_tuple(2.0, 3.0, 6.0), std::make_tuple(2.0, 4.0, 2.0)    // Series with ID 2
-        // Add more series as needed
-    };
+GraphManager::GraphManager(QWidget *parent, Engine *engine, Cluster *cluster,
+                           SimulationCanvas *simulationCanvas)
+    : QObject(nullptr), parent_(parent), engine_(engine), cluster_(cluster),
+      simulationCanvas_(simulationCanvas) {
+  testData = {
+      std::make_tuple(0.0, 0.0, 0.0), std::make_tuple(0.0, 1.0, 1.0),
+      std::make_tuple(0.0, 2.0, 2.0), std::make_tuple(0.0, 3.0, 3.0),
+      std::make_tuple(0.0, 4.0, 4.0), // Series with ID 0
+      std::make_tuple(1.0, 0.0, 2.0), std::make_tuple(1.0, 1.0, 4.0),
+      std::make_tuple(1.0, 2.0, 3.0), std::make_tuple(1.0, 3.0, 7.0),
+      std::make_tuple(1.0, 4.0, 1.0), // Series with ID 1
+      std::make_tuple(2.0, 0.0, 5.0), std::make_tuple(2.0, 1.0, 3.0),
+      std::make_tuple(2.0, 2.0, 8.0), std::make_tuple(2.0, 3.0, 6.0),
+      std::make_tuple(2.0, 4.0, 2.0) // Series with ID 2
+                                     // Add more series as needed
+  };
 }
 
 void GraphManager::SetEngine(Engine* engine)
@@ -216,7 +221,7 @@ void GraphManager::DrawAreaGraph(const std::vector<std::tuple<double, double, do
 }
 
 void GraphManager::DrawSpeciesArea() {
-  DrawAreaGraph(testData, "Species Population over Time");
+  DrawAreaGraph(cluster_->getSpeciesData(), "Species Population over Time");
 }
 
 void GraphManager::DrawSizeEnergyScatterplot() {
@@ -349,5 +354,9 @@ void GraphManager::handleDropdownSelection(int index) {
     DrawEnergyVelocityScatterplot();
   }
 
+  if (index == 10) {
+    qDebug() << "Calling DrawSpeciesArea";
+    DrawSpeciesArea();
+  }
 
 }

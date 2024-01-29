@@ -148,11 +148,11 @@ std::unordered_map<int, int> Cluster::speciesSizes() {
   return species_sizes;
 }
 
-std::vector<std::tuple<double, int, double>> Cluster::getSpeciesData() {
+std::vector<std::tuple<double, double, double>> Cluster::getSpeciesData() {
   std::lock_guard<std::recursive_mutex> lock(mutex_);
 
   std::unordered_map<int, int> species_sizes = this->speciesSizes();
-  std::vector<std::tuple<double, int, double>> species_data;
+  std::vector<std::tuple<double, double, double>> species_data;
 
   for (const auto& pair : species_sizes) {
     species_data.push_back(

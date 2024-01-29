@@ -21,12 +21,13 @@
 #include "QtWidgets/qpushbutton.h"
 #include "engine.h"
 #include "simulationcanvas/simulationcanvas.h"
+#include "mainwindow/cluster.h"
 
 class GraphManager : public QObject {
   Q_OBJECT  // Enable signal and slot mechanism
 
 public:
-  explicit GraphManager(QWidget* parent, Engine* engine, SimulationCanvas* simulationCanvas);
+  explicit GraphManager(QWidget* parent, Engine* engine, Cluster* cluster, SimulationCanvas* simulationCanvas);
   void SetEngine(Engine* engine);
 
   // Helper function to create a directory if it doesn't exist
@@ -261,6 +262,7 @@ public slots:
 private:
   QWidget* parent_;
   Engine* engine_;
+  Cluster* cluster_;
   SimulationCanvas* simulationCanvas_;
   InfoPanel* GetInfoPanel();
   std::vector<std::tuple<double,double, double>> testData;
