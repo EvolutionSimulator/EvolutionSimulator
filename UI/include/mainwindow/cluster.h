@@ -1,8 +1,6 @@
 #ifndef CLUSTER_H
 #define CLUSTER_H
 
-#endif // CLUSTER_H
-
 #include <unordered_map>
 #include <mutex>
 
@@ -56,9 +54,11 @@ class Cluster {
   std::unordered_map<int, int> getSpecies() const;
   std::unordered_map<int, int> speciesSizes();
 
-  std::vector<std::tuple<double, int, double>> getSpeciesData();
+  std::vector<std::tuple<double, double, double>> getSpeciesData();
 
  private:
   std::vector<int> GetNeighbors(int id);
   void expandCluster(int id, std::vector<int>& neighbors, int speciesLabel);
 };
+
+#endif // CLUSTER_H

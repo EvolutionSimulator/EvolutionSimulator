@@ -28,6 +28,8 @@ QT_END_NAMESPACE  //
   void InitializeEngine();
   void InitializeEngineWithDensities(double food_density, double creature_density);
 
+  Cluster* GetCluster();
+
   void keyPressEvent(QKeyEvent *event) override; // Add this line
 
  private slots:  // Slots should be placed under this section
