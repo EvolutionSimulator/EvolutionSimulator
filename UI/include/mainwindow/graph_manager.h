@@ -15,6 +15,7 @@
 #include <QtCharts/QChart>
 #include <QtCharts/QChartView>
 #include <QtCharts/QScatterSeries>
+#include <QtCharts/QAreaSeries>
 #include <QDialog>
 #include <QVBoxLayout>
 #include "QtWidgets/qpushbutton.h"
@@ -68,6 +69,11 @@ public:
     dialog->setLayout(layout);
     dialog->resize(800, 600);
 
+    // Set the stack mode for the chart
+    chart->setTheme(QChart::ChartThemeLight);
+    chart->setAnimationOptions(QChart::AllAnimations);
+    chart->legend()->setAlignment(Qt::AlignBottom);
+
     // Add a Save button to the dialog
     QPushButton* saveButton = new QPushButton("Save Graph");
     layout->addWidget(saveButton);
@@ -79,14 +85,15 @@ public:
 
         // Create the folder if it doesn't exist
         if (createDirectory(folderPath)) {
-            QString filePath = QFileDialog::getSaveFileName(nullptr, "Save Graph", folderPath, "PNG Image (*.png);;CSV File (*.csv)");
+            QString filePath = QFileDialog::getSaveFileName(nullptr, "Save Graph", folderPath, "PNG Image (.png);;CSV File (.csv)");
             if (!filePath.isEmpty()) {
+
                 // Save image
                 QString imageFilePath = filePath + ".png";
                 chartView->grab().save(imageFilePath);
 
                 // Save data to CSV file
-                QString csvFilePath = filePath;
+                QString csvFilePath = filePath + ".csv";
                 QFile file(csvFilePath);
                 if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
                     QTextStream stream(&file);
@@ -185,6 +192,11 @@ public:
     dialog.resize(800, 600);
     dialog.setWindowTitle(title);
 
+    // Set the stack mode for the chart
+    chart->setTheme(QChart::ChartThemeLight);
+    chart->setAnimationOptions(QChart::AllAnimations);
+    chart->legend()->setAlignment(Qt::AlignBottom);
+
     // Add a Save button to the dialog
     QPushButton* saveButton = new QPushButton("Save Scatter Plot");
     layout->addWidget(saveButton);
@@ -224,13 +236,23 @@ public:
     dialog.exec();
   }
 
+  template <size_t Index = 0, typename... Types>
+  void writeTupleElements(QTextStream& stream, size_t id, const std::tuple<Types...>& tuple) {
+    if constexpr (Index < sizeof...(Types)) {
+      stream << id << "," << Index << "," << std::get<Index>(tuple) << "\n";
+      writeTupleElements<Index + 1>(stream, id, tuple);
+    }
+  }
+
 public slots:
+  void DrawAreaGraph(const std::vector<std::tuple<double,double, double>>& data, const QString& graphTitle);
   void DrawCreaturesOverTimeGraph();
   void DrawCreaturesDietOverTimeGraph();
   void DrawCreaturesOffspringOverTimeGraph();
   void DrawCreaturesSizeOverTimeGraph();
   void DrawCreaturesEnergyOverTimeGraph();
   void DrawCreaturesVelocityOverTimeGraph();
+  void DrawSpeciesArea();
   void DrawSizeEnergyScatterplot();
   void DrawSizeVelocityScatterplot();
   void DrawEnergyVelocityScatterplot();
@@ -241,6 +263,7 @@ private:
   Engine* engine_;
   SimulationCanvas* simulationCanvas_;
   InfoPanel* GetInfoPanel();
+  std::vector<std::tuple<double,double, double>> testData;
 
 signals:
   void resetGraphMenuIndex();
