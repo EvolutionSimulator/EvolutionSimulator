@@ -4,6 +4,7 @@
 #include "qslider.h"
 #include <QDialog>
 #include <QVBoxLayout>
+#include <QPushButton>
 
 ConfigManager::ConfigManager(QWidget* parent, Engine *engine) :
                                                               QObject(nullptr),
@@ -57,7 +58,11 @@ void ConfigManager::ShowConfigScreen(){
   QVBoxLayout* mainLayout = new QVBoxLayout(configDialog);
   QVBoxLayout* titleLayout = new QVBoxLayout();
   QVBoxLayout* contentLayout = new QVBoxLayout();
+  QVBoxLayout* sliderLayout = new QVBoxLayout();
+  QVBoxLayout* buttonLayout = new QVBoxLayout();
 
+  contentLayout->addLayout(sliderLayout);
+  contentLayout->addLayout(buttonLayout);
   mainLayout->addLayout(titleLayout);
   mainLayout->addLayout(contentLayout);
 
@@ -80,17 +85,23 @@ void ConfigManager::ShowConfigScreen(){
 
   titleLayout->addWidget(titleLabel, Qt::AlignTop | Qt::AlignHCenter);
   QLabel* speedValueLabel = new QLabel(QString("Simulation Speed: %1").arg(initial_speed));
-  contentLayout->addWidget(speedValueLabel);
-  contentLayout->addWidget(speedSlider);
+  sliderLayout->addWidget(speedValueLabel);
+  sliderLayout->addWidget(speedSlider);
 
-  contentLayout->addWidget(foodDLabel);
-  contentLayout->addWidget(foodDSlider);
+  sliderLayout->addWidget(foodDLabel);
+  sliderLayout->addWidget(foodDSlider);
 
   QLabel* frictionValueLabel = new QLabel(QString("Frictional Coefficient: %1").arg(frictional_coefficient));
-  contentLayout->addWidget(frictionValueLabel);
-  contentLayout->addWidget(frictionSlider);
+  sliderLayout->addWidget(frictionValueLabel);
+  sliderLayout->addWidget(frictionSlider);
 
+  QPushButton* saveButton = new QPushButton("Save simulation", configDialog);
+  QPushButton* loadButton = new QPushButton("Load simulation", configDialog);
+  buttonLayout->addWidget(saveButton);
+  buttonLayout->addWidget(loadButton);
 
+  buttonLayout->setContentsMargins(20,5,20,20);
+  sliderLayout->setContentsMargins(20,5,20,20);
   titleLayout->setContentsMargins(20,5,20,20);
   contentLayout->setContentsMargins(20,5,20,5);
   mainLayout->setContentsMargins(5,5,5,5);
@@ -98,6 +109,10 @@ void ConfigManager::ShowConfigScreen(){
   connect(speedSlider, &QSlider::valueChanged, this, &ConfigManager::ChangeEngineSpeed);
   connect(foodDSlider, &QSlider::valueChanged, this, &ConfigManager::ChangeFoodDensity);
   connect(frictionSlider, &QSlider::valueChanged, this, &ConfigManager::ChangeFriction);
+  /*
+  connect(loadButton, &QPushButton::clicked, this, &MainWindow::LoadSimulation);
+  connect(saveButton, &QPushButton::clicked, this, &MainWindow::SaveSimulation);
+  */
 
   // Create a local pointer to configDialog
   QDialog* localConfigDialog = configDialog;
@@ -117,6 +132,15 @@ void ConfigManager::ShowConfigScreen(){
 
       // Now, you can use localConfigDialog here if needed
   });
+
+  configDialog->setStyleSheet("QDialog { background-color: lightgray;}"
+                "QPushButton { background-color: #b3b3b3; margin: 5px; padding: 3px; font-size: 15px;}"
+                "QLabel {font-size: 15px;}"
+                "QSlider {margin: 5px; height: 10px; margin: 5px}"
+                "QSlider::handle:horizontal { background-color: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #b3b3b3, stop:1 #555555); border: 1px solid black; width: 15px; margin: -2px 0; border-radius: 6px; }"
+                "QSlider::groove:horizontal { background: #b3b3b3; height: 8px; }");
+
+
 
          // Show the configuration dialog modally
   configDialog->setLayout(mainLayout);
