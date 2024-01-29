@@ -1,4 +1,4 @@
-#define ENABLE_TIMING
+// #define ENABLE_TIMING
 #include "simulation.h"
 #include <chrono>
 
