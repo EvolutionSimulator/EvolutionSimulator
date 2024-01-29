@@ -18,6 +18,7 @@ class Egg : virtual public AliveEntity, virtual public MovableEntity {
   void Update(double delta_time);
   double GetNutritionalValue(){ return nutritional_value_; }
   void SetNutritionalValue(double value) { nutritional_value_ = value; }
+  bool CompatibleWithCreature(neat::Genome genome, Mutable mutables);
 
  protected:
   int generation_;

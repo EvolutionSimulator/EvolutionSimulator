@@ -41,3 +41,26 @@ std::shared_ptr<Creature> Egg::Hatch() {
   creature->SetGeneration(generation_);
   return creature;
 }
+
+/*!
+ * @brief Determines if the egg is compatible with a
+ * creature.
+ *
+ * @details This function calculates the compatibility between the current
+ * creature and another creature based on their genomes and mutable
+ * characteristics. It sums the brain distance, derived from genome
+ * compatibility, with the mutable distance, derived from mutable
+ * characteristics compatibility. The creatures are considered compatible if the
+ * sum is less than a predefined compatibility threshold.
+ *
+ * @param other_creature A reference to another `Creature` object for
+ * compatibility comparison.
+ * @return bool Returns `true` if the sum of brain and mutable distances is less
+ * than the compatibility threshold, indicating compatibility; otherwise returns
+ * `false`.
+ */
+bool Egg::CompatibleWithCreature(neat::Genome genome, Mutable mutables) {
+  double brain_distance = this->GetGenome().CompatibilityBetweenGenomes(genome);
+  double mutable_distance = this->GetMutable().CompatibilityBetweenMutables(mutables);
+  return brain_distance + mutable_distance < SETTINGS.compatibility.compatibility_threshold;
+}

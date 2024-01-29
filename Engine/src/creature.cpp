@@ -397,10 +397,12 @@ void Creature::ProcessVision(std::shared_ptr<Entity> entity, int start) {
     neuron_data_.at(start + 3) = entity->GetColor();
 
     std::shared_ptr<Creature> otherCreature = std::dynamic_pointer_cast<Creature>(entity);
+    if (otherCreature && Compatible(otherCreature)) { neuron_data_.at(start + 4) = 1; entity_compatibility_ = 1;}
+    else{ neuron_data_.at(start + 4) = 0; entity_compatibility_ = 0;}
 
-    if (otherCreature && Compatible(otherCreature)) { neuron_data_.at(start + 4) = 1;}
-    else{ neuron_data_.at(start + 4) = 0; }
-
+    std::shared_ptr<Egg> egg = std::dynamic_pointer_cast<Egg>(entity);
+    if (egg && egg->CompatibleWithCreature(GetGenome(), GetMutable())) { neuron_data_.at(start + 4) = 1; entity_compatibility_ = 1;}
+    else{ neuron_data_.at(start + 4) = 0; entity_compatibility_ = 0;}
   }
   else {
     neuron_data_.at(start) =  vision_radius_;
