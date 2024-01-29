@@ -125,9 +125,9 @@ void SimulationData::WriteDataToFile() {
     nlohmann::json simulation_json;
 
     // load simulation settings
-    simulation_json["width"] = SimulationData::GetEnvironment().GetMapWidth();
-    simulation_json["height"] = SimulationData::GetEnvironment().GetMapHeight();
-    simulation_json["food density"] = SimulationData::GetEnvironment().GetFoodDensity(SimulationData::GetEnvironment().GetMapWidth(), SimulationData::GetEnvironment().GetMapHeight());
+    //simulation_json["width"] = Settings.envi
+    //simulation_json["height"] = SimulationData::GetEnvironment().GetMapHeight();
+    // simulation_json["food density"] = SimulationData::GetEnvironment().GetFoodDensity(SimulationData::GetEnvironment().GetMapWidth(), SimulationData::GetEnvironment().GetMapHeight());
     simulation_json["creature density"] = SimulationData::GetEnvironment().GetCreatureDensity();
 
     // load the food from the current simulation
@@ -156,8 +156,8 @@ void SimulationData::WriteDataToFile() {
         egg_entry["health"] = egg_item->GetHealth();
         egg_entry["age"] = egg_item->GetAge();
         egg_entry["generation"] = egg_item->GetGeneration();
-        egg_entry["x_coord"] = egg_item->Food::GetCoordinates().first;
-        egg_entry["y_coord"] = egg_item->Food::GetCoordinates().second;
+        egg_entry["x_coord"] = egg_item->Entity::GetCoordinates().first;
+        egg_entry["y_coord"] = egg_item->Entity::GetCoordinates().second;
 
         // decompose the genome
         egg_entry["genome"]["in_count"] = egg_item->GetGenome().GetInputCount();
@@ -249,8 +249,8 @@ void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
 
     // load simulation settings
     Environment environment;
-    environment.SetMapWidth(simulation_json["width"]);
-    environment.SetMapHeight(simulation_json["height"]);
+    // environment.SetMapWidth(simulation_json["width"]);
+    // environment.SetMapHeight(simulation_json["height"]);
     environment.SetFoodDensity(simulation_json["food density"]);
     environment.SetCreatureDensity(simulation_json["creature density"]);
     SimulationData::SetEnvironment(environment);
