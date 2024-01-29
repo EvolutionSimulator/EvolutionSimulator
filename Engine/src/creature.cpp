@@ -47,10 +47,10 @@ Creature::Creature(neat::Genome genome, Mutable mutables)
       MaleReproductiveSystem(genome, mutables),
       FemaleReproductiveSystem(genome, mutables),
       PheromoneSystem(genome, mutables),
-      mating_desire_(false)
-      {
-    think_count_ = this->GetID();
-    color_hue_ = mutables.GetColor();
+      mating_desire_(false),
+      species_id_(0) {
+  think_count_ = this->GetID();
+  color_hue_ = mutables.GetColor();
 }
 
 /*!
@@ -76,6 +76,10 @@ void Creature::UpdateEnergy(double deltaTime) {
     Dies();
   }
 }
+
+int Creature::GetSpecies() const { return species_id_; }
+
+void Creature::SetSpecies(int species_id) { species_id_ = species_id; }
 
 /*!
  * @brief Updates the creature's desire to mate

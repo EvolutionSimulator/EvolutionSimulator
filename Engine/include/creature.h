@@ -50,6 +50,10 @@ class Creature : virtual public MovableEntity,
   Creature(neat::Genome genome, Mutable mutable_);
   virtual ~Creature() override {}
 
+  int GetSpecies() const;
+
+  void SetSpecies(int species_id);
+
   void UpdateEnergy(double deltaTime);
 
   void UpdateMatingDesire();
@@ -84,6 +88,6 @@ class Creature : virtual public MovableEntity,
   bool mating_desire_; /*! Indicates whether creature currently wants to mate <-
                         TO BE INTEGRATED INTO REPRODUCTIVE SYSTEM*/
   bool attack_; /*! Indicates whether creature currently wants to attack */
-
+  int species_id_;
 };
 #endif  // CREATURE_HPP
