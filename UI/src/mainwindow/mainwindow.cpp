@@ -165,12 +165,12 @@ void MainWindow::ToggleSimulation() {
     QPixmap pixMap2(":/Resources/Run.png");
     QIcon icon2(pixMap2);
     ui_->runButton->setIcon(icon2);
-
-    auto cluster_data = cluster_->getSpeciesData();
+    
+    auto cluster_data = cluster_->getCurrentSpeciesData();
     for (const auto& sample : cluster_data) {
       std::cout << "ID: " << std::get<0>(sample)
-                << "; size: " << std::get<1>(sample)
-                << "; time: " << std::get<2>(sample) << std::endl;
+                << "; time: " << std::get<1>(sample)
+                << "; size: " << std::get<2>(sample) << std::endl;
     }
   }
 }
