@@ -76,9 +76,11 @@ void SortById(std::vector<std::tuple<double, double, double>>& data) {
 
 void PrintData(const std::vector<std::tuple<double, double, double>>& data) {
   for (const auto& point : data) {
-      std::cout << "ID: " << std::get<0>(point)
-                << ", X: " << std::get<1>(point)
-                << ", Y: " << std::get<2>(point) << "\n";
+      auto id = std::get<0>(point);
+      auto x = std::get<1>(point);
+      auto y = std::get<2>(point);
+
+      std::cout << "ID: " << id << ", X: " << x << ", Y: " << y << std::endl;
   }
   std::cout << "------\n";
 }
@@ -89,8 +91,12 @@ void GraphManager::DrawAreaGraph(const std::vector<std::tuple<double, double, do
       return;
   }
 
+  PrintData(data);
+
   std::vector<std::tuple<double, double, double>> sortedData = data;
   SortById(sortedData);
+
+  PrintData(sortedData);
 
   QChart* chart = new QChart();
 
@@ -221,7 +227,8 @@ void GraphManager::DrawAreaGraph(const std::vector<std::tuple<double, double, do
 }
 
 void GraphManager::DrawSpeciesArea() {
-  DrawAreaGraph(cluster_->getSpeciesData(), "Species Population over Time");
+  auto data = cluster_->getSpeciesData();
+  DrawAreaGraph(data, "Species Population over Time");
 }
 
 void GraphManager::DrawSizeEnergyScatterplot() {
