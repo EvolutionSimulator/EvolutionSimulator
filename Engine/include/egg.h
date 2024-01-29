@@ -4,8 +4,9 @@
 #include "creature.h"
 #include "mutable.h"
 #include "neat/neat-genome.h"
+#include "movable_entity.h"
 
-class Egg : virtual public AliveEntity {
+class Egg : virtual public AliveEntity, virtual public MovableEntity {
  public:
   Egg(const GestatingEgg& gestating_egg,
       const std::pair<double, double>& coordinates);

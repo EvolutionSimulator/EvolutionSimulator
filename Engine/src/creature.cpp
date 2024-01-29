@@ -9,6 +9,7 @@
 #include "random.h"
 #include "settings.h"
 #include "grabbing_entity.h"
+#include "egg.h"
 
 /*!
  * @brief Construct a new Creature object.
@@ -206,15 +207,28 @@ void Creature::OnCollision(std::shared_ptr<Entity>other_entity, double kMapWidth
       MovableEntity::OnCollision(other_entity, kMapWidth, kMapHeight);
       return;
   }
+
   SetEnergy(GetEnergy() - bite_strength_ * SETTINGS.physical_constraints.d_bite_energy_consumption_ratio);
 
   if (std::shared_ptr<Food> food_entity = std::dynamic_pointer_cast<Food>(other_entity)) {
       DigestiveSystem::Bite(food_entity);
   }
 
-  if (std::shared_ptr<Creature>creature_entity = std::dynamic_pointer_cast<Creature>(other_entity)) {
-      if (attack_) Bite(creature_entity);
+  else{
+    if (std::shared_ptr<Creature>creature_entity = std::dynamic_pointer_cast<Creature>(other_entity)) {
+        if (attack_) Bite(creature_entity);
+    }
+    else {
+        if (std::shared_ptr<Egg>egg_entity = std::dynamic_pointer_cast<Egg>(other_entity)) {
+          if (attack_) {
+            EatEgg(egg_entity->GetSize(), egg_entity->GetNutritionalValue());
+            egg_entity->Break();
+          }
+          //else if (GetSize() > 5.0 * egg_entity->GetSize()) egg_entity->Break();
+        }
+    }
   }
+
   MovableEntity::OnCollision(other_entity, kMapWidth, kMapHeight);
 
   // if (other_entity->GetState() == Entity::Alive && grabbing_ && IsInSight(other_entity) && !(this->GetGrabbedEntity())){

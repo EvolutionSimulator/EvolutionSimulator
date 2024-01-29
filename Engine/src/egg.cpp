@@ -22,7 +22,7 @@ void Egg::Update(double delta_time) {
 
   age_ += delta_time;
 
-  SetSize(age_ / incubation_time_ * AliveEntity::GetMutable().GetBabySize());
+  SetSize((0.5 + age_ / incubation_time_) * AliveEntity::GetMutable().GetBabySize());
 }
 
 void Egg::Break() { AliveEntity::SetState(Dead); }

@@ -62,7 +62,7 @@ class Settings {
     double plant_nutritional_value = 0.5;
     double meat_nutritional_value = 1;
     double egg_nutritional_value = 1;
-    double egg_incubation_time_multiplier = 0.1;
+    double egg_incubation_time_multiplier = 10;
     double plant_proportion = 0.5; // PlantProportion + MeatProportion = 1
     double rot_factor = 0.03;
     double grid_cell_size = 50.0;
