@@ -15,6 +15,7 @@
 #include "grabbing_entity.h"
 #include "pheromones_system.h"
 #include "mutable.h"
+
 /*!
  * @file creature.h
  * @brief Defines the Creature class and related functionalities in a NEAT-based

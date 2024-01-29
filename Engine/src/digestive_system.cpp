@@ -149,3 +149,10 @@ void DigestiveSystem::SetAcid(double value)
     else { stomach_acid_ = value; }
   }
 }
+
+void DigestiveSystem::EatEgg(double size, double nutritional_value)
+{
+  auto area_to_eat = std::min(M_PI * size * size, stomach_capacity_ - stomach_fullness_);
+  SetStomachFullness(GetStomachFullness() + area_to_eat);
+  potential_energy_in_stomach_ += area_to_eat * nutritional_value;
+}

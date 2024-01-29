@@ -1,4 +1,5 @@
 #include "vision_system.h"
+#include "pheromone.h"
 #include "settings.h"
 #include <queue>
 #include <set>
@@ -82,10 +83,14 @@ std::vector<std::shared_ptr<Entity>> VisionSystem::GetClosestEntitiesInSight(std
 
       for (auto entity : grid[x][y]) {
         if (entity &&  entity.get() != this && IsInVisionCone(entity, map_width, map_heigth)) {
+          std::shared_ptr<Pheromone> pheromone_entity = std::dynamic_pointer_cast<Pheromone>(entity);
+
+            if (!pheromone_entity) {
             found_entities.push_back(entity);
             if (found_entities.size() == number_entities_to_return_) {
               break;
             }
+          }
         }
       }
       if (found_entities.size() == number_entities_to_return_ || processed_cells > max_cells_to_find_food) {

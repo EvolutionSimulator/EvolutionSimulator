@@ -22,6 +22,7 @@ public:
   void AddAcid(double quantity);
   void Eats(double nutritional_value);
 
+  void EatEgg(double size, double nutritional_value);
 
 protected:
   double stomach_capacity_; /*!< The stomach capacity (area) - mutable proportional to size squared */

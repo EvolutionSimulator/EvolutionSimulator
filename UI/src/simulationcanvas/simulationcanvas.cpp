@@ -213,8 +213,8 @@ void SimulationCanvas::RenderEggAtPosition(
     std::shared_ptr<Egg> egg, const std::pair<double, double>& position) {
   sf::Sprite eggSprite;
   eggSprite.setTexture(texture_manager_.egg_texture_);
-  eggSprite.setScale(egg->GetSize()/160.0f , egg->GetSize()/160.0f);
   eggSprite.setOrigin(160.0f, 160.0f);
+  eggSprite.setScale(egg->GetSize()/160.0f , egg->GetSize()/160.0f);
 
   texture_manager_.color_shader_.setUniform("hueShift", egg->GetMutable().GetColor());
 

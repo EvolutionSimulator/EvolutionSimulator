@@ -145,6 +145,33 @@ void UpdateGridPheromones(
 }
 
 /*!
+ * @brief Function that erases the eaten eggs from their
+ * corresponding vectors and fills the grid with the remaining eggs.
+ *
+ * @param food Vector of type Food.
+ * @param entityGrid 3D vector of entities.
+ * @param cellSize Size of the grid cells.
+ */
+
+void UpdateGridEgg(std::vector<std::shared_ptr<Egg>> &eggs,
+                    std::vector<std::vector<std::vector<std::shared_ptr<Entity>>>> &entityGrid,
+                    double cellSize) {
+    eggs.erase(std::remove_if(eggs.begin(), eggs.end(),
+                               [](const std::shared_ptr<Egg> egg) {
+                                 return egg->GetState() != Entity::Alive;
+                               }),
+                eggs.end());
+
+    for (const auto egg : eggs) {
+        std::pair<double, double> coordinates = egg->GetCoordinates();
+        int gridX = static_cast<int>(coordinates.first / cellSize);
+        int gridY = static_cast<int>(coordinates.second / cellSize);
+
+        entityGrid[gridX][gridY].push_back(egg);
+    }
+}
+
+/*!
  * @brief Updates the simulation grid, removing dead entities and placing the
  * living ones.
  */
@@ -152,6 +179,7 @@ void EntityGrid::UpdateGrid(SimulationData &data, Environment &environment, doub
     ClearGrid();
     UpdateGridCreature(data.creatures_, grid_, SETTINGS.environment.grid_cell_size, data.food_entities_);
     UpdateGridFood(data.food_entities_, grid_, SETTINGS.environment.grid_cell_size);
+    UpdateGridEgg(data.eggs_, grid_, SETTINGS.environment.grid_cell_size);
     UpdateQueue(data.reproduce_);
     UpdateGridPheromones(data.pheromones_, grid_, SETTINGS.environment.grid_cell_size, deltaTime);
 }
