@@ -134,6 +134,9 @@ void InfoPanel::DrawCircle(const Creature& creature, sf::Color color = sf::Color
   redCircle.setPosition(creature.GetCoordinates().first - creature.GetSize(),
                         creature.GetCoordinates().second - creature.GetSize());
   canvas_->draw(redCircle);
+  redCircle.setPosition(creature.GetCoordinates().first - creature.GetSize() - offset_x_,
+                        creature.GetCoordinates().second - creature.GetSize() - offset_y_);
+  canvas_->draw(redCircle);
 }
 
 void InfoPanel::DrawPanel(sf::RenderTarget& target) {
