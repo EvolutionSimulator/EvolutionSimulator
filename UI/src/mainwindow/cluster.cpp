@@ -25,39 +25,70 @@ void Cluster::start(Simulation* simulation) {
 
     // std::cout << "Simulation time: " << data->world_time_ << std::endl;
 
-    { //Lock, Copy, and Unlock also sets the trigger flags
-      std::lock_guard<std::recursive_mutex> lock(mutex_);
-      auto data = simulation->GetSimulationData();
-      if (data->world_time_ - lastRecordedTime_ > 10.0){
-        CopyCreatures(data->creatures_);
-        update_creatures_species(data->creatures_);
-        update_triggered = true;
-        if (data->world_time_ - lastReclusterTime_ > 100.0){
-          recluster_triggered = true;
-          lastReclusterTime_ = data->world_time_;
-        }
-        lastRecordedTime_ = data->world_time_;
-      }
-    }
+  //   { //Lock, Copy, and Unlock also sets the trigger flags
+  //     std::lock_guard<std::recursive_mutex> lock(mutex_);
+  //     auto data = simulation->GetSimulationData();
+  //     if (data->world_time_ - lastRecordedTime_ > 10.0){
+  //       CopyCreatures(data->creatures_);
+  //       update_creatures_species(data->creatures_);
+  //       update_triggered = true;
+  //       if (data->world_time_ - lastReclusterTime_ > 100.0){
+  //         recluster_triggered = true;
+  //         lastReclusterTime_ = data->world_time_;
+  //       }
+  //       lastRecordedTime_ = data->world_time_;
+  //     }
+  //   }
 
-    if (update_triggered){
-        update_all_creatures(creatures_);
-        if (recluster_triggered){
-          std::cout << "Reclustering" << std::endl;
-          for(auto it = begin(points); it != end(points);) {
-            if(!(it->second.alive)) {
-              it = points.erase(it);
-            } else {
-              ++it;
-            }
+  //   if (update_triggered){
+  //       update_all_creatures(creatures_);
+  //       if (recluster_triggered){
+  //         std::cout << "Reclustering" << std::endl;
+  //         for(auto it = begin(points); it != end(points);) {
+  //           if(!(it->second.alive)) {
+  //             it = points.erase(it);
+  //           } else {
+  //             ++it;
+  //           }
+  //         }
+  //         recluster();
+  //       }
+  //     auto species_data = getCurrentSpeciesData();
+  //     species_data_.insert(species_data_.end(), species_data.begin(),
+  //                          species_data.end());
+  //   }
+  // }
+    auto data = simulation->GetSimulationData();
+    if (data->world_time_ - lastRecordedTime_ > 10.0) {
+      std::lock_guard<std::recursive_mutex> lock(mutex_);
+      update_all_creatures(data->creatures_);
+      update_creatures_species(data->creatures_);
+
+      if (data->world_time_ - lastReclusterTime_ > 500.0) {
+        std::cout << "Reclustering" << std::endl;
+        for(auto it = begin(points); it != end(points);) {
+          if(!(it->second.alive)) {
+            it = points.erase(it);
+          } else {
+            ++it;
           }
-          recluster();
         }
+
+        recluster();
+
+        lastReclusterTime_ = data->world_time_;
+        update_all_creatures(data->creatures_);
+        update_creatures_species(data->creatures_);
+      }
+
+      lastRecordedTime_ = data->world_time_;
+
       auto species_data = getCurrentSpeciesData();
       species_data_.insert(species_data_.end(), species_data.begin(),
                            species_data.end());
     }
   }
+
 }
 
 void Cluster::init(Simulation* simulation) {
@@ -231,7 +262,7 @@ void Cluster::update_all_creatures(const std::vector<std::shared_ptr<Creature>>&
     }
 
     CreatureData creature_data{creature->GetGenome(), creature->GetMutable(),
-                               true};
+                               true, creature->GetColor()};
     points[creature->GetID()] = creature_data;
     // maybe core points ids should be shuffled every time
     bool assigned_species = false;
