@@ -10,6 +10,7 @@
 #include <QFileDialog>
 
 #include <QDockWidget>
+#include "qregularexpression.h"
 #include "ui_mainwindow.h"
 #include "simulationdata.h"
 
@@ -324,7 +325,8 @@ void MainWindow::handleDropdownSelectionSave(int index) {
     std::filesystem::path evolutionSimulatorPath = currentFilePath.parent_path().parent_path().parent_path();
     std::filesystem::path file_path = evolutionSimulatorPath / "Simulations";
     std::filesystem::create_directory(file_path);
-    QString dir = QFileDialog::getSaveFileName(this, "Save as", QString::fromStdString(file_path.string()));
+
+    QString dir = QFileDialog::getSaveFileName(this, "Save as", QString::fromStdString(file_path.string()), "JSON Files (*.json)");
     if (dir.isNull() || dir.isEmpty()) {
             qDebug() << "Save canceled by user";
             emit ResumeSimulation();
@@ -337,13 +339,13 @@ void MainWindow::handleDropdownSelectionSave(int index) {
     // Save the statistics to a separate file
     QFileInfo fileInfo(dir);
     QString fileName = fileInfo.fileName();
-    QRegularExpression regex("^[a-zA-Z0-9_()]+$");
+    QRegularExpression regex("^[a-zA-Z0-9_().]+$");
         if (!regex.match(fileName).hasMatch()) {
-            qDebug() << "Invalid characters in file name";
+            qDebug() << "Invalid characters in file name: " << fileName;
             emit ResumeSimulation();
             return;
         }
-    QString simulationFilePath = QString("Statistics(") + fileName + QString(")");
+    QString simulationFilePath = QString("stats_" + fileName);
     qDebug() << simulationFilePath;
     std::filesystem::path statisticsFilePath = file_path / simulationFilePath.toStdString();
     data.WriteStatisticsToFile(statisticsFilePath);
