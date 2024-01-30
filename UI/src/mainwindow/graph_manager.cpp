@@ -249,7 +249,7 @@ void GraphManager::onAreaHovered(QAreaSeries *series, QPointF point, bool state)
         int speciesId = series->property("speciesId").toInt();
 
         // Create the tooltip text
-        QString tooltipText = QString("Species ID: %1\nCoordinates: (%2, %3)")
+        QString tooltipText = QString("Species ID: %1")
                               .arg(speciesId);
 
         // Show the tooltip
