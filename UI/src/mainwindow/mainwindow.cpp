@@ -53,7 +53,7 @@ void MainWindow::InitializeEngine()
     engine_->SetSpeed(100);
     ui_->canvas->SetSimulation(engine_->GetSimulation());
 
-    cluster_ = new Cluster(SETTINGS.compatibility.compatibility_threshold * 2/3, 10);
+    cluster_ = new Cluster(SETTINGS.compatibility.compatibility_threshold * 3/4, 10);
   }
 
   // If this function changes change the kMaxFoodDensityColor in config.h as for a correct shade of the backgroung we need this measure
