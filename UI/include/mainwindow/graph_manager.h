@@ -259,6 +259,7 @@ public slots:
   void DrawEnergyVelocityScatterplot();
   void handleDropdownSelection(int index);
   void onAreaHovered(QAreaSeries *series, QPointF point, bool state);
+  void onAreaClicked(QAreaSeries *series, QPointF point);
 
 private:
   QWidget* parent_;

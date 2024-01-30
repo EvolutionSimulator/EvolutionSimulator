@@ -177,6 +177,9 @@ void GraphManager::DrawAreaGraph(const std::vector<std::tuple<int, double, int, 
       connect(areaSeries, &QAreaSeries::hovered, [this, areaSeries](const QPointF &point, bool state) {
           this->onAreaHovered(areaSeries, point, state);
       });
+      connect(areaSeries, &QAreaSeries::clicked, [this, areaSeries](const QPointF &point) {
+          this->onAreaClicked(areaSeries, point);
+      });
 
              // Add series to chart
       chart->addSeries(areaSeries);
@@ -204,7 +207,9 @@ void GraphManager::DrawAreaGraph(const std::vector<std::tuple<int, double, int, 
   QPushButton* saveButton = new QPushButton("Save Graph");
   layout->addWidget(saveButton);
 
-  QDialog* dialog = new QDialog(parent_);
+  QDialog* dialog = new QDialog();
+  dialog->setWindowFlags(dialog->windowFlags() | Qt::Window);
+
   dialog->setWindowTitle(graphTitle);
   dialog->setLayout(layout);
   dialog->resize(800, 600);
@@ -239,8 +244,11 @@ void GraphManager::DrawAreaGraph(const std::vector<std::tuple<int, double, int, 
   });
 
   connect(dialog, &QDialog::finished, dialog, &QObject::deleteLater);
+  connect(dialog, &QDialog::finished, [this]() {
+      this->simulationCanvas_->GetInfoPanel().RemoveSelectedSpecies();
+  });
   emit resetGraphMenuIndex();
-  dialog->exec();
+  dialog->show();
 }
 
 void GraphManager::onAreaHovered(QAreaSeries *series, QPointF point, bool state) {
@@ -254,14 +262,16 @@ void GraphManager::onAreaHovered(QAreaSeries *series, QPointF point, bool state)
 
         // Show the tooltip
         QToolTip::showText(QCursor::pos(), tooltipText);
-
-        simulationCanvas_->GetInfoPanel().SetSelectedSpecies(speciesId);
     } else {
         // Hide the tooltip when not hovering
         QToolTip::hideText();
-        simulationCanvas_->GetInfoPanel().RemoveSelectedSpecies();
-
     }
+}
+
+void GraphManager::onAreaClicked(QAreaSeries *series, QPointF point) {
+    int speciesId = series->property("speciesId").toInt();
+    if (simulationCanvas_->GetInfoPanel().GetSelectedSpecies() == speciesId) simulationCanvas_->GetInfoPanel().RemoveSelectedSpecies();
+    else simulationCanvas_->GetInfoPanel().SetSelectedSpecies(speciesId);
 }
 
 void GraphManager::DrawSpeciesArea() {
