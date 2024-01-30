@@ -193,6 +193,7 @@ void SimulationData::WriteDataToFile() {
             link_entry["out"] = link.GetOutId();
             link_entry["weight"] = link.GetWeight();
             link_entry["active"] = link.IsActive();
+            link_entry["cyclic"] = link.IsCyclic();
             egg_entry["genome"]["links"] += link_entry;
         }
 
@@ -269,6 +270,7 @@ void SimulationData::WriteDataToFile() {
             link_entry["out"] = link.GetOutId();
             link_entry["weight"] = link.GetWeight();
             link_entry["active"] = link.IsActive();
+            link_entry["cyclic"] = link.IsCyclic();
             creature_entry["genome"]["links"] += link_entry;
         }
 
@@ -366,13 +368,12 @@ void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
             }
 
             for (const auto& link : egg_item["genome"]["links"]) {
-                neat::Link new_link = neat::Link(link["id"], link["in"], link["out"]);
-                new_link.SetWeight(link["weight"]);
-                if (link["active"] == true)
-                    new_link.SetActive();
-                genome.AddLink(new_link);
+              neat::Link new_link =
+                  neat::Link(link["id"], link["in"], link["out"],
+                             link["weight"], link["active"], link["cyclic"]);
+              genome.AddLink(new_link);
             }
-            
+
             std::shared_ptr<Egg> egg = std::make_shared<Egg>(GestatingEgg(genome, mutables, egg_item["generation"]), coords);
             // egg->SetIncubationTime(egg_item["incubation time"]);
             egg->SetHealth(egg_item["health"]);
@@ -419,11 +420,10 @@ void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
         }
 
         for (const auto& link : creature_item["genome"]["links"]) {
-            neat::Link new_link = neat::Link(link["id"], link["in"], link["out"]);
-            new_link.SetWeight(link["weight"]);
-            if (link["active"] == true)
-                new_link.SetActive();
-            genome.AddLink(new_link);
+          neat::Link new_link =
+              neat::Link(link["id"], link["in"], link["out"], link["weight"],
+                         link["active"], link["cyclic"]);
+          genome.AddLink(new_link);
         }
 
         std::shared_ptr<Creature> creature = std::make_shared<Creature>(genome, mutables);
