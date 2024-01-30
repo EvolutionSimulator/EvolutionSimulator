@@ -66,15 +66,28 @@ void GraphManager::DrawCreaturesOffspringOverTimeGraph() {
 // Define a type alias for your data type
 using DataType = std::vector<std::tuple<double, double, double>>;
 
-bool SortByIdComparator(const std::tuple<double, double, double>& a, const std::tuple<double, double, double>& b) {
-  return std::get<0>(a) < std::get<0>(b);
+bool SortByIdComparator(const std::tuple<int, double, int>& a, const std::tuple<int, double, int>& b) {
+  if (std::get<0>(a) < std::get<0>(b)) return 1;
+  else{
+    if (std::get<0>(a) > std::get<0>(b)) return 0;
+    else {return std::get<1>(a) < std::get<1>(b);}
+  }
 }
 
-void SortById(std::vector<std::tuple<double, double, double>>& data) {
+bool SortByDateComparator(const std::tuple<int, double, int>& a, const std::tuple<int, double, int>& b) {
+  return std::get<1>(a) < std::get<1>(b);
+}
+
+void SortById(std::vector<std::tuple<int, double, int>>& data) {
   std::sort(data.begin(), data.end(), SortByIdComparator);
 }
 
-void PrintData(const std::vector<std::tuple<double, double, double>>& data) {
+void SortByDate(std::vector<std::tuple<int, double, int>>& data) {
+  std::sort(data.begin(), data.end(), SortByDateComparator);
+}
+
+
+void PrintData(const std::vector<std::tuple<int, double, int>>& data) {
   for (const auto& point : data) {
       auto id = std::get<0>(point);
       auto x = std::get<1>(point);
@@ -85,7 +98,7 @@ void PrintData(const std::vector<std::tuple<double, double, double>>& data) {
   std::cout << "------\n";
 }
 
-void GraphManager::DrawAreaGraph(const std::vector<std::tuple<double, double, double>>& data, const QString& graphTitle) {
+void GraphManager::DrawAreaGraph(const std::vector<std::tuple<int, double, int>>& data, const QString& graphTitle) {
   if (data.empty()) {
       qDebug() << "No data to display.";
       return;
@@ -93,76 +106,73 @@ void GraphManager::DrawAreaGraph(const std::vector<std::tuple<double, double, do
 
   PrintData(data);
 
-  std::vector<std::tuple<double, double, double>> sortedData = data;
+  std::vector<std::tuple<int, double, int>> sortedData = data;
   SortById(sortedData);
+
+  std::vector<std::tuple<int, double, int>> sortedByDateData = data;
+  SortByDate(sortedByDateData);
 
   PrintData(sortedData);
 
   QChart* chart = new QChart();
+  chart->setTitle(graphTitle);
 
-  qreal minX = std::numeric_limits<qreal>::max();
-  qreal maxX = std::numeric_limits<qreal>::min();
-  qreal minY = std::numeric_limits<qreal>::max();
-  qreal maxY = std::numeric_limits<qreal>::min();
+         // Initialize min and max values for chart axis
+  qreal minX = 0;
+  qreal maxX = std::get<1>(sortedByDateData.back());
+  qreal minY = 0;  // Start y-axis from 0
+  qreal maxY = 0;  // Will be calculated based on stacked data
 
-  // Generate equally spaced colors based on the number of unique IDs
-  std::set<double> uniqueIds;
-  for (const auto& seriesData : data) {
-      uniqueIds.insert(std::get<0>(seriesData));
+         // Set to store unique species IDs
+  std::set<int> uniqueIds;
+  for (const auto& entry : sortedData) {
+      uniqueIds.insert(std::get<0>(entry));
   }
 
-  const int numSeries = static_cast<int>(uniqueIds.size());
+         // Map to keep track of the cumulative height at each x for stacking
+  std::map<double, double> cumulativeHeightAtX;
+
+         // Generate colors for each species
   QVector<QColor> seriesColors;
-
-  for (double id : uniqueIds) {
-      // Calculate HSV values to get equally spaced colors
-      qreal hue = static_cast<qreal>(id) / numSeries;
-      qreal saturation = 1.0;
-      qreal value = 1.0;
-
-      QColor color = QColor::fromHsvF(hue, saturation, value);
-      seriesColors.push_back(color);
+  for (int id : uniqueIds) {
+      qreal hue = static_cast<qreal>(id) / uniqueIds.size();
+      seriesColors.push_back(QColor::fromHsvF(hue, 0.75, 0.75));
   }
 
-  std::vector<double> lower_bound(data.size(), 0.0);
-
-  for (double id : uniqueIds) {
+  for (int id : uniqueIds) {
       QLineSeries* upperSeries = new QLineSeries();
       QLineSeries* lowerSeries = new QLineSeries();
-      for (const auto& seriesData : data) {
-          if (std::get<0>(seriesData) == id) {
-              qreal x = std::get<1>(seriesData); // Second element as x
-              qreal y = std::get<2>(seriesData); // Third element as y
 
-              // Append to upper series
-              upperSeries->append(QPointF(x,y+lower_bound[x]));
+      for (const auto& entry : sortedData) {
+        if (std::get<0>(entry) == id) {
+          double x = std::get<1>(entry);
+          double y = std::get<2>(entry);
 
-              // Update min and max values
-              minX = std::min(minX, x);
-              maxX = std::max(maxX, x);
-              minY = std::min(minY, y);
-              maxY = std::max(maxY, y+lower_bound[x]);
+          double lowerBound = cumulativeHeightAtX[x];
+          double upperBound = lowerBound + y;
 
-              // Append to lower series
-              lowerSeries->append(QPointF(x, lower_bound[x]));
-              lower_bound[x] = y+lower_bound[x];
-          }
+                 // Append data points to series
+          upperSeries->append(x, upperBound);
+          lowerSeries->append(x, lowerBound);
+
+                 // Update the cumulative height for stacking
+          cumulativeHeightAtX[x] = upperBound;
+
+                 // Update maxY
+          maxY = std::max(maxY, 4/3 * upperBound);
+        }
       }
 
       QAreaSeries* areaSeries = new QAreaSeries(upperSeries, lowerSeries);
+      areaSeries->setName(QString("Species %1").arg(id));
+
+             // Set color
+      int colorIndex = id % seriesColors.size(); // Use modulo to cycle through colors if there are more IDs than colors
+      areaSeries->setColor(seriesColors[colorIndex]);
+      areaSeries->setBorderColor(seriesColors[colorIndex].darker());
+
+             // Add series to chart
       chart->addSeries(areaSeries);
-
-      // Set series properties, including color
-      areaSeries->setName("Series " + QString::number(id));
-      QPen pen(seriesColors[static_cast<int>(id)]);
-      pen.setWidth(3);
-      areaSeries->setPen(pen);
-
-      QLinearGradient gradient(QPointF(0, 0), QPointF(0, 1));
-      gradient.setColorAt(0.0, seriesColors[static_cast<int>(id)]);
-      gradient.setColorAt(1.0, seriesColors[static_cast<int>(id)].lighter(150)); // Lighter shade for gradient
-      gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
-      areaSeries->setBrush(gradient);
   }
 
   chart->setTitle(graphTitle);
