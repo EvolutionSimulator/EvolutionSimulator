@@ -64,7 +64,7 @@ void InfoPanel::Draw() {
   }
   creature_position.first += offset_x_;
   creature_position.second += offset_y_;
-//  DrawVisionCone(target, *selected_creature_, creature_position);
+  DrawVisionCone(target, *selected_creature_, creature_position);
 }
 
 double round_double(double number, int decimal_places) {
