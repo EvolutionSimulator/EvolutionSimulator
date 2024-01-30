@@ -254,9 +254,13 @@ void GraphManager::onAreaHovered(QAreaSeries *series, QPointF point, bool state)
 
         // Show the tooltip
         QToolTip::showText(QCursor::pos(), tooltipText);
+
+        simulationCanvas_->GetInfoPanel().SetSelectedSpecies(speciesId);
     } else {
         // Hide the tooltip when not hovering
         QToolTip::hideText();
+        simulationCanvas_->GetInfoPanel().RemoveSelectedSpecies();
+
     }
 }
 

@@ -110,9 +110,12 @@ void SimulationCanvas::OnUpdate()
       info_panel_.SetPanelView(info_panel_view_);
       info_panel_.Draw();
     }
-  } else if (info_panel_.IsVisible()) {
-    std::cout << "Info panel flag is set, but no creature position is recorded."
-              << std::endl;
+  } else if (info_panel_.GetSelectedSpecies() != -1) {
+    info_panel_.SetUIView(ui_view_);
+    for (auto& creature : data->creatures_) {
+      if (creature->GetSpecies() == info_panel_.GetSelectedSpecies()) info_panel_.DrawCircle(*creature, sf::Color::Yellow);
+//      else
+    }
   }
   setView(ui_view_);
 }
@@ -223,6 +226,11 @@ void SimulationCanvas::RenderFoodAtPosition(const std::shared_ptr<Food> food, co
 
   foodSprite.setScale(food->GetSize()/128.0f, food->GetSize()/128.0f);
 
+  float alphaValue = (info_panel_.GetSelectedSpecies() == -1) ? 1.0f : 0.3f;
+
+  //Add color filter to creature
+  texture_manager_.color_shader_.setUniform("alpha", alphaValue);
+
   texture_manager_.color_shader_.setUniform("hueShift", food->GetColor());
 
   sf::Transform foodTransform;
@@ -241,6 +249,11 @@ void SimulationCanvas::RenderEggAtPosition(
   eggSprite.setTexture(texture_manager_.egg_texture_);
   eggSprite.setOrigin(160.0f, 160.0f);
   eggSprite.setScale(egg->GetSize()/160.0f , egg->GetSize()/160.0f);
+
+  float alphaValue = (info_panel_.GetSelectedSpecies() == -1) ? 1.0f : 0.3f;
+
+  //Add color filter to creature
+  texture_manager_.color_shader_.setUniform("alpha", alphaValue);
 
   texture_manager_.color_shader_.setUniform("hueShift", egg->GetMutable().GetColor());
 
@@ -295,7 +308,13 @@ void SimulationCanvas::RenderCreatureAtPosition(
   eyes_sprite.setRotation(90.0f);
   tail_sprite.setRotation(90.0f);
 
+  float alphaValue = 1.0f;
+
+  if (creature->GetSpecies() != info_panel_.GetSelectedSpecies() && info_panel_.GetSelectedSpecies() != -1) alphaValue = 0.3f;
+
   //Add color filter to creature
+  texture_manager_.color_shader_.setUniform("alpha", alphaValue);
+
   texture_manager_.color_shader_.setUniform("hueShift", creature->GetColor());
 
   sf::Transform creatureTransform;

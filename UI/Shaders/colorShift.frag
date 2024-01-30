@@ -1,4 +1,5 @@
 uniform sampler2D texture;
+uniform float alpha;
 uniform float hueShift;
 
 // Code taken from http://lolengine.net/blog/2013/07/27/rgb-to-hsv-in-glsl
@@ -22,6 +23,7 @@ vec3 hsv2rgb(vec3 c)
 
 void main() {
     vec4 pixel = texture2D(texture, gl_TexCoord[0].xy);
+    pixel.a *= alpha;
     vec3 hsv = rgb2hsv(pixel.rgb);
 
     hsv.x += hueShift;

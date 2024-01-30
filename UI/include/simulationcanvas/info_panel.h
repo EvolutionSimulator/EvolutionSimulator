@@ -22,6 +22,7 @@ public:
   void Hide();
   bool IsVisible() const;
   void Draw();
+  void DrawCircle(const Creature &creature, sf::Color color);
   void DrawVisionCone(sf::RenderTarget& target, const Creature &creature, std::pair<double, double> position);
   void DrawStomach(sf::RenderTarget& target, const Creature& creature);
   std::string FormatCreatureInfo(const Creature& creature);
@@ -29,8 +30,13 @@ public:
   void SetUIView(sf::View view);
   void SetPanelView(sf::View view);
   void SetOffset(float offset_x, float offset_y);
+  void SetSelectedSpecies(int id);
+  void RemoveSelectedSpecies();
+  int GetSelectedSpecies() const;
 
 private:
+  int selected_id_ = -1;
+
   QSFMLCanvas* canvas_;
   Simulation* simulation_;
   std::shared_ptr<Creature> selected_creature_;
