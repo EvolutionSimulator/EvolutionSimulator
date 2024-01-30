@@ -94,7 +94,7 @@ void Simulation::FixedUpdate(double deltaTime) {
     print_duration("UpdateTimeAndStatistics");
     #endif
 
-    std::cout << "World time: " << data_->world_time_ << std::endl;
+    //std::cout << "World time: " << data_->world_time_ << std::endl;
 }
 
 DataAccessor<SimulationData> Simulation::GetSimulationData() {

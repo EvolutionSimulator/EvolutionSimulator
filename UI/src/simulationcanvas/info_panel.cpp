@@ -64,7 +64,7 @@ void InfoPanel::Draw() {
   }
   creature_position.first += offset_x_;
   creature_position.second += offset_y_;
-  DrawVisionCone(target, *selected_creature_, creature_position);
+//  DrawVisionCone(target, *selected_creature_, creature_position);
 }
 
 double round_double(double number, int decimal_places) {
@@ -105,6 +105,35 @@ std::string InfoPanel::FormatCreatureInfo(const Creature& creature) {
   ss << "Pheromone rate: " << mutables.GetPheromoneEmission() << "\n";
 
   return ss.str();
+}
+
+
+void InfoPanel::SetSelectedSpecies(int id) {
+  qDebug() << "species id set to " << id;
+  selected_id_ = id;
+}
+
+void InfoPanel::RemoveSelectedSpecies() {
+  selected_id_ = -1;
+}
+
+int InfoPanel::GetSelectedSpecies() const {
+  return selected_id_;
+}
+
+void InfoPanel::DrawCircle(const Creature& creature, sf::Color color = sf::Color::Red) {
+  canvas_->setView(ui_view_);
+  if (GetSelectedCreature() && creature.GetID() != GetSelectedCreature()->GetID() && selected_id_ == -1) return;
+  sf::CircleShape redCircle(creature.GetSize()); // Adjust as needed
+  redCircle.setOutlineColor(color);
+  redCircle.setOutlineThickness(creature.GetSize()/3); // Adjust thickness as needed
+  redCircle.setFillColor(sf::Color::Transparent);
+  redCircle.setPosition(creature.GetCoordinates().first - creature.GetSize() + offset_x_,
+                        creature.GetCoordinates().second - creature.GetSize() + offset_y_);
+  canvas_->draw(redCircle);
+  redCircle.setPosition(creature.GetCoordinates().first - creature.GetSize(),
+                        creature.GetCoordinates().second - creature.GetSize());
+  canvas_->draw(redCircle);
 }
 
 void InfoPanel::DrawPanel(sf::RenderTarget& target) {
@@ -179,18 +208,7 @@ void InfoPanel::DrawPanel(sf::RenderTarget& target) {
   infoText.setPosition(panelPosition.x + 10, 10);  // Adjust the Y position as needed
   target.draw(infoText);
 
-  target.setView(ui_view_);
-
-  sf::CircleShape redCircle((*selected_creature_).GetSize()); // Adjust as needed
-  redCircle.setOutlineColor(sf::Color::Red);
-  redCircle.setOutlineThickness((*selected_creature_).GetSize()/5); // Adjust thickness as needed
-  redCircle.setFillColor(sf::Color::Transparent);
-  redCircle.setPosition((*selected_creature_).GetCoordinates().first - (*selected_creature_).GetSize() + offset_x_,
-                        (*selected_creature_).GetCoordinates().second - (*selected_creature_).GetSize() + offset_y_);
-  target.draw(redCircle);
-  redCircle.setPosition((*selected_creature_).GetCoordinates().first - (*selected_creature_).GetSize(),
-                        (*selected_creature_).GetCoordinates().second - (*selected_creature_).GetSize());
-  target.draw(redCircle);
+  DrawCircle(*selected_creature_);
 
          // Check if the creature's health is 0 and display the message
   if ((*selected_creature_).GetHealth() == 0) {
