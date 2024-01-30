@@ -175,7 +175,8 @@ void SimulationData::WriteDataToFile() {
         egg_entry["y_coord"] = egg_item->Entity::GetCoordinates().second;
 
         egg_entry["genome"]["neurons"] = nlohmann::json::array();
-        for (const auto& neuron : egg_item->GetGenome().GetNeurons()) {
+        auto egg_neurons = egg_item->GetGenome().GetNeurons();
+        for (const auto& neuron : egg_neurons) {
             nlohmann::json neuron_entry;
             neuron_entry["id"] = neuron.GetId();
             neuron_entry["type"] = neuron.GetType();
@@ -186,7 +187,8 @@ void SimulationData::WriteDataToFile() {
         }
 
         egg_entry["genome"]["links"] = nlohmann::json::array();
-        for (const auto& link : egg_item->GetGenome().GetLinks()) {
+        auto egg_links = egg_item->GetGenome().GetLinks();
+        for (const auto& link : egg_links) {
             nlohmann::json link_entry;
             link_entry["id"] = link.GetId();
             link_entry["in"] = link.GetInId();
@@ -202,7 +204,7 @@ void SimulationData::WriteDataToFile() {
 
     // load the eggs from the current simulation
     simulation_json["creatures"] = nlohmann::json::array();
-    for (const auto& creature_item : SimulationData::creatures_) {
+    for (const auto& creature_item : creatures_) {
         nlohmann::json creature_entry;
         // mutable entity characteristics
         creature_entry["mutable"]["energy density"] = creature_item->GetMutable().GetEnergyDensity();
@@ -252,7 +254,8 @@ void SimulationData::WriteDataToFile() {
         creature_entry["generation"] = creature_item->GetGeneration();
 
         creature_entry["genome"]["neurons"] = nlohmann::json::array();
-        for (const auto& neuron : creature_item->GetGenome().GetNeurons()) {
+        auto creature_neurons = creature_item->GetGenome().GetNeurons();
+        for (const auto& neuron : creature_neurons) {
             nlohmann::json neuron_entry;
             neuron_entry["id"] = neuron.GetId();
             neuron_entry["type"] = neuron.GetType();
@@ -263,7 +266,8 @@ void SimulationData::WriteDataToFile() {
         }
 
         creature_entry["genome"]["links"] = nlohmann::json::array();
-        for (const auto& link : creature_item->GetGenome().GetLinks()) {
+        auto creature_links = creature_item->GetGenome().GetLinks();
+        for (const auto& link : creature_links) {
             nlohmann::json link_entry;
             link_entry["id"] = link.GetId();
             link_entry["in"] = link.GetInId();
