@@ -298,9 +298,9 @@ void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
     }
 
     // Delete old data
-    SimulationData::creatures_.clear();
-    SimulationData::food_entities_.clear();
-    SimulationData::eggs_.clear();
+    creatures_.clear();
+    food_entities_.clear();
+    eggs_.clear();
 
     // load simulation settings
     Environment environment;
@@ -309,7 +309,7 @@ void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
 
     environment.SetFoodDensity(simulation_json["food density"]);
     environment.SetCreatureDensity(simulation_json["creature density"]);
-    SimulationData::SetEnvironment(environment);
+    SetEnvironment(environment);
 
     // load the food from the current simulation
     for (const auto& food_item : simulation_json["food"]) {
@@ -323,7 +323,7 @@ void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
             food->SetOrientation(food_item["orientation"]);
             food->SetState(food_item["state"]);
             food->SetColor(food_item["color"]);
-            SimulationData::food_entities_.push_back(food);
+            food_entities_.push_back(food);
         }
         else {
             std::shared_ptr<Meat> food = std::make_shared<Meat>(x, y);
@@ -331,7 +331,7 @@ void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
             food->SetOrientation(food_item["orientation"]);
             food->SetState(food_item["state"]);
             food->SetColor(food_item["color"]);
-            SimulationData::food_entities_.push_back(food);
+            food_entities_.push_back(food);
         }
     }
 
@@ -379,12 +379,14 @@ void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
             egg->SetHealth(egg_item["health"]);
             egg->SetAge(egg_item["age"]);
             //egg->SetGenome(genome);
-            SimulationData::eggs_.push_back(egg);
+            eggs_.push_back(egg);
         }
     }
     qDebug() << "Done Loading Eggs";
     // load the creatures into the current simulation
+    int creature_cnt = 0;
     for (const auto& creature_item : simulation_json["creatures"]) {
+        qDebug() << ++creature_cnt << "/" << simulation_json["creatures"].size();
         // create the mutable of the creature
         Mutable mutables = Mutable();
         mutables.SetEnergyDensity(creature_item["mutable"]["energy density"]);
@@ -426,6 +428,7 @@ void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
 
 
         std::shared_ptr<Creature> creature = std::make_shared<Creature>(genome, mutables);
+        creature->SetCoordinates(coords.first, coords.second);
         creature->SetHealth(creature_item["health"]);
         creature->SetAge(creature_item["age"]);
         creature->SetSize(creature_item["size"]);
@@ -445,8 +448,7 @@ void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
         creature->SetRotationalVelocity(creature_item["rotational velocity"]);
         // creature->SetStrafingDifficulty(creature_item["strafing difficulty"]);
 
-
-        SimulationData::creatures_.push_back(creature);
+        creatures_.push_back(creature);
     }
     qDebug() << "Done Loading Creature";
 }

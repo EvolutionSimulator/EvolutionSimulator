@@ -269,16 +269,16 @@ void MainWindow::handleDropdownSelectionSave(int index) {
 
   if (index == 1) {
     qDebug() << "Load Button";
-      // load the last save
-      // SimulationData data = *engine_->GetSimulation()->GetSimulationData();
-      // data.RetrieveLastSimulation();
+    // load the last save
+    engine_->GetSimulation()->GetSimulationData()->RetrieveLastSimulation();
   }
   if (index == 2) {
     qDebug() << "Save button";
     // save the data to a new file
     SimulationData data = *engine_->GetSimulation()->GetSimulationData();
-    data.WriteDataToFile();
     qDebug() << "Saving simulation";
+    data.WriteDataToFile();
+    qDebug() << "Saved simulation";
   }
   // if (index == 2) {
 
