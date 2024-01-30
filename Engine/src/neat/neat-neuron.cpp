@@ -22,6 +22,10 @@ Neuron::Neuron(NeuronType type, double bias)
     : id_(next_id_++), type_(type), bias_(bias), active_(true),
       activation_(ActivationType::linear){}
 
+Neuron::Neuron(int id, NeuronType type, double bias, bool active, ActivationType activation)
+    : id_(id), type_(type), bias_(bias), active_(active),
+      activation_(activation){}
+
 /*!
  * @brief Gets the unique identifier of the neuron.
  *

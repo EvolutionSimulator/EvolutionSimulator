@@ -19,6 +19,8 @@ enum class ActivationType { sigmoid, relu, elu, leakyRelu, binary, linear };
 class Neuron {
  public:
   explicit Neuron(NeuronType type, double bias);
+  explicit Neuron(int id, NeuronType type, double bias, bool active,
+                  ActivationType activation);
 
   int GetId() const;
   NeuronType GetType() const;
