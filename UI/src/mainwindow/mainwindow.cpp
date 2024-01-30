@@ -7,6 +7,7 @@
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QChart>
 #include <QVBoxLayout>
+#include <QFileDialog>
 
 #include <QDockWidget>
 #include "ui_mainwindow.h"
@@ -268,17 +269,31 @@ void MainWindow::handleDropdownSelectionSave(int index) {
   qDebug() << "Dropdown selection changed to index:" << index;
 
   if (index == 1) {
+    emit PauseSimulation();
     qDebug() << "Load Button";
     // load the last save
-    engine_->GetSimulation()->GetSimulationData()->RetrieveLastSimulation();
+    std::filesystem::path currentFilePath = __FILE__;
+    std::filesystem::path evolutionSimulatorPath = currentFilePath.parent_path().parent_path().parent_path();
+    std::filesystem::path file_path = evolutionSimulatorPath / "Simulations";
+    std::filesystem::create_directory(file_path);
+    QString dir = QFileDialog::getOpenFileName(this, "Open file", QString::fromStdString(file_path.string()));
+    engine_->GetSimulation()->GetSimulationData()->RetrieveDataFromFile(std::filesystem::path(dir.toStdString()));
+    emit ResumeSimulation();
   }
   if (index == 2) {
+    emit PauseSimulation();
     qDebug() << "Save button";
     // save the data to a new file
     SimulationData data = *engine_->GetSimulation()->GetSimulationData();
     qDebug() << "Saving simulation";
-    data.WriteDataToFile();
+    std::filesystem::path currentFilePath = __FILE__;
+    std::filesystem::path evolutionSimulatorPath = currentFilePath.parent_path().parent_path().parent_path();
+    std::filesystem::path file_path = evolutionSimulatorPath / "Simulations";
+    std::filesystem::create_directory(file_path);
+    QString dir = QFileDialog::getSaveFileName(this, "Save as", QString::fromStdString(file_path.string()));
+    data.WriteDataToFile(std::filesystem::path(dir.toStdString()));
     qDebug() << "Saved simulation";
+    emit ResumeSimulation();
   }
   // if (index == 2) {
 
