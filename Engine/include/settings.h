@@ -134,7 +134,8 @@ class Settings {
   struct UISettings {
     double dragging_sensitivity = 1.0f;
     double min_zoom = 0.003;
-    double max_zoom = 3; //This really takes a toll on performance handle with care
+    double max_zoom = 5; //This really takes a toll on performance handle with care
+
     //Values of up to 5 should work but take into account it increases exponentially
     // Also UI takes the most to work in this situation so try not to render the entire map constantly
   } ui;
