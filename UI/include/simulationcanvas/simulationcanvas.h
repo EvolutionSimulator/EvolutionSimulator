@@ -3,6 +3,7 @@
 #include <engine.h>
 
 #include <SFML/Graphics.hpp>
+#include <QGestureEvent>
 
 #include "qwidgets/qsfmlcanvas.h"
 #include "simulation.h"
@@ -24,17 +25,20 @@ class SimulationCanvas : public QSFMLCanvas {
   InfoPanel& GetInfoPanel();
 
   protected:
+  bool event(QEvent *event) override;
   void mousePressEvent(QMouseEvent *event) override;
   void wheelEvent(QWheelEvent *event) override;
   void mouseMoveEvent(QMouseEvent* event) override;
   void mouseReleaseEvent(QMouseEvent* event) override;
   void resizeEvent(QResizeEvent* event) override;
-  void zoom(float factor, sf::Vector2f& zoomPoint);
+  void zoom(float factor);
 
   private:
   Simulation *simulation_ = nullptr;
   virtual void OnInit() override;
   virtual void OnUpdate() override;
+  bool gestureEvent(QGestureEvent* event);
+  void pinchTriggered(QPinchGesture* gesture);
 
   // Rendering logic
   void RenderSimulation(SimulationData& data);
