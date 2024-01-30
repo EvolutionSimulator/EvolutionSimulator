@@ -64,7 +64,7 @@ void Cluster::start(Simulation* simulation) {
       update_all_creatures(data->creatures_);
       update_creatures_species(data->creatures_);
 
-      if (data->world_time_ - lastReclusterTime_ > 500.0) {
+      if (data->world_time_ - lastReclusterTime_ > 250.0) {
         std::cout << "Reclustering" << std::endl;
         for(auto it = begin(points); it != end(points);) {
           if(!(it->second.alive)) {
