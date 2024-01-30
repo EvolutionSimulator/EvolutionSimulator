@@ -133,6 +133,7 @@ class Settings {
 
   struct UISettings {
     double dragging_sensitivity = 1.0f;
+
     double min_zoom = 0.003;
     double max_zoom = 5; //This really takes a toll on performance handle with care
 
