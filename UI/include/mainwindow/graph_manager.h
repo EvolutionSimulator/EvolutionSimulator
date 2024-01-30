@@ -246,7 +246,7 @@ public:
   }
 
 public slots:
-  void DrawAreaGraph(const std::vector<std::tuple<int, double, int>>& data, const QString& graphTitle);
+  void DrawAreaGraph(const std::vector<std::tuple<int, double, int, float>>& data, const QString& graphTitle);
   void DrawCreaturesOverTimeGraph();
   void DrawCreaturesDietOverTimeGraph();
   void DrawCreaturesOffspringOverTimeGraph();

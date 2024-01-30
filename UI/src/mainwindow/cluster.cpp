@@ -18,35 +18,41 @@ void Cluster::start(Simulation* simulation) {
   recluster();
   lastRecordedTime_ = 0.0;
   lastReclusterTime_ = 0.0;
-
+  bool recluster_triggered = false;
+  bool update_triggered = false;
   while (running_) {
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     // std::cout << "Simulation time: " << data->world_time_ << std::endl;
 
-    auto data = simulation->GetSimulationData();
-    if (data->world_time_ - lastRecordedTime_ > 10.0) {
+    { //Lock, Copy, and Unlock also sets the trigger flags
       std::lock_guard<std::recursive_mutex> lock(mutex_);
-      update_all_creatures(data->creatures_);
-      update_creatures_species(data->creatures_);
-
-      if (data->world_time_ - lastReclusterTime_ > 100.0) {
-        std::cout << "Reclustering" << std::endl;
-        for(auto it = begin(points); it != end(points);) {
-          if(!(it->second.alive)) {
-            it = points.erase(it);
-          } else {
-            ++it;
-          }
+      auto data = simulation->GetSimulationData();
+      if (data->world_time_ - lastRecordedTime_ > 10.0){
+        CopyCreatures(data->creatures_);
+        update_creatures_species(data->creatures_);
+        update_triggered = true;
+        if (data->world_time_ - lastReclusterTime_ > 100.0){
+          recluster_triggered = true;
+          lastReclusterTime_ = data->world_time_;
         }
-
-        recluster();
-
-        lastReclusterTime_ = data->world_time_;
+        lastRecordedTime_ = data->world_time_;
       }
+    }
 
-      lastRecordedTime_ = data->world_time_;
-
+    if (update_triggered){
+        update_all_creatures(creatures_);
+        if (recluster_triggered){
+          std::cout << "Reclustering" << std::endl;
+          for(auto it = begin(points); it != end(points);) {
+            if(!(it->second.alive)) {
+              it = points.erase(it);
+            } else {
+              ++it;
+            }
+          }
+          recluster();
+        }
       auto species_data = getCurrentSpeciesData();
       species_data_.insert(species_data_.end(), species_data.begin(),
                            species_data.end());
@@ -66,10 +72,16 @@ void Cluster::stop() {
   core_points_ids.clear();
 }
 
+void Cluster::CopyCreatures(const std::vector<std::shared_ptr<Creature>>& creatures){
+    for(const auto& creature: creatures){
+        creatures_.push_back(std::make_shared<Creature>(*creature));
+    }
+}
+
 void Cluster::setPoints(const std::vector<std::shared_ptr<Creature>>& creatures) {
   for (const std::shared_ptr<Creature>& creature : creatures) {
     points[creature->GetID()] =
-        CreatureData{creature->GetGenome(), creature->GetMutable(), true};
+        CreatureData{creature->GetGenome(), creature->GetMutable(), true, creature->GetColor()};
   }
 }
 
@@ -87,6 +99,7 @@ std::vector<int> Cluster::GetNeighbors(int id) {
 
 void Cluster::expandCluster(int id, std::vector<int>& neighbors) {
   species[id] = next_species_label;
+  species_colors_[next_species_label] = points[id].hue;
   core_points_ids.push_back(id);
   for (size_t i = 0; i < neighbors.size(); ++i) {
     int neighborId = neighbors[i];
@@ -156,15 +169,15 @@ std::unordered_map<int, int> Cluster::speciesSizes() {
   return species_sizes;
 }
 
-std::vector<std::tuple<int, double, int>> Cluster::getCurrentSpeciesData() {
+std::vector<std::tuple<int, double, int, float>> Cluster::getCurrentSpeciesData() {
   std::lock_guard<std::recursive_mutex> lock(mutex_);
 
   std::unordered_map<int, int> species_sizes = this->speciesSizes();
-  std::vector<std::tuple<int, double, int>> species_data;
+  std::vector<std::tuple<int, double, int, float>> species_data;
 
   for (const auto& pair : species_sizes) {
     species_data.push_back(
-        std::make_tuple(pair.first, lastRecordedTime_, pair.second));
+        std::make_tuple(pair.first, lastRecordedTime_, pair.second, species_colors_[pair.first]));
   }
 
   return species_data;
@@ -242,7 +255,7 @@ void Cluster::update_creatures_species(
   }
 }
 
-std::vector<std::tuple<int, double, int>> Cluster::getSpeciesData() {
+std::vector<std::tuple<int, double, int, float>> Cluster::getSpeciesData() {
   std::lock_guard<std::recursive_mutex> lock(mutex_);
 
   return species_data_;
