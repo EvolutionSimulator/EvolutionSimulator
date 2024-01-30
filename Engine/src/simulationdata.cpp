@@ -174,9 +174,17 @@ void SimulationData::WriteDataToFile() {
         egg_entry["x_coord"] = egg_item->Entity::GetCoordinates().first;
         egg_entry["y_coord"] = egg_item->Entity::GetCoordinates().second;
 
-        // decompose the genome
-        egg_entry["genome"]["in_count"] = egg_item->GetGenome().GetInputCount();
-        egg_entry["genome"]["out_count"] = egg_item->GetGenome().GetOutputCount();
+        egg_entry["genome"]["neurons"] = nlohmann::json::array();
+        for (const auto& neuron : egg_item->GetGenome().GetNeurons()) {
+            nlohmann::json neuron_entry;
+            neuron_entry["id"] = neuron.GetId();
+            neuron_entry["type"] = neuron.GetType();
+            neuron_entry["bias"] = neuron.GetBias();
+            neuron_entry["active"] = neuron.IsActive();
+            neuron_entry["activation"] = neuron.GetActivation();
+            egg_entry["genome"]["neurons"] += neuron_entry;
+        }
+
         egg_entry["genome"]["links"] = nlohmann::json::array();
         for (const auto& link : egg_item->GetGenome().GetLinks()) {
             nlohmann::json link_entry;
@@ -186,15 +194,6 @@ void SimulationData::WriteDataToFile() {
             link_entry["weight"] = link.GetWeight();
             link_entry["active"] = link.IsActive();
             egg_entry["genome"]["links"] += link_entry;
-        }
-
-        egg_entry["genome"]["neurons"] = nlohmann::json::array();
-        for (const auto& neuron : egg_item->GetGenome().GetNeurons()) {
-            nlohmann::json neuron_entry;
-            neuron_entry["id"] = neuron.GetId();
-            neuron_entry["type"] = neuron.GetType();
-            neuron_entry["bias"] = neuron.GetBias();
-            egg_entry["genome"]["neurons"] += neuron_entry;
         }
 
         simulation_json["eggs"] += egg_entry;
@@ -251,9 +250,17 @@ void SimulationData::WriteDataToFile() {
         creature_entry["energy"] = creature_item->GetEnergy();
         creature_entry["generation"] = creature_item->GetGeneration();
 
-        // decompose the genome
-        creature_entry["genome"]["in_count"] = creature_item->GetGenome().GetInputCount();
-        creature_entry["genome"]["out_count"] = creature_item->GetGenome().GetOutputCount();
+        creature_entry["genome"]["neurons"] = nlohmann::json::array();
+        for (const auto& neuron : creature_item->GetGenome().GetNeurons()) {
+            nlohmann::json neuron_entry;
+            neuron_entry["id"] = neuron.GetId();
+            neuron_entry["type"] = neuron.GetType();
+            neuron_entry["bias"] = neuron.GetBias();
+            neuron_entry["active"] = neuron.IsActive();
+            neuron_entry["activation"] = neuron.GetActivation();
+            creature_entry["genome"]["neurons"] += neuron_entry;
+        }
+
         creature_entry["genome"]["links"] = nlohmann::json::array();
         for (const auto& link : creature_item->GetGenome().GetLinks()) {
             nlohmann::json link_entry;
@@ -263,17 +270,6 @@ void SimulationData::WriteDataToFile() {
             link_entry["weight"] = link.GetWeight();
             link_entry["active"] = link.IsActive();
             creature_entry["genome"]["links"] += link_entry;
-        }
-
-        creature_entry["genome"]["neurons"] = nlohmann::json::array();
-        creature_entry["genome"]["in_count"] = creature_item->GetGenome().GetInputCount();
-        creature_entry["genome"]["out_count"] = creature_item->GetGenome().GetOutputCount();
-        for (const auto& neuron : creature_item->GetGenome().GetNeurons()) {
-            nlohmann::json neuron_entry;
-            neuron_entry["id"] = neuron.GetId();
-            neuron_entry["type"] = neuron.GetType();
-            neuron_entry["bias"] = neuron.GetBias();
-            creature_entry["genome"]["neurons"] += neuron_entry;
         }
 
         simulation_json["creatures"] += creature_entry;
@@ -360,7 +356,15 @@ void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
             mutables.SetPheromoneEmission(egg_item["mutable"]["pheromomone emission"]);
 
             // reconstruct the genome
-            neat::Genome genome = neat::Genome(egg_item["genome"]["in_count"], egg_item["genome"]["out_count"]);
+            neat::Genome genome = neat::Genome(0, 0);
+
+            for (const auto& neuron : egg_item["genome"]["neurons"]) {
+              neat::Neuron new_neuron =
+                  neat::Neuron(neuron["id"], neuron["type"], neuron["bias"],
+                               neuron["active"], neuron["activation"]);
+              genome.AddNeuron(new_neuron);
+            }
+
             for (const auto& link : egg_item["genome"]["links"]) {
                 neat::Link new_link = neat::Link(link["id"], link["in"], link["out"]);
                 new_link.SetWeight(link["weight"]);
@@ -368,12 +372,7 @@ void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
                     new_link.SetActive();
                 genome.AddLink(new_link);
             }
-
-            for (const auto& neuron : egg_item["genome"]["neurons"]) {
-                neat::Neuron new_neuron = neat::Neuron(neuron["type"], neuron["bias"]);
-                // new_neuron.id_ = neuron["id"];
-                genome.AddNeuron(new_neuron);
-            }
+            
             std::shared_ptr<Egg> egg = std::make_shared<Egg>(GestatingEgg(genome, mutables, egg_item["generation"]), coords);
             // egg->SetIncubationTime(egg_item["incubation time"]);
             egg->SetHealth(egg_item["health"]);
@@ -410,7 +409,14 @@ void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
         auto coords = std::make_pair(creature_item["x_coord"], creature_item["y_coord"]);
 
         // reconstruct the genome
-        neat::Genome genome = neat::Genome(creature_item["genome"]["in_count"], creature_item["genome"]["out_count"]);
+        neat::Genome genome = neat::Genome(0, 0);
+
+        for (const auto& neuron : creature_item["genome"]["neurons"]) {
+            neat::Neuron new_neuron =
+                neat::Neuron(neuron["id"], neuron["type"], neuron["bias"],
+                            neuron["active"], neuron["activation"]);
+            genome.AddNeuron(new_neuron);
+        }
 
         for (const auto& link : creature_item["genome"]["links"]) {
             neat::Link new_link = neat::Link(link["id"], link["in"], link["out"]);
@@ -419,13 +425,6 @@ void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
                 new_link.SetActive();
             genome.AddLink(new_link);
         }
-
-        for (const auto& neuron : creature_item["genome"]["neurons"]) {
-            neat::Neuron new_neuron = neat::Neuron(neuron["type"], neuron["bias"]);
-            // new_neuron.id_ = neuron["id"];
-            genome.AddNeuron(new_neuron);
-        }
-
 
         std::shared_ptr<Creature> creature = std::make_shared<Creature>(genome, mutables);
         creature->SetCoordinates(coords.first, coords.second);
