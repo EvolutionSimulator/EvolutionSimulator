@@ -47,6 +47,7 @@ struct SimulationData {
 
   double world_time_ = 0;
 
+  void WriteStatisticsToFile(std::filesystem::path filename);
   void WriteDataToFile(std::filesystem::path dir);
   void RetrieveDataFromFile(std::filesystem::path dir);
 

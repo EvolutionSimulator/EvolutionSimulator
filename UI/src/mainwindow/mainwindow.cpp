@@ -293,16 +293,26 @@ void MainWindow::handleDropdownSelectionSave(int index) {
   qDebug() << "Dropdown selection changed to index:" << index;
 
   if (index == 1) {
-    emit PauseSimulation();
-    qDebug() << "Load Button";
-    // load the last save
-    std::filesystem::path currentFilePath = __FILE__;
-    std::filesystem::path evolutionSimulatorPath = currentFilePath.parent_path().parent_path().parent_path();
-    std::filesystem::path file_path = evolutionSimulatorPath / "Simulations";
-    std::filesystem::create_directory(file_path);
-    QString dir = QFileDialog::getOpenFileName(this, "Open file", QString::fromStdString(file_path.string()));
-    engine_->GetSimulation()->GetSimulationData()->RetrieveDataFromFile(std::filesystem::path(dir.toStdString()));
-    emit ResumeSimulation();
+      emit PauseSimulation();
+      qDebug() << "Load Button";
+
+      QString dir = QFileDialog::getOpenFileName(this, "Open file", "", "JSON Files (*.json)");
+
+      if (dir.isNull() || dir.isEmpty()) {
+          qDebug() << "Load canceled by user";
+          emit ResumeSimulation();
+          return;  // Return without attempting to load data
+      }
+
+      std::filesystem::path filePath = std::filesystem::path(dir.toStdString());
+      if (std::filesystem::exists(filePath)) {
+          engine_->GetSimulation()->GetSimulationData()->RetrieveDataFromFile(filePath);
+          qDebug() << "Load successful";
+      } else {
+          qDebug() << "File does not exist: " << dir;
+      }
+
+      emit ResumeSimulation();
   }
   if (index == 2) {
     emit PauseSimulation();
@@ -315,12 +325,31 @@ void MainWindow::handleDropdownSelectionSave(int index) {
     std::filesystem::path file_path = evolutionSimulatorPath / "Simulations";
     std::filesystem::create_directory(file_path);
     QString dir = QFileDialog::getSaveFileName(this, "Save as", QString::fromStdString(file_path.string()));
-    data.WriteDataToFile(std::filesystem::path(dir.toStdString()));
+    if (dir.isNull() || dir.isEmpty()) {
+            qDebug() << "Save canceled by user";
+            emit ResumeSimulation();
+            return;  // Return without attempting to save data
+        }
+    std::filesystem::path saveFilePath = std::filesystem::path(dir.toStdString());
+    data.WriteDataToFile(saveFilePath);
+
+
+    // Save the statistics to a separate file
+    QFileInfo fileInfo(dir);
+    QString fileName = fileInfo.fileName();
+    QRegularExpression regex("^[a-zA-Z0-9_()]+$");
+        if (!regex.match(fileName).hasMatch()) {
+            qDebug() << "Invalid characters in file name";
+            emit ResumeSimulation();
+            return;
+        }
+    QString simulationFilePath = QString("Statistics(") + fileName + QString(")");
+    qDebug() << simulationFilePath;
+    std::filesystem::path statisticsFilePath = file_path / simulationFilePath.toStdString();
+    data.WriteStatisticsToFile(statisticsFilePath);
+
     qDebug() << "Saved simulation";
     emit ResumeSimulation();
   }
-  // if (index == 2) {
-
-  // }
   ui_->saveMenu->setCurrentIndex(0);
 }
