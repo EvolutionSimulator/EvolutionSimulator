@@ -124,7 +124,7 @@ class Settings {
     double after_birth_velocity_factor = 1.5; //Not used currently
     double d_bite_damage_ratio = 0.1;
     double d_bite_energy_consumption_ratio = 0.01;
-    double d_bite_nutritional_value = 1.0;
+    double d_bite_nutritional_value = 0.0;
     double d_eating_speed = 0.6;
     double d_pheromone_emission = 0.5;
     double pheromone_detection_sensitivity = 1;
@@ -133,7 +133,7 @@ class Settings {
 
   struct UISettings {
     double dragging_sensitivity = 1.0f;
-    double zoom = 3; //This really takes a toll on performance handle with care
+    double zoom = 5; //This really takes a toll on performance handle with care
     //Values of up to 5 should work but take into account it increases exponentially
     // Also UI takes the most to work in this situation so try not to render the entire map constantly
   } ui;
