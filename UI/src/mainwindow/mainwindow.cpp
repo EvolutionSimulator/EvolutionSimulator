@@ -19,8 +19,8 @@ MainWindow::MainWindow(QWidget *parent)
 
   int width = sf::VideoMode::getDesktopMode().width;
   int height = sf::VideoMode::getDesktopMode().height;
-  SETTINGS.environment.map_width = width * SETTINGS.ui.zoom;
-  SETTINGS.environment.map_height = height * SETTINGS.ui.zoom;
+  SETTINGS.environment.map_width = width * SETTINGS.ui.max_zoom;
+  SETTINGS.environment.map_height = height * SETTINGS.ui.max_zoom;
 
   InitializeEngine();
   PauseSimulation();

@@ -28,6 +28,9 @@ SimulationCanvas::SimulationCanvas(QWidget* Parent)
   // Set the fixed size with the scaled dimensions
   setFixedSize(scaledWidth, scaledHeight);
 
+  // Grab the pinch gesture for zooming
+  grabGesture(Qt::PinchGesture);
+
   std::cout << "SimulationCanvas created" << std::endl;
 }
 
@@ -104,6 +107,21 @@ void SimulationCanvas::OnUpdate()
               << std::endl;
   }
   setView(ui_view_);
+}
+
+bool SimulationCanvas::gestureEvent(QGestureEvent* event) {
+  if (QGesture* pinch = event->gesture(Qt::PinchGesture))
+    pinchTriggered(static_cast<QPinchGesture*>(pinch));
+  return true;
+}
+
+void SimulationCanvas::pinchTriggered(QPinchGesture* gesture) {
+  QPinchGesture::ChangeFlags changeFlags = gesture->changeFlags();
+  if (changeFlags & QPinchGesture::ScaleFactorChanged) {
+    float delta = gesture->scaleFactor();
+    zoom(1 / delta);
+    qDebug() << "pinchTriggered(): zoom by" << delta;
+  }
 }
 
 void SimulationCanvas::DrawMouseCoordinates() {
@@ -353,6 +371,12 @@ std::vector<std::pair<double, double>> SimulationCanvas::getEntityRenderPosition
   return positions;
 }
 
+bool SimulationCanvas::event(QEvent* event) {
+  if (event->type() == QEvent::Gesture)
+    return gestureEvent(static_cast<QGestureEvent*>(event));
+  return QWidget::event(event);
+}
+
 void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
   float scaleFactor = this->devicePixelRatioF();
   sf::Vector2i scaledPos(static_cast<int>(event->position().x() * scaleFactor),
@@ -395,61 +419,60 @@ void SimulationCanvas::mousePressEvent(QMouseEvent* event) {
 }
 
 void SimulationCanvas::wheelEvent(QWheelEvent* event) {
+  qDebug() << "Wheel event";
   // Use platform-independent pixelDelta for wheel events
   QPoint pixelDelta = event->pixelDelta();
   QPoint angleDelta = event->angleDelta();
-  float scaleFactor = this->devicePixelRatioF();
-  sf::Vector2i scaledPos(static_cast<int>(event->position().x() * scaleFactor),
-                         static_cast<int>(event->position().y() * scaleFactor));
 
   if (!pixelDelta.isNull()) {
     // Use pixelDelta for more accurate scrolling
     float delta = pixelDelta.y() > 0 ? 1.1f : 0.9f;
-    sf::Vector2f worldPos = mapPixelToCoords(scaledPos);
-    zoom(delta, worldPos);
+    zoom(delta);
   } else if (!angleDelta.isNull()) {
     // Use angleDelta as a fallback
     float delta = angleDelta.y() > 0 ? 1.1f : 0.9f;
-    sf::Vector2f worldPos = mapPixelToCoords(scaledPos);
-    zoom(delta, worldPos);
+    zoom(delta);
   }
 }
 
-void SimulationCanvas::zoom(float factor, sf::Vector2f& zoomPoint) {
-
-  // Check for maximum zoom
-  if (zoomFactor * factor > SETTINGS.ui.zoom) {
-    zoomFactor = SETTINGS.ui.zoom;
-  } else {
-    zoomFactor *= factor;
-
-    // Get the current mouse position in screen coordinates
-    sf::Vector2i mouseScreenPos = sf::Mouse::getPosition(*this);
-
-    // Convert screen coordinates to world coordinates
-    sf::Vector2f mouseWorldPosBeforeZoom = mapPixelToCoords(mouseScreenPos);
-
-    // Calculate the new center directly based on the mouse position
-    sf::Vector2f newCenter = mouseWorldPosBeforeZoom;
-
-    // Adjust the new center based on the zoom factor and direction
-    float zoomSpeed = 0.1f;
-    sf::Vector2f centerDiff = newCenter - ui_view_.getCenter();
-    if (factor > 1.0f) {
-      // Invert the direction for zooming out
-      centerDiff *= -(1.0f + 1.0f / (8 * factor));
-    }
-    ui_view_.setCenter(ui_view_.getCenter() + centerDiff * zoomSpeed);
-
-    // After adjusting center, get the new mouse position in world coordinates
-    sf::Vector2f mouseWorldPosAfterZoom = mapPixelToCoords(mouseScreenPos);
-    // Adjust the center again to ensure it's relative to the mouse position
-    sf::Vector2f zoomDiff = mouseWorldPosBeforeZoom - mouseWorldPosAfterZoom;
-    ui_view_.setCenter(ui_view_.getCenter() + zoomDiff * factor);
+void SimulationCanvas::zoom(float factor) {;
+  // Check for minimum and maximum zoom
+  if (zoomFactor * factor < SETTINGS.ui.min_zoom) {
+    factor = SETTINGS.ui.min_zoom / zoomFactor;
+  } else if (zoomFactor * factor > SETTINGS.ui.max_zoom) {
+    factor = SETTINGS.ui.max_zoom / zoomFactor;
   }
 
+  zoomFactor *= factor;
+  qDebug() << "New zoom factor" << zoomFactor;
+
+  // Get the current mouse position in screen coordinates
+  sf::Vector2i mouseScreenPos = sf::Mouse::getPosition(*this);
+
+  // Convert screen coordinates to world coordinates
+  sf::Vector2f mouseWorldPosBeforeZoom = mapPixelToCoords(mouseScreenPos);
+
+  // Calculate the new center directly based on the mouse position
+  sf::Vector2f newCenter = mouseWorldPosBeforeZoom;
+
+  // Adjust the new center based on the zoom factor and direction
+  float zoomSpeed = abs(1 - factor);
+  sf::Vector2f centerDiff = newCenter - ui_view_.getCenter();
+  if (factor > 1.0f) {
+    // Invert the direction for zooming out
+    centerDiff = -centerDiff;
+  }
+  ui_view_.setCenter(ui_view_.getCenter() + centerDiff * zoomSpeed);
+
+  // After adjusting center, get the new mouse position in world coordinates
+  sf::Vector2f mouseWorldPosAfterZoom = mapPixelToCoords(mouseScreenPos);
+  // Adjust the center again to ensure it's relative to the mouse position
+  sf::Vector2f zoomDiff = mouseWorldPosBeforeZoom - mouseWorldPosAfterZoom;
+  ui_view_.setCenter(ui_view_.getCenter() + zoomDiff * factor);
+
   // Set the new size of the view
-  ui_view_.setSize(initialViewSize.x * zoomFactor, initialViewSize.y * zoomFactor);
+  ui_view_.setSize(initialViewSize.x * zoomFactor,
+                   initialViewSize.y * zoomFactor);
 
   // Apply the new view and update
   setView(ui_view_);
