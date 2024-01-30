@@ -78,6 +78,9 @@ std::string InfoPanel::FormatCreatureInfo(const Creature& creature) {
   ss << "Generation: " << creature.GetGeneration() << "\n";
   ss << "\n";
   ss << "\n";
+  ss << "\n";
+  ss << "Species: " << creature.GetSpecies() << "\n";
+  ss << "\n";
   ss << "Max Energy: " <<round_double(creature.GetMaxEnergy(), 2) << "\n";
   ss << "Velocity: " << round_double(creature.GetVelocity(), 2) << "\n";
   ss << "Rot. Velocity: " << round_double(creature.GetRotationalVelocity(), 2) << "\n\n";
