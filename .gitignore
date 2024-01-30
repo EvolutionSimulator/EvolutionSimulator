@@ -62,3 +62,6 @@ build
 # Automatic Documentation
 html/
 latex/
+
+# Runtime storage
+Simulations/
