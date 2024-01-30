@@ -6,7 +6,6 @@
 #include <stdexcept>
 #include <vector>
 #include <fstream>
-#include <filesystem>
 #include <nlohmann/json.hpp>
 
 #include "collision_functions.h"
@@ -90,35 +89,12 @@ std::vector<double> SimulationData::GetCreatureOffspringOverTime() const {
   return creatureOffspringOverTime_;
 }
 
-void SimulationData::WriteDataToFile() {
+void SimulationData::WriteDataToFile(std::filesystem::path filename) {
     #include <fstream>
     #include <filesystem>
 
-    // identifying the correct path for each platform
-    std::filesystem::path currentFilePath = __FILE__;
-    std::filesystem::path evolutionSimulatorPath = currentFilePath.parent_path().parent_path().parent_path();
-    std::filesystem::path file_path = evolutionSimulatorPath / "Simulations";
-
-
-    std::filesystem::create_directories(file_path);
-
-    // getting the file count
-    int n, simulation_count = 0;
-    std::string file_number;
-    for (const auto& simulation_saves : std::filesystem::directory_iterator(file_path)) {
-        n = simulation_saves.path().stem().string().length();
-        file_number = "";
-        for (int i = 11; i < n; i++) {
-            file_number += simulation_saves.path().stem().string()[i];
-        }
-        // qDebug() << file_number;
-        if (std::stoi(file_number) > simulation_count) {
-            simulation_count = std::stoi(file_number);
-        }
-    }
     // writing the data to the new file
-    std::filesystem::path simulationFilePath = file_path / ("simulation_" + std::to_string(simulation_count + 1) + ".json");
-    std::ofstream WriteSimulation(simulationFilePath);
+    std::ofstream WriteSimulation(filename);
     nlohmann::json simulation_json;
 
     // load simulation settings
@@ -328,14 +304,7 @@ void SimulationData::WriteDataToFile() {
     WriteSimulation << simulation_json.dump(4);
 }
 
-void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
-    // identifying the correct path for each platform
-    std::filesystem::path currentFilePath = __FILE__;
-    std::filesystem::path evolutionSimulatorPath = currentFilePath.parent_path().parent_path().parent_path();
-    std::filesystem::path file_path = evolutionSimulatorPath / "Simulations";
-
-    // reading the data from the file
-    std::filesystem::path simulationFilePath = file_path / ("simulation_" + std::to_string(simulationNumber) + ".json");
+void SimulationData::RetrieveDataFromFile(std::filesystem::path simulationFilePath) {
     std::ifstream ReadSimulation(simulationFilePath);
     nlohmann::json simulation_json;
     if (ReadSimulation.is_open()) {
@@ -511,29 +480,4 @@ void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
         creatures_.push_back(creature);
     }
     qDebug() << "Done Loading Creature";
-}
-
-void SimulationData::RetrieveLastSimulation() {
-    // identifying the correct path for each platform
-    std::filesystem::path currentFilePath = __FILE__;
-    std::filesystem::path evolutionSimulatorPath = currentFilePath.parent_path().parent_path().parent_path();
-    std::filesystem::path file_path = evolutionSimulatorPath / "Simulations";
-
-    // getting the file count
-    int n, simulation_count = 0;
-    std::string file_number;
-    for (const auto& simulation_saves : std::filesystem::directory_iterator(file_path)) {
-        n = simulation_saves.path().stem().string().length();
-        file_number = "";
-        for (int i = 11; i < n; i++) {
-            file_number += simulation_saves.path().stem().string()[i];
-        }
-        if (std::stoi(file_number) > simulation_count) {
-            // qDebug() << file_number;
-            simulation_count = std::stoi(file_number);
-        }
-    }
-
-    // call the function to retrieve the data from the file
-    SimulationData::RetrieveDataFromFile(simulation_count);
 }
