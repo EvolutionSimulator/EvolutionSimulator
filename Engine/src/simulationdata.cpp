@@ -199,6 +199,29 @@ void SimulationData::WriteDataToFile() {
             egg_entry["genome"]["links"] += link_entry;
         }
 
+        auto modules = egg_item->GetGenome().GetModules();
+        egg_entry["genome"]["modules"] = nlohmann::json::array();
+        for (const auto& module : modules) {
+            nlohmann::json module_entry;
+            module_entry["first_input_index"] = module.GetFirstInputIndex();
+            module_entry["first_output_index"] = module.GetFirstOutputIndex();
+
+            module_entry["input_neuron_ids"] = nlohmann::json::array();
+            auto input_neuron_ids = module.GetInputNeuronIds();
+            for (const auto& id: input_neuron_ids) module_entry["input_neuron_ids"] += id;
+
+            module_entry["output_neuron_ids"] = nlohmann::json::array();
+            auto output_neuron_ids = module.GetOutputNeuronIds();
+            for (const auto& id: output_neuron_ids) module_entry["output_neuron_ids"] += id;
+
+            module_entry["module_id"] = module.GetModuleId();
+            module_entry["multiple"] = module.GetMultiple();
+            module_entry["type"] = module.GetType();
+
+            egg_entry["genome"]["modules"] += module_entry;
+        }
+
+
         simulation_json["eggs"] += egg_entry;
     }
 
@@ -276,6 +299,28 @@ void SimulationData::WriteDataToFile() {
             link_entry["active"] = link.IsActive();
             link_entry["cyclic"] = link.IsCyclic();
             creature_entry["genome"]["links"] += link_entry;
+        }
+
+        auto modules = creature_item->GetGenome().GetModules();
+        creature_entry["genome"]["modules"] = nlohmann::json::array();
+        for (const auto& module : modules) {
+            nlohmann::json module_entry;
+            module_entry["first_input_index"] = module.GetFirstInputIndex();
+            module_entry["first_output_index"] = module.GetFirstOutputIndex();
+
+            module_entry["input_neuron_ids"] = nlohmann::json::array();
+            auto input_neuron_ids = module.GetInputNeuronIds();
+            for (const auto& id: input_neuron_ids) module_entry["input_neuron_ids"] += id;
+
+            module_entry["output_neuron_ids"] = nlohmann::json::array();
+            auto output_neuron_ids = module.GetOutputNeuronIds();
+            for (const auto& id: output_neuron_ids) module_entry["output_neuron_ids"] += id;
+
+            module_entry["module_id"] = module.GetModuleId();
+            module_entry["multiple"] = module.GetMultiple();
+            module_entry["type"] = module.GetType();
+
+            creature_entry["genome"]["modules"] += module_entry;
         }
 
         simulation_json["creatures"] += creature_entry;
@@ -378,6 +423,12 @@ void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
               genome.AddLink(new_link);
             }
 
+            std::vector<BrainModule> modules;
+            for (const auto& module : egg_item["genome"]["modules"]) {
+              modules.emplace_back(module["first_input_index"], module["first_output_index"], module["input_neuron_ids"], module["output_neuron_ids"], module["module_id"], module["multiple"], module["type"]);
+            }
+            genome.SetModules(modules);
+
             std::shared_ptr<Egg> egg = std::make_shared<Egg>(GestatingEgg(genome, mutables, egg_item["generation"]), coords);
             // egg->SetIncubationTime(egg_item["incubation time"]);
             egg->SetHealth(egg_item["health"]);
@@ -429,6 +480,12 @@ void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
                          link["active"], link["cyclic"]);
           genome.AddLink(new_link);
         }
+
+        std::vector<BrainModule> modules;
+        for (const auto& module : creature_item["genome"]["modules"]) {
+          modules.emplace_back(module["first_input_index"], module["first_output_index"], module["input_neuron_ids"], module["output_neuron_ids"], module["module_id"], module["multiple"], module["type"]);
+        }
+        genome.SetModules(modules);
 
         std::shared_ptr<Creature> creature = std::make_shared<Creature>(genome, mutables);
         creature->SetCoordinates(coords.first, coords.second);
