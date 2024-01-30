@@ -63,10 +63,7 @@ void GraphManager::DrawCreaturesOffspringOverTimeGraph() {
   DrawGraph(data->GetCreatureOffspringOverTime(), "Average children of Creatures in the Simulation");
 }
 
-// Define a type alias for your data type
-using DataType = std::vector<std::tuple<double, double, double>>;
-
-bool SortByIdComparator(const std::tuple<int, double, int>& a, const std::tuple<int, double, int>& b) {
+bool SortByIdComparator(const std::tuple<int, double, int, float>& a, const std::tuple<int, double, int, float>& b) {
   if (std::get<0>(a) < std::get<0>(b)) return 1;
   else{
     if (std::get<0>(a) > std::get<0>(b)) return 0;
@@ -74,20 +71,20 @@ bool SortByIdComparator(const std::tuple<int, double, int>& a, const std::tuple<
   }
 }
 
-bool SortByDateComparator(const std::tuple<int, double, int>& a, const std::tuple<int, double, int>& b) {
+bool SortByDateComparator(const std::tuple<int, double, int, float>& a, const std::tuple<int, double, int, float>& b) {
   return std::get<1>(a) < std::get<1>(b);
 }
 
-void SortById(std::vector<std::tuple<int, double, int>>& data) {
+void SortById(std::vector<std::tuple<int, double, int, float>>& data) {
   std::sort(data.begin(), data.end(), SortByIdComparator);
 }
 
-void SortByDate(std::vector<std::tuple<int, double, int>>& data) {
+void SortByDate(std::vector<std::tuple<int, double, int, float>>& data) {
   std::sort(data.begin(), data.end(), SortByDateComparator);
 }
 
 
-void PrintData(const std::vector<std::tuple<int, double, int>>& data) {
+void PrintData(const std::vector<std::tuple<int, double, int, float>>& data) {
   for (const auto& point : data) {
       auto id = std::get<0>(point);
       auto x = std::get<1>(point);
@@ -98,21 +95,17 @@ void PrintData(const std::vector<std::tuple<int, double, int>>& data) {
   std::cout << "------\n";
 }
 
-void GraphManager::DrawAreaGraph(const std::vector<std::tuple<int, double, int>>& data, const QString& graphTitle) {
+void GraphManager::DrawAreaGraph(const std::vector<std::tuple<int, double, int, float>>& data, const QString& graphTitle) {
   if (data.empty()) {
       qDebug() << "No data to display.";
       return;
   }
 
-  PrintData(data);
-
-  std::vector<std::tuple<int, double, int>> sortedData = data;
+  std::vector<std::tuple<int, double, int, float>> sortedData = data;
   SortById(sortedData);
 
-  std::vector<std::tuple<int, double, int>> sortedByDateData = data;
+  std::vector<std::tuple<int, double, int, float>> sortedByDateData = data;
   SortByDate(sortedByDateData);
-
-  PrintData(sortedData);
 
   QChart* chart = new QChart();
   chart->setTitle(graphTitle);
@@ -124,27 +117,36 @@ void GraphManager::DrawAreaGraph(const std::vector<std::tuple<int, double, int>>
   qreal maxY = 0;  // Will be calculated based on stacked data
 
          // Set to store unique species IDs
+
+  std::map<double, int> speciesAtTime;
   std::set<int> uniqueIds;
   for (const auto& entry : sortedData) {
+      double time = std::get<1>(entry);
+      // Check if this time point is already in the map
+      if (speciesAtTime.find(time) == speciesAtTime.end()) {
+          // Not found, initialize the count for this time
+          speciesAtTime[time] = 1;
+      } else {
+          // Found, increment the count for this time
+          speciesAtTime[time]++;
+      }
       uniqueIds.insert(std::get<0>(entry));
   }
 
          // Map to keep track of the cumulative height at each x for stacking
   std::map<double, double> cumulativeHeightAtX;
 
-         // Generate colors for each species
-  QVector<QColor> seriesColors;
-  for (int id : uniqueIds) {
-      qreal hue = static_cast<qreal>(id) / uniqueIds.size();
-      seriesColors.push_back(QColor::fromHsvF(hue, 0.75, 0.75));
-  }
-
   for (int id : uniqueIds) {
       QLineSeries* upperSeries = new QLineSeries();
       QLineSeries* lowerSeries = new QLineSeries();
-
+      bool first_time = true;
+      float color = 0;
       for (const auto& entry : sortedData) {
         if (std::get<0>(entry) == id) {
+          if(first_time) {
+            color = std::get<3>(entry);
+            first_time = false;
+          }
           double x = std::get<1>(entry);
           double y = std::get<2>(entry);
 
@@ -160,16 +162,16 @@ void GraphManager::DrawAreaGraph(const std::vector<std::tuple<int, double, int>>
 
                  // Update maxY
           maxY = std::max(maxY, 4/3 * upperBound);
+
         }
       }
 
       QAreaSeries* areaSeries = new QAreaSeries(upperSeries, lowerSeries);
       areaSeries->setName(QString("Species %1").arg(id));
 
-             // Set color
-      int colorIndex = id % seriesColors.size(); // Use modulo to cycle through colors if there are more IDs than colors
-      areaSeries->setColor(seriesColors[colorIndex]);
-      areaSeries->setBorderColor(seriesColors[colorIndex].darker());
+      qreal hue = 0;
+      areaSeries->setColor(QColor::fromHsvF(hue, 0.75, 0.75));
+      areaSeries->setBorderColor(QColor::fromHsvF(hue, 0.75, 0.75).darker());
 
              // Add series to chart
       chart->addSeries(areaSeries);
