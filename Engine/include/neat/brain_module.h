@@ -7,6 +7,7 @@ class BrainModule
 {
 public:
     BrainModule(int input, int output, int module_id, bool multiple = false);
+    BrainModule(int first_input_index, int first_output_index, const std::vector<int>& input_neuron_ids, const std::vector<int>& output_neurons_ids, int module_id, bool multiple, int type);
 
     int GetFirstInputIndex() const;
     void SetFirstInputIndex(const int index);
@@ -25,6 +26,7 @@ public:
     bool GetMultiple() const;
 
     int GetType() const;
+
 
 private:
     int first_input_index_;

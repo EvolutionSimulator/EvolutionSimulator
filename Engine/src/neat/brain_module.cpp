@@ -9,6 +9,12 @@ BrainModule::BrainModule(int input, int output, int module_id, bool multiple)
     type_ = Random::Int(0, 15);
 }
 
+BrainModule::BrainModule(int first_input_index, int first_output_index, const std::vector<int>& input_neuron_ids, const std::vector<int>& output_neuron_ids, int module_id, bool multiple, int type)
+    : first_input_index_(first_input_index), first_output_index_(first_output_index), input_neuron_ids_(input_neuron_ids), output_neuron_ids_(output_neuron_ids), module_id_(module_id),
+    multiple_(multiple), type_(type) {
+
+}
+
 int BrainModule::GetFirstInputIndex() const {
     return first_input_index_;
 }
