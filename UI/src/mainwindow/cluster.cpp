@@ -25,72 +25,72 @@ void Cluster::start(Simulation* simulation) {
 
     // std::cout << "Simulation time: " << data->world_time_ << std::endl;
 
-  //   { //Lock, Copy, and Unlock also sets the trigger flags
-  //     std::lock_guard<std::recursive_mutex> lock(mutex_);
-  //     auto data = simulation->GetSimulationData();
-  //     if (data->world_time_ - lastRecordedTime_ > 10.0){
-  //       CopyCreatures(data->creatures_);
-  //       update_creatures_species(data->creatures_);
-  //       update_triggered = true;
-  //       if (data->world_time_ - lastReclusterTime_ > 100.0){
-  //         recluster_triggered = true;
-  //         lastReclusterTime_ = data->world_time_;
-  //       }
-  //       lastRecordedTime_ = data->world_time_;
-  //     }
-  //   }
-
-  //   if (update_triggered){
-  //       update_triggered = false;
-  //       update_all_creatures(creatures_);
-  //       if (recluster_triggered){
-  //         std::cout << "Reclustering" << std::endl;
-  //         for(auto it = begin(points); it != end(points);) {
-  //           if(!(it->second.alive)) {
-  //             it = points.erase(it);
-  //           } else {
-  //             ++it;
-  //           }
-  //         }
-  //         recluster();
-  //         recluster_triggered = false;
-  //       }
-  //     auto species_data = getCurrentSpeciesData();
-  //     species_data_.insert(species_data_.end(), species_data.begin(),
-  //                          species_data.end());
-  //   }
-  // }
-
-    auto data = simulation->GetSimulationData();
-    if (data->world_time_ - lastRecordedTime_ > 10.0) {
+    { //Lock, Copy, and Unlock also sets the trigger flags
       std::lock_guard<std::recursive_mutex> lock(mutex_);
-      update_all_creatures(data->creatures_);
-      update_creatures_species(data->creatures_);
-
-      if (data->world_time_ - lastReclusterTime_ > 250.0) {
-        std::cout << "Reclustering" << std::endl;
-        for(auto it = begin(points); it != end(points);) {
-          if(!(it->second.alive)) {
-            it = points.erase(it);
-          } else {
-            ++it;
-          }
-        }
-
-        recluster();
-
-        lastReclusterTime_ = data->world_time_;
-        update_all_creatures(data->creatures_);
+      auto data = simulation->GetSimulationData();
+      if (data->world_time_ - lastRecordedTime_ > 10.0){
+        CopyCreatures(data->creatures_);
         update_creatures_species(data->creatures_);
+        update_triggered = true;
+        if (data->world_time_ - lastReclusterTime_ > 100.0){
+          recluster_triggered = true;
+          lastReclusterTime_ = data->world_time_;
+        }
+        lastRecordedTime_ = data->world_time_;
       }
+    }
 
-      lastRecordedTime_ = data->world_time_;
-
+    if (update_triggered){
+        update_triggered = false;
+        update_all_creatures(creatures_);
+        if (recluster_triggered){
+          std::cout << "Reclustering" << std::endl;
+          for(auto it = begin(points); it != end(points);) {
+            if(!(it->second.alive)) {
+              it = points.erase(it);
+            } else {
+              ++it;
+            }
+          }
+          recluster();
+          recluster_triggered = false;
+        }
       auto species_data = getCurrentSpeciesData();
       species_data_.insert(species_data_.end(), species_data.begin(),
                            species_data.end());
     }
   }
+
+  //   auto data = simulation->GetSimulationData();
+  //   if (data->world_time_ - lastRecordedTime_ > 10.0) {
+  //     std::lock_guard<std::recursive_mutex> lock(mutex_);
+  //     update_all_creatures(data->creatures_);
+  //     update_creatures_species(data->creatures_);
+
+  //     if (data->world_time_ - lastReclusterTime_ > 250.0) {
+  //       std::cout << "Reclustering" << std::endl;
+  //       for(auto it = begin(points); it != end(points);) {
+  //         if(!(it->second.alive)) {
+  //           it = points.erase(it);
+  //         } else {
+  //           ++it;
+  //         }
+  //       }
+
+  //       recluster();
+
+  //       lastReclusterTime_ = data->world_time_;
+  //       update_all_creatures(data->creatures_);
+  //       update_creatures_species(data->creatures_);
+  //     }
+
+  //     lastRecordedTime_ = data->world_time_;
+
+  //     auto species_data = getCurrentSpeciesData();
+  //     species_data_.insert(species_data_.end(), species_data.begin(),
+  //                          species_data.end());
+  //   }
+  // }
 
 }
 
