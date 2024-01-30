@@ -14,6 +14,8 @@ namespace neat {
 class Link {
  public:
   explicit Link(int in_id, int out_id, double weight);
+  explicit Link(int id, int in_id, int out_id, double weight, bool active,
+                bool cyclic);
 
   int GetId() const;
   int GetInId() const;

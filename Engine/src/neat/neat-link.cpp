@@ -27,6 +27,16 @@ Link::Link(int in_id, int out_id, double weight)
       weight_(weight),
       active_(true),
       cyclic_(false) {}
+
+Link::Link(int id, int in_id, int out_id, double weight, bool active,
+           bool cyclic)
+    : id_(id),
+      in_id_(in_id),
+      out_id_(out_id),
+      weight_(weight),
+      active_(active),
+      cyclic_(cyclic) {}
+      
 /*!
  * @brief Gets the unique identifier of the link.
  *
