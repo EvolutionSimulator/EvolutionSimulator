@@ -37,13 +37,14 @@
 - Worked on the visualization of the food density along the map using a shader (sadly even though the code is there this functionality was never made compatible with the zoom capabilities and it cannot be seen on the final project)
 - Refactored the creature class into a set of smaller classes with more specific functionalities.
 - Reworked the entire project to use shared pointers to entities in the heap instead of them being stored in vectors of the SimulationData class
+- Designed with Milan an algorithm based on the DBSCAN to cluster creatures into species and update it as the population changed.
 
 # Week 7 - Final touches
 - Helped merge with main the reproduction and attack projects after the creature refactor and the stack to heap change
-- Implemented pheromones as a brain module
-- Designed with Milan an algorithm based on the DBSCAN to cluster creatures into species and update it as the population changed. 
-
-
-
+- Implemented pheromones as a brain module 
+- Adapt the species graph to match the color shown with that of the species
+- Centralized the random generation into a class to allow for the repetition of seeds
+- Created a feature allowing infinitely big map sizes just toggling a setting.
+- Spent extensive hours debugging the code until it became (hopefully) completely free of bugs. 
 
 On top of all of this on a weekly basis I created guidelines for what each project was supposed to implement/accomplish and I worked closely with Nikola to decide what our next objectives in the road map were. Moreover, extensive hours were spent helping other members with questions about the objectives of specific implementations and finding hidden bugs all over the code.
