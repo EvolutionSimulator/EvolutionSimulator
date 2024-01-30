@@ -119,9 +119,7 @@ void SimulationCanvas::pinchTriggered(QPinchGesture* gesture) {
   QPinchGesture::ChangeFlags changeFlags = gesture->changeFlags();
   if (changeFlags & QPinchGesture::ScaleFactorChanged) {
     float delta = gesture->scaleFactor();
-    if (QSysInfo::kernelType() == "darwin")  // Reverse direction if on macOS
-      delta = 1 / delta;
-    zoom(delta);
+    zoom(1 / delta);
     qDebug() << "pinchTriggered(): zoom by" << delta;
   }
 }
