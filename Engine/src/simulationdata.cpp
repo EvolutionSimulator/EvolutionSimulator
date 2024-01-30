@@ -89,6 +89,21 @@ std::vector<double> SimulationData::GetCreatureOffspringOverTime() const {
   return creatureOffspringOverTime_;
 }
 
+void SimulationData::WriteStatisticsToFile(std::filesystem::path filename) {
+    nlohmann::json statistics_json;
+
+    statistics_json["creature_count_over_time"] = GetCreatureCountOverTime();
+    statistics_json["creature_size_over_time"] = GetCreatureSizeOverTime();
+    statistics_json["creature_energy_over_time"] = GetCreatureEnergyOverTime();
+    statistics_json["creature_velocity_over_time"] = GetCreatureVelocityOverTime();
+    statistics_json["creature_diet_over_time"] = GetCreatureDietOverTime();
+    statistics_json["creature_offspring_over_time"] = GetCreatureOffspringOverTime();
+
+    std::ofstream WriteStatistics(filename);
+    WriteStatistics << statistics_json.dump(4);
+    qDebug() << "Saved statistics";
+}
+
 void SimulationData::WriteDataToFile(std::filesystem::path filename) {
     #include <fstream>
     #include <filesystem>
