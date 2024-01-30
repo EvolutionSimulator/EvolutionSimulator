@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <vector>
 #include <memory>
+#include <filesystem>
 
 #include "creature.h"
 #include "egg.h"
@@ -46,9 +47,8 @@ struct SimulationData {
 
   double world_time_ = 0;
 
-  void WriteDataToFile();
-  void RetrieveDataFromFile(const int&);
-  void RetrieveLastSimulation();
+  void WriteDataToFile(std::filesystem::path dir);
+  void RetrieveDataFromFile(std::filesystem::path dir);
 
  private:
   double lastRecordedTime_;
