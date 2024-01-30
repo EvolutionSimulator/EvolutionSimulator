@@ -169,7 +169,7 @@ void GraphManager::DrawAreaGraph(const std::vector<std::tuple<int, double, int, 
       QAreaSeries* areaSeries = new QAreaSeries(upperSeries, lowerSeries);
       areaSeries->setName(QString("Species %1").arg(id));
 
-      qreal hue = 0;
+      qreal hue = color;
       areaSeries->setColor(QColor::fromHsvF(hue, 0.75, 0.75));
       areaSeries->setBorderColor(QColor::fromHsvF(hue, 0.75, 0.75).darker());
 
