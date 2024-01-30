@@ -54,7 +54,7 @@ class Settings {
     int max_food_size = 15;  // Influences vision
     int max_creature_size = 15;
     double tolerance = 1e-3;
-    double default_food_density = 0.06;
+    double default_food_density = 0.01;
     double food_spawn_rate = 1e-5;
     double energy_to_health = 70.0;
     double health_to_energy = 10.0;
@@ -133,7 +133,7 @@ class Settings {
 
   struct UISettings {
     double dragging_sensitivity = 1.0f;
-    double zoom = 3; //This really takes a toll on performance handle with care
+    double zoom = 5; //This really takes a toll on performance handle with care
     //Values of up to 5 should work but take into account it increases exponentially
     // Also UI takes the most to work in this situation so try not to render the entire map constantly
   } ui;

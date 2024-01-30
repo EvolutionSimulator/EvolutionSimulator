@@ -8,7 +8,6 @@ class Environment {
  public:
   // Constructor
   Environment();
-  Environment(double width, double height);
 
   // Getter and setter for food density
   void SetFoodDensity(double density);
@@ -28,8 +27,9 @@ class Environment {
   std::function <double(double, double)> food_density_func_;
   double creature_density_;
   double friction_coefficient_;
-  double map_width_;
-  double map_height_;
+
+  double WrapCoordinate(double coordinate, double max_value);
+  double CalculateGaussian(double x, double y, double mean_x, double mean_y, double sigma_x, double sigma_y);
 };
 
 #endif  // ENVIRONMENT_H
