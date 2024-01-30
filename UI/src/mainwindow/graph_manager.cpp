@@ -8,6 +8,7 @@
 #include <QDialog>
 #include <QVBoxLayout>
 #include <QValueAxis>
+#include <QToolTip>
 #include <algorithm>  // Add this include for std::sort
 
 GraphManager::GraphManager(QWidget *parent, Engine *engine, Cluster *cluster,
@@ -168,10 +169,14 @@ void GraphManager::DrawAreaGraph(const std::vector<std::tuple<int, double, int, 
 
       QAreaSeries* areaSeries = new QAreaSeries(upperSeries, lowerSeries);
       areaSeries->setName(QString("Species %1").arg(id));
+      areaSeries->setProperty("speciesId", QVariant(id));
 
       qreal hue = color;
       areaSeries->setColor(QColor::fromHsvF(hue, 0.75, 0.75));
       areaSeries->setBorderColor(QColor::fromHsvF(hue, 0.75, 0.75).darker());
+      connect(areaSeries, &QAreaSeries::hovered, [this, areaSeries](const QPointF &point, bool state) {
+          this->onAreaHovered(areaSeries, point, state);
+      });
 
              // Add series to chart
       chart->addSeries(areaSeries);
@@ -236,6 +241,23 @@ void GraphManager::DrawAreaGraph(const std::vector<std::tuple<int, double, int, 
   connect(dialog, &QDialog::finished, dialog, &QObject::deleteLater);
   emit resetGraphMenuIndex();
   dialog->exec();
+}
+
+void GraphManager::onAreaHovered(QAreaSeries *series, QPointF point, bool state) {
+    if (state) {
+        // Retrieve the custom property
+        int speciesId = series->property("speciesId").toInt();
+
+        // Create the tooltip text
+        QString tooltipText = QString("Species ID: %1\nCoordinates: (%2, %3)")
+                              .arg(speciesId);
+
+        // Show the tooltip
+        QToolTip::showText(QCursor::pos(), tooltipText);
+    } else {
+        // Hide the tooltip when not hovering
+        QToolTip::hideText();
+    }
 }
 
 void GraphManager::DrawSpeciesArea() {
