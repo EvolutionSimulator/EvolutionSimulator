@@ -429,11 +429,11 @@ void SimulationCanvas::wheelEvent(QWheelEvent* event) {
   if (!pixelDelta.isNull()) {
     // Use pixelDelta for more accurate scrolling
     float delta = pixelDelta.y() > 0 ? 1.1f : 0.9f;
-    zoom(delta);
+    zoom(1/delta);
   } else if (!angleDelta.isNull()) {
     // Use angleDelta as a fallback
     float delta = angleDelta.y() > 0 ? 1.1f : 0.9f;
-    zoom(delta);
+    zoom(1/delta);
   }
 }
 
