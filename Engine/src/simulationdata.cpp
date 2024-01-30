@@ -186,16 +186,51 @@ void SimulationData::WriteDataToFile() {
     simulation_json["creatures"] = nlohmann::json::array();
     for (const auto& creature_item : SimulationData::creatures_) {
         nlohmann::json creature_entry;
+        // mutable entity characteristics
+        creature_entry["mutable"]["energy density"] = creature_item->GetMutable().GetEnergyDensity();
+        creature_entry["mutable"]["energy loss"] = creature_item->GetMutable().GetEnergyLoss();
+        creature_entry["mutable"]["integrity"] = creature_item->GetMutable().GetIntegrity();
+        creature_entry["mutable"]["strafing difficulty"] = creature_item->GetMutable().GetStrafingDifficulty();
+        creature_entry["mutable"]["max size"] = creature_item->GetMutable().GetMaxSize();
+        creature_entry["mutable"]["baby size"] = creature_item->GetMutable().GetBabySize();
+        creature_entry["mutable"]["max force"] = creature_item->GetMutable().GetMaxForce();
+        creature_entry["mutable"]["growth factor"] = creature_item->GetMutable().GetGrowthFactor();
+        creature_entry["mutable"]["vision factor"] = creature_item->GetMutable().GetVisionFactor();
+        creature_entry["mutable"]["gestation ratio"] = creature_item->GetMutable().GetGestationRatioToIncubation();
+        creature_entry["mutable"]["color"] = creature_item->GetMutable().GetColor();
+        creature_entry["mutable"]["stomach capacity factor"] = creature_item->GetMutable().GetStomachCapacityFactor();
+        creature_entry["mutable"]["diet"] = creature_item->GetMutable().GetDiet();
+        creature_entry["mutable"]["genetic strength"] = creature_item->GetMutable().GetGeneticStrength();
+        creature_entry["mutable"]["eating speed"] = creature_item->GetMutable().GetEatingSpeed();
+        creature_entry["mutable"]["pheromomone emission"] = creature_item->GetMutable().GetPheromoneEmission();
+
+        // entity characteristics
         creature_entry["x_coord"] = creature_item->GetCoordinates().first;
         creature_entry["y_coord"] = creature_item->GetCoordinates().second;
-        creature_entry["health"] = creature_item->GetHealth();
-        creature_entry["age"] = creature_item->GetAge();
         creature_entry["size"] = creature_item->GetSize();
         creature_entry["orientation"] = creature_item->GetOrientation();
         creature_entry["state"] = creature_item->GetState();
+        creature_entry["id"] = creature_item->GetID();
         creature_entry["color"] = creature_item->GetColor();
-        creature_entry["energy"] = creature_item->GetEnergy();
+
+        // movable entity characteristics
+        creature_entry["acceleration"] = creature_item->GetAcceleration();
+        creature_entry["acceleration angle"] = creature_item->GetAccelerationAngle();
+        creature_entry["rotational acceleration"] = creature_item->GetRotationalAcceleration();
         creature_entry["velocity"] = creature_item->GetVelocity();
+        creature_entry["velocity angle"] = creature_item->GetVelocityAngle();
+        creature_entry["rotational velocity"] = creature_item->GetRotationalVelocity();
+        // creature_entry["strafing difficulty"] = creature_item->GetStrafingDifficulty();
+
+        // alive entity characteristics
+        creature_entry["age"] = creature_item->GetAge();
+
+        //digestive system characteristics -- inherited from Mutable
+        // creature_entry["stomach acid"] = creature_item->GetStomachAcid();
+        // creature_entry["stomach capacity"] = creature_item->GetStomachCapacity();
+
+        creature_entry["health"] = creature_item->GetHealth();
+        creature_entry["energy"] = creature_item->GetEnergy();
         creature_entry["generation"] = creature_item->GetGeneration();
 
         // decompose the genome
@@ -313,6 +348,26 @@ void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
     qDebug() << "Done Loading Eggs";
     // load the creatures into the current simulation
     for (const auto& creature_item : simulation_json["creatures"]) {
+        // create the mutable of the creature
+        Mutable mutables = Mutable();
+        mutables.SetEnergyDensity(creature_item["mutable"]["energy density"]);
+        mutables.SetEnergyLoss(creature_item["mutable"]["energy loss"]);
+        mutables.SetIntegrity(creature_item["mutable"]["integrity"]);
+        mutables.SetStrafingDifficulty(creature_item["mutable"]["strafing difficulty"]);
+        mutables.SetMaxSize(creature_item["mutable"]["max size"]);
+        mutables.SetBabySize(creature_item["mutable"]["baby size"]);
+        mutables.SetMaxForce(creature_item["mutable"]["max force"]);
+        mutables.SetGrowthFactor(creature_item["mutable"]["growth factor"]);
+        mutables.SetVisionFactor(creature_item["mutable"]["vision factor"]);
+        mutables.SetGestationRatioToIncubation(creature_item["mutable"]["gestation ratio"]);
+        mutables.SetColor(creature_item["mutable"]["color"]);
+        mutables.SetStomachCapacityFactor(creature_item["mutable"]["stomach capacity factor"]);
+        mutables.SetDiet(creature_item["mutable"]["diet"]);
+        mutables.SetGeneticStrength(creature_item["mutable"]["genetic strength"]);
+        mutables.SetEatingSpeed(creature_item["mutable"]["eating speed"]);
+        mutables.SetPheromoneEmission(creature_item["mutable"]["pheromomone emission"]);
+
+        // make a pair of the coordinates of the creature
         auto coords = std::make_pair(creature_item["x_coord"], creature_item["y_coord"]);
 
         // reconstruct the genome
@@ -333,7 +388,7 @@ void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
         }
 
 
-        std::shared_ptr<Creature> creature = std::make_shared<Creature>(genome, Mutable());
+        std::shared_ptr<Creature> creature = std::make_shared<Creature>(genome, mutables);
         creature->SetHealth(creature_item["health"]);
         creature->SetAge(creature_item["age"]);
         creature->SetSize(creature_item["size"]);
@@ -343,6 +398,17 @@ void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
         creature->SetEnergy(creature_item["energy"]);
         creature->SetVelocity(creature_item["velocity"]);
         creature->SetGeneration(creature_item["generation"]);
+
+        // movable entity characteristics
+        creature->SetAcceleration(creature_item["acceleration"]);
+        creature->SetAccelerationAngle(creature_item["acceleration angle"]);
+        creature->SetRotationalAcceleration(creature_item["rotational acceleration"]);
+        creature->SetVelocity(creature_item["velocity"]);
+        creature->SetVelocityAngle(creature_item["velocity angle"]);
+        creature->SetRotationalVelocity(creature_item["rotational velocity"]);
+        // creature->SetStrafingDifficulty(creature_item["strafing difficulty"]);
+
+
         SimulationData::creatures_.push_back(creature);
     }
     qDebug() << "Done Loading Creature";
