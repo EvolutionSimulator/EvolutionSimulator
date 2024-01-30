@@ -149,6 +149,24 @@ void SimulationData::WriteDataToFile() {
     simulation_json["eggs"] = nlohmann::json::array();
     for (const auto& egg_item : SimulationData::eggs_) {
         nlohmann::json egg_entry;
+        // mutable egg characteristics
+        egg_entry["mutable"]["energy density"] = egg_item->GetMutable().GetEnergyDensity();
+        egg_entry["mutable"]["energy loss"] = egg_item->GetMutable().GetEnergyLoss();
+        egg_entry["mutable"]["integrity"] = egg_item->GetMutable().GetIntegrity();
+        egg_entry["mutable"]["strafing difficulty"] = egg_item->GetMutable().GetStrafingDifficulty();
+        egg_entry["mutable"]["max size"] = egg_item->GetMutable().GetMaxSize();
+        egg_entry["mutable"]["baby size"] = egg_item->GetMutable().GetBabySize();
+        egg_entry["mutable"]["max force"] = egg_item->GetMutable().GetMaxForce();
+        egg_entry["mutable"]["growth factor"] = egg_item->GetMutable().GetGrowthFactor();
+        egg_entry["mutable"]["vision factor"] = egg_item->GetMutable().GetVisionFactor();
+        egg_entry["mutable"]["gestation ratio"] = egg_item->GetMutable().GetGestationRatioToIncubation();
+        egg_entry["mutable"]["color"] = egg_item->GetMutable().GetColor();
+        egg_entry["mutable"]["stomach capacity factor"] = egg_item->GetMutable().GetStomachCapacityFactor();
+        egg_entry["mutable"]["diet"] = egg_item->GetMutable().GetDiet();
+        egg_entry["mutable"]["genetic strength"] = egg_item->GetMutable().GetGeneticStrength();
+        egg_entry["mutable"]["eating speed"] = egg_item->GetMutable().GetEatingSpeed();
+        egg_entry["mutable"]["pheromomone emission"] = egg_item->GetMutable().GetPheromoneEmission();
+
         egg_entry["incubation time"] = egg_item->GetIncubationTime();
         egg_entry["health"] = egg_item->GetHealth();
         egg_entry["age"] = egg_item->GetAge();
@@ -322,6 +340,25 @@ void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
         for (const auto& egg_item : simulation_json["eggs"]) {
             auto coords = std::make_pair(egg_item["x_coord"], egg_item["y_coord"]);
 
+            // create the mutable of the egg
+            Mutable mutables = Mutable();
+            mutables.SetEnergyDensity(egg_item["mutable"]["energy density"]);
+            mutables.SetEnergyLoss(egg_item["mutable"]["energy loss"]);
+            mutables.SetIntegrity(egg_item["mutable"]["integrity"]);
+            mutables.SetStrafingDifficulty(egg_item["mutable"]["strafing difficulty"]);
+            mutables.SetMaxSize(egg_item["mutable"]["max size"]);
+            mutables.SetBabySize(egg_item["mutable"]["baby size"]);
+            mutables.SetMaxForce(egg_item["mutable"]["max force"]);
+            mutables.SetGrowthFactor(egg_item["mutable"]["growth factor"]);
+            mutables.SetVisionFactor(egg_item["mutable"]["vision factor"]);
+            mutables.SetGestationRatioToIncubation(egg_item["mutable"]["gestation ratio"]);
+            mutables.SetColor(egg_item["mutable"]["color"]);
+            mutables.SetStomachCapacityFactor(egg_item["mutable"]["stomach capacity factor"]);
+            mutables.SetDiet(egg_item["mutable"]["diet"]);
+            mutables.SetGeneticStrength(egg_item["mutable"]["genetic strength"]);
+            mutables.SetEatingSpeed(egg_item["mutable"]["eating speed"]);
+            mutables.SetPheromoneEmission(egg_item["mutable"]["pheromomone emission"]);
+
             // reconstruct the genome
             neat::Genome genome = neat::Genome(egg_item["genome"]["in_count"], egg_item["genome"]["out_count"]);
             for (const auto& link : egg_item["genome"]["links"]) {
@@ -337,7 +374,7 @@ void SimulationData::RetrieveDataFromFile(const int& simulationNumber) {
                 // new_neuron.id_ = neuron["id"];
                 genome.AddNeuron(new_neuron);
             }
-            std::shared_ptr<Egg> egg = std::make_shared<Egg>(GestatingEgg(genome, Mutable(), egg_item["generation"]), coords);
+            std::shared_ptr<Egg> egg = std::make_shared<Egg>(GestatingEgg(genome, mutables, egg_item["generation"]), coords);
             // egg->SetIncubationTime(egg_item["incubation time"]);
             egg->SetHealth(egg_item["health"]);
             egg->SetAge(egg_item["age"]);
