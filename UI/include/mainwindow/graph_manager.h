@@ -19,7 +19,7 @@
 #include <QDialog>
 #include <QVBoxLayout>
 #include "QtWidgets/qpushbutton.h"
-#include "engine.h"
+#include "core/engine.h"
 #include "simulationcanvas/simulationcanvas.h"
 #include "mainwindow/cluster.h"
 

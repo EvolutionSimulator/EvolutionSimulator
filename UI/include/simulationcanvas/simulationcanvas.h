@@ -1,12 +1,12 @@
 #pragma once
 
-#include <engine.h>
+#include <core/engine.h>
 
 #include <SFML/Graphics.hpp>
 #include <QGestureEvent>
 
 #include "qwidgets/qsfmlcanvas.h"
-#include "simulation.h"
+#include "simulation/simulation.h"
 #include "info_panel.h"
 #include "texture_manager.h"
 

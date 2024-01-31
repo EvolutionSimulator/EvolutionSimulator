@@ -4,7 +4,7 @@
 #include <thread>
 
 #include "QtWidgets/qslider.h"
-#include "engine.h"
+#include "core/engine.h"
 #include "graph_manager.h"
 #include "config_manager.h"
 #include "cluster.h"

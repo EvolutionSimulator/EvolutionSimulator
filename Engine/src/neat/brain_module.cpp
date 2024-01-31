@@ -1,6 +1,6 @@
 #include "neat/brain_module.h"
 
-#include "random.h"
+#include "core/random.h"
 
 BrainModule::BrainModule(int input, int output, int module_id, bool multiple)
     : input_neuron_ids_(input, 0), output_neuron_ids_(output, 0),
