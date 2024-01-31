@@ -33,58 +33,58 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 
 add_library(Engine STATIC
-  include/engine.h src/engine.cpp
-  include/simulation.h src/simulation.cpp
-  include/simulationdata.h src/simulationdata.cpp
-  include/environment.h src/environment.cpp
+  include/core/engine.h src/core/engine.cpp
+  include/simulation/simulation.h src/simulation/simulation.cpp
+  include/simulation/simulation_data.h src/simulation/simulation_data.cpp
+  include/simulation/environment.h src/simulation/environment.cpp
 
-  include/neat/neat-neuron.h src/neat/neat-neuron.cpp
-  include/neat/neat-link.h src/neat/neat-link.cpp
-  include/neat/neat-genome.h src/neat/neat-genome.cpp
-  include/neat/neat-neural-network.h src/neat/neat-neural-network.cpp
+  include/neat/neuron.h src/neat/neuron.cpp
+  include/neat/link.h src/neat/link.cpp
+  include/neat/genome.h src/neat/genome.cpp
+  include/neat/neural_network.h src/neat/neural_network.cpp
   include/neat/brain_module.h src/neat/brain_module.cpp
 
-  include/mutable.h src/mutable.cpp
+  include/entity/creature/mutable.h src/entity/creature/mutable.cpp
 
-  include/egg.h
-  src/egg.cpp
-  include/mathlib.h
-  src/mathlib.cpp
-  include/reproduction.h
-  src/reproduction.cpp
+  include/entity/creature/egg.h
+  src/entity/creature/egg.cpp
+  include/core/mathlib.h
+  src/core/mathlib.cpp
+  include/entity/creature/reproduction.h
+  src/entity/creature/reproduction.cpp
 
-  include/grabbing_entity.h src/grabbing_entity.cpp
+  include/entity/grabbing_entity.h src/entity/grabbing_entity.cpp
 
 
-  include/data_accessor.h
-  include/synchronization_primitives.h
-  include/settings.h src/settings.cpp
+  include/core/data_accessor.h
+  include/core/synchronization_primitives.h
+  include/core/settings.h src/core/settings.cpp
 
-  include/entity.h src/entity.cpp
+  include/entity/entity.h src/entity/entity.cpp
 
-  include/food.h src/food.cpp
+  include/entity/food.h src/entity/food.cpp
 
-  include/pheromone.h src/pheromone.cpp
+  include/entity/creature/pheromone.h src/entity/creature/pheromone.cpp
 
-  include/movable_entity.h src/movable_entity.cpp
-  include/alive_entity.h src/alive_entity.cpp
+  include/entity/movable_entity.h src/entity/movable_entity.cpp
+  include/entity/alive_entity.h src/entity/alive_entity.cpp
 
-  include/vision_system.h src/vision_system.cpp
-  include/digestive_system.h src/digestive_system.cpp
+  include/entity/creature/vision_system.h src/entity/creature/vision_system.cpp
+  include/entity/creature/digestive_system.h src/entity/creature/digestive_system.cpp
 
-  include/pheromones_system.h src/pheromones_system.cpp
+  include/entity/creature/pheromones_system.h src/entity/creature/pheromones_system.cpp
 
-  include/creature.h src/creature.cpp
+  include/entity/creature/creature.h src/entity/creature/creature.cpp
 
-  include/geometry_primitives.h src/geometry_primitives.cpp
-  include/collision_functions.h src/collision_functions.cpp
+  include/core/geometry_primitives.h src/core/geometry_primitives.cpp
+  include/core/collision_functions.h src/core/collision_functions.cpp
 
-  include/food_manager.h src/food_manager.cpp
-  include/entity_grid.h src/entity_grid.cpp
-  include/collision_manager.h src/collision_manager.cpp
-  include/creature_manager.h src/creature_manager.cpp
+  include/simulation/food_manager.h src/simulation/food_manager.cpp
+  include/simulation/entity_grid.h src/simulation/entity_grid.cpp
+  include/simulation/collision_manager.h src/simulation/collision_manager.cpp
+  include/simulation/creature_manager.h src/simulation/creature_manager.cpp
 
-  include/random.h src/random.cpp
+  include/core/random.h src/core/random.cpp
 )
 
 add_subdirectory(tests)

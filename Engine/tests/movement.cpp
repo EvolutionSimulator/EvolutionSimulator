@@ -1,5 +1,5 @@
-#include "movable_entity.h"
-#include "settings.h"
+#include "entity/movable_entity.h"
+#include "core/settings.h"
 #include <gtest/gtest.h>
 #include "math.h"
 

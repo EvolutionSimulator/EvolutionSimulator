@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "neat/neat-neural-network.h"
+#include "neat/neural_network.h"
 
 /*!
  * @file neat.cpp

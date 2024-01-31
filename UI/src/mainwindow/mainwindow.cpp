@@ -12,7 +12,7 @@
 #include <QDockWidget>
 #include "qregularexpression.h"
 #include "ui_mainwindow.h"
-#include "simulationdata.h"
+#include "simulation/simulation_data.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui_(new Ui::MainWindow), lastRecordedTime_(0.0) {

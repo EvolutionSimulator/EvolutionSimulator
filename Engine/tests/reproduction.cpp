@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "egg.h"
+#include "entity/creature/egg.h"
 
 TEST(ReproductionTest, SimulatePregnancy) {
   neat::Genome genome(4, 4);

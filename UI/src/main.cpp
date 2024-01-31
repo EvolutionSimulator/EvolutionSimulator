@@ -1,4 +1,4 @@
-#include <engine.h>
+#include <core/engine.h>
 
 #include <QApplication>
 #include <SFML/Graphics.hpp>
@@ -9,7 +9,7 @@
 #include "qwidgets/qsfmlcanvas.h"
 
 int main(int argc, char *argv[]) {
-  // SETTINGS.LoadFromFile("./settings.json");
+  SETTINGS.LoadFromFile("./settings.json");
 
   QApplication app(argc, argv);
   MainWindow window;

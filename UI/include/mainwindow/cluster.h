@@ -4,9 +4,9 @@
 #include <unordered_map>
 #include <mutex>
 
-#include "creature.h"
-#include "neat/neat-genome.h"
-#include "simulation.h"
+#include "entity/creature/creature.h"
+#include "neat/genome.h"
+#include "simulation/simulation.h"
 
 struct CreatureData {
   neat::Genome genome;

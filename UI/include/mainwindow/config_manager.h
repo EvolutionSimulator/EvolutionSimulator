@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QWidget>
 #include "QtWidgets/qlabel.h"
-#include "engine.h"
+#include "core/engine.h"
 
 class ConfigManager : public QObject {
   Q_OBJECT  // Enable signal and slot mechanism
