@@ -50,5 +50,7 @@
 - Fixed the statistics saving system
 - Spent a lot of time merging pull requests and finalizing the project
 - Tinkered a lot with different simulation parameters to analyze different emerging behaviour of creatures
+- Reorganized the folder structure
+- Fixed settings loading from JSON
 
 There were also a lot of small bugfixes that I didn't feel were worth mentioning individually, but they add up over time. Aside from all this, I regularly discussed design and implementation details with other team members, most notably Ioana, Carlos, and Milan. I constantly answered questions and provided help to whoever needed it.
