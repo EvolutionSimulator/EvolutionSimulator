@@ -9,6 +9,7 @@
 - 🐾 Starting out from random initialization, the organisms evolve highly complex behaviour like efficient food seeking, predation, cooperation, etc.
 - 🛡️ None of the behavior is hard coded. All actions are guided through by the neural network that, through generations, adapt to survive in the environment.
 - 🕹️ The software provides a way to configure your own environment factors and see which ones impact the evolution the most and in what ways.
+- 🛠️ The simulation is based on a modified version of the NEAT algorithm (<a href="https://nn.cs.utexas.edu/downloads/papers/stanley.ec02.pdf"> link to the original algorithm </a>).
 
 ## 💻 Installation guide
 
